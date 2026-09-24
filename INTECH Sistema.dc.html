@@ -22,27 +22,32 @@
 </helmet>
 
 <sc-if value="{{ loggedOut }}" hint-placeholder-val="{{ true }}">
-<div style="min-height:100vh;display:grid;grid-template-columns:1.05fr 1fr;align-items:stretch">
-  <div style="background:#1D4ED8;display:flex;flex-direction:column;justify-content:center;padding:64px 72px;color:#fff">
-    <img src="./Nuevas funcionalidades/Nuevo Branding/logo-login.jpg" alt="ElectroGestión" style="height:80px;border-radius:8px" />
-    <div style="font-size:22px;margin-top:18px;opacity:.92">Sistema Informático de Servicios Eléctricos</div>
-    <div style="font-size:16px;margin-top:6px;opacity:.7">Cel: 809-224-1279</div>
-    <div style="height:1px;background:rgba(255,255,255,.25);margin:38px 0 24px;max-width:320px"></div>
-    <div style="font-size:17px;line-height:1.6;max-width:380px;opacity:.85">Sistema de gestión de solicitudes, visitas, levantamientos técnicos y órdenes de trabajo.</div>
-  </div>
-  <div style="display:flex;align-items:center;justify-content:center;padding:48px">
+<div style="min-height:100vh;display:grid;grid-template-columns:1fr 1.1fr;align-items:stretch;background:#fff">
+  <div style="display:flex;flex-direction:column;justify-content:center;padding:64px 80px;position:relative">
+    <div style="margin-bottom:48px;display:flex;align-items:center;gap:14px">
+      <div style="font-family:'Manrope';font-weight:900;font-size:56px;letter-spacing:-3px;line-height:1;display:flex;align-items:center;position:relative">
+        <span style="color:#1D4ED8">E</span>
+        <span style="color:#F59E0B;margin-left:-4px">G</span>
+        <svg style="position:absolute;left:25px;top:6px" width="22" height="44" viewBox="0 0 16 32">
+          <path d="M14 2 L2 16 H10 L4 30 L16 14 H8 L14 2 Z" fill="#F59E0B" stroke="#fff" stroke-width="2.5" stroke-linejoin="round"/>
+        </svg>
+      </div>
+      <div style="font-family:'Manrope';font-weight:900;font-size:30px;letter-spacing:-0.5px;line-height:1">
+        <span style="color:#1D4ED8">ELECTRO</span><span style="color:#334155">GESTIÓN</span>
+      </div>
+    </div>
     <div style="width:100%;max-width:390px">
       <div style="font-family:'Manrope';font-weight:800;font-size:30px">Iniciar sesión</div>
       <div style="color:#6B7085;margin-top:8px;font-size:15px">Ingresa tus credenciales para continuar.</div>
       <div style="margin-top:30px">
         <label style="display:block;font-size:13px;font-weight:700;color:#4A4E63;margin-bottom:7px">Usuario</label>
-        <input value="{{ fields.usuario.value }}" onChange="{{ fields.usuario.onChange }}" placeholder="admin" style="width:100%;padding:13px 14px;border:1px solid #D5D8E6;border-radius:10px;font-size:15px;background:#fff" />
+        <input value="{{ fields.usuario.value }}" onChange="{{ fields.usuario.onChange }}" placeholder="admin" style="width:100%;padding:13px 14px;border:1px solid #D5D8E6;border-radius:10px;font-size:15px;background:#F4F5FB" />
         <sc-if value="{{ fields.usuario.error }}" hint-placeholder-val="{{ false }}"><div style="color:#C4141B;font-size:12.5px;margin-top:6px;font-weight:700">{{ fields.usuario.error }}</div></sc-if>
       </div>
       <div style="margin-top:18px">
         <label style="display:block;font-size:13px;font-weight:700;color:#4A4E63;margin-bottom:7px">Contraseña</label>
         <div style="position:relative;display:flex;align-items:center">
-          <input type="{{ pw.password.type }}" value="{{ fields.password.value }}" onChange="{{ fields.password.onChange }}" placeholder="••••••" style="width:100%;padding:13px 46px 13px 14px;border:1px solid #D5D8E6;border-radius:10px;font-size:15px;background:#fff" />
+          <input type="{{ pw.password.type }}" value="{{ fields.password.value }}" onChange="{{ fields.password.onChange }}" placeholder="••••••" style="width:100%;padding:13px 46px 13px 14px;border:1px solid #D5D8E6;border-radius:10px;font-size:15px;background:#F4F5FB" />
           <button onClick="{{ pw.password.toggle }}" title="{{ pw.password.title }}" style="position:absolute;right:6px;width:34px;height:34px;border:0;background:none;cursor:pointer;display:flex;align-items:center;justify-content:center;border-radius:8px" style-hover="background:#EEF0F8">
             <svg viewBox="0 0 24 24" width="19" height="19" fill="none" stroke="#6B7085" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="{{ pw.password.d }}"></path></svg>
           </button>
@@ -55,19 +60,59 @@
       <button onClick="{{ doLogin }}" style="width:100%;margin-top:24px;padding:14px;background:#1D4ED8;color:#fff;border:0;border-radius:10px;font-size:16px;font-weight:700;cursor:pointer;font-family:'Manrope'" style-hover="background:#1E40AF">Entrar</button>
     </div>
   </div>
+  <div style="background:linear-gradient(135deg, #1D4ED8 0%, #1E3A8A 100%);display:flex;flex-direction:column;justify-content:center;padding:64px 80px;color:#fff;position:relative;overflow:hidden">
+    <div style="position:absolute;top:-20%;right:-10%;width:600px;height:600px;background:radial-gradient(circle, rgba(255,255,255,0.08) 0%, rgba(255,255,255,0) 70%);border-radius:50%"></div>
+    <div style="position:absolute;bottom:-10%;left:-10%;width:400px;height:400px;background:radial-gradient(circle, rgba(245,158,11,0.15) 0%, rgba(245,158,11,0) 70%);border-radius:50%"></div>
+    
+    <div style="position:relative;z-index:10">
+      <div style="width:64px;height:64px;background:rgba(255,255,255,0.1);border-radius:16px;display:flex;align-items:center;justify-content:center;margin-bottom:32px;backdrop-filter:blur(10px)">
+        <svg viewBox="0 0 24 24" width="32" height="32" fill="none" stroke="#F59E0B" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"></path></svg>
+      </div>
+      <div style="font-family:'Manrope';font-weight:800;font-size:42px;line-height:1.15;margin-bottom:20px;letter-spacing:-1px">Sistema Informático<br/>de Servicios Eléctricos</div>
+      <div style="font-size:18px;line-height:1.6;opacity:.85;max-width:480px;margin-bottom:40px">Plataforma integral para la gestión operativa: solicitudes, agendas, levantamientos técnicos y seguimiento de órdenes de trabajo.</div>
+      
+      <div style="display:flex;align-items:center;gap:12px;background:rgba(255,255,255,0.1);padding:16px 20px;border-radius:12px;width:max-content;backdrop-filter:blur(10px);border:1px solid rgba(255,255,255,0.1)">
+        <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="#F59E0B" stroke-width="2"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path></svg>
+        <div>
+          <div style="font-size:12px;text-transform:uppercase;letter-spacing:.05em;opacity:.7;font-weight:700">Soporte Técnico</div>
+          <div style="font-size:15px;font-weight:700;margin-top:2px">809-224-1279</div>
+        </div>
+      </div>
+    </div>
+  </div>
 </div>
 </sc-if>
 
 <sc-if value="{{ loggedIn }}" hint-placeholder-val="{{ false }}">
 <div style="min-height:100vh;display:flex">
   <aside style="width:252px;flex:0 0 252px;background:#fff;border-right:1px solid #E3E5EE;display:flex;flex-direction:column;padding:24px 0;position:sticky;top:0;height:100vh">
-    <div style="padding:0 22px 22px">
-      <img src="./Nuevas funcionalidades/Nuevo Branding/logo-sidebar.jpg" alt="ElectroGestión" style="height:38px;border-radius:4px" />
+    <div style="padding:28px 22px 24px;display:flex;flex-direction:column;align-items:center;text-align:center">
+      <div style="display:flex;align-items:center;margin-bottom:8px">
+        <div style="font-family:'Manrope';font-weight:900;font-size:46px;letter-spacing:-2.5px;line-height:1;display:flex;align-items:center;position:relative">
+          <span style="color:#1D4ED8">E</span>
+          <span style="color:#F59E0B;margin-left:-3px">G</span>
+          <svg style="position:absolute;left:20px;top:4px" width="18" height="36" viewBox="0 0 16 32">
+            <path d="M14 2 L2 16 H10 L4 30 L16 14 H8 L14 2 Z" fill="#F59E0B" stroke="#fff" stroke-width="2.5" stroke-linejoin="round"/>
+          </svg>
+        </div>
+      </div>
+      <div style="font-family:'Manrope';font-weight:900;font-size:17.5px;letter-spacing:-0.5px">
+        <span style="color:#1D4ED8">ELECTRO</span><span style="color:#334155">GESTIÓN</span>
+      </div>
     </div>
-    <nav style="display:flex;flex-direction:column;gap:2px;padding:0 12px">
+    <nav style="display:flex;flex-direction:column;gap:4px;padding:0 12px">
       <sc-for list="{{ navItems }}" as="it" hint-placeholder-count="7">
-        <button onClick="{{ it.go }}" style="display:flex;align-items:center;gap:12px;width:100%;text-align:left;border:0;cursor:pointer;padding:11px 12px;border-radius:9px;font-size:14.5px;font-weight:{{ it.w }};background:{{ it.bg }};color:{{ it.fg }}">
-          <svg viewBox="0 0 24 24" width="19" height="19" fill="none" stroke="{{ it.dot }}" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" style="flex:0 0 19px"><path d="{{ it.d }}"></path></svg>{{ it.label }}
+        <button onClick="{{ it.go }}" style="position:relative;display:flex;align-items:center;gap:12px;width:100%;text-align:left;border:0;cursor:pointer;padding:12px 14px;border-radius:10px;font-size:14.5px;font-weight:{{ it.w }};background:{{ it.bg }};color:{{ it.fg }};transition:all 0.2s" style-hover="background:{{ it.activo ? '#EDEBFF' : '#F4F5FB' }}">
+          <div style="position:relative;display:flex;align-items:center;justify-content:center;width:24px;height:24px">
+            <sc-if value="{{ it.activo }}" hint-placeholder-val="{{ false }}">
+              <div style="position:absolute;inset:-2px;background:#FEF3C7;border-radius:6px;opacity:0.8;transform:rotate(10deg)"></div>
+            </sc-if>
+            <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="position:relative;z-index:1;flex:0 0 22px">
+              <path d="{{ it.d1 }}" stroke="{{ it.dot1 }}"></path>
+              <path d="{{ it.d2 }}" stroke="{{ it.dot2 }}"></path>
+            </svg>
+          </div>
+          {{ it.label }}
         </button>
       </sc-for>
     </nav>
@@ -1029,21 +1074,21 @@ const BADGE = {
   'Técnico':['#FFF3E0','#B26A00']
 };
 const ICON = {
-  inicio:'M3.5 11 12 3.5 20.5 11 M6 9.6V20.5h12V9.6 M10 20.5v-5.5h4v5.5',
-  solicitudes:'M6.5 4.5h11v16h-11z M9.5 2.8h5v3.2h-5z M9.5 11h5 M9.5 15h5',
-  agenda:'M4.5 6.5h15v14h-15z M4.5 11h15 M8.5 3.8v4 M15.5 3.8v4',
-  levantamientos:'M4 17.5h16 M6.5 17.5V13a5.5 5.5 0 0 1 11 0v4.5 M10.5 8.3V5.2h3v3.1',
-  ordenes:'M6.5 3.5h7.5L17.5 7v13.5h-11z M14 3.5V7h3.5 M9.5 12.6l2 2 3.5-3.6',
-  clientes:'M9.3 11.2a3.3 3.3 0 1 0 0-6.6 3.3 3.3 0 0 0 0 6.6 M3.5 20.3c0-3.3 2.6-5.7 5.8-5.7s5.8 2.4 5.8 5.7 M16.2 5.3a3.1 3.1 0 0 1 0 5.9 M17.2 15c1.9.7 3.3 2.7 3.3 5.3',
-  historial:'M12 20.5a8.5 8.5 0 1 0 0-17 8.5 8.5 0 0 0 0 17 M12 7.6V12l3.4 2.1',
-  usuarios:'M11.5 11.6a3.7 3.7 0 1 0 0-7.4 3.7 3.7 0 0 0 0 7.4 M4 20.5c0-3.7 3.4-6.3 7.5-6.3 1.3 0 2.6.3 3.7.8 M17.5 15v6 M14.5 18h6',
-  cotizaciones:'M4.5 4.5h12v16h-12z M8 9h5 M8 12.5h5 M8 16h3 M16.5 4.5l3 3v12.5h-3',
-  cobros:'M12 21a9 9 0 1 0 0-18 9 9 0 0 0 0 18 M12 7v10 M8.5 13.5h7',
-  inventario:'M3.5 8.5h17v12h-17z M3.5 8.5L6 4.5h12l2.5 4 M10 12.5h4',
-  proveedores:'M4 17.5h16 M6 17.5V8.5l6-4 6 4v9 M10 17.5v-4h4v4',
-  reportes:'M4.5 4.5h15v15h-15z M8 14v2.5 M12 10v6.5 M16 12v4.5',
-  servicios:'M12 3.5L3.5 8v12.5h17V8z M9 14.5h6 M9 17.5h6 M12 3.5v5'
-};
+  inicio: { d1: 'M3.5 11 12 3.5 20.5 11 M6 9.6V20.5h12V9.6', d2: 'M10 20.5v-5.5h4v5.5' },
+  solicitudes: { d1: 'M6.5 4.5h11v16h-11z M9.5 2.8h5v3.2h-5z', d2: 'M9.5 11h5 M9.5 15h5' },
+  agenda: { d1: 'M4.5 6.5h15v14h-15z M4.5 11h15', d2: 'M8.5 3.8v4 M15.5 3.8v4' },
+  levantamientos: { d1: 'M4 17.5h16 M6.5 17.5V13a5.5 5.5 0 0 1 11 0v4.5', d2: 'M10.5 8.3V5.2h3v3.1' },
+  ordenes: { d1: 'M6.5 3.5h7.5L17.5 7v13.5h-11z M14 3.5V7h3.5', d2: 'M9.5 12.6l2 2 3.5-3.6' },
+  clientes: { d1: 'M3.5 20.3c0-3.3 2.6-5.7 5.8-5.7s5.8 2.4 5.8 5.7 M16.2 5.3a3.1 3.1 0 0 1 0 5.9 M17.2 15c1.9.7 3.3 2.7 3.3 5.3', d2: 'M9.3 11.2a3.3 3.3 0 1 0 0-6.6 3.3 3.3 0 0 0 0 6.6' },
+  historial: { d1: 'M12 20.5a8.5 8.5 0 1 0 0-17 8.5 8.5 0 0 0 0 17', d2: 'M12 7.6V12l3.4 2.1' },
+  usuarios: { d1: 'M4 20.5c0-3.7 3.4-6.3 7.5-6.3 1.3 0 2.6.3 3.7.8 M17.5 15v6 M14.5 18h6', d2: 'M11.5 11.6a3.7 3.7 0 1 0 0-7.4 3.7 3.7 0 0 0 0 7.4' },
+  cotizaciones: { d1: 'M4.5 4.5h12v16h-12z M16.5 4.5l3 3v12.5h-3', d2: 'M8 9h5 M8 12.5h5 M8 16h3' },
+  cobros: { d1: 'M12 21a9 9 0 1 0 0-18 9 9 0 0 0 0 18', d2: 'M12 7v10 M8.5 13.5h7' },
+  inventario: { d1: 'M3.5 8.5h17v12h-17z M3.5 8.5L6 4.5h12l2.5 4', d2: 'M10 12.5h4' },
+  proveedores: { d1: 'M6 17.5V8.5l6-4 6 4v9', d2: 'M4 17.5h16 M10 17.5v-4h4v4' },
+  reportes: { d1: 'M4.5 4.5h15v15h-15z', d2: 'M8 14v2.5 M12 10v6.5 M16 12v4.5' },
+  servicios: { d1: 'M12 3.5L3.5 8v12.5h17V8z M12 3.5v5', d2: 'M9 14.5h6 M9 17.5h6' }
+}
 const ICON_SERV = {
   'Instalación Solar':'M12 15.2a3.2 3.2 0 1 0 0-6.4 3.2 3.2 0 0 0 0 6.4 M12 3.2v2.4 M12 18.4v2.4 M4.8 12H2.4 M21.6 12h-2.4 M6.9 6.9 5.2 5.2 M18.8 18.8l-1.7-1.7 M6.9 17.1l-1.7 1.7 M18.8 5.2l-1.7 1.7',
   'Instalación de Sistema UPS':'M4.5 6.5h12v11h-12z M16.5 10h3v4h-3 M9.8 8.6 7.8 12.4h2.6l-.8 3 3-4.2h-2.6z',
@@ -1301,7 +1346,7 @@ class Component extends DCLogic {
       nav=[['inicio','Inicio'],['solicitudes','Solicitudes'],['agenda','Agenda'],['levantamientos','Levantamientos'],['ordenes','Órdenes de trabajo'],['clientes','Clientes'],['historial','Historial']];
     }
     const activo = (s.screen==='nuevoLev'||s.screen==='levSolicitud') ? 'levantamientos' : (s.screen==='reporteConsumo'?'reportes':s.screen);
-    out.navItems=nav.map(([k,label])=>({label, d:ICON[k], w:activo===k?'800':'600', bg:activo===k?'#EDEBFF':'transparent', fg:activo===k?'#1D4ED8':'#4A4E63', dot:activo===k?'#1D4ED8':'#8B90A3', go:()=>self.go(k)}));
+    out.navItems=nav.map(([k,label])=>({label, d1:ICON[k].d1, d2:ICON[k].d2, w:activo===k?'800':'600', bg:activo===k?'#EDEBFF':'transparent', fg:activo===k?'#1D4ED8':'#4A4E63', dot1:activo===k?'#1D4ED8':'#6B7085', dot2:activo===k?'#F59E0B':'#A1A5B7', activo:activo===k, go:()=>self.go(k)}));
 
     const titles={inicio:['¡Bienvenido, '+s.session.nombre.split(' ')[0]+'!','Resumen de la operación de hoy.'],
       solicitudes:['Solicitudes','Registro de las necesidades de los clientes.'],
