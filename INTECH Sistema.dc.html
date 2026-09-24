@@ -564,6 +564,232 @@
         </sc-for>
       </div>
     </sc-if>
+
+    <sc-if value="{{ isEnDesarrollo }}" hint-placeholder-val="{{ false }}">
+      <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;padding:80px 40px;text-align:center">
+        <div style="width:88px;height:88px;border-radius:50%;background:#EFF6FF;display:flex;align-items:center;justify-content:center;margin-bottom:24px">
+          <svg viewBox="0 0 24 24" width="40" height="40" fill="none" stroke="#1D4ED8" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 6v6l4 2"></path><circle cx="12" cy="12" r="9.5"></circle></svg>
+        </div>
+        <div style="font-family:'Manrope';font-weight:800;font-size:24px;color:#14162B;margin-bottom:10px">Funcionalidad en desarrollo</div>
+        <div style="color:#6B7085;font-size:15px;max-width:420px;line-height:1.6">Este módulo se encuentra actualmente en construcción. Estamos trabajando para traerte la mejor experiencia. ¡Pronto estará disponible!</div>
+        <div style="margin-top:28px;padding:10px 22px;background:#EFF6FF;border:1px solid #BFDBFE;border-radius:10px;font-size:13px;font-weight:700;color:#1D4ED8">🚧 Próximamente</div>
+      </div>
+    </sc-if>
+
+    <sc-if value="{{ isReportes }}" hint-placeholder-val="{{ false }}">
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:20px">
+        <div style="background:#fff;border:1px solid #E3E5EE;border-radius:14px;padding:28px 24px;cursor:pointer;transition:box-shadow .15s" style-hover="box-shadow:0 4px 20px rgba(29,78,216,.12)" onClick="{{ goReporteConsumo }}">
+          <div style="width:48px;height:48px;border-radius:12px;background:#EFF6FF;display:flex;align-items:center;justify-content:center;margin-bottom:16px">
+            <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="#1D4ED8" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M4.5 4.5h15v15h-15z M8 14v2.5 M12 10v6.5 M16 12v4.5"></path></svg>
+          </div>
+          <div style="font-family:'Manrope';font-weight:800;font-size:17px;margin-bottom:6px">Consumo en Servicios</div>
+          <div style="color:#6B7085;font-size:13.5px;line-height:1.5">Análisis operativo detallado por tipo de servicio e inventario consumido del último año.</div>
+          <div style="margin-top:14px;color:#1D4ED8;font-size:13px;font-weight:700">Ver reporte →</div>
+        </div>
+        <div style="background:#fff;border:1px solid #E3E5EE;border-radius:14px;padding:28px 24px;opacity:.55;cursor:default">
+          <div style="width:48px;height:48px;border-radius:12px;background:#FFF7ED;display:flex;align-items:center;justify-content:center;margin-bottom:16px">
+            <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="#F59E0B" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21a9 9 0 1 0 0-18 9 9 0 0 0 0 18 M12 7v10 M8.5 13.5h7"></path></svg>
+          </div>
+          <div style="font-family:'Manrope';font-weight:800;font-size:17px;margin-bottom:6px">Reportes Financieros</div>
+          <div style="color:#6B7085;font-size:13.5px;line-height:1.5">Ingresos, egresos y balance general por período.</div>
+          <div style="margin-top:14px;color:#8B90A3;font-size:13px;font-weight:700">Próximamente</div>
+        </div>
+        <div style="background:#fff;border:1px solid #E3E5EE;border-radius:14px;padding:28px 24px;opacity:.55;cursor:default">
+          <div style="width:48px;height:48px;border-radius:12px;background:#F0FDF4;display:flex;align-items:center;justify-content:center;margin-bottom:16px">
+            <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="#17803D" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M9.3 11.2a3.3 3.3 0 1 0 0-6.6 3.3 3.3 0 0 0 0 6.6 M3.5 20.3c0-3.3 2.6-5.7 5.8-5.7s5.8 2.4 5.8 5.7 M16.2 5.3a3.1 3.1 0 0 1 0 5.9 M17.2 15c1.9.7 3.3 2.7 3.3 5.3"></path></svg>
+          </div>
+          <div style="font-family:'Manrope';font-weight:800;font-size:17px;margin-bottom:6px">Rendimiento de Técnicos</div>
+          <div style="color:#6B7085;font-size:13.5px;line-height:1.5">Productividad, servicios completados y métricas por técnico.</div>
+          <div style="margin-top:14px;color:#8B90A3;font-size:13px;font-weight:700">Próximamente</div>
+        </div>
+      </div>
+    </sc-if>
+
+    <sc-if value="{{ isReporteConsumo }}" hint-placeholder-val="{{ false }}">
+      <div>
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:16px;font-size:13px;color:#1D4ED8">
+          <span style="cursor:pointer" onClick="{{ volverReportes }}">Reportes</span> <span style="color:#8B90A3">/</span> <span style="color:#8B90A3">Consumos</span> <span style="color:#8B90A3">/</span> <span style="color:#334155;font-weight:700">Reporte de Consumo en Servicios del último año</span>
+        </div>
+        <div style="background:#fff;border:1px solid #E3E5EE;border-radius:14px;padding:20px 24px;display:flex;align-items:center;gap:20px;flex-wrap:wrap;margin-bottom:24px">
+          <div style="display:flex;align-items:center;gap:8px">
+            <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="#1D4ED8" stroke-width="1.7"><path d="M4.5 6.5h15v14h-15z M4.5 11h15 M8.5 3.8v4 M15.5 3.8v4"></path></svg>
+            <span style="font-size:14px;font-weight:700;color:#334155">Período:</span>
+            <span style="font-size:14px;color:#6B7085">Último Año</span>
+          </div>
+          <select style="padding:9px 14px;border:1px solid #D5D8E6;border-radius:9px;font-size:14px;background:#fff">
+            <option>Año 2025</option>
+          </select>
+          <span style="font-size:14px;font-weight:700;color:#334155">Categoría:</span>
+          <select style="padding:9px 14px;border:1px solid #D5D8E6;border-radius:9px;font-size:14px;background:#fff">
+            <option>Todos los Servicios</option>
+          </select>
+          <button style="margin-left:auto;padding:10px 20px;background:#1D4ED8;color:#fff;border:0;border-radius:9px;font-weight:700;font-size:13.5px;cursor:pointer;font-family:'Manrope'" style-hover="background:#1E40AF">Actualizar Reporte</button>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px;margin-bottom:24px">
+          <div style="background:#fff;border:1px solid #E3E5EE;border-radius:12px;padding:18px 22px">
+            <div style="font-size:12px;font-weight:700;color:#6B7085;text-transform:uppercase;letter-spacing:.05em">Total Consumo (RD$)</div>
+            <div style="font-family:'Manrope';font-weight:800;font-size:28px;color:#14162B;margin-top:6px">1,625,000.00</div>
+          </div>
+          <div style="background:#fff;border:1px solid #E3E5EE;border-radius:12px;padding:18px 22px">
+            <div style="font-size:12px;font-weight:700;color:#6B7085;text-transform:uppercase;letter-spacing:.05em">Costo Promedio por Instalación (RD$)</div>
+            <div style="font-family:'Manrope';font-weight:800;font-size:28px;color:#14162B;margin-top:6px">1,696.24</div>
+          </div>
+          <div style="background:#fff;border:1px solid #E3E5EE;border-radius:12px;padding:18px 22px">
+            <div style="font-size:12px;font-weight:700;color:#6B7085;text-transform:uppercase;letter-spacing:.05em">Servicio con Mayor Consumo</div>
+            <div style="font-family:'Manrope';font-weight:800;font-size:20px;color:#14162B;margin-top:6px">Instalación Paneles Solares</div>
+          </div>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:24px">
+          <div style="background:#fff;border:1px solid #E3E5EE;border-radius:12px;padding:18px 22px">
+            <div style="font-size:12px;font-weight:700;color:#6B7085;text-transform:uppercase;letter-spacing:.05em">Costo de Inventario en Riesgo de Merma (RD$)</div>
+            <div style="font-family:'Manrope';font-weight:800;font-size:28px;color:#14162B;margin-top:6px">75,000.00</div>
+          </div>
+          <div style="background:#fff;border:1px solid #E3E5EE;border-radius:12px;padding:18px 22px">
+            <div style="font-size:14px;font-weight:800;color:#14162B;margin-bottom:12px">Porcentaje de Consumo de Materiales por Categoría</div>
+            <div style="display:flex;align-items:center;gap:18px">
+              <div style="position:relative;width:120px;height:120px">
+                <svg viewBox="0 0 36 36" width="120" height="120" style="transform:rotate(-90deg)">
+                  <circle cx="18" cy="18" r="14" fill="none" stroke="#E3E5EE" stroke-width="4"/>
+                  <circle cx="18" cy="18" r="14" fill="none" stroke="#1D4ED8" stroke-width="4" stroke-dasharray="26.4 61.6" stroke-dashoffset="0"/>
+                  <circle cx="18" cy="18" r="14" fill="none" stroke="#3B82F6" stroke-width="4" stroke-dasharray="22 66" stroke-dashoffset="-26.4"/>
+                  <circle cx="18" cy="18" r="14" fill="none" stroke="#60A5FA" stroke-width="4" stroke-dasharray="17.6 70.4" stroke-dashoffset="-48.4"/>
+                  <circle cx="18" cy="18" r="14" fill="none" stroke="#93C5FD" stroke-width="4" stroke-dasharray="13.2 74.8" stroke-dashoffset="-66"/>
+                  <circle cx="18" cy="18" r="14" fill="none" stroke="#BFDBFE" stroke-width="4" stroke-dasharray="8.8 79.2" stroke-dashoffset="-79.2"/>
+                </svg>
+              </div>
+              <div style="font-size:12.5px;display:flex;flex-direction:column;gap:5px">
+                <div style="display:flex;align-items:center;gap:6px"><span style="width:10px;height:10px;border-radius:2px;background:#1D4ED8;display:inline-block"></span> Climatización (AC) (30%)</div>
+                <div style="display:flex;align-items:center;gap:6px"><span style="width:10px;height:10px;border-radius:2px;background:#3B82F6;display:inline-block"></span> Paneles Solares (25%)</div>
+                <div style="display:flex;align-items:center;gap:6px"><span style="width:10px;height:10px;border-radius:2px;background:#60A5FA;display:inline-block"></span> Redes (20%)</div>
+                <div style="display:flex;align-items:center;gap:6px"><span style="width:10px;height:10px;border-radius:2px;background:#93C5FD;display:inline-block"></span> Automatización (15%)</div>
+                <div style="display:flex;align-items:center;gap:6px"><span style="width:10px;height:10px;border-radius:2px;background:#BFDBFE;display:inline-block"></span> Seguridad (10%)</div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div style="display:grid;grid-template-columns:3fr 2fr;gap:16px">
+          <div style="background:#fff;border:1px solid #E3E5EE;border-radius:12px;overflow:hidden">
+            <div style="display:grid;grid-template-columns:1.5fr 1fr 1fr 1fr .8fr;padding:12px 18px;font-size:11.5px;font-weight:800;color:#8B90A3;text-transform:uppercase;letter-spacing:.05em;border-bottom:1px solid #EFF0F6;background:#F8FAFC">
+              <div>Servicio de Instalación</div><div style="text-align:right">Materiales (RD$)</div><div style="text-align:right">Consumibles (RD$)</div><div style="text-align:right">Total (RD$)</div><div style="text-align:center">Instalaciones</div>
+            </div>
+            <div style="display:grid;grid-template-columns:1.5fr 1fr 1fr 1fr .8fr;padding:12px 18px;font-size:13.5px;border-bottom:1px solid #F4F5FB;align-items:center">
+              <div style="font-weight:700">Solar</div><div style="text-align:right;color:#6B7085">RD$ 250,000.00</div><div style="text-align:right;color:#6B7085">RD$ 120,000.00</div><div style="text-align:right;font-weight:700">RD$ 370,000.00</div><div style="text-align:center">30</div>
+            </div>
+            <div style="display:grid;grid-template-columns:1.5fr 1fr 1fr 1fr .8fr;padding:12px 18px;font-size:13.5px;border-bottom:1px solid #F4F5FB;align-items:center">
+              <div style="font-weight:700">AC (Industrial)</div><div style="text-align:right;color:#6B7085">RD$ 180,000.00</div><div style="text-align:right;color:#6B7085">RD$ 75,000.00</div><div style="text-align:right;font-weight:700">RD$ 255,000.00</div><div style="text-align:center">25</div>
+            </div>
+            <div style="display:grid;grid-template-columns:1.5fr 1fr 1fr 1fr .8fr;padding:12px 18px;font-size:13.5px;border-bottom:1px solid #F4F5FB;align-items:center">
+              <div style="font-weight:700">AC (Residencial)</div><div style="text-align:right;color:#6B7085">RD$ 150,000.00</div><div style="text-align:right;color:#6B7085">RD$ 65,000.00</div><div style="text-align:right;font-weight:700">RD$ 215,000.00</div><div style="text-align:center">16</div>
+            </div>
+            <div style="display:grid;grid-template-columns:1.5fr 1fr 1fr 1fr .8fr;padding:12px 18px;font-size:13.5px;border-bottom:1px solid #F4F5FB;align-items:center">
+              <div style="font-weight:700">Cableado Red</div><div style="text-align:right;color:#6B7085">RD$ 160,000.00</div><div style="text-align:right;color:#6B7085">RD$ 70,000.00</div><div style="text-align:right;font-weight:700">RD$ 230,000.00</div><div style="text-align:center">22</div>
+            </div>
+            <div style="display:grid;grid-template-columns:1.5fr 1fr 1fr 1fr .8fr;padding:12px 18px;font-size:13.5px;border-bottom:1px solid #F4F5FB;align-items:center">
+              <div style="font-weight:700">Seguridad</div><div style="text-align:right;color:#6B7085">RD$ 83,000.00</div><div style="text-align:right;color:#6B7085">RD$ 23,000.00</div><div style="text-align:right;font-weight:700">RD$ 106,000.00</div><div style="text-align:center">12</div>
+            </div>
+            <div style="display:grid;grid-template-columns:1.5fr 1fr 1fr 1fr .8fr;padding:12px 18px;font-size:13.5px;border-bottom:1px solid #F4F5FB;align-items:center">
+              <div style="font-weight:700">Automatización</div><div style="text-align:right;color:#6B7085">RD$ 110,000.00</div><div style="text-align:right;color:#6B7085">RD$ 110,000.00</div><div style="text-align:right;font-weight:700">RD$ 220,000.00</div><div style="text-align:center">3</div>
+            </div>
+            <div style="display:grid;grid-template-columns:1.5fr 1fr 1fr 1fr .8fr;padding:12px 18px;font-size:13.5px;align-items:center;background:#EFF6FF;font-weight:800">
+              <div>TOTAL</div><div style="text-align:right">RD$ 933,000.00</div><div style="text-align:right">RD$ 463,000.00</div><div style="text-align:right;color:#1D4ED8">RD$ 1,625,000.00</div><div style="text-align:center">108</div>
+            </div>
+          </div>
+          <div style="background:#fff;border:1px solid #E3E5EE;border-radius:12px;padding:18px 22px">
+            <div style="font-size:14px;font-weight:800;color:#14162B;margin-bottom:16px">Tendencia Mensual de Consumo (Costo)</div>
+            <div style="display:flex;align-items:flex-end;gap:0;height:180px;border-bottom:1px solid #EFF0F6;padding:0 10px">
+              <div style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;height:100%">
+                <div style="font-size:11px;font-weight:700;color:#1D4ED8;margin-bottom:4px">450,000</div>
+                <div style="width:48px;background:#93C5FD;border-radius:6px 6px 0 0;height:56%"></div>
+              </div>
+              <div style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;height:100%">
+                <div style="font-size:11px;font-weight:700;color:#1D4ED8;margin-bottom:4px">380,000</div>
+                <div style="width:48px;background:#93C5FD;border-radius:6px 6px 0 0;height:47%"></div>
+              </div>
+              <div style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;height:100%">
+                <div style="font-size:11px;font-weight:700;color:#1D4ED8;margin-bottom:4px">520,000</div>
+                <div style="width:48px;background:#93C5FD;border-radius:6px 6px 0 0;height:65%"></div>
+              </div>
+            </div>
+            <div style="display:flex;padding:8px 10px 0;gap:0">
+              <div style="flex:1;text-align:center;font-size:12px;font-weight:700;color:#334155">Oct</div>
+              <div style="flex:1;text-align:center;font-size:12px;font-weight:700;color:#334155">Sep</div>
+              <div style="flex:1;text-align:center;font-size:12px;font-weight:700;color:#334155">Ago</div>
+            </div>
+            <div style="display:flex;align-items:center;gap:6px;justify-content:center;margin-top:12px;font-size:11.5px;color:#6B7085">
+              <span style="width:12px;height:12px;border-radius:3px;background:#93C5FD;display:inline-block"></span> Consumo Total (RD$)
+            </div>
+          </div>
+        </div>
+      </div>
+    </sc-if>
+
+    <sc-if value="{{ isServicios }}" hint-placeholder-val="{{ false }}">
+      <div>
+        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px;margin-bottom:28px">
+          <div style="background:#fff;border:1px solid #E3E5EE;border-radius:14px;padding:22px 24px">
+            <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px">
+              <div style="width:40px;height:40px;border-radius:10px;background:#EFF6FF;display:flex;align-items:center;justify-content:center">
+                <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="#1D4ED8" stroke-width="1.7"><path d="M12 15.2a3.2 3.2 0 1 0 0-6.4 3.2 3.2 0 0 0 0 6.4 M12 3.2v2.4 M12 18.4v2.4 M4.8 12H2.4 M21.6 12h-2.4"></path></svg>
+              </div>
+              <div style="font-family:'Manrope';font-weight:800;font-size:16px">Instalaciones Eléctricas</div>
+            </div>
+            <div style="font-size:13px;color:#6B7085;margin-bottom:10px">Servicios de instalación y montaje de sistemas eléctricos.</div>
+            <div style="display:flex;flex-wrap:wrap;gap:6px">
+              <span style="padding:5px 11px;background:#EFF6FF;border-radius:20px;font-size:11.5px;font-weight:700;color:#1D4ED8">Paneles Solares</span>
+              <span style="padding:5px 11px;background:#EFF6FF;border-radius:20px;font-size:11.5px;font-weight:700;color:#1D4ED8">Sistema UPS</span>
+              <span style="padding:5px 11px;background:#EFF6FF;border-radius:20px;font-size:11.5px;font-weight:700;color:#1D4ED8">Planta Eléctrica</span>
+            </div>
+          </div>
+          <div style="background:#fff;border:1px solid #E3E5EE;border-radius:14px;padding:22px 24px">
+            <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px">
+              <div style="width:40px;height:40px;border-radius:10px;background:#FFF7ED;display:flex;align-items:center;justify-content:center">
+                <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="#F59E0B" stroke-width="1.7"><path d="M13.6 4.4 20 10.8l-2.6 2.6-6.4-6.4z M10.2 8.2 4.6 13.8a2.6 2.6 0 0 0 3.6 3.6l5.6-5.6 M15.5 15.5l4.2 4.2"></path></svg>
+              </div>
+              <div style="font-family:'Manrope';font-weight:800;font-size:16px">Mantenimiento</div>
+            </div>
+            <div style="font-size:13px;color:#6B7085;margin-bottom:10px">Servicios preventivos y correctivos de sistemas eléctricos.</div>
+            <div style="display:flex;flex-wrap:wrap;gap:6px">
+              <span style="padding:5px 11px;background:#FFF7ED;border-radius:20px;font-size:11.5px;font-weight:700;color:#B26A00">Mantenimiento Eléctrico</span>
+              <span style="padding:5px 11px;background:#FFF7ED;border-radius:20px;font-size:11.5px;font-weight:700;color:#B26A00">Revisión Preventiva</span>
+            </div>
+          </div>
+          <div style="background:#fff;border:1px solid #E3E5EE;border-radius:14px;padding:22px 24px">
+            <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px">
+              <div style="width:40px;height:40px;border-radius:10px;background:#F0FDF4;display:flex;align-items:center;justify-content:center">
+                <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="#17803D" stroke-width="1.7"><path d="M6 3.5v5 M18 3.5v5 M3.8 8.5h16.4v3.2a4 4 0 0 1-4 4H7.8a4 4 0 0 1-4-4z M12 15.7v4.8"></path></svg>
+              </div>
+              <div style="font-family:'Manrope';font-weight:800;font-size:16px">Redes y Cableado</div>
+            </div>
+            <div style="font-size:13px;color:#6B7085;margin-bottom:10px">Diseño e instalación de redes de datos y cableado estructurado.</div>
+            <div style="display:flex;flex-wrap:wrap;gap:6px">
+              <span style="padding:5px 11px;background:#F0FDF4;border-radius:20px;font-size:11.5px;font-weight:700;color:#17803D">Cableado Estructurado</span>
+              <span style="padding:5px 11px;background:#F0FDF4;border-radius:20px;font-size:11.5px;font-weight:700;color:#17803D">Fibra Óptica</span>
+            </div>
+          </div>
+        </div>
+        <div style="background:#fff;border:1px solid #E3E5EE;border-radius:14px;overflow:hidden">
+          <div style="display:grid;grid-template-columns:.5fr 1.5fr 1fr 1fr .8fr;padding:14px 18px;font-size:12px;font-weight:800;color:#8B90A3;text-transform:uppercase;letter-spacing:.06em;border-bottom:1px solid #EFF0F6">
+            <div>ID</div><div>Servicio</div><div>Categoría</div><div>Precio base (RD$)</div><div style="text-align:center">Estado</div>
+          </div>
+          <div style="display:grid;grid-template-columns:.5fr 1.5fr 1fr 1fr .8fr;padding:14px 18px;font-size:14px;border-bottom:1px solid #F4F5FB;align-items:center">
+            <div style="font-weight:700;color:#8B90A3">SV-001</div><div style="font-weight:700">Instalación de Paneles Solares</div><div style="color:#6B7085">Instalaciones</div><div>RD$ 85,000.00</div><div style="text-align:center"><span style="padding:5px 11px;border-radius:20px;font-size:12px;font-weight:800;background:#E4F6EA;color:#17803D">Activo</span></div>
+          </div>
+          <div style="display:grid;grid-template-columns:.5fr 1.5fr 1fr 1fr .8fr;padding:14px 18px;font-size:14px;border-bottom:1px solid #F4F5FB;align-items:center">
+            <div style="font-weight:700;color:#8B90A3">SV-002</div><div style="font-weight:700">Instalación de Sistema UPS</div><div style="color:#6B7085">Instalaciones</div><div>RD$ 45,000.00</div><div style="text-align:center"><span style="padding:5px 11px;border-radius:20px;font-size:12px;font-weight:800;background:#E4F6EA;color:#17803D">Activo</span></div>
+          </div>
+          <div style="display:grid;grid-template-columns:.5fr 1.5fr 1fr 1fr .8fr;padding:14px 18px;font-size:14px;border-bottom:1px solid #F4F5FB;align-items:center">
+            <div style="font-weight:700;color:#8B90A3">SV-003</div><div style="font-weight:700">Mantenimiento Eléctrico</div><div style="color:#6B7085">Mantenimiento</div><div>RD$ 12,500.00</div><div style="text-align:center"><span style="padding:5px 11px;border-radius:20px;font-size:12px;font-weight:800;background:#E4F6EA;color:#17803D">Activo</span></div>
+          </div>
+          <div style="display:grid;grid-template-columns:.5fr 1.5fr 1fr 1fr .8fr;padding:14px 18px;font-size:14px;border-bottom:1px solid #F4F5FB;align-items:center">
+            <div style="font-weight:700;color:#8B90A3">SV-004</div><div style="font-weight:700">Cableado Estructurado</div><div style="color:#6B7085">Redes y Cableado</div><div>RD$ 28,000.00</div><div style="text-align:center"><span style="padding:5px 11px;border-radius:20px;font-size:12px;font-weight:800;background:#E4F6EA;color:#17803D">Activo</span></div>
+          </div>
+          <div style="display:grid;grid-template-columns:.5fr 1.5fr 1fr 1fr .8fr;padding:14px 18px;font-size:14px;align-items:center">
+            <div style="font-weight:700;color:#8B90A3">SV-005</div><div style="font-weight:700">Instalación de Planta Eléctrica</div><div style="color:#6B7085">Instalaciones</div><div>RD$ 120,000.00</div><div style="text-align:center"><span style="padding:5px 11px;border-radius:20px;font-size:12px;font-weight:800;background:#E4F6EA;color:#17803D">Activo</span></div>
+          </div>
+        </div>
+      </div>
+    </sc-if>
+
   </main>
 </div>
 </sc-if>
@@ -799,8 +1025,8 @@ const BADGE = {
   'Finalizada':['#E4F6EA','#17803D'],
   'Cancelada':['#FDE9EA','#C4141B'],
   'En Espera Administración':['#EDE9FE','#5B21B6'],
-  'Administrador':['#EDEBFF','#1D4ED8'],
-  'Empleado':['#EEF0F8','#4A4E63']
+  'Gerente':['#EDEBFF','#1D4ED8'],
+  'Técnico':['#FFF3E0','#B26A00']
 };
 const ICON = {
   inicio:'M3.5 11 12 3.5 20.5 11 M6 9.6V20.5h12V9.6 M10 20.5v-5.5h4v5.5',
@@ -810,7 +1036,13 @@ const ICON = {
   ordenes:'M6.5 3.5h7.5L17.5 7v13.5h-11z M14 3.5V7h3.5 M9.5 12.6l2 2 3.5-3.6',
   clientes:'M9.3 11.2a3.3 3.3 0 1 0 0-6.6 3.3 3.3 0 0 0 0 6.6 M3.5 20.3c0-3.3 2.6-5.7 5.8-5.7s5.8 2.4 5.8 5.7 M16.2 5.3a3.1 3.1 0 0 1 0 5.9 M17.2 15c1.9.7 3.3 2.7 3.3 5.3',
   historial:'M12 20.5a8.5 8.5 0 1 0 0-17 8.5 8.5 0 0 0 0 17 M12 7.6V12l3.4 2.1',
-  usuarios:'M11.5 11.6a3.7 3.7 0 1 0 0-7.4 3.7 3.7 0 0 0 0 7.4 M4 20.5c0-3.7 3.4-6.3 7.5-6.3 1.3 0 2.6.3 3.7.8 M17.5 15v6 M14.5 18h6'
+  usuarios:'M11.5 11.6a3.7 3.7 0 1 0 0-7.4 3.7 3.7 0 0 0 0 7.4 M4 20.5c0-3.7 3.4-6.3 7.5-6.3 1.3 0 2.6.3 3.7.8 M17.5 15v6 M14.5 18h6',
+  cotizaciones:'M4.5 4.5h12v16h-12z M8 9h5 M8 12.5h5 M8 16h3 M16.5 4.5l3 3v12.5h-3',
+  cobros:'M12 21a9 9 0 1 0 0-18 9 9 0 0 0 0 18 M12 7v10 M8.5 13.5h7',
+  inventario:'M3.5 8.5h17v12h-17z M3.5 8.5L6 4.5h12l2.5 4 M10 12.5h4',
+  proveedores:'M4 17.5h16 M6 17.5V8.5l6-4 6 4v9 M10 17.5v-4h4v4',
+  reportes:'M4.5 4.5h15v15h-15z M8 14v2.5 M12 10v6.5 M16 12v4.5',
+  servicios:'M12 3.5L3.5 8v12.5h17V8z M9 14.5h6 M9 17.5h6 M12 3.5v5'
 };
 const ICON_SERV = {
   'Instalación Solar':'M12 15.2a3.2 3.2 0 1 0 0-6.4 3.2 3.2 0 0 0 0 6.4 M12 3.2v2.4 M12 18.4v2.4 M4.8 12H2.4 M21.6 12h-2.4 M6.9 6.9 5.2 5.2 M18.8 18.8l-1.7-1.7 M6.9 17.1l-1.7 1.7 M18.8 5.2l-1.7 1.7',
@@ -845,8 +1077,8 @@ class Component extends DCLogic {
       qOrd:'', fOrd:'Todos los estados', vAgenda:'Hoy',
       selEvento:null, levEdit:null, showPw:{},
       usuarios:[
-        {id:1,usuario:'admin',password:'admin',nombre:'Ana Hernández',cargo:'Administradora',rol:'Administrador'},
-        {id:2,usuario:'empleado',password:'empleado',nombre:'Luis Peña',cargo:'Técnico eléctrico',rol:'Empleado'}
+        {id:1,usuario:'gerente',password:'gerente',nombre:'Ana Hernández',cargo:'Gerente General',rol:'Gerente'},
+        {id:2,usuario:'tecnico',password:'tecnico',nombre:'Luis Peña',cargo:'Técnico eléctrico',rol:'Técnico'}
       ],
       clientes:[
         {id:1,nombre:'Melody Santos',correo:'melody@email.com',telefono:'809-000-0000',telefono2:'829-111-2222',rnc:'402-1234567-1',direccion:'Calle Duarte #24, Santiago',servicios:8,ultimo:'Instalación de Sistema UPS'},
@@ -893,7 +1125,7 @@ class Component extends DCLogic {
   go(screen){ this.setState({screen, modal:null, errors:{}}); }
   setForm(k,v){ this.setState(s=>({form:{...s.form,[k]:v}, errors:{...s.errors,[k]:''}})); }
   openModal(m,form){ this.setState({modal:m, form:form||{}, errors:{}}); }
-  esAdmin(){ return this.state.session && this.state.session.rol==='Administrador'; }
+  esGerente(){ return this.state.session && this.state.session.rol==='Gerente'; }
   mapa(dir){ window.open('https://www.google.com/maps/search/?api=1&query='+encodeURIComponent(dir||''),'_blank'); }
   visibles(){ const req = this.props.requiereFechaYHora !== false; return this.state.solicitudes.filter(s=> req ? (esFecha(s.fecha) && !!s.hora) : true); }
 
@@ -1060,11 +1292,15 @@ class Component extends DCLogic {
     };
     if(!s.session) return out;
 
-    const admin=self.esAdmin();
+    const esGerente=self.esGerente();
     out.user={nombre:s.session.nombre, cargo:s.session.cargo, inicial:s.session.nombre.slice(0,1)};
-    const nav=[['inicio','Inicio'],['solicitudes','Solicitudes'],['agenda','Agenda'],['levantamientos','Levantamientos'],['ordenes','Órdenes de trabajo'],['clientes','Clientes'],['historial','Historial']];
-    if(admin) nav.push(['usuarios','Usuarios']);
-    const activo = (s.screen==='nuevoLev'||s.screen==='levSolicitud') ? 'levantamientos' : s.screen;
+    let nav;
+    if(esGerente){
+      nav=[['inicio','Inicio'],['solicitudes','Solicitudes'],['cotizaciones','Cotizaciones'],['ordenes','Órdenes'],['clientes','Clientes'],['cobros','Cobros'],['inventario','Inventario'],['proveedores','Proveedores'],['reportes','Reportes'],['servicios','Servicios']];
+    } else {
+      nav=[['inicio','Inicio'],['solicitudes','Solicitudes'],['agenda','Agenda'],['levantamientos','Levantamientos'],['ordenes','Órdenes de trabajo'],['clientes','Clientes'],['historial','Historial']];
+    }
+    const activo = (s.screen==='nuevoLev'||s.screen==='levSolicitud') ? 'levantamientos' : (s.screen==='reporteConsumo'?'reportes':s.screen);
     out.navItems=nav.map(([k,label])=>({label, d:ICON[k], w:activo===k?'800':'600', bg:activo===k?'#EDEBFF':'transparent', fg:activo===k?'#1D4ED8':'#4A4E63', dot:activo===k?'#1D4ED8':'#8B90A3', go:()=>self.go(k)}));
 
     const titles={inicio:['¡Bienvenido, '+s.session.nombre.split(' ')[0]+'!','Resumen de la operación de hoy.'],
@@ -1076,7 +1312,14 @@ class Component extends DCLogic {
       ordenes:['Órdenes de trabajo','Documentos enviados por Administración.'],
       clientes:['Clientes','Clientes registrados en el sistema.'],
       historial:['Historial de servicios','Servicios finalizados.'],
-      usuarios:['Usuarios','Administración de accesos al sistema.']};
+      usuarios:['Usuarios','Administración de accesos al sistema.'],
+      cotizaciones:['Cotizaciones','Gestión de cotizaciones para clientes.'],
+      cobros:['Cobros','Control de pagos y facturación.'],
+      inventario:['Inventario','Gestión de materiales y existencias.'],
+      proveedores:['Proveedores','Directorio de proveedores y compras.'],
+      reportes:['Reportes','Análisis operativo y financiero del sistema.'],
+      reporteConsumo:['Reporte de Consumo en Servicios del último año','Análisis operativo detallado por tipo de servicio e inventario consumido.'],
+      servicios:['Servicios','Catálogo de servicios y categorías.']};
     out.pageTitle=titles[s.screen][0]; out.pageSub=titles[s.screen][1];
     out.isInicio=s.screen==='inicio'; out.isSolicitudes=s.screen==='solicitudes'; out.isAgenda=s.screen==='agenda';
     out.isLevantamientos=s.screen==='levantamientos';
@@ -1086,7 +1329,11 @@ class Component extends DCLogic {
     out.origenTexto=s.origen?('Solicitud '+String(s.origen.id).padStart(4,'0')+' · '+fmt(s.origen.fecha)+' a las '+h12(s.origen.hora)+' · '+(s.origen.direccion||'')):'';
     out.volverLevantamientos=()=>self.go('levantamientos');
     out.isNuevoLevOnly=s.screen==='nuevoLev'; out.isOrdenes=s.screen==='ordenes';
-    out.isClientes=s.screen==='clientes'; out.isHistorial=s.screen==='historial'; out.isUsuarios=s.screen==='usuarios'&&admin;
+    out.isClientes=s.screen==='clientes'; out.isHistorial=s.screen==='historial'; out.isUsuarios=s.screen==='usuarios'&&esGerente;
+    out.isCotizaciones=s.screen==='cotizaciones'; out.isCobros=s.screen==='cobros'; out.isInventario=s.screen==='inventario'; out.isProveedores=s.screen==='proveedores';
+    out.isReportes=s.screen==='reportes'; out.isReporteConsumo=s.screen==='reporteConsumo'; out.isServicios=s.screen==='servicios';
+    out.isEnDesarrollo=out.isCotizaciones||out.isCobros||out.isInventario||out.isProveedores;
+    out.goReporteConsumo=()=>self.go('reporteConsumo'); out.volverReportes=()=>self.go('reportes');
 
     const nuevaSolicitud=()=>self.openModal('solicitud',{});
     const nuevoCliente=()=>self.openModal('cliente',{});
