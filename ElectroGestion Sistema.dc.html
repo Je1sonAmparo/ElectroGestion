@@ -46,25 +46,10 @@
     
     <div style="font-family:'Manrope';font-weight:800;font-size:22px;margin-bottom:24px;letter-spacing:-0.5px">Iniciar sesión</div>
     
-    <div>
-      <label style="display:block;font-size:13px;font-weight:700;color:#4A4E63;margin-bottom:7px">Usuario</label>
-      <input value="{{ fields.usuario.value }}" onChange="{{ fields.usuario.onChange }}" placeholder="ej. admin" style="width:100%;padding:13px 14px;border:1px solid #D5D8E6;border-radius:10px;font-size:15px;background:#fff;transition:border 0.2s" />
-      <sc-if value="{{ fields.usuario.error }}" hint-placeholder-val="{{ false }}"><div style="color:#C4141B;font-size:12.5px;margin-top:6px;font-weight:700">{{ fields.usuario.error }}</div></sc-if>
+    <div style="display:flex;gap:16px;margin-top:20px">
+      <button onClick="{{ loginTecnico }}" style="flex:1;padding:15px;background:#1D4ED8;color:#fff;border:0;border-radius:10px;font-size:16px;font-weight:700;cursor:pointer;font-family:'Manrope';box-shadow:0 4px 14px rgba(29,78,216,0.25);transition:all 0.2s" style-hover="background:#1E40AF;transform:translateY(-1px);box-shadow:0 6px 16px rgba(29,78,216,0.3)">Técnico</button>
+      <button onClick="{{ loginGerente }}" style="flex:1;padding:15px;background:#1D4ED8;color:#fff;border:0;border-radius:10px;font-size:16px;font-weight:700;cursor:pointer;font-family:'Manrope';box-shadow:0 4px 14px rgba(29,78,216,0.25);transition:all 0.2s" style-hover="background:#1E40AF;transform:translateY(-1px);box-shadow:0 6px 16px rgba(29,78,216,0.3)">Gerente</button>
     </div>
-    <div style="margin-top:18px">
-      <label style="display:block;font-size:13px;font-weight:700;color:#4A4E63;margin-bottom:7px">Contraseña</label>
-      <div style="position:relative;display:flex;align-items:center">
-        <input type="{{ pw.password.type }}" value="{{ fields.password.value }}" onChange="{{ fields.password.onChange }}" placeholder="••••••" style="width:100%;padding:13px 46px 13px 14px;border:1px solid #D5D8E6;border-radius:10px;font-size:15px;background:#fff;transition:border 0.2s" />
-        <button onClick="{{ pw.password.toggle }}" title="{{ pw.password.title }}" style="position:absolute;right:6px;width:34px;height:34px;border:0;background:none;cursor:pointer;display:flex;align-items:center;justify-content:center;border-radius:8px" style-hover="background:#F4F5FB">
-          <svg viewBox="0 0 24 24" width="19" height="19" fill="none" stroke="#6B7085" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="{{ pw.password.d }}"></path></svg>
-        </button>
-      </div>
-      <sc-if value="{{ fields.password.error }}" hint-placeholder-val="{{ false }}"><div style="color:#C4141B;font-size:12.5px;margin-top:6px;font-weight:700">{{ fields.password.error }}</div></sc-if>
-    </div>
-    <sc-if value="{{ loginError }}" hint-placeholder-val="{{ false }}">
-      <div style="margin-top:18px;background:#FDE9EA;border:1px solid #F5C2C4;color:#C4141B;padding:11px 13px;border-radius:10px;font-size:13.5px;font-weight:700">{{ loginError }}</div>
-    </sc-if>
-    <button onClick="{{ doLogin }}" style="width:100%;margin-top:28px;padding:15px;background:#1D4ED8;color:#fff;border:0;border-radius:10px;font-size:16px;font-weight:700;cursor:pointer;font-family:'Manrope';box-shadow:0 4px 14px rgba(29,78,216,0.25);transition:all 0.2s" style-hover="background:#1E40AF;transform:translateY(-1px);box-shadow:0 6px 16px rgba(29,78,216,0.3)">Entrar</button>
   </div>
 </div>
 </sc-if>
@@ -1326,13 +1311,13 @@ class Component extends DCLogic {
   mapa(dir){ window.open('https://www.google.com/maps/search/?api=1&query='+encodeURIComponent(dir||''),'_blank'); }
   visibles(){ const req = this.props.requiereFechaYHora !== false; return this.state.solicitudes.filter(s=> req ? (esFecha(s.fecha) && !!s.hora) : true); }
 
-  doLogin(){
-    const f=this.state.form, e={};
-    if(!(f.usuario||'').trim()) e.usuario='El usuario es obligatorio.';
-    if(!(f.password||'')) e.password='La contraseña es obligatoria.';
-    if(Object.keys(e).length){ this.setState({errors:e,loginError:''}); return; }
-    const u=this.state.usuarios.find(x=>x.usuario===f.usuario.trim().toLowerCase() && x.password===f.password);
-    if(!u){ this.setState({loginError:'Usuario o contraseña incorrectos. Verifica tus credenciales.',errors:{}}); return; }
+  loginTecnico(){
+    const u=this.state.usuarios.find(x=>x.rol==='Técnico');
+    this.setState({session:u, screen:'inicio', form:{}, errors:{}, loginError:''});
+    this.toast('Bienvenido, '+u.nombre.split(' ')[0]+'.');
+  }
+  loginGerente(){
+    const u=this.state.usuarios.find(x=>x.rol==='Gerente');
     this.setState({session:u, screen:'inicio', form:{}, errors:{}, loginError:''});
     this.toast('Bienvenido, '+u.nombre.split(' ')[0]+'.');
   }
@@ -1502,7 +1487,7 @@ class Component extends DCLogic {
       sidebarCollapsed: !!s.sidebarCollapsed, toggleSidebar: () => self.setState({ sidebarCollapsed: !s.sidebarCollapsed }),
       loggedIn:!!s.session, loggedOut:!s.session, fields, tipos:TIPOS, toasts:s.toasts,
       pw:{password:PW('password'), password2:PW('password2')},
-      loginError:s.loginError, doLogin:()=>self.doLogin(),
+      loginError:s.loginError, loginTecnico:()=>self.loginTecnico(), loginGerente:()=>self.loginGerente(),
       clientesNombres:s.clientes.map(c=>c.nombre),
       estadosSolFiltro:['Todos los estados','Pendiente','En proceso','Finalizada','Cancelada'],
       estadosLev:['Pendiente','En Espera Administración'],
@@ -1556,18 +1541,28 @@ class Component extends DCLogic {
       reporteConsumo:['Reporte de Consumo en Servicios del último año','Análisis operativo detallado por tipo de servicio e inventario consumido.'],
       servicios:['Servicios','Catálogo de servicios y categorías.']};
     out.pageTitle=titles[s.screen][0]; out.pageSub=titles[s.screen][1];
-    out.isInicio=s.screen==='inicio'; out.isSolicitudes=s.screen==='solicitudes'; out.isAgenda=s.screen==='agenda';
-    out.isLevantamientos=s.screen==='levantamientos';
-    out.isNuevoLev=s.screen==='nuevoLev'||s.screen==='levSolicitud';
+    out.isInicio=s.screen==='inicio'; 
+    out.isSolicitudes=s.screen==='solicitudes'; 
+    out.isClientes=s.screen==='clientes';
+
+    if(esGerente) {
+      out.isReportes=s.screen==='reportes'; 
+      out.isReporteConsumo=s.screen==='reporteConsumo'; 
+      out.isListaReportesConsumo=s.screen==='listaReportesConsumo';
+      out.isEnDesarrollo=['cotizaciones','ordenes','cobros','servicios','inventario','proveedores','usuarios'].includes(s.screen);
+    } else {
+      out.isReportes=false; out.isReporteConsumo=false; out.isListaReportesConsumo=false;
+      out.isEnDesarrollo=['agenda','levantamientos','nuevoLev','levSolicitud','ordenes','historial'].includes(s.screen);
+    }
+
+    out.isAgenda=false; out.isLevantamientos=false; out.isNuevoLev=false; 
+    out.isNuevoLevOnly=false; out.isOrdenes=false; out.isHistorial=false; out.isUsuarios=false;
+    out.isCotizaciones=false; out.isCobros=false; out.isInventario=false; out.isProveedores=false; out.isServicios=false;
+
     out.desdeSolicitud=s.screen==='levSolicitud';
     out.lockBg=s.screen==='levSolicitud'?'#F4F5FB':'#fff';
     out.origenTexto=s.origen?('Solicitud '+String(s.origen.id).padStart(4,'0')+' · '+fmt(s.origen.fecha)+' a las '+h12(s.origen.hora)+' · '+(s.origen.direccion||'')):'';
     out.volverLevantamientos=()=>self.go('levantamientos');
-    out.isNuevoLevOnly=s.screen==='nuevoLev'; out.isOrdenes=s.screen==='ordenes';
-    out.isClientes=s.screen==='clientes'; out.isHistorial=s.screen==='historial'; out.isUsuarios=s.screen==='usuarios'&&esGerente;
-    out.isCotizaciones=s.screen==='cotizaciones'; out.isCobros=s.screen==='cobros'; out.isInventario=s.screen==='inventario'; out.isProveedores=s.screen==='proveedores';
-    out.isReportes=s.screen==='reportes'; out.isReporteConsumo=s.screen==='reporteConsumo'; out.isListaReportesConsumo=s.screen==='listaReportesConsumo'; out.isServicios=s.screen==='servicios';
-    out.isEnDesarrollo=out.isCotizaciones||out.isCobros||out.isInventario||out.isProveedores;
     out.goReporteConsumo=()=>self.go('reporteConsumo'); out.volverReportes=()=>self.go('reportes');
 
     const nuevaSolicitud=()=>self.openModal('solicitud',{});
@@ -1578,6 +1573,7 @@ class Component extends DCLogic {
       clientes:{label:'+ Nuevo cliente',on:nuevoCliente}, levantamientos:{label:'+ Nuevo levantamiento',on:()=>self.nuevoLevManual()},
       usuarios:{label:'+ Nuevo usuario',on:nuevoUsuario}, servicios:{label:'+ Crear servicio',on:()=>self.nuevoServicio()}};
     out.primaryAction=pa[s.screen]||null;
+    if(out.isEnDesarrollo) out.primaryAction=null;
     
     let servs = s.servicios;
     if(s.search&&s.search.srv) {
