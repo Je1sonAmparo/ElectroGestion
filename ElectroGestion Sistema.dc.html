@@ -1313,12 +1313,12 @@ class Component extends DCLogic {
 
   loginTecnico(){
     const u=this.state.usuarios.find(x=>x.rol==='Técnico');
-    this.setState({session:u, screen:'inicio', form:{}, errors:{}, loginError:''});
+    this.setState({session:u, screen:'solicitudes', form:{}, errors:{}, loginError:''});
     this.toast('Bienvenido, '+u.nombre.split(' ')[0]+'.');
   }
   loginGerente(){
     const u=this.state.usuarios.find(x=>x.rol==='Gerente');
-    this.setState({session:u, screen:'inicio', form:{}, errors:{}, loginError:''});
+    this.setState({session:u, screen:'solicitudes', form:{}, errors:{}, loginError:''});
     this.toast('Bienvenido, '+u.nombre.split(' ')[0]+'.');
   }
 
@@ -1541,7 +1541,7 @@ class Component extends DCLogic {
       reporteConsumo:['Reporte de Consumo en Servicios del último año','Análisis operativo detallado por tipo de servicio e inventario consumido.'],
       servicios:['Servicios','Catálogo de servicios y categorías.']};
     out.pageTitle=titles[s.screen][0]; out.pageSub=titles[s.screen][1];
-    out.isInicio=s.screen==='inicio'; 
+    
     out.isSolicitudes=s.screen==='solicitudes'; 
     out.isClientes=s.screen==='clientes';
 
@@ -1549,13 +1549,13 @@ class Component extends DCLogic {
       out.isReportes=s.screen==='reportes'; 
       out.isReporteConsumo=s.screen==='reporteConsumo'; 
       out.isListaReportesConsumo=s.screen==='listaReportesConsumo';
-      out.isEnDesarrollo=['cotizaciones','ordenes','cobros','servicios','inventario','proveedores','usuarios'].includes(s.screen);
+      out.isEnDesarrollo=['inicio','cotizaciones','ordenes','cobros','servicios','inventario','proveedores','usuarios'].includes(s.screen);
     } else {
       out.isReportes=false; out.isReporteConsumo=false; out.isListaReportesConsumo=false;
-      out.isEnDesarrollo=['agenda','levantamientos','nuevoLev','levSolicitud','ordenes','historial'].includes(s.screen);
+      out.isEnDesarrollo=['inicio','agenda','levantamientos','nuevoLev','levSolicitud','ordenes','historial'].includes(s.screen);
     }
 
-    out.isAgenda=false; out.isLevantamientos=false; out.isNuevoLev=false; 
+    out.isInicio=false; out.isAgenda=false; out.isLevantamientos=false; out.isNuevoLev=false; 
     out.isNuevoLevOnly=false; out.isOrdenes=false; out.isHistorial=false; out.isUsuarios=false;
     out.isCotizaciones=false; out.isCobros=false; out.isInventario=false; out.isProveedores=false; out.isServicios=false;
 
