@@ -22,108 +22,137 @@
 </helmet>
 
 <sc-if value="{{ loggedOut }}" hint-placeholder-val="{{ true }}">
-<div style="min-height:100vh;display:grid;grid-template-columns:1fr 1.1fr;align-items:stretch;background:#fff">
-  <div style="display:flex;flex-direction:column;justify-content:center;padding:64px 80px;position:relative">
-    <div style="margin-bottom:48px;display:flex;align-items:center;gap:14px">
-      <div style="font-family:'Manrope';font-weight:900;font-size:56px;letter-spacing:-3px;line-height:1;display:flex;align-items:center;position:relative">
-        <span style="color:#1D4ED8">E</span>
-        <span style="color:#F59E0B;margin-left:-4px">G</span>
-        <svg style="position:absolute;left:25px;top:6px" width="22" height="44" viewBox="0 0 16 32">
-          <path d="M14 2 L2 16 H10 L4 30 L16 14 H8 L14 2 Z" fill="#F59E0B" stroke="#fff" stroke-width="2.5" stroke-linejoin="round"/>
+<div style="min-height:100vh;display:flex;align-items:center;justify-content:center;background:#F4F5FB;padding:20px;background-image:radial-gradient(circle at top right, rgba(29,78,216,0.05), transparent 40%), radial-gradient(circle at bottom left, rgba(245,158,11,0.05), transparent 40%)">
+  <div style="width:100%;max-width:440px;background:#fff;border-radius:24px;box-shadow:0 24px 48px rgba(20,22,43,0.04), 0 2px 8px rgba(20,22,43,0.02);padding:48px 44px">
+    <div style="display:flex;flex-direction:column;align-items:center;margin-bottom:40px;text-align:center">
+      <div style="display:flex;align-items:center;margin-bottom:12px;position:relative;margin-left:-8px">
+        <svg viewBox="0 0 100 60" width="76" height="46">
+          <defs>
+            <mask id="bolt-mask">
+              <rect width="100" height="60" fill="white" />
+              <path d="M46 5 L34 32 H46 L38 58 L54 28 H42 Z" fill="black" stroke="black" stroke-width="2.5" stroke-linejoin="round"/>
+            </mask>
+          </defs>
+          <text x="10" y="48" font-family="'Manrope', sans-serif" font-weight="900" font-size="52" fill="#1D4ED8" letter-spacing="-1.5">E</text>
+          <text x="44" y="48" font-family="'Manrope', sans-serif" font-weight="900" font-size="52" fill="#F59E0B" mask="url(#bolt-mask)" letter-spacing="-1.5">G</text>
+          <path d="M46 5 L34 32 H46 L38 58 L54 28 H42 Z" fill="#F59E0B" stroke="#F59E0B" stroke-width="0" stroke-linejoin="round"/>
         </svg>
       </div>
-      <div style="font-family:'Manrope';font-weight:900;font-size:30px;letter-spacing:-0.5px;line-height:1">
+      <div style="font-family:'Manrope';font-weight:900;font-size:24px;letter-spacing:-0.5px;line-height:1.2;margin-bottom:8px">
         <span style="color:#1D4ED8">ELECTRO</span><span style="color:#334155">GESTIÓN</span>
       </div>
+      <div style="color:#6B7085;font-size:14.5px;line-height:1.5">Sistema Informático de Servicios Eléctricos</div>
     </div>
-    <div style="width:100%;max-width:390px">
-      <div style="font-family:'Manrope';font-weight:800;font-size:30px">Iniciar sesión</div>
-      <div style="color:#6B7085;margin-top:8px;font-size:15px">Ingresa tus credenciales para continuar.</div>
-      <div style="margin-top:30px">
-        <label style="display:block;font-size:13px;font-weight:700;color:#4A4E63;margin-bottom:7px">Usuario</label>
-        <input value="{{ fields.usuario.value }}" onChange="{{ fields.usuario.onChange }}" placeholder="admin" style="width:100%;padding:13px 14px;border:1px solid #D5D8E6;border-radius:10px;font-size:15px;background:#F4F5FB" />
-        <sc-if value="{{ fields.usuario.error }}" hint-placeholder-val="{{ false }}"><div style="color:#C4141B;font-size:12.5px;margin-top:6px;font-weight:700">{{ fields.usuario.error }}</div></sc-if>
-      </div>
-      <div style="margin-top:18px">
-        <label style="display:block;font-size:13px;font-weight:700;color:#4A4E63;margin-bottom:7px">Contraseña</label>
-        <div style="position:relative;display:flex;align-items:center">
-          <input type="{{ pw.password.type }}" value="{{ fields.password.value }}" onChange="{{ fields.password.onChange }}" placeholder="••••••" style="width:100%;padding:13px 46px 13px 14px;border:1px solid #D5D8E6;border-radius:10px;font-size:15px;background:#F4F5FB" />
-          <button onClick="{{ pw.password.toggle }}" title="{{ pw.password.title }}" style="position:absolute;right:6px;width:34px;height:34px;border:0;background:none;cursor:pointer;display:flex;align-items:center;justify-content:center;border-radius:8px" style-hover="background:#EEF0F8">
-            <svg viewBox="0 0 24 24" width="19" height="19" fill="none" stroke="#6B7085" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="{{ pw.password.d }}"></path></svg>
-          </button>
-        </div>
-        <sc-if value="{{ fields.password.error }}" hint-placeholder-val="{{ false }}"><div style="color:#C4141B;font-size:12.5px;margin-top:6px;font-weight:700">{{ fields.password.error }}</div></sc-if>
-      </div>
-      <sc-if value="{{ loginError }}" hint-placeholder-val="{{ false }}">
-        <div style="margin-top:18px;background:#FDE9EA;border:1px solid #F5C2C4;color:#C4141B;padding:11px 13px;border-radius:10px;font-size:13.5px;font-weight:700">{{ loginError }}</div>
-      </sc-if>
-      <button onClick="{{ doLogin }}" style="width:100%;margin-top:24px;padding:14px;background:#1D4ED8;color:#fff;border:0;border-radius:10px;font-size:16px;font-weight:700;cursor:pointer;font-family:'Manrope'" style-hover="background:#1E40AF">Entrar</button>
-    </div>
-  </div>
-  <div style="background:linear-gradient(135deg, #1D4ED8 0%, #1E3A8A 100%);display:flex;flex-direction:column;justify-content:center;padding:64px 80px;color:#fff;position:relative;overflow:hidden">
-    <div style="position:absolute;top:-20%;right:-10%;width:600px;height:600px;background:radial-gradient(circle, rgba(255,255,255,0.08) 0%, rgba(255,255,255,0) 70%);border-radius:50%"></div>
-    <div style="position:absolute;bottom:-10%;left:-10%;width:400px;height:400px;background:radial-gradient(circle, rgba(245,158,11,0.15) 0%, rgba(245,158,11,0) 70%);border-radius:50%"></div>
     
-    <div style="position:relative;z-index:10">
-      <div style="width:64px;height:64px;background:rgba(255,255,255,0.1);border-radius:16px;display:flex;align-items:center;justify-content:center;margin-bottom:32px;backdrop-filter:blur(10px)">
-        <svg viewBox="0 0 24 24" width="32" height="32" fill="none" stroke="#F59E0B" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"></path></svg>
-      </div>
-      <div style="font-family:'Manrope';font-weight:800;font-size:42px;line-height:1.15;margin-bottom:20px;letter-spacing:-1px">Sistema Informático<br/>de Servicios Eléctricos</div>
-      <div style="font-size:18px;line-height:1.6;opacity:.85;max-width:480px;margin-bottom:40px">Plataforma integral para la gestión operativa: solicitudes, agendas, levantamientos técnicos y seguimiento de órdenes de trabajo.</div>
-      
-      <div style="display:flex;align-items:center;gap:12px;background:rgba(255,255,255,0.1);padding:16px 20px;border-radius:12px;width:max-content;backdrop-filter:blur(10px);border:1px solid rgba(255,255,255,0.1)">
-        <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="#F59E0B" stroke-width="2"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path></svg>
-        <div>
-          <div style="font-size:12px;text-transform:uppercase;letter-spacing:.05em;opacity:.7;font-weight:700">Soporte Técnico</div>
-          <div style="font-size:15px;font-weight:700;margin-top:2px">809-224-1279</div>
-        </div>
-      </div>
+    <div style="font-family:'Manrope';font-weight:800;font-size:22px;margin-bottom:24px;letter-spacing:-0.5px">Iniciar sesión</div>
+    
+    <div>
+      <label style="display:block;font-size:13px;font-weight:700;color:#4A4E63;margin-bottom:7px">Usuario</label>
+      <input value="{{ fields.usuario.value }}" onChange="{{ fields.usuario.onChange }}" placeholder="ej. admin" style="width:100%;padding:13px 14px;border:1px solid #D5D8E6;border-radius:10px;font-size:15px;background:#fff;transition:border 0.2s" />
+      <sc-if value="{{ fields.usuario.error }}" hint-placeholder-val="{{ false }}"><div style="color:#C4141B;font-size:12.5px;margin-top:6px;font-weight:700">{{ fields.usuario.error }}</div></sc-if>
     </div>
+    <div style="margin-top:18px">
+      <label style="display:block;font-size:13px;font-weight:700;color:#4A4E63;margin-bottom:7px">Contraseña</label>
+      <div style="position:relative;display:flex;align-items:center">
+        <input type="{{ pw.password.type }}" value="{{ fields.password.value }}" onChange="{{ fields.password.onChange }}" placeholder="••••••" style="width:100%;padding:13px 46px 13px 14px;border:1px solid #D5D8E6;border-radius:10px;font-size:15px;background:#fff;transition:border 0.2s" />
+        <button onClick="{{ pw.password.toggle }}" title="{{ pw.password.title }}" style="position:absolute;right:6px;width:34px;height:34px;border:0;background:none;cursor:pointer;display:flex;align-items:center;justify-content:center;border-radius:8px" style-hover="background:#F4F5FB">
+          <svg viewBox="0 0 24 24" width="19" height="19" fill="none" stroke="#6B7085" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="{{ pw.password.d }}"></path></svg>
+        </button>
+      </div>
+      <sc-if value="{{ fields.password.error }}" hint-placeholder-val="{{ false }}"><div style="color:#C4141B;font-size:12.5px;margin-top:6px;font-weight:700">{{ fields.password.error }}</div></sc-if>
+    </div>
+    <sc-if value="{{ loginError }}" hint-placeholder-val="{{ false }}">
+      <div style="margin-top:18px;background:#FDE9EA;border:1px solid #F5C2C4;color:#C4141B;padding:11px 13px;border-radius:10px;font-size:13.5px;font-weight:700">{{ loginError }}</div>
+    </sc-if>
+    <button onClick="{{ doLogin }}" style="width:100%;margin-top:28px;padding:15px;background:#1D4ED8;color:#fff;border:0;border-radius:10px;font-size:16px;font-weight:700;cursor:pointer;font-family:'Manrope';box-shadow:0 4px 14px rgba(29,78,216,0.25);transition:all 0.2s" style-hover="background:#1E40AF;transform:translateY(-1px);box-shadow:0 6px 16px rgba(29,78,216,0.3)">Entrar</button>
   </div>
 </div>
 </sc-if>
 
 <sc-if value="{{ loggedIn }}" hint-placeholder-val="{{ false }}">
 <div style="min-height:100vh;display:flex">
-  <aside style="width:252px;flex:0 0 252px;background:#fff;border-right:1px solid #E3E5EE;display:flex;flex-direction:column;padding:24px 0;position:sticky;top:0;height:100vh">
-    <div style="padding:28px 22px 24px;display:flex;flex-direction:column;align-items:center;text-align:center">
-      <div style="display:flex;align-items:center;margin-bottom:8px">
-        <div style="font-family:'Manrope';font-weight:900;font-size:46px;letter-spacing:-2.5px;line-height:1;display:flex;align-items:center;position:relative">
-          <span style="color:#1D4ED8">E</span>
-          <span style="color:#F59E0B;margin-left:-3px">G</span>
-          <svg style="position:absolute;left:20px;top:4px" width="18" height="36" viewBox="0 0 16 32">
-            <path d="M14 2 L2 16 H10 L4 30 L16 14 H8 L14 2 Z" fill="#F59E0B" stroke="#fff" stroke-width="2.5" stroke-linejoin="round"/>
+  <aside style="width:{{ sidebarCollapsed ? '80px' : '250px' }};flex:0 0 {{ sidebarCollapsed ? '80px' : '250px' }};background:#fff;border-right:1px solid #E3E5EE;display:flex;flex-direction:column;padding:24px 0;position:sticky;top:0;height:100vh;transition:width 0.3s cubic-bezier(0.4, 0, 0.2, 1)">
+    <button onClick="{{ toggleSidebar }}" style="position:absolute;top:28px;right:-14px;width:28px;height:28px;border:1px solid #E3E5EE;background:#fff;border-radius:50%;cursor:pointer;display:flex;align-items:center;justify-content:center;color:#6B7085;z-index:10;box-shadow:0 2px 5px rgba(0,0,0,0.05)" style-hover="color:#1D4ED8;border-color:#1D4ED8">
+      <sc-if value="{{ sidebarCollapsed }}" hint-placeholder-val="{{ false }}">
+        <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18l6-6-6-6"/></svg>
+      </sc-if>
+      <sc-if value="{{ !sidebarCollapsed }}" hint-placeholder-val="{{ true }}">
+        <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg>
+      </sc-if>
+    </button>
+    <div style="padding:32px 0 28px;display:flex;flex-direction:row;align-items:center;justify-content:center;gap:3px;overflow:hidden;width:100%;cursor:pointer" onClick="{{ goInicio }}">
+      <sc-if value="{{ !sidebarCollapsed }}" hint-placeholder-val="{{ true }}">
+        <div style="display:flex;align-items:center;justify-content:center;width:100%;padding-left:14px;padding-right:14px">
+          <svg viewBox="10 0 74 60" width="42" height="34" style="flex:0 0 auto">
+            <defs>
+              <mask id="bolt-mask-sidebar-row">
+                <rect width="100" height="60" fill="white" />
+                <path d="M46 5 L34 32 H46 L38 58 L54 28 H42 Z" fill="black" stroke="black" stroke-width="2.5" stroke-linejoin="round"/>
+              </mask>
+            </defs>
+            <text x="10" y="48" font-family="'Manrope', sans-serif" font-weight="900" font-size="52" fill="#1D4ED8" letter-spacing="-1.5">E</text>
+            <text x="44" y="48" font-family="'Manrope', sans-serif" font-weight="900" font-size="52" fill="#F59E0B" mask="url(#bolt-mask-sidebar-row)" letter-spacing="-1.5">G</text>
+            <path d="M46 5 L34 32 H46 L38 58 L54 28 H42 Z" fill="#F59E0B" stroke="#F59E0B" stroke-width="0" stroke-linejoin="round"/>
+          </svg>
+          <div style="font-family:'Manrope';font-weight:900;font-size:20px;letter-spacing:-0.5px;white-space:nowrap;line-height:1;margin-top:2px;margin-left:4px">
+             <span style="color:#1D4ED8">ELECTRO</span><span style="color:#334155">GESTIÓN</span>
+          </div>
+        </div>
+      </sc-if>
+      <sc-if value="{{ sidebarCollapsed }}" hint-placeholder-val="{{ false }}">
+        <div style="display:flex;align-items:center;justify-content:center;width:100%">
+          <svg viewBox="10 0 74 60" width="52" height="42">
+            <defs>
+              <mask id="bolt-mask-sidebar-col">
+                <rect width="100" height="60" fill="white" />
+                <path d="M46 5 L34 32 H46 L38 58 L54 28 H42 Z" fill="black" stroke="black" stroke-width="2.5" stroke-linejoin="round"/>
+              </mask>
+            </defs>
+            <text x="10" y="48" font-family="'Manrope', sans-serif" font-weight="900" font-size="52" fill="#1D4ED8" letter-spacing="-1.5">E</text>
+            <text x="44" y="48" font-family="'Manrope', sans-serif" font-weight="900" font-size="52" fill="#F59E0B" mask="url(#bolt-mask-sidebar-col)" letter-spacing="-1.5">G</text>
+            <path d="M46 5 L34 32 H46 L38 58 L54 28 H42 Z" fill="#F59E0B" stroke="#F59E0B" stroke-width="0" stroke-linejoin="round"/>
           </svg>
         </div>
-      </div>
-      <div style="font-family:'Manrope';font-weight:900;font-size:17.5px;letter-spacing:-0.5px">
-        <span style="color:#1D4ED8">ELECTRO</span><span style="color:#334155">GESTIÓN</span>
-      </div>
+      </sc-if>
     </div>
-    <nav style="display:flex;flex-direction:column;gap:4px;padding:0 12px">
+    <nav style="display:flex;flex-direction:column;gap:4px;padding:0 12px;overflow:hidden">
       <sc-for list="{{ navItems }}" as="it" hint-placeholder-count="7">
-        <button onClick="{{ it.go }}" style="position:relative;display:flex;align-items:center;gap:12px;width:100%;text-align:left;border:0;cursor:pointer;padding:12px 14px;border-radius:10px;font-size:14.5px;font-weight:{{ it.w }};background:{{ it.bg }};color:{{ it.fg }};transition:all 0.2s" style-hover="background:{{ it.activo ? '#EDEBFF' : '#F4F5FB' }}">
-          <div style="position:relative;display:flex;align-items:center;justify-content:center;width:24px;height:24px">
-            <sc-if value="{{ it.activo }}" hint-placeholder-val="{{ false }}">
-              <div style="position:absolute;inset:-2px;background:#FEF3C7;border-radius:6px;opacity:0.8;transform:rotate(10deg)"></div>
-            </sc-if>
-            <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="position:relative;z-index:1;flex:0 0 22px">
+        <button onClick="{{ it.go }}" style="position:relative;display:flex;align-items:center;gap:12px;width:100%;text-align:left;border:0;cursor:pointer;padding:12px {{ sidebarCollapsed ? '16px' : '14px' }};border-radius:10px;font-size:14.5px;font-weight:{{ it.w }};background:{{ it.bg }};color:{{ it.fg }};transition:all 0.2s" style-hover="background:{{ it.activo ? '#EDEBFF' : '#F4F5FB' }}" title="{{ sidebarCollapsed ? it.label : '' }}">
+          <div style="position:relative;display:flex;align-items:center;justify-content:center;width:24px;height:24px;flex:0 0 24px">
+            <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="position:relative;z-index:1">
               <path d="{{ it.d1 }}" stroke="{{ it.dot1 }}"></path>
               <path d="{{ it.d2 }}" stroke="{{ it.dot2 }}"></path>
             </svg>
           </div>
-          {{ it.label }}
+          <sc-if value="{{ !sidebarCollapsed }}" hint-placeholder-val="{{ true }}">
+            <span style="white-space:nowrap">{{ it.label }}</span>
+          </sc-if>
         </button>
       </sc-for>
     </nav>
-    <div style="margin-top:auto;padding:18px 20px 0;border-top:1px solid #EFF0F6;display:flex;align-items:center;gap:11px">
-      <div style="width:38px;height:38px;border-radius:50%;background:#1D4ED8;color:#fff;display:flex;align-items:center;justify-content:center;font-weight:800;font-family:'Manrope'">{{ user.inicial }}</div>
-      <div style="min-width:0">
-        <div style="font-weight:700;font-size:14px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ user.nombre }}</div>
-        <div style="font-size:12px;color:#8B90A3">{{ user.cargo }}</div>
-      </div>
+    <div style="margin-top:auto;border-top:1px solid #EFF0F6;padding-top:18px;width:100%">
+      <sc-if value="{{ !sidebarCollapsed }}" hint-placeholder-val="{{ true }}">
+        <div style="display:flex;align-items:center;gap:11px;padding-left:26px;padding-right:20px;width:100%;box-sizing:border-box">
+          <div style="width:38px;height:38px;border-radius:50%;background:#1D4ED8;color:#fff;display:flex;align-items:center;justify-content:center;font-weight:800;font-family:'Manrope';flex:0 0 38px">{{ user.inicial }}</div>
+          <div style="min-width:0">
+            <div style="font-weight:700;font-size:14px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ user.nombre }}</div>
+            <div style="font-size:12px;color:#8B90A3">{{ user.cargo }}</div>
+          </div>
+        </div>
+        <button onClick="{{ askLogout }}" style="margin:12px 20px 0;width:calc(100% - 40px);padding:9px;border:1px solid #E3E5EE;background:#fff;border-radius:9px;font-size:13px;font-weight:700;color:#C4141B;cursor:pointer" style-hover="background:#FDE9EA;border-color:#F5C2C4">Cerrar sesión</button>
+      </sc-if>
+      
+      <sc-if value="{{ sidebarCollapsed }}" hint-placeholder-val="{{ false }}">
+        <div style="display:flex;align-items:center;justify-content:center;width:100%">
+          <div style="width:38px;height:38px;border-radius:50%;background:#1D4ED8;color:#fff;display:flex;align-items:center;justify-content:center;font-weight:800;font-family:'Manrope';flex:0 0 38px" title="{{ user.nombre }}">{{ user.inicial }}</div>
+        </div>
+      </sc-if>
     </div>
-    <button onClick="{{ askLogout }}" style="margin:12px 20px 0;padding:9px;border:1px solid #E3E5EE;background:#fff;border-radius:9px;font-size:13px;font-weight:700;color:#C4141B;cursor:pointer" style-hover="background:#FDE9EA;border-color:#F5C2C4">Cerrar sesión</button>
+    <sc-if value="{{ sidebarCollapsed }}" hint-placeholder-val="{{ false }}">
+      <button onClick="{{ askLogout }}" title="Cerrar sesión" style="margin:12px 12px 0;padding:9px;border:1px solid #E3E5EE;background:#fff;border-radius:9px;font-size:13px;font-weight:700;color:#C4141B;cursor:pointer;display:flex;align-items:center;justify-content:center" style-hover="background:#FDE9EA;border-color:#F5C2C4">
+        <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4"></path><path d="M16 17l5-5-5-5"></path><path d="M21 12H9"></path></svg>
+      </button>
+    </sc-if>
   </aside>
 
   <main style="flex:1;min-width:0;padding:32px 38px 60px">
@@ -202,7 +231,10 @@
               <sc-for list="{{ actividad }}" as="a" hint-placeholder-count="3">
                 <div style="display:flex;align-items:center;gap:12px">
                   <div style="width:34px;height:34px;border-radius:50%;background:#EDEBFF;flex:0 0 34px;display:flex;align-items:center;justify-content:center">
-                    <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="#1D4ED8" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="{{ a.d }}"></path></svg>
+                    <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+                      <path d="{{ a.d1 }}" stroke="#1D4ED8"></path>
+                      <path d="{{ a.d2 }}" stroke="#F59E0B"></path>
+                    </svg>
                   </div>
                   <div style="min-width:0;flex:1">
                     <div style="font-weight:700;font-size:14px">{{ a.tipoServicio }}</div>
@@ -222,7 +254,10 @@
             <div style="display:grid;grid-template-columns:repeat(5,1fr);gap:14px">
               <sc-for list="{{ accesos }}" as="q" hint-placeholder-count="5">
                 <button onClick="{{ q.on }}" style="background:#fff;border:1px solid #E3E5EE;border-radius:13px;padding:20px 14px;cursor:pointer;text-align:center;font-size:13.5px;font-weight:700;color:#14162B" style-hover="border-color:#1D4ED8;color:#1D4ED8">
-                  <svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="#1D4ED8" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" style="display:block;margin:0 auto 12px"><path d="{{ q.d }}"></path></svg>{{ q.label }}
+                  <svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" style="display:block;margin:0 auto 12px">
+                    <path d="{{ q.d1 }}" stroke="#1D4ED8"></path>
+                    <path d="{{ q.d2 }}" stroke="#F59E0B"></path>
+                  </svg>{{ q.label }}
                 </button>
               </sc-for>
             </div>
@@ -233,11 +268,42 @@
 
     <sc-if value="{{ isSolicitudes }}" hint-placeholder-val="{{ false }}">
       <div style="background:#fff;border:1px solid #E3E5EE;border-radius:14px;overflow:hidden">
-        <div style="display:flex;gap:14px;padding:18px;border-bottom:1px solid #EFF0F6">
-          <input value="{{ search.sol.value }}" onChange="{{ search.sol.onChange }}" placeholder="Buscar solicitud por cliente..." style="flex:1;padding:11px 14px;border:1px solid #D5D8E6;border-radius:9px;font-size:14px" />
-          <select value="{{ filters.sol.value }}" onChange="{{ filters.sol.onChange }}" style="padding:11px 14px;border:1px solid #D5D8E6;border-radius:9px;font-size:14px;background:#fff;min-width:200px">
-            <sc-for list="{{ estadosSolFiltro }}" as="e" hint-placeholder-count="5"><option value="{{ e }}">{{ e }}</option></sc-for>
-          </select>
+        <div style="display:flex;flex-direction:column;gap:18px;padding:22px;border-bottom:1px solid #EFF0F6">
+          <div style="display:flex;align-items:center;gap:40px">
+            <div style="display:flex;align-items:center;gap:10px">
+              <span style="font-family:'Manrope';font-weight:800;font-size:15px;color:#14162B">ID:</span>
+              <input value="{{ search.solId.value }}" onChange="{{ search.solId.onChange }}" placeholder="ID de solicitud" style="width:140px;padding:9px 12px;border:1px solid #D5D8E6;border-radius:6px;font-size:14px;color:#4A4E63" />
+            </div>
+            <div style="display:flex;align-items:center;gap:10px">
+              <span style="font-family:'Manrope';font-weight:800;font-size:15px;color:#14162B">Cliente:</span>
+              <input value="{{ search.solCli.value }}" onChange="{{ search.solCli.onChange }}" placeholder="Nombre del cliente" style="width:200px;padding:9px 12px;border:1px solid #D5D8E6;border-radius:6px;font-size:14px;color:#4A4E63" />
+            </div>
+            <div style="display:flex;align-items:center;gap:10px">
+              <span style="font-family:'Manrope';font-weight:800;font-size:15px;color:#14162B">Tipo de Servicio:</span>
+              <select value="{{ search.solTipo.value }}" onChange="{{ search.solTipo.onChange }}" style="width:190px;padding:9px 12px;border:1px solid #D5D8E6;border-radius:6px;font-size:14px;background:#fff;color:#4A4E63">
+                <option value="">Seleccione Servicio</option>
+                <sc-for list="{{ tipos }}" as="t" hint-placeholder-count="5"><option value="{{ t }}">{{ t }}</option></sc-for>
+              </select>
+            </div>
+          </div>
+          <div style="display:flex;align-items:center;gap:40px">
+            <div style="display:flex;align-items:center;gap:10px">
+              <span style="font-family:'Manrope';font-weight:800;font-size:15px;color:#14162B">Fecha Solicitud:</span>
+              <input type="date" value="{{ search.solFecha.value }}" onChange="{{ search.solFecha.onChange }}" style="width:160px;padding:9px 12px;border:1px solid #D5D8E6;border-radius:6px;font-size:14px;background:#fff;color:#4A4E63" />
+            </div>
+            <div style="display:flex;align-items:center;gap:10px">
+              <span style="font-family:'Manrope';font-weight:800;font-size:15px;color:#14162B">Estado:</span>
+              <select value="{{ filters.sol.value }}" onChange="{{ filters.sol.onChange }}" style="width:170px;padding:9px 12px;border:1px solid #D5D8E6;border-radius:6px;font-size:14px;background:#fff;color:#4A4E63">
+                <sc-for list="{{ estadosSolFiltro }}" as="e" hint-placeholder-count="5"><option value="{{ e }}">{{ e }}</option></sc-for>
+              </select>
+            </div>
+            <div style="width:190px;display:flex;justify-content:flex-end;margin-left:auto">
+              <button style="display:flex;align-items:center;gap:8px;padding:9px 24px;border:0;background:#1D4ED8;color:#fff;border-radius:6px;font-weight:700;font-size:14px;cursor:pointer;font-family:'Manrope'" style-hover="background:#1E40AF">
+              <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+              Buscar
+              </button>
+            </div>
+          </div>
         </div>
         <div style="display:grid;grid-template-columns:80px 1.2fr 1.4fr 1fr 1fr 110px;padding:14px 18px;font-size:12px;font-weight:800;color:#8B90A3;text-transform:uppercase;letter-spacing:.06em;border-bottom:1px solid #EFF0F6">
           <div>ID</div><div>Cliente</div><div>Tipo de servicio</div><div>Fecha solicitud</div><div>Estado</div><div style="text-align:right">Acciones</div>
@@ -623,7 +689,7 @@
 
     <sc-if value="{{ isReportes }}" hint-placeholder-val="{{ false }}">
       <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:20px">
-        <div style="background:#fff;border:1px solid #E3E5EE;border-radius:14px;padding:28px 24px;cursor:pointer;transition:box-shadow .15s" style-hover="box-shadow:0 4px 20px rgba(29,78,216,.12)" onClick="{{ goReporteConsumo }}">
+        <div style="background:#fff;border:1px solid #E3E5EE;border-radius:14px;padding:28px 24px;cursor:pointer;transition:box-shadow .15s" style-hover="box-shadow:0 4px 20px rgba(29,78,216,.12)" onClick="{{ goListaReportesConsumo }}">
           <div style="width:48px;height:48px;border-radius:12px;background:#EFF6FF;display:flex;align-items:center;justify-content:center;margin-bottom:16px">
             <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="#1D4ED8" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M4.5 4.5h15v15h-15z M8 14v2.5 M12 10v6.5 M16 12v4.5"></path></svg>
           </div>
@@ -650,70 +716,161 @@
       </div>
     </sc-if>
 
+    <sc-if value="{{ isListaReportesConsumo }}" hint-placeholder-val="{{ false }}">
+      <div>
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:16px;font-size:13px;color:#1D4ED8">
+          <span style="cursor:pointer" onClick="{{ volverReportes }}">Reportes</span> 
+          <span style="color:#8B90A3">/</span> 
+          <span style="color:#334155;font-weight:700">Consumo en Servicios</span>
+        </div>
+        
+        <div style="margin-bottom:24px">
+          <h2 style="font-family:'Manrope';font-weight:800;font-size:22px;color:#14162B;margin:0 0 4px 0">Reportes de Consumo en Servicios</h2>
+          <p style="color:#6B7085;font-size:14.5px;margin:0">Seleccione el reporte que desea visualizar.</p>
+        </div>
+
+        <div style="display:flex;flex-direction:column;gap:12px">
+          <div style="background:#fff;border:1px solid #E3E5EE;border-radius:12px;padding:20px 24px;display:flex;align-items:center;justify-content:space-between;cursor:pointer;transition:box-shadow .15s" style-hover="box-shadow:0 4px 12px rgba(29,78,216,.08)" onClick="{{ goReporteConsumo }}">
+            <div style="display:flex;align-items:center;gap:16px">
+              <div style="width:40px;height:40px;border-radius:10px;background:#EFF6FF;display:flex;align-items:center;justify-content:center">
+                <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="#1D4ED8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4.5 6.5h15v14h-15z M4.5 11h15 M8.5 3.8v4 M15.5 3.8v4"></path></svg>
+              </div>
+              <div>
+                <div style="font-family:'Manrope';font-weight:700;font-size:15px;color:#14162B;margin-bottom:4px">Reporte de Consumo en Servicios del último año</div>
+                <div style="color:#6B7085;font-size:13px">Vista general de servicios y materiales utilizados durante el año.</div>
+              </div>
+            </div>
+            <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="#8B90A3" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18l6-6-6-6"/></svg>
+          </div>
+          
+          <div style="background:#fff;border:1px solid #E3E5EE;border-radius:12px;padding:20px 24px;display:flex;align-items:center;justify-content:space-between;opacity:0.6;cursor:default">
+            <div style="display:flex;align-items:center;gap:16px">
+              <div style="width:40px;height:40px;border-radius:10px;background:#F1F5F9;display:flex;align-items:center;justify-content:center">
+                <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="#64748B" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4.5 6.5h15v14h-15z M4.5 11h15 M8.5 3.8v4 M15.5 3.8v4"></path></svg>
+              </div>
+              <div>
+                <div style="font-family:'Manrope';font-weight:700;font-size:15px;color:#334155;margin-bottom:4px">Reporte de Consumo Mensual</div>
+                <div style="color:#94A3B8;font-size:13px">Desglose mensual de recursos consumidos. (Próximamente)</div>
+              </div>
+            </div>
+          </div>
+          
+          <div style="background:#fff;border:1px solid #E3E5EE;border-radius:12px;padding:20px 24px;display:flex;align-items:center;justify-content:space-between;opacity:0.6;cursor:default">
+            <div style="display:flex;align-items:center;gap:16px">
+              <div style="width:40px;height:40px;border-radius:10px;background:#F1F5F9;display:flex;align-items:center;justify-content:center">
+                <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="#64748B" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9 M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"></path></svg>
+              </div>
+              <div>
+                <div style="font-family:'Manrope';font-weight:700;font-size:15px;color:#334155;margin-bottom:4px">Reporte de Materiales por Técnico</div>
+                <div style="color:#94A3B8;font-size:13px">Consumo específico asignado a cada técnico de campo. (Próximamente)</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </sc-if>
+
+
     <sc-if value="{{ isReporteConsumo }}" hint-placeholder-val="{{ false }}">
       <div>
         <div style="display:flex;align-items:center;gap:8px;margin-bottom:16px;font-size:13px;color:#1D4ED8">
-          <span style="cursor:pointer" onClick="{{ volverReportes }}">Reportes</span> <span style="color:#8B90A3">/</span> <span style="color:#8B90A3">Consumos</span> <span style="color:#8B90A3">/</span> <span style="color:#334155;font-weight:700">Reporte de Consumo en Servicios del último año</span>
+          <span style="cursor:pointer" onClick="{{ volverReportes }}">Reportes</span> 
+          <span style="color:#8B90A3">/</span> 
+          <span style="cursor:pointer" onClick="{{ goListaReportesConsumo }}">Consumo en Servicios</span>
+          <span style="color:#8B90A3">/</span> 
+          <span style="color:#334155;font-weight:700">Reporte de Consumo en Servicios del último año</span>
         </div>
-        <div style="background:#fff;border:1px solid #E3E5EE;border-radius:14px;padding:20px 24px;display:flex;align-items:center;gap:20px;flex-wrap:wrap;margin-bottom:24px">
-          <div style="display:flex;align-items:center;gap:8px">
-            <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="#1D4ED8" stroke-width="1.7"><path d="M4.5 6.5h15v14h-15z M4.5 11h15 M8.5 3.8v4 M15.5 3.8v4"></path></svg>
-            <span style="font-size:14px;font-weight:700;color:#334155">Período:</span>
-            <span style="font-size:14px;color:#6B7085">Último Año</span>
+        <div style="background:#fff;border:1px solid #E3E5EE;border-radius:14px;padding:20px 24px;display:flex;align-items:center;justify-content:center;gap:24px;flex-wrap:wrap;margin-bottom:24px;box-shadow:0 4px 12px rgba(20,22,43,0.02)">
+          <div style="display:flex;align-items:center;gap:10px">
+            <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="#14162B" stroke-width="2"><path d="M4.5 6.5h15v14h-15z M4.5 11h15 M8.5 3.8v4 M15.5 3.8v4"></path></svg>
+            <span style="font-size:15px;color:#14162B">Período: <b>Último Año</b></span>
           </div>
-          <select style="padding:9px 14px;border:1px solid #D5D8E6;border-radius:9px;font-size:14px;background:#fff">
-            <option>Año 2025</option>
+          <select value="{{ reportesConfig.anio.value }}" onChange="{{ reportesConfig.anio.onChange }}" style="padding:10px 18px;border:1px solid #8B90A3;border-radius:9px;font-size:14.5px;color:#1D4ED8;font-weight:700;background:#fff">
+            <sc-for list="{{ reportesConfig.anios }}" as="a">
+              <option value="{{ a }}">{{ a }}</option>
+            </sc-for>
           </select>
-          <span style="font-size:14px;font-weight:700;color:#334155">Categoría:</span>
-          <select style="padding:9px 14px;border:1px solid #D5D8E6;border-radius:9px;font-size:14px;background:#fff">
-            <option>Todos los Servicios</option>
-          </select>
-          <button style="margin-left:auto;padding:10px 20px;background:#1D4ED8;color:#fff;border:0;border-radius:9px;font-weight:700;font-size:13.5px;cursor:pointer;font-family:'Manrope'" style-hover="background:#1E40AF">Actualizar Reporte</button>
+          <div style="display:flex;align-items:center;gap:10px">
+            <span style="font-size:15px;color:#14162B">Categoría:</span>
+            <select value="{{ reportesConfig.categoria.value }}" onChange="{{ reportesConfig.categoria.onChange }}" style="padding:10px 18px;border:1px solid #8B90A3;border-radius:9px;font-size:14.5px;color:#1D4ED8;font-weight:700;background:#fff;min-width:180px;max-width:260px">
+              <sc-for list="{{ reportesConfig.categorias }}" as="c">
+                <option value="{{ c }}">{{ c }}</option>
+              </sc-for>
+            </select>
+          </div>
+          <button style="padding:11px 22px;background:#DBEAFE;color:#1D4ED8;border:0;border-radius:9px;font-weight:800;font-size:14.5px;cursor:pointer;font-family:'Manrope'" style-hover="background:#BFDBFE">Actualizar Reporte</button>
         </div>
-        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px;margin-bottom:24px">
-          <div style="background:#fff;border:1px solid #E3E5EE;border-radius:12px;padding:18px 22px">
-            <div style="font-size:12px;font-weight:700;color:#6B7085;text-transform:uppercase;letter-spacing:.05em">Total Consumo (RD$)</div>
-            <div style="font-family:'Manrope';font-weight:800;font-size:28px;color:#14162B;margin-top:6px">1,625,000.00</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr 2fr;gap:16px;margin-bottom:24px">
+          
+          <!-- Primera Columna -->
+          <div style="display:flex;flex-direction:column;gap:16px">
+            <div style="background:#fff;border:1px solid #E3E5EE;border-radius:12px;box-shadow:0 4px 12px rgba(20,22,43,0.02);padding:18px 22px;flex:1;display:flex;flex-direction:column;justify-content:center">
+              <div style="font-size:12px;font-weight:700;color:#6B7085;text-transform:uppercase;letter-spacing:.05em;text-align:center">Total Consumo (RD$)</div>
+              <div style="font-family:'Manrope';font-weight:800;font-size:28px;color:#14162B;margin-top:6px;text-align:center">1,625,000.00</div>
+            </div>
+            <div style="background:#fff;border:1px solid #E3E5EE;border-radius:12px;box-shadow:0 4px 12px rgba(20,22,43,0.02);padding:18px 22px;flex:1;display:flex;flex-direction:column;justify-content:center">
+              <div style="font-size:12px;font-weight:700;color:#6B7085;text-transform:uppercase;letter-spacing:.05em;text-align:center">Costo de Inventario<br>en Riesgo de Merma (RD$)</div>
+              <div style="font-family:'Manrope';font-weight:800;font-size:28px;color:#14162B;margin-top:6px;text-align:center">75,000.00</div>
+            </div>
           </div>
-          <div style="background:#fff;border:1px solid #E3E5EE;border-radius:12px;padding:18px 22px">
-            <div style="font-size:12px;font-weight:700;color:#6B7085;text-transform:uppercase;letter-spacing:.05em">Costo Promedio por Instalación (RD$)</div>
-            <div style="font-family:'Manrope';font-weight:800;font-size:28px;color:#14162B;margin-top:6px">1,696.24</div>
+
+          <!-- Segunda Columna -->
+          <div style="display:flex;flex-direction:column;gap:16px">
+            <div style="background:#fff;border:1px solid #E3E5EE;border-radius:12px;box-shadow:0 4px 12px rgba(20,22,43,0.02);padding:18px 22px;flex:1;display:flex;flex-direction:column;justify-content:center">
+              <div style="font-size:12px;font-weight:700;color:#6B7085;text-transform:uppercase;letter-spacing:.05em;text-align:center">Costo Promedio de Consumo<br>por Instalación (RD$)</div>
+              <div style="font-family:'Manrope';font-weight:800;font-size:28px;color:#14162B;margin-top:6px;text-align:center">1,696.24</div>
+            </div>
+            <div style="background:#fff;border:1px solid #E3E5EE;border-radius:12px;box-shadow:0 4px 12px rgba(20,22,43,0.02);padding:18px 22px;flex:1;display:flex;flex-direction:column;justify-content:center">
+              <div style="font-size:12px;font-weight:700;color:#6B7085;text-transform:uppercase;letter-spacing:.05em;text-align:center">Servicio con Mayor Consumo</div>
+              <div style="font-family:'Manrope';font-weight:800;font-size:20px;color:#14162B;margin-top:6px;text-align:center">Instalación Paneles Solares</div>
+            </div>
           </div>
-          <div style="background:#fff;border:1px solid #E3E5EE;border-radius:12px;padding:18px 22px">
-            <div style="font-size:12px;font-weight:700;color:#6B7085;text-transform:uppercase;letter-spacing:.05em">Servicio con Mayor Consumo</div>
-            <div style="font-family:'Manrope';font-weight:800;font-size:20px;color:#14162B;margin-top:6px">Instalación Paneles Solares</div>
-          </div>
-        </div>
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:24px">
-          <div style="background:#fff;border:1px solid #E3E5EE;border-radius:12px;padding:18px 22px">
-            <div style="font-size:12px;font-weight:700;color:#6B7085;text-transform:uppercase;letter-spacing:.05em">Costo de Inventario en Riesgo de Merma (RD$)</div>
-            <div style="font-family:'Manrope';font-weight:800;font-size:28px;color:#14162B;margin-top:6px">75,000.00</div>
-          </div>
-          <div style="background:#fff;border:1px solid #E3E5EE;border-radius:12px;padding:18px 22px">
-            <div style="font-size:14px;font-weight:800;color:#14162B;margin-bottom:12px">Porcentaje de Consumo de Materiales por Categoría</div>
-            <div style="display:flex;align-items:center;gap:18px">
-              <div style="position:relative;width:120px;height:120px">
-                <svg viewBox="0 0 36 36" width="120" height="120" style="transform:rotate(-90deg)">
-                  <circle cx="18" cy="18" r="14" fill="none" stroke="#E3E5EE" stroke-width="4"/>
-                  <circle cx="18" cy="18" r="14" fill="none" stroke="#1D4ED8" stroke-width="4" stroke-dasharray="26.4 61.6" stroke-dashoffset="0"/>
-                  <circle cx="18" cy="18" r="14" fill="none" stroke="#3B82F6" stroke-width="4" stroke-dasharray="22 66" stroke-dashoffset="-26.4"/>
-                  <circle cx="18" cy="18" r="14" fill="none" stroke="#60A5FA" stroke-width="4" stroke-dasharray="17.6 70.4" stroke-dashoffset="-48.4"/>
-                  <circle cx="18" cy="18" r="14" fill="none" stroke="#93C5FD" stroke-width="4" stroke-dasharray="13.2 74.8" stroke-dashoffset="-66"/>
-                  <circle cx="18" cy="18" r="14" fill="none" stroke="#BFDBFE" stroke-width="4" stroke-dasharray="8.8 79.2" stroke-dashoffset="-79.2"/>
-                </svg>
+
+          <!-- Tercera Columna (Pie Chart) -->
+          <div style="background:#fff;border:1px solid #E3E5EE;border-radius:12px;box-shadow:0 4px 12px rgba(20,22,43,0.02);padding:24px 32px;display:flex;flex-direction:column;justify-content:center">
+            <div style="font-size:15px;font-weight:800;color:#14162B;margin-bottom:20px;text-align:center">Porcentaje de Consumo de Materiales por Categoría</div>
+            <div style="display:flex;align-items:center;justify-content:center;gap:10px;flex:1">
+              <div style="position:relative;flex:1;display:flex;align-items:center;justify-content:center;min-width:240px">
+                <svg viewBox="0 0 200 200" width="100%" height="100%" style="max-height:220px; font-family:'Manrope', sans-serif;">
+<g transform="translate(100, 100) rotate(-90) translate(-100, -100)">
+  <circle cx="100" cy="100" r="40" fill="none" stroke="#1D4ED8" stroke-width="30" stroke-dasharray="75.39822368615503 175.92918860102841" stroke-dashoffset="-0.0"/>
+  <circle cx="100" cy="100" r="40" fill="none" stroke="#3B82F6" stroke-width="30" stroke-dasharray="62.83185307179586 188.49555921538757" stroke-dashoffset="-75.39822368615503"/>
+  <circle cx="100" cy="100" r="40" fill="none" stroke="#60A5FA" stroke-width="30" stroke-dasharray="50.26548245743669 201.06192982974676" stroke-dashoffset="-138.2300767579509"/>
+  <circle cx="100" cy="100" r="40" fill="none" stroke="#93C5FD" stroke-width="30" stroke-dasharray="37.69911184307752 213.62830044410595" stroke-dashoffset="-188.49555921538757"/>
+  <circle cx="100" cy="100" r="40" fill="none" stroke="#BFDBFE" stroke-width="30" stroke-dasharray="25.132741228718345 226.1946710584651" stroke-dashoffset="-226.1946710584651"/>
+  <circle cx="100" cy="100" r="40" fill="none" stroke="#14162B" stroke-width="31" stroke-dasharray="0.7 74.69822368615503 0.7 62.13185307179586 0.7 49.56548245743669 0.7 36.999111843077515 0.7 24.432741228718346" stroke-dashoffset="0"/>
+  <circle cx="100" cy="100" r="55.0" fill="none" stroke="#14162B" stroke-width="1.5"/>
+  <circle cx="100" cy="100" r="25.0" fill="none" stroke="#14162B" stroke-width="1.5"/>
+</g>
+  <polyline points="144.4959346906221,67.67181112391398 156.63118960624632,58.85503233952688 166.63118960624632,58.85503233952688" fill="none" stroke="#1D4ED8" stroke-width="1.5"/>
+  <text x="170.63118960624632" y="56.85503233952688" font-size="9" font-weight="700" fill="#14162B" text-anchor="start">Climatización (AC)</text>
+  <text x="170.63118960624632" y="67.85503233952687" font-size="9" font-weight="700" fill="#1D4ED8" text-anchor="start">30%</text>
+  <polyline points="124.96947748567507,149.00535883036022 131.77933498176827,162.37045669318576 141.77933498176827,162.37045669318576" fill="none" stroke="#3B82F6" stroke-width="1.5"/>
+  <text x="145.77933498176827" y="160.37045669318576" font-size="9" font-weight="700" fill="#14162B" text-anchor="start">Paneles Solares</text>
+  <text x="145.77933498176827" y="171.37045669318576" font-size="9" font-weight="700" fill="#3B82F6" text-anchor="start">25%</text>
+  <polyline points="55.50406530937789,132.32818887608602 43.368810393753684,141.14496766047313 33.368810393753684,141.14496766047313" fill="none" stroke="#60A5FA" stroke-width="1.5"/>
+  <text x="29.368810393753684" y="139.14496766047313" font-size="9" font-weight="700" fill="#14162B" text-anchor="end">Redes</text>
+  <text x="29.368810393753684" y="150.14496766047313" font-size="9" font-weight="700" fill="#60A5FA" text-anchor="end">20%</text>
+  <polyline points="50.99464116963976,75.03052251432493 37.62954330681425,68.22066501823173 27.62954330681425,68.22066501823173" fill="none" stroke="#93C5FD" stroke-width="1.5"/>
+  <text x="23.62954330681425" y="66.22066501823173" font-size="9" font-weight="700" fill="#14162B" text-anchor="end">Automatización</text>
+  <text x="23.62954330681425" y="77.22066501823173" font-size="9" font-weight="700" fill="#93C5FD" text-anchor="end">15%</text>
+  <polyline points="83.00406530937789,47.69189160376656 78.36881039375368,33.42604385933926 68.36881039375368,33.42604385933926" fill="none" stroke="#BFDBFE" stroke-width="1.5"/>
+  <text x="64.36881039375368" y="31.42604385933926" font-size="9" font-weight="700" fill="#14162B" text-anchor="end">Seguridad</text>
+  <text x="64.36881039375368" y="42.42604385933926" font-size="9" font-weight="700" fill="#BFDBFE" text-anchor="end">10%</text>
+</svg>
               </div>
-              <div style="font-size:12.5px;display:flex;flex-direction:column;gap:5px">
-                <div style="display:flex;align-items:center;gap:6px"><span style="width:10px;height:10px;border-radius:2px;background:#1D4ED8;display:inline-block"></span> Climatización (AC) (30%)</div>
-                <div style="display:flex;align-items:center;gap:6px"><span style="width:10px;height:10px;border-radius:2px;background:#3B82F6;display:inline-block"></span> Paneles Solares (25%)</div>
-                <div style="display:flex;align-items:center;gap:6px"><span style="width:10px;height:10px;border-radius:2px;background:#60A5FA;display:inline-block"></span> Redes (20%)</div>
-                <div style="display:flex;align-items:center;gap:6px"><span style="width:10px;height:10px;border-radius:2px;background:#93C5FD;display:inline-block"></span> Automatización (15%)</div>
-                <div style="display:flex;align-items:center;gap:6px"><span style="width:10px;height:10px;border-radius:2px;background:#BFDBFE;display:inline-block"></span> Seguridad (10%)</div>
+              <div style="font-size:12.5px;display:flex;flex-direction:column;gap:8px">
+                <div style="display:flex;align-items:center;gap:6px"><span style="width:12px;height:12px;border-radius:3px;background:#1D4ED8;border:1px solid #14162B;display:inline-block"></span> Climatización (AC) (30%)</div>
+                <div style="display:flex;align-items:center;gap:6px"><span style="width:12px;height:12px;border-radius:3px;background:#3B82F6;border:1px solid #14162B;display:inline-block"></span> Paneles Solares (25%)</div>
+                <div style="display:flex;align-items:center;gap:6px"><span style="width:12px;height:12px;border-radius:3px;background:#60A5FA;border:1px solid #14162B;display:inline-block"></span> Redes (20%)</div>
+                <div style="display:flex;align-items:center;gap:6px"><span style="width:12px;height:12px;border-radius:3px;background:#93C5FD;border:1px solid #14162B;display:inline-block"></span> Automatización (15%)</div>
+                <div style="display:flex;align-items:center;gap:6px"><span style="width:12px;height:12px;border-radius:3px;background:#BFDBFE;border:1px solid #14162B;display:inline-block"></span> Seguridad (10%)</div>
               </div>
             </div>
           </div>
         </div>
         <div style="display:grid;grid-template-columns:3fr 2fr;gap:16px">
-          <div style="background:#fff;border:1px solid #E3E5EE;border-radius:12px;overflow:hidden">
+          <div style="background:#fff;border:1px solid #E3E5EE;border-radius:12px;box-shadow:0 4px 12px rgba(20,22,43,0.02);overflow:hidden">
             <div style="display:grid;grid-template-columns:1.5fr 1fr 1fr 1fr .8fr;padding:12px 18px;font-size:11.5px;font-weight:800;color:#8B90A3;text-transform:uppercase;letter-spacing:.05em;border-bottom:1px solid #EFF0F6;background:#F8FAFC">
               <div>Servicio de Instalación</div><div style="text-align:right">Materiales (RD$)</div><div style="text-align:right">Consumibles (RD$)</div><div style="text-align:right">Total (RD$)</div><div style="text-align:center">Instalaciones</div>
             </div>
@@ -739,29 +896,39 @@
               <div>TOTAL</div><div style="text-align:right">RD$ 933,000.00</div><div style="text-align:right">RD$ 463,000.00</div><div style="text-align:right;color:#1D4ED8">RD$ 1,625,000.00</div><div style="text-align:center">108</div>
             </div>
           </div>
-          <div style="background:#fff;border:1px solid #E3E5EE;border-radius:12px;padding:18px 22px">
+          <div style="background:#fff;border:1px solid #E3E5EE;border-radius:12px;box-shadow:0 4px 12px rgba(20,22,43,0.02);padding:18px 22px;display:flex;flex-direction:column;min-height:300px">
             <div style="font-size:14px;font-weight:800;color:#14162B;margin-bottom:16px">Tendencia Mensual de Consumo (Costo)</div>
-            <div style="display:flex;align-items:flex-end;gap:0;height:180px;border-bottom:1px solid #EFF0F6;padding:0 10px">
-              <div style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;height:100%">
-                <div style="font-size:11px;font-weight:700;color:#1D4ED8;margin-bottom:4px">450,000</div>
-                <div style="width:48px;background:#93C5FD;border-radius:6px 6px 0 0;height:56%"></div>
+            <div style="position:relative;flex:1;display:flex;padding-left:60px">
+              <div style="position:absolute;left:0;top:0;bottom:24px;width:100%;display:flex;flex-direction:column;justify-content:space-between;font-size:11px;color:#6B7085;font-weight:700">
+                <div style="display:flex;align-items:center;height:0"><span style="width:50px;text-align:right;margin-right:10px">1,000,000</span><div style="flex:1;border-top:1px dashed #E3E5EE"></div></div>
+                <div style="display:flex;align-items:center;height:0"><span style="width:50px;text-align:right;margin-right:10px">800,000</span><div style="flex:1;border-top:1px dashed #E3E5EE"></div></div>
+                <div style="display:flex;align-items:center;height:0"><span style="width:50px;text-align:right;margin-right:10px">600,000</span><div style="flex:1;border-top:1px dashed #E3E5EE"></div></div>
+                <div style="display:flex;align-items:center;height:0"><span style="width:50px;text-align:right;margin-right:10px">400,000</span><div style="flex:1;border-top:1px dashed #E3E5EE"></div></div>
+                <div style="display:flex;align-items:center;height:0"><span style="width:50px;text-align:right;margin-right:10px">200,000</span><div style="flex:1;border-top:1px dashed #E3E5EE"></div></div>
+                <div style="display:flex;align-items:center;height:0"><span style="width:50px;text-align:right;margin-right:10px">0</span><div style="flex:1;border-top:1px solid #14162B"></div></div>
               </div>
-              <div style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;height:100%">
-                <div style="font-size:11px;font-weight:700;color:#1D4ED8;margin-bottom:4px">380,000</div>
-                <div style="width:48px;background:#93C5FD;border-radius:6px 6px 0 0;height:47%"></div>
+              <div style="display:flex;align-items:flex-end;width:100%;height:calc(100% - 24px);position:relative;z-index:1;justify-content:space-around;padding:0 20px">
+                <div style="display:flex;flex-direction:column;align-items:center;justify-content:flex-end;height:100%;width:60px">
+                  <div style="font-size:12px;font-weight:800;color:#14162B;margin-bottom:6px">450,000</div>
+                  <div style="width:48px;background:#3B82F6;border:1.5px solid #14162B;height:45%"></div>
+                </div>
+                <div style="display:flex;flex-direction:column;align-items:center;justify-content:flex-end;height:100%;width:60px">
+                  <div style="font-size:12px;font-weight:800;color:#14162B;margin-bottom:6px">380,000</div>
+                  <div style="width:48px;background:#3B82F6;border:1.5px solid #14162B;height:38%"></div>
+                </div>
+                <div style="display:flex;flex-direction:column;align-items:center;justify-content:flex-end;height:100%;width:60px">
+                  <div style="font-size:12px;font-weight:800;color:#14162B;margin-bottom:6px">520,000</div>
+                  <div style="width:48px;background:#3B82F6;border:1.5px solid #14162B;height:52%"></div>
+                </div>
               </div>
-              <div style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;height:100%">
-                <div style="font-size:11px;font-weight:700;color:#1D4ED8;margin-bottom:4px">520,000</div>
-                <div style="width:48px;background:#93C5FD;border-radius:6px 6px 0 0;height:65%"></div>
+              <div style="position:absolute;left:60px;bottom:0;right:0;display:flex;justify-content:space-around;padding:0 20px;height:24px;align-items:flex-end">
+                <div style="width:60px;text-align:center;font-size:12px;font-weight:700;color:#334155">Oct</div>
+                <div style="width:60px;text-align:center;font-size:12px;font-weight:700;color:#334155">Sep</div>
+                <div style="width:60px;text-align:center;font-size:12px;font-weight:700;color:#334155">Ago</div>
               </div>
             </div>
-            <div style="display:flex;padding:8px 10px 0;gap:0">
-              <div style="flex:1;text-align:center;font-size:12px;font-weight:700;color:#334155">Oct</div>
-              <div style="flex:1;text-align:center;font-size:12px;font-weight:700;color:#334155">Sep</div>
-              <div style="flex:1;text-align:center;font-size:12px;font-weight:700;color:#334155">Ago</div>
-            </div>
-            <div style="display:flex;align-items:center;gap:6px;justify-content:center;margin-top:12px;font-size:11.5px;color:#6B7085">
-              <span style="width:12px;height:12px;border-radius:3px;background:#93C5FD;display:inline-block"></span> Consumo Total (RD$)
+            <div style="display:flex;align-items:center;gap:8px;justify-content:center;margin-top:18px;font-size:12.5px;color:#334155;font-weight:700">
+              <span style="width:14px;height:14px;border-radius:2px;background:#3B82F6;border:1.5px solid #14162B;display:inline-block"></span> Consumo Total (RD$)
             </div>
           </div>
         </div>
@@ -770,67 +937,25 @@
 
     <sc-if value="{{ isServicios }}" hint-placeholder-val="{{ false }}">
       <div>
-        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px;margin-bottom:28px">
-          <div style="background:#fff;border:1px solid #E3E5EE;border-radius:14px;padding:22px 24px">
-            <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px">
-              <div style="width:40px;height:40px;border-radius:10px;background:#EFF6FF;display:flex;align-items:center;justify-content:center">
-                <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="#1D4ED8" stroke-width="1.7"><path d="M12 15.2a3.2 3.2 0 1 0 0-6.4 3.2 3.2 0 0 0 0 6.4 M12 3.2v2.4 M12 18.4v2.4 M4.8 12H2.4 M21.6 12h-2.4"></path></svg>
-              </div>
-              <div style="font-family:'Manrope';font-weight:800;font-size:16px">Instalaciones Eléctricas</div>
-            </div>
-            <div style="font-size:13px;color:#6B7085;margin-bottom:10px">Servicios de instalación y montaje de sistemas eléctricos.</div>
-            <div style="display:flex;flex-wrap:wrap;gap:6px">
-              <span style="padding:5px 11px;background:#EFF6FF;border-radius:20px;font-size:11.5px;font-weight:700;color:#1D4ED8">Paneles Solares</span>
-              <span style="padding:5px 11px;background:#EFF6FF;border-radius:20px;font-size:11.5px;font-weight:700;color:#1D4ED8">Sistema UPS</span>
-              <span style="padding:5px 11px;background:#EFF6FF;border-radius:20px;font-size:11.5px;font-weight:700;color:#1D4ED8">Planta Eléctrica</span>
-            </div>
-          </div>
-          <div style="background:#fff;border:1px solid #E3E5EE;border-radius:14px;padding:22px 24px">
-            <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px">
-              <div style="width:40px;height:40px;border-radius:10px;background:#FFF7ED;display:flex;align-items:center;justify-content:center">
-                <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="#F59E0B" stroke-width="1.7"><path d="M13.6 4.4 20 10.8l-2.6 2.6-6.4-6.4z M10.2 8.2 4.6 13.8a2.6 2.6 0 0 0 3.6 3.6l5.6-5.6 M15.5 15.5l4.2 4.2"></path></svg>
-              </div>
-              <div style="font-family:'Manrope';font-weight:800;font-size:16px">Mantenimiento</div>
-            </div>
-            <div style="font-size:13px;color:#6B7085;margin-bottom:10px">Servicios preventivos y correctivos de sistemas eléctricos.</div>
-            <div style="display:flex;flex-wrap:wrap;gap:6px">
-              <span style="padding:5px 11px;background:#FFF7ED;border-radius:20px;font-size:11.5px;font-weight:700;color:#B26A00">Mantenimiento Eléctrico</span>
-              <span style="padding:5px 11px;background:#FFF7ED;border-radius:20px;font-size:11.5px;font-weight:700;color:#B26A00">Revisión Preventiva</span>
-            </div>
-          </div>
-          <div style="background:#fff;border:1px solid #E3E5EE;border-radius:14px;padding:22px 24px">
-            <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px">
-              <div style="width:40px;height:40px;border-radius:10px;background:#F0FDF4;display:flex;align-items:center;justify-content:center">
-                <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="#17803D" stroke-width="1.7"><path d="M6 3.5v5 M18 3.5v5 M3.8 8.5h16.4v3.2a4 4 0 0 1-4 4H7.8a4 4 0 0 1-4-4z M12 15.7v4.8"></path></svg>
-              </div>
-              <div style="font-family:'Manrope';font-weight:800;font-size:16px">Redes y Cableado</div>
-            </div>
-            <div style="font-size:13px;color:#6B7085;margin-bottom:10px">Diseño e instalación de redes de datos y cableado estructurado.</div>
-            <div style="display:flex;flex-wrap:wrap;gap:6px">
-              <span style="padding:5px 11px;background:#F0FDF4;border-radius:20px;font-size:11.5px;font-weight:700;color:#17803D">Cableado Estructurado</span>
-              <span style="padding:5px 11px;background:#F0FDF4;border-radius:20px;font-size:11.5px;font-weight:700;color:#17803D">Fibra Óptica</span>
-            </div>
-          </div>
-        </div>
         <div style="background:#fff;border:1px solid #E3E5EE;border-radius:14px;overflow:hidden">
+          <div style="display:flex;gap:14px;padding:18px;border-bottom:1px solid #EFF0F6;align-items:center;flex-wrap:wrap">
+            <input value="{{ search.srv.value }}" onChange="{{ search.srv.onChange }}" placeholder="Buscar servicio por nombre..." style="flex:1;min-width:200px;padding:11px 14px;border:1px solid #D5D8E6;border-radius:9px;font-size:14px" />
+            <select value="{{ filters.srv.value }}" onChange="{{ filters.srv.onChange }}" style="padding:11px 14px;border:1px solid #D5D8E6;border-radius:9px;font-size:14px;background:#fff;min-width:200px">
+              <option value="Todas las categorías">Todas las categorías</option>
+              <option value="Instalaciones">Instalaciones</option>
+              <option value="Mantenimiento">Mantenimiento</option>
+              <option value="Redes y Cableado">Redes y Cableado</option>
+            </select>
+
+          </div>
           <div style="display:grid;grid-template-columns:.5fr 1.5fr 1fr 1fr .8fr;padding:14px 18px;font-size:12px;font-weight:800;color:#8B90A3;text-transform:uppercase;letter-spacing:.06em;border-bottom:1px solid #EFF0F6">
             <div>ID</div><div>Servicio</div><div>Categoría</div><div>Precio base (RD$)</div><div style="text-align:center">Estado</div>
           </div>
-          <div style="display:grid;grid-template-columns:.5fr 1.5fr 1fr 1fr .8fr;padding:14px 18px;font-size:14px;border-bottom:1px solid #F4F5FB;align-items:center">
-            <div style="font-weight:700;color:#8B90A3">SV-001</div><div style="font-weight:700">Instalación de Paneles Solares</div><div style="color:#6B7085">Instalaciones</div><div>RD$ 85,000.00</div><div style="text-align:center"><span style="padding:5px 11px;border-radius:20px;font-size:12px;font-weight:800;background:#E4F6EA;color:#17803D">Activo</span></div>
-          </div>
-          <div style="display:grid;grid-template-columns:.5fr 1.5fr 1fr 1fr .8fr;padding:14px 18px;font-size:14px;border-bottom:1px solid #F4F5FB;align-items:center">
-            <div style="font-weight:700;color:#8B90A3">SV-002</div><div style="font-weight:700">Instalación de Sistema UPS</div><div style="color:#6B7085">Instalaciones</div><div>RD$ 45,000.00</div><div style="text-align:center"><span style="padding:5px 11px;border-radius:20px;font-size:12px;font-weight:800;background:#E4F6EA;color:#17803D">Activo</span></div>
-          </div>
-          <div style="display:grid;grid-template-columns:.5fr 1.5fr 1fr 1fr .8fr;padding:14px 18px;font-size:14px;border-bottom:1px solid #F4F5FB;align-items:center">
-            <div style="font-weight:700;color:#8B90A3">SV-003</div><div style="font-weight:700">Mantenimiento Eléctrico</div><div style="color:#6B7085">Mantenimiento</div><div>RD$ 12,500.00</div><div style="text-align:center"><span style="padding:5px 11px;border-radius:20px;font-size:12px;font-weight:800;background:#E4F6EA;color:#17803D">Activo</span></div>
-          </div>
-          <div style="display:grid;grid-template-columns:.5fr 1.5fr 1fr 1fr .8fr;padding:14px 18px;font-size:14px;border-bottom:1px solid #F4F5FB;align-items:center">
-            <div style="font-weight:700;color:#8B90A3">SV-004</div><div style="font-weight:700">Cableado Estructurado</div><div style="color:#6B7085">Redes y Cableado</div><div>RD$ 28,000.00</div><div style="text-align:center"><span style="padding:5px 11px;border-radius:20px;font-size:12px;font-weight:800;background:#E4F6EA;color:#17803D">Activo</span></div>
-          </div>
-          <div style="display:grid;grid-template-columns:.5fr 1.5fr 1fr 1fr .8fr;padding:14px 18px;font-size:14px;align-items:center">
-            <div style="font-weight:700;color:#8B90A3">SV-005</div><div style="font-weight:700">Instalación de Planta Eléctrica</div><div style="color:#6B7085">Instalaciones</div><div>RD$ 120,000.00</div><div style="text-align:center"><span style="padding:5px 11px;border-radius:20px;font-size:12px;font-weight:800;background:#E4F6EA;color:#17803D">Activo</span></div>
-          </div>
+          <sc-for list="{{ servicios }}" as="s" hint-placeholder-count="5">
+            <div style="display:grid;grid-template-columns:.5fr 1.5fr 1fr 1fr .8fr;padding:14px 18px;font-size:14px;border-bottom:1px solid #F4F5FB;align-items:center">
+              <div style="font-weight:700;color:#8B90A3">{{ s.servicioId }}</div><div style="font-weight:700">{{ s.nombre }}</div><div style="color:#6B7085">{{ s.categoria }}</div><div>RD$ {{ s.precioStr }}</div><div style="text-align:center"><span style="padding:5px 11px;border-radius:20px;font-size:12px;font-weight:800;background:#E4F6EA;color:#17803D">{{ s.estado }}</span></div>
+            </div>
+          </sc-for>
         </div>
       </div>
     </sc-if>
@@ -867,12 +992,7 @@
               </div>
             </sc-if>
           </div>
-          <div>
-            <label style="display:block;font-size:13px;font-weight:700;color:#4A4E63;margin-bottom:7px">Contacto *</label>
-            <input value="{{ fields.contacto.value }}" onChange="{{ fields.contacto.onChange }}" placeholder="809-000-0000" style="width:100%;padding:12px 13px;border:1px solid #D5D8E6;border-radius:9px;font-size:14.5px" />
-            <sc-if value="{{ fields.contacto.error }}" hint-placeholder-val="{{ false }}"><div style="color:#C4141B;font-size:12.5px;margin-top:6px;font-weight:700">{{ fields.contacto.error }}</div></sc-if>
-          </div>
-          <div>
+          <div style="grid-column:span 2">
             <label style="display:block;font-size:13px;font-weight:700;color:#4A4E63;margin-bottom:7px">Tipo de servicio *</label>
             <select value="{{ fields.tipoServicio.value }}" onChange="{{ fields.tipoServicio.onChange }}" style="width:100%;padding:12px 13px;border:1px solid #D5D8E6;border-radius:9px;font-size:14.5px;background:#fff">
               <option value="">Seleccionar...</option>
@@ -894,9 +1014,6 @@
             <label style="display:block;font-size:13px;font-weight:700;color:#4A4E63;margin-bottom:7px">Hora</label>
             <input type="time" value="{{ fields.hora.value }}" onChange="{{ fields.hora.onChange }}" style="width:100%;padding:12px 13px;border:1px solid #D5D8E6;border-radius:9px;font-size:14.5px" />
             <sc-if value="{{ fields.hora.error }}" hint-placeholder-val="{{ false }}"><div style="color:#C4141B;font-size:12.5px;margin-top:6px;font-weight:700">{{ fields.hora.error }}</div></sc-if>
-          </div>
-          <div style="grid-column:span 2;background:#F7F8FC;border:1px solid #EFF0F6;border-radius:10px;padding:12px 14px;font-size:13px;color:#6B7085">
-            El estado de la solicitud se registra automáticamente como <b style="color:#B26A00">Pendiente</b>. La solicitud aparecerá en Levantamientos solo cuando tenga fecha y hora definidas.
           </div>
         </div>
       </sc-if>
@@ -968,9 +1085,6 @@
             <input type="time" value="{{ fields.hora.value }}" onChange="{{ fields.hora.onChange }}" style="width:100%;padding:12px 13px;border:1px solid #D5D8E6;border-radius:9px;font-size:14.5px" />
             <sc-if value="{{ fields.hora.error }}" hint-placeholder-val="{{ false }}"><div style="color:#C4141B;font-size:12.5px;margin-top:6px;font-weight:700">{{ fields.hora.error }}</div></sc-if>
           </div>
-          <div style="grid-column:span 2;background:#F7F8FC;border:1px solid #EFF0F6;border-radius:10px;padding:12px 14px;font-size:13px;color:#6B7085">
-            El estado de la cita se llena automáticamente con el estado de la solicitud.
-          </div>
         </div>
       </sc-if>
 
@@ -1008,7 +1122,7 @@
           </div>
           <div>
             <label style="display:block;font-size:13px;font-weight:700;color:#4A4E63;margin-bottom:7px">Cargo *</label>
-            <input value="{{ fields.cargo.value }}" onChange="{{ fields.cargo.onChange }}" placeholder="ej. Técnico eléctrico" style="width:100%;padding:12px 13px;border:1px solid #D5D8E6;border-radius:9px;font-size:14.5px" />
+            <input value="{{ fields.cargo.value }}" onChange="{{ fields.cargo.onChange }}" placeholder="ej. Técnico" style="width:100%;padding:12px 13px;border:1px solid #D5D8E6;border-radius:9px;font-size:14.5px" />
             <sc-if value="{{ fields.cargo.error }}" hint-placeholder-val="{{ false }}"><div style="color:#C4141B;font-size:12.5px;margin-top:6px;font-weight:700">{{ fields.cargo.error }}</div></sc-if>
           </div>
           <div style="grid-column:span 2">
@@ -1017,6 +1131,36 @@
               <option value="Empleado">Empleado</option>
               <option value="Administrador">Administrador</option>
             </select>
+          </div>
+        </div>
+      </sc-if>
+
+      <sc-if value="{{ isFormServicio }}" hint-placeholder-val="{{ false }}">
+        <div style="display:grid;grid-template-columns:1fr;gap:16px">
+          <div>
+            <label style="display:block;font-size:13px;font-weight:700;color:#4A4E63;margin-bottom:7px">ID del Servicio *</label>
+            <input value="{{ fields.servicioId.value }}" onChange="{{ fields.servicioId.onChange }}" placeholder="ej. SV-006" style="width:100%;padding:12px 13px;border:1px solid #D5D8E6;border-radius:9px;font-size:14.5px" />
+            <sc-if value="{{ fields.servicioId.error }}" hint-placeholder-val="{{ false }}"><div style="color:#C4141B;font-size:12.5px;margin-top:6px;font-weight:700">{{ fields.servicioId.error }}</div></sc-if>
+          </div>
+          <div>
+            <label style="display:block;font-size:13px;font-weight:700;color:#4A4E63;margin-bottom:7px">Nombre del servicio *</label>
+            <input value="{{ fields.nombre.value }}" onChange="{{ fields.nombre.onChange }}" placeholder="ej. Instalación de Luces LED" style="width:100%;padding:12px 13px;border:1px solid #D5D8E6;border-radius:9px;font-size:14.5px" />
+            <sc-if value="{{ fields.nombre.error }}" hint-placeholder-val="{{ false }}"><div style="color:#C4141B;font-size:12.5px;margin-top:6px;font-weight:700">{{ fields.nombre.error }}</div></sc-if>
+          </div>
+          <div>
+            <label style="display:block;font-size:13px;font-weight:700;color:#4A4E63;margin-bottom:7px">Categoría *</label>
+            <select value="{{ fields.categoria.value }}" onChange="{{ fields.categoria.onChange }}" style="width:100%;padding:12px 13px;border:1px solid #D5D8E6;border-radius:9px;font-size:14.5px;background:#fff">
+              <option value="">Seleccionar categoría...</option>
+              <option value="Instalaciones">Instalaciones</option>
+              <option value="Mantenimiento">Mantenimiento</option>
+              <option value="Redes y Cableado">Redes y Cableado</option>
+            </select>
+            <sc-if value="{{ fields.categoria.error }}" hint-placeholder-val="{{ false }}"><div style="color:#C4141B;font-size:12.5px;margin-top:6px;font-weight:700">{{ fields.categoria.error }}</div></sc-if>
+          </div>
+          <div>
+            <label style="display:block;font-size:13px;font-weight:700;color:#4A4E63;margin-bottom:7px">Precio base (RD$) *</label>
+            <input type="number" value="{{ fields.precioBase.value }}" onChange="{{ fields.precioBase.onChange }}" placeholder="0.00" style="width:100%;padding:12px 13px;border:1px solid #D5D8E6;border-radius:9px;font-size:14.5px" />
+            <sc-if value="{{ fields.precioBase.error }}" hint-placeholder-val="{{ false }}"><div style="color:#C4141B;font-size:12.5px;margin-top:6px;font-weight:700">{{ fields.precioBase.error }}</div></sc-if>
           </div>
         </div>
       </sc-if>
@@ -1074,31 +1218,32 @@ const BADGE = {
   'Técnico':['#FFF3E0','#B26A00']
 };
 const ICON = {
-  inicio: { d1: 'M3.5 11 12 3.5 20.5 11 M6 9.6V20.5h12V9.6', d2: 'M10 20.5v-5.5h4v5.5' },
-  solicitudes: { d1: 'M6.5 4.5h11v16h-11z M9.5 2.8h5v3.2h-5z', d2: 'M9.5 11h5 M9.5 15h5' },
-  agenda: { d1: 'M4.5 6.5h15v14h-15z M4.5 11h15', d2: 'M8.5 3.8v4 M15.5 3.8v4' },
-  levantamientos: { d1: 'M4 17.5h16 M6.5 17.5V13a5.5 5.5 0 0 1 11 0v4.5', d2: 'M10.5 8.3V5.2h3v3.1' },
-  ordenes: { d1: 'M6.5 3.5h7.5L17.5 7v13.5h-11z M14 3.5V7h3.5', d2: 'M9.5 12.6l2 2 3.5-3.6' },
-  clientes: { d1: 'M3.5 20.3c0-3.3 2.6-5.7 5.8-5.7s5.8 2.4 5.8 5.7 M16.2 5.3a3.1 3.1 0 0 1 0 5.9 M17.2 15c1.9.7 3.3 2.7 3.3 5.3', d2: 'M9.3 11.2a3.3 3.3 0 1 0 0-6.6 3.3 3.3 0 0 0 0 6.6' },
+  inicio: { d1: 'M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z', d2: 'M9 22V12h6v10' },
+  solicitudes: { d1: 'M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z M14 2v6h6', d2: 'M9 9a2 2 0 1 1 4 0 2 2 0 0 1-4 0 M8 13h8 M8 17h8' },
+  agenda: { d1: 'M19 4H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6a2 2 0 0 0-2-2z M3 10h18', d2: 'M16 2v4 M8 2v4 M8 14h2 M14 14h2 M8 18h2 M14 18h2' },
+  levantamientos: { d1: 'M12 21a9 9 0 1 0 0-18 9 9 0 0 0 0 18z M12 21v2', d2: 'M9.5 14.5l2-5 4-1-2 5z' },
+  ordenes: { d1: 'M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2 M15 2H9a1 1 0 0 0-1 1v2a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1V3a1 1 0 0 0-1-1z', d2: 'M11 11h5 M11 15h5 M11 19h5 M7 11l1.5 1.5 2-2 M7 15l1.5 1.5 2-2 M7 19l1.5 1.5 2-2' },
+  clientes: { d1: 'M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2 M7.5 7a4 4 0 1 1 8 0 4 4 0 0 1-8 0', d2: 'M22 21v-2a4 4 0 0 0-3-3.87 M15 3.13a4 4 0 0 1 0 7.75' },
   historial: { d1: 'M12 20.5a8.5 8.5 0 1 0 0-17 8.5 8.5 0 0 0 0 17', d2: 'M12 7.6V12l3.4 2.1' },
-  usuarios: { d1: 'M4 20.5c0-3.7 3.4-6.3 7.5-6.3 1.3 0 2.6.3 3.7.8 M17.5 15v6 M14.5 18h6', d2: 'M11.5 11.6a3.7 3.7 0 1 0 0-7.4 3.7 3.7 0 0 0 0 7.4' },
-  cotizaciones: { d1: 'M4.5 4.5h12v16h-12z M16.5 4.5l3 3v12.5h-3', d2: 'M8 9h5 M8 12.5h5 M8 16h3' },
+  usuarios: { d1: 'M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2 M7.5 7a4 4 0 1 1 8 0 4 4 0 0 1-8 0', d2: 'M11.5 11.6a3.7 3.7 0 1 0 0-7.4 3.7 3.7 0 0 0 0 7.4' },
+  cotizaciones: { d1: 'M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z', d2: 'M14 2v6h6 M8 10h8 M8 14h8 M8 18h5' },
   cobros: { d1: 'M12 21a9 9 0 1 0 0-18 9 9 0 0 0 0 18', d2: 'M12 7v10 M8.5 13.5h7' },
-  inventario: { d1: 'M3.5 8.5h17v12h-17z M3.5 8.5L6 4.5h12l2.5 4', d2: 'M10 12.5h4' },
-  proveedores: { d1: 'M6 17.5V8.5l6-4 6 4v9', d2: 'M4 17.5h16 M10 17.5v-4h4v4' },
-  reportes: { d1: 'M4.5 4.5h15v15h-15z', d2: 'M8 14v2.5 M12 10v6.5 M16 12v4.5' },
+  inventario: { d1: 'M6 4h12a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2z M9 4v4h6V4', d2: 'M15 15h5v5h-5z M16 15v-2h3v2' },
+  proveedores: { d1: 'M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2 M7.5 7a4 4 0 1 1 8 0 4 4 0 0 1-8 0 M22 21v-2a4 4 0 0 0-3-3.87', d2: 'M16 16a4 4 0 1 1 8 0 4 4 0 0 1-8 0 M20 14.5a1.5 1.5 0 0 0-3 0v.5l1.5.5v1 M20 18h0' },
+  reportes: { d1: 'M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z M14 2v6h6', d2: 'M8 18v-4 M12 18v-8 M16 18v-6 M7 12l4-4 3 3 4-4' },
   servicios: { d1: 'M12 3.5L3.5 8v12.5h17V8z M12 3.5v5', d2: 'M9 14.5h6 M9 17.5h6' }
-}
-const ICON_SERV = {
-  'Instalación Solar':'M12 15.2a3.2 3.2 0 1 0 0-6.4 3.2 3.2 0 0 0 0 6.4 M12 3.2v2.4 M12 18.4v2.4 M4.8 12H2.4 M21.6 12h-2.4 M6.9 6.9 5.2 5.2 M18.8 18.8l-1.7-1.7 M6.9 17.1l-1.7 1.7 M18.8 5.2l-1.7 1.7',
-  'Instalación de Sistema UPS':'M4.5 6.5h12v11h-12z M16.5 10h3v4h-3 M9.8 8.6 7.8 12.4h2.6l-.8 3 3-4.2h-2.6z',
-  'Instalación de planta eléctrica':'M3.5 19.5h17 M5.5 19.5V9.5h9v10 M14.5 12.5h4v7 M8 12.5h3.5 M8 15.8h3.5',
-  'Mantenimiento Eléctrico':'M13.6 4.4 20 10.8l-2.6 2.6-6.4-6.4z M10.2 8.2 4.6 13.8a2.6 2.6 0 0 0 3.6 3.6l5.6-5.6 M15.5 15.5l4.2 4.2',
-  'Cableado Estructurado':'M6 3.5v5 M18 3.5v5 M3.8 8.5h16.4v3.2a4 4 0 0 1-4 4H7.8a4 4 0 0 1-4-4z M12 15.7v4.8'
 };
 const EYE = 'M2.6 12S6.2 6 12 6s9.4 6 9.4 6-3.6 6-9.4 6S2.6 12 2.6 12Z M12 15a3 3 0 1 0 0-6 3 3 0 0 0 0 6';
 const EYE_OFF = EYE + ' M4 20 20 4';
-const FIELDS = ['usuario','password','password2','nombre','rol','cargo','cliente','contacto','correo','telefono','telefono2','rnc','direccion','tipoServicio','fecha','hora','espacios','cargas','tension','tuberias','cableado','observaciones','fotos'];
+const FIELDS = ['usuario','password','password2','nombre','rol','cargo','cliente','contacto','correo','telefono','telefono2','rnc','direccion','tipoServicio','fecha','hora','espacios','cargas','tension','tuberias','cableado','observaciones','fotos','servicioId','categoria','precioBase'];
+
+const ICON_SERV = {
+  'Instalación Solar': { d1: 'M12 4V2m0 20v-2m8-8h2M2 12h2m13.657-5.657l1.414-1.414M4.93 19.07l1.414-1.414m12.728 0l-1.414-1.414M4.93 4.93l1.414 1.414', d2: 'M12 16a4 4 0 100-8 4 4 0 000 8z' },
+  'Instalación de Sistema UPS': { d1: 'M16 4h-8a2 2 0 00-2 2v12a2 2 0 002 2h8a2 2 0 002-2V6a2 2 0 00-2-2z', d2: 'M12 10v4l-2 2' },
+  'Instalación de Planta Eléctrica': { d1: 'M4 8h16v10a2 2 0 01-2 2H6a2 2 0 01-2-2V8z', d2: 'M12 12a3 3 0 100 6 3 3 0 000-6z M12 4v4 M8 4h8' },
+  'Mantenimiento Eléctrico': { d1: 'M12 11V7l-5 6h4v4l5-6h-4z', d2: 'M12 21a9 9 0 1 0 0-18 9 9 0 0 0 0 18z' },
+  'Cableado Estructurado': { d1: 'M4 8h16v8H4z', d2: 'M8 8v-4 M16 8v-4 M12 16v4' }
+};
 
 function iso(d){ return d.toISOString().slice(0,10); }
 function fmt(s){ if(!s) return '—'; const p=s.split('-'); return p[2]+'/'+p[1]+'/'+p[0]; }
@@ -1122,8 +1267,8 @@ class Component extends DCLogic {
       qOrd:'', fOrd:'Todos los estados', vAgenda:'Hoy',
       selEvento:null, levEdit:null, showPw:{},
       usuarios:[
-        {id:1,usuario:'gerente',password:'gerente',nombre:'Ana Hernández',cargo:'Gerente General',rol:'Gerente'},
-        {id:2,usuario:'tecnico',password:'tecnico',nombre:'Luis Peña',cargo:'Técnico eléctrico',rol:'Técnico'}
+        {id:1,usuario:'gerente',password:'gerente',nombre:'Ana Hernández',cargo:'Gerente',rol:'Gerente'},
+        {id:2,usuario:'tecnico',password:'tecnico',nombre:'Luis Peña',cargo:'Técnico',rol:'Técnico'}
       ],
       clientes:[
         {id:1,nombre:'Melody Santos',correo:'melody@email.com',telefono:'809-000-0000',telefono2:'829-111-2222',rnc:'402-1234567-1',direccion:'Calle Duarte #24, Santiago',servicios:8,ultimo:'Instalación de Sistema UPS'},
@@ -1157,6 +1302,13 @@ class Component extends DCLogic {
          trabajos:['Instalación de estructura en techo (12 paneles)','Tendido de tubería y cableado DC','Configuración de inversor y monitoreo'],
          materiales:['Paneles 550W x12','Inversor híbrido 6kW','Riel de aluminio','Tubería EMT 3/4','Cable solar #10','Herramienta de crimpado'],
          observaciones:'Verificar disponibilidad de andamio en obra. Entregar informe fotográfico al finalizar.'}
+      ],
+      servicios:[
+        {id:1, servicioId:'SV-001', nombre:'Instalación de Paneles Solares', categoria:'Instalaciones', precioBase:85000, estado:'Activo'},
+        {id:2, servicioId:'SV-002', nombre:'Instalación de Sistema UPS', categoria:'Instalaciones', precioBase:45000, estado:'Activo'},
+        {id:3, servicioId:'SV-003', nombre:'Mantenimiento Eléctrico', categoria:'Mantenimiento', precioBase:12500, estado:'Activo'},
+        {id:4, servicioId:'SV-004', nombre:'Cableado Estructurado', categoria:'Redes y Cableado', precioBase:28000, estado:'Activo'},
+        {id:5, servicioId:'SV-005', nombre:'Instalación de Planta Eléctrica', categoria:'Instalaciones', precioBase:120000, estado:'Activo'}
       ]
     };
   }
@@ -1249,6 +1401,33 @@ class Component extends DCLogic {
     this.toast(f.id?'Visita actualizada en la agenda.':'Visita agendada correctamente.');
   }
 
+  nuevoServicio(){
+    this.setState({modal:'nuevoServicio', form:{}, errors:{}});
+  }
+
+  guardarServicio(){
+    const f=this.state.form, e={};
+    if(!(f.servicioId||'').trim()) e.servicioId='El ID es obligatorio.';
+    if(!(f.nombre||'').trim()) e.nombre='El nombre es obligatorio.';
+    if(!(f.categoria||'').trim()) e.categoria='La categoría es obligatoria.';
+    if(!(f.precioBase||'').trim()) e.precioBase='El precio base es obligatorio.';
+    
+    if(Object.keys(e).length){ this.setState({errors:e}); this.toast('Revisa los campos marcados.','error'); return; }
+    
+    this.setState(s=>({
+      servicios: [...s.servicios, {
+        id: Math.max(0, ...s.servicios.map(x=>x.id))+1,
+        servicioId: f.servicioId,
+        nombre: f.nombre,
+        categoria: f.categoria,
+        precioBase: Number(f.precioBase),
+        estado: 'Activo'
+      }],
+      modal:null, form:{}, errors:{}
+    }));
+    this.toast('Servicio registrado correctamente.');
+  }
+
   guardarUsuario(){
     const f=this.state.form, e={};
     const u=(f.usuario||'').trim().toLowerCase();
@@ -1320,6 +1499,7 @@ class Component extends DCLogic {
     const badge=(k)=>({bg:(BADGE[k]||['#EEF0F8','#4A4E63'])[0], fg:(BADGE[k]||['#EEF0F8','#4A4E63'])[1]});
     const hoy=iso(new Date());
     const out={
+      sidebarCollapsed: !!s.sidebarCollapsed, toggleSidebar: () => self.setState({ sidebarCollapsed: !s.sidebarCollapsed }),
       loggedIn:!!s.session, loggedOut:!s.session, fields, tipos:TIPOS, toasts:s.toasts,
       pw:{password:PW('password'), password2:PW('password2')},
       loginError:s.loginError, doLogin:()=>self.doLogin(),
@@ -1330,6 +1510,15 @@ class Component extends DCLogic {
       hoyLargo:fmtLargo(hoy),
       horas:['08:00 AM','09:00 AM','10:00 AM','11:00 AM','12:00 PM','01:00 PM','02:00 PM','03:00 PM','04:00 PM','05:00 PM'],
       goHistorial:()=>self.go('historial'),
+      goInicio:()=>self.go('inicio'),
+      goListaReportesConsumo:()=>self.go('listaReportesConsumo'),
+      goReporteConsumo:()=>self.go('reporteConsumo'),
+      reportesConfig:{
+        anio: { value: s.reporteAnio || 'Año 2025', onChange: (e) => self.setState({reporteAnio: e.target.value}) },
+        categoria: { value: s.reporteCategoria || 'Todos los Servicios', onChange: (e) => self.setState({reporteCategoria: e.target.value}) },
+        anios: ['Año 2025', 'Año 2024', 'Año 2023', 'Año 2022', 'Año 2021'],
+        categorias: ['Todos los Servicios', ...TIPOS]
+      },
       closeModal:()=>self.setState({modal:null,form:{},errors:{}}),
       closeConfirm:()=>self.setState({confirm:null}),
       askLogout:()=>self.setState({confirm:{title:'Cerrar sesión',msg:'¿Deseas cerrar la sesión actual? Los cambios guardados se mantienen.',okLabel:'Cerrar sesión',color:'#C4141B',ok:()=>{self.setState({session:null,confirm:null,screen:'inicio',form:{},errors:{},modal:null}); self.toast('Sesión cerrada correctamente.');}}}),
@@ -1341,11 +1530,11 @@ class Component extends DCLogic {
     out.user={nombre:s.session.nombre, cargo:s.session.cargo, inicial:s.session.nombre.slice(0,1)};
     let nav;
     if(esGerente){
-      nav=[['inicio','Inicio'],['solicitudes','Solicitudes'],['cotizaciones','Cotizaciones'],['ordenes','Órdenes'],['clientes','Clientes'],['cobros','Cobros'],['inventario','Inventario'],['proveedores','Proveedores'],['reportes','Reportes'],['servicios','Servicios']];
+      nav=[['inicio','Inicio'],['solicitudes','Solicitudes'],['cotizaciones','Cotizaciones'],['ordenes','Órdenes'],['clientes','Clientes'],['cobros','Cobros'],['servicios','Servicios'],['inventario','Inventario'],['proveedores','Proveedores'],['reportes','Reportes']];
     } else {
       nav=[['inicio','Inicio'],['solicitudes','Solicitudes'],['agenda','Agenda'],['levantamientos','Levantamientos'],['ordenes','Órdenes de trabajo'],['clientes','Clientes'],['historial','Historial']];
     }
-    const activo = (s.screen==='nuevoLev'||s.screen==='levSolicitud') ? 'levantamientos' : (s.screen==='reporteConsumo'?'reportes':s.screen);
+    const activo = (s.screen==='nuevoLev'||s.screen==='levSolicitud') ? 'levantamientos' : ((s.screen==='reporteConsumo'||s.screen==='listaReportesConsumo')?'reportes':s.screen);
     out.navItems=nav.map(([k,label])=>({label, d1:ICON[k].d1, d2:ICON[k].d2, w:activo===k?'800':'600', bg:activo===k?'#EDEBFF':'transparent', fg:activo===k?'#1D4ED8':'#4A4E63', dot1:activo===k?'#1D4ED8':'#6B7085', dot2:activo===k?'#F59E0B':'#A1A5B7', activo:activo===k, go:()=>self.go(k)}));
 
     const titles={inicio:['¡Bienvenido, '+s.session.nombre.split(' ')[0]+'!','Resumen de la operación de hoy.'],
@@ -1363,6 +1552,7 @@ class Component extends DCLogic {
       inventario:['Inventario','Gestión de materiales y existencias.'],
       proveedores:['Proveedores','Directorio de proveedores y compras.'],
       reportes:['Reportes','Análisis operativo y financiero del sistema.'],
+      listaReportesConsumo:['Reportes','Análisis operativo y financiero del sistema.'],
       reporteConsumo:['Reporte de Consumo en Servicios del último año','Análisis operativo detallado por tipo de servicio e inventario consumido.'],
       servicios:['Servicios','Catálogo de servicios y categorías.']};
     out.pageTitle=titles[s.screen][0]; out.pageSub=titles[s.screen][1];
@@ -1376,7 +1566,7 @@ class Component extends DCLogic {
     out.isNuevoLevOnly=s.screen==='nuevoLev'; out.isOrdenes=s.screen==='ordenes';
     out.isClientes=s.screen==='clientes'; out.isHistorial=s.screen==='historial'; out.isUsuarios=s.screen==='usuarios'&&esGerente;
     out.isCotizaciones=s.screen==='cotizaciones'; out.isCobros=s.screen==='cobros'; out.isInventario=s.screen==='inventario'; out.isProveedores=s.screen==='proveedores';
-    out.isReportes=s.screen==='reportes'; out.isReporteConsumo=s.screen==='reporteConsumo'; out.isServicios=s.screen==='servicios';
+    out.isReportes=s.screen==='reportes'; out.isReporteConsumo=s.screen==='reporteConsumo'; out.isListaReportesConsumo=s.screen==='listaReportesConsumo'; out.isServicios=s.screen==='servicios';
     out.isEnDesarrollo=out.isCotizaciones||out.isCobros||out.isInventario||out.isProveedores;
     out.goReporteConsumo=()=>self.go('reporteConsumo'); out.volverReportes=()=>self.go('reportes');
 
@@ -1386,8 +1576,19 @@ class Component extends DCLogic {
     const nuevoUsuario=()=>self.openModal('usuario',{rol:'Empleado'});
     const pa={solicitudes:{label:'+ Nueva solicitud',on:nuevaSolicitud}, agenda:{label:'+ Nueva agenda',on:nuevaAgenda},
       clientes:{label:'+ Nuevo cliente',on:nuevoCliente}, levantamientos:{label:'+ Nuevo levantamiento',on:()=>self.nuevoLevManual()},
-      usuarios:{label:'+ Nuevo usuario',on:nuevoUsuario}};
+      usuarios:{label:'+ Nuevo usuario',on:nuevoUsuario}, servicios:{label:'+ Crear servicio',on:()=>self.nuevoServicio()}};
     out.primaryAction=pa[s.screen]||null;
+    
+    let servs = s.servicios;
+    if(s.search&&s.search.srv) {
+       const q = s.search.srv.toLowerCase();
+       servs = servs.filter(x => x.nombre.toLowerCase().includes(q) || x.servicioId.toLowerCase().includes(q));
+    }
+    if(s.filters&&s.filters.srv && s.filters.srv !== 'Todas las categorías') {
+       servs = servs.filter(x => x.categoria === s.filters.srv);
+    }
+    out.servicios = servs.map(x => ({...x, precioStr: x.precioBase.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})}));
+    
 
     // Inicio
     const visibles=self.visibles();
@@ -1403,26 +1604,41 @@ class Component extends DCLogic {
     const prox=visibles.filter(x=>x.estado!=='Cancelada'&&x.estado!=='Finalizada').sort((a,b)=>(a.fecha+a.hora).localeCompare(b.fecha+b.hora))[0];
     out.proxima=prox?{hora:h12(prox.hora),cliente:prox.cliente,tipoServicio:prox.tipoServicio,direccion:prox.direccion,mapa:()=>self.mapa(prox.direccion)}:null;
     out.sinProxima=!prox;
-    const ALIAS={'Cableado Estructurado':'Instalación de Sistema UPS','Mantenimiento Eléctrico':'Instalación de planta eléctrica'};
+    const ALIAS={'Cableado Estructurado':'Instalación de Sistema UPS','Mantenimiento Eléctrico':'Instalación de Planta Eléctrica'};
     out.actividad=s.solicitudes.slice().reverse().slice(0,3).map((x,i)=>{
       const t=ALIAS[x.tipoServicio]||x.tipoServicio;
-      return {tipoServicio:t, cliente:x.cliente, d:ICON_SERV[t]||ICON_SERV['Mantenimiento Eléctrico'], hace:'Hace '+(i+1)+(i===0?' hora':' horas')};
+      const ic=ICON_SERV[t]||ICON_SERV['Mantenimiento Eléctrico'];
+      return {tipoServicio:t, cliente:x.cliente, d1:ic.d1, d2:ic.d2, hace:'Hace '+(i+1)+(i===0?' hora':' horas')};
     });
-    out.accesos=[{label:'Nueva solicitud',d:ICON.solicitudes,on:nuevaSolicitud},{label:'Ver agenda',d:ICON.agenda,on:()=>self.go('agenda')},
-      {label:'Nuevo levantamiento',d:ICON.levantamientos,on:()=>self.nuevoLevManual()},{label:'Órdenes de trabajo',d:ICON.ordenes,on:()=>self.go('ordenes')},{label:'Clientes',d:ICON.clientes,on:()=>self.go('clientes')}];
+    out.accesos=[{label:'Nueva solicitud',d1:ICON.solicitudes.d1,d2:ICON.solicitudes.d2,on:nuevaSolicitud},{label:'Ver agenda',d1:ICON.agenda.d1,d2:ICON.agenda.d2,on:()=>self.go('agenda')},
+      {label:'Nuevo levantamiento',d1:ICON.levantamientos.d1,d2:ICON.levantamientos.d2,on:()=>self.nuevoLevManual()},{label:'Órdenes de trabajo',d1:ICON.ordenes.d1,d2:ICON.ordenes.d2,on:()=>self.go('ordenes')},{label:'Clientes',d1:ICON.clientes.d1,d2:ICON.clientes.d2,on:()=>self.go('clientes')}];
 
     // Solicitudes
     const detalleSol=(x)=>self.setState({modal:'detalleSolicitud',form:{...x},errors:{}});
     const editarSol=(x)=>self.openModal('solicitud',{...x});
-    out.solicitudesView=s.solicitudes.filter(x=>x.cliente.toLowerCase().includes(s.qSol.toLowerCase()) && (s.fSol==='Todos los estados'||x.estado===s.fSol))
-      .map(x=>({code:String(x.id).padStart(4,'0'),cliente:x.cliente,tipoServicio:x.tipoServicio,fechaSolicitud:fmt(x.fechaSolicitud),estado:x.estado,...badge(x.estado),view:()=>detalleSol(x),edit:()=>editarSol(x)}));
+    out.solicitudesView=s.solicitudes.filter(x=>{
+      const qId = (s.qSolId || '').trim().toLowerCase();
+      const qCli = (s.qSolCli || '').trim().toLowerCase();
+      const qTipo = (s.qSolTipo || '');
+      const mId = !qId || String(x.id).padStart(4,'0').toLowerCase().includes(qId);
+      const mCli = !qCli || (x.cliente || '').toLowerCase().includes(qCli);
+      const mTipo = !qTipo || x.tipoServicio === qTipo;
+      const mEstado = s.fSol === 'Todos los estados' || x.estado === s.fSol;
+      const mFecha = !s.qSolFecha || x.fechaSolicitud === s.qSolFecha;
+      return mId && mCli && mTipo && mEstado && mFecha;
+    }).map(x=>({code:String(x.id).padStart(4,'0'),cliente:x.cliente,tipoServicio:x.tipoServicio,fechaSolicitud:fmt(x.fechaSolicitud),estado:x.estado,...badge(x.estado),view:()=>detalleSol(x),edit:()=>editarSol(x)}));
     out.solVacio=out.solicitudesView.length===0;
-    out.search={sol:{value:s.qSol,onChange:e=>self.setState({qSol:e.target.value})},cli:{value:s.qCli,onChange:e=>self.setState({qCli:e.target.value})},
+    out.search={
+      solId:{value:s.qSolId,onChange:e=>self.setState({qSolId:e.target.value})},
+      solCli:{value:s.qSolCli,onChange:e=>self.setState({qSolCli:e.target.value})},
+      solTipo:{value:s.qSolTipo,onChange:e=>self.setState({qSolTipo:e.target.value})},
+      solFecha:{value:s.qSolFecha,onChange:e=>self.setState({qSolFecha:e.target.value})},
+      cli:{value:s.qCli,onChange:e=>self.setState({qCli:e.target.value})},
       hist:{value:s.qHist,onChange:e=>self.setState({qHist:e.target.value})},lev:{value:s.qLev,onChange:e=>self.setState({qLev:e.target.value})},
-      ord:{value:s.qOrd,onChange:e=>self.setState({qOrd:e.target.value})}};
+      ord:{value:s.qOrd,onChange:e=>self.setState({qOrd:e.target.value})},srv:{value:s.qSrv,onChange:e=>self.setState({qSrv:e.target.value})}};
     out.filters={sol:{value:s.fSol,onChange:e=>self.setState({fSol:e.target.value})},hist:{value:s.fHist,onChange:e=>self.setState({fHist:e.target.value})},
       lev:{value:s.fLev,onChange:e=>self.setState({fLev:e.target.value})},ord:{value:s.fOrd,onChange:e=>self.setState({fOrd:e.target.value})},
-      agenda:{value:s.vAgenda,onChange:e=>self.setState({vAgenda:e.target.value})}};
+      agenda:{value:s.vAgenda,onChange:e=>self.setState({vAgenda:e.target.value})},srv:{value:s.fSrv,onChange:e=>self.setState({fSrv:e.target.value})}};
     out.estadosOrd=['Todos los estados','En proceso','Finalizada'];
     out.vistasAgenda=['Hoy','Semanal','Mensual'];
     out.diasSemana=['Lun','Mar','Mié','Jue','Vie','Sáb','Dom'];
@@ -1547,7 +1763,7 @@ class Component extends DCLogic {
     // Modales
     const m=s.modal;
     out.modalOpen=!!m;
-    out.isFormSolicitud=m==='solicitud'; out.isFormCliente=m==='cliente'; out.isFormAgenda=m==='agenda'; out.isFormUsuario=m==='usuario';
+    out.isFormSolicitud=m==='solicitud'; out.isFormCliente=m==='cliente'; out.isFormAgenda=m==='agenda'; out.isFormUsuario=m==='usuario'; out.isFormServicio=m==='nuevoServicio';
     out.isDetalleModal=m==='detalleSolicitud'||m==='detalleCliente';
     out.clienteNoRegistrado=m==='solicitud'&&s.form.cliente==='__nuevo';
     out.irARegistroCliente=()=>self.openModal('cliente',{});
@@ -1556,6 +1772,7 @@ class Component extends DCLogic {
       cliente:{title:s.form.id?'Editar cliente':'Nuevo cliente',sub:'Datos de contacto y ubicación.',width:'560px',saveLabel:s.form.id?'Guardar cambios':'Registrar cliente',save:()=>self.guardarCliente()},
       agenda:{title:s.form.id?'Editar visita':'Nueva agenda',sub:'Asigna fecha y hora para la visita.',width:'620px',saveLabel:'Guardar visita',save:()=>self.guardarAgenda()},
       usuario:{title:s.form.id?'Modificar usuario':'Nuevo usuario',sub:'Define credenciales y rol de acceso.',width:'620px',saveLabel:s.form.id?'Guardar cambios':'Crear usuario',save:()=>self.guardarUsuario()},
+      nuevoServicio:{title:'Registrar nuevo servicio',sub:'Complete los datos para agregar el servicio al catálogo.',width:'560px',saveLabel:'Crear servicio',save:()=>self.guardarServicio()},
       detalleSolicitud:{title:'Detalle de la solicitud',sub:'Solicitud '+String(s.form.id||'').padStart(4,'0'),width:'620px',save:null,closeLabel:'Cerrar'},
       detalleCliente:{title:s.form.nombre||'Cliente',sub:'Información del cliente registrado.',width:'620px',save:null,closeLabel:'Cerrar'}
     };
