@@ -1,0 +1,8 @@
+{
+  "rewrites": [
+    {
+      "source": "/",
+      "destination": "/INTECH Sistema.dc.html"
+    }
+  ]
+}
