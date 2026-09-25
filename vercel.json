@@ -2,7 +2,7 @@
   "rewrites": [
     {
       "source": "/",
-      "destination": "/INTECH Sistema.dc.html"
+      "destination": "/ElectroGestion Sistema.dc.html"
     }
   ]
 }
