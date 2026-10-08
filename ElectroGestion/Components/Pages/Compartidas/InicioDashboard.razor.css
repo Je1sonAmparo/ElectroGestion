@@ -1,44 +1,44 @@
 .home-dashboard {
     min-width: 0;
-    max-width: 950px; /* Evita que se estire demasiado en pantallas grandes */
+    max-width: 1100px;
 }
 
 .home-heading {
-    margin-bottom: 12px;
+    margin-bottom: 20px;
 }
 
 .home-heading h1 {
     margin: 0;
     color: #14162B;
     font-family: 'Manrope', sans-serif;
-    font-size: 22px;
+    font-size: 28px;
     font-weight: 800;
     line-height: 1.2;
 }
 
 .home-heading p {
-    margin: 3px 0 0;
+    margin: 6px 0 0;
     color: #6B7085;
-    font-size: 12px;
+    font-size: 14px;
 }
 
 .home-metrics {
     display: grid;
     grid-template-columns: repeat(4, minmax(0, 1fr));
-    gap: 10px;
+    gap: 16px;
 }
 
 .home-metric,
 .home-panel {
     min-width: 0;
     border: 1px solid #E3E5EE;
-    border-radius: 10px;
+    border-radius: 12px;
     background: #fff;
 }
 
 .home-metric {
-    min-height: 80px;
-    padding: 10px 12px 9px;
+    min-height: 110px;
+    padding: 16px 20px;
     display: flex;
     flex-direction: column;
     align-items: flex-start;
@@ -46,16 +46,16 @@
 
 .home-metric-label {
     color: #6B7085;
-    font-size: 9.5px;
+    font-size: 13px;
     font-weight: 700;
     line-height: 1.35;
 }
 
 .home-metric-value {
-    margin: 4px 0 2px;
+    margin: 8px 0 6px;
     color: #1D4ED8;
     font-family: 'Manrope', sans-serif;
-    font-size: 22px;
+    font-size: 32px;
     font-weight: 800;
     line-height: 1;
     font-variant-numeric: tabular-nums;
@@ -67,7 +67,7 @@
     padding: 0;
     color: #1D4ED8;
     cursor: pointer;
-    font-size: 9.5px;
+    font-size: 12px;
     font-weight: 700;
     text-align: left;
 }
@@ -79,29 +79,29 @@
 .home-operations {
     display: grid;
     grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr);
-    gap: 10px;
-    margin-top: 10px;
+    gap: 16px;
+    margin-top: 16px;
 }
 
 .home-panel {
-    padding: 12px 14px;
+    padding: 20px;
 }
 
 .home-panel h2,
 .home-quick-section h2 {
-    margin: 0 0 10px;
+    margin: 0 0 16px;
     color: #14162B;
     font-family: 'Manrope', sans-serif;
-    font-size: 12.5px;
+    font-size: 16px;
     font-weight: 800;
 }
 
 .home-visit-content {
-    min-height: 90px;
+    min-height: 130px;
     display: grid;
     grid-template-columns: minmax(0, .95fr) minmax(0, 1.05fr);
     align-items: center;
-    gap: 12px;
+    gap: 16px;
 }
 
 .home-visit-details {
@@ -111,35 +111,35 @@
 .home-visit-time {
     color: #1D4ED8;
     font-family: 'Manrope', sans-serif;
-    font-size: 20px;
+    font-size: 26px;
     font-weight: 800;
     line-height: 1.1;
 }
 
 .home-visit-client {
-    margin-top: 6px;
+    margin-top: 10px;
     color: #14162B;
-    font-size: 11px;
+    font-size: 14px;
     font-weight: 700;
 }
 
 .home-visit-meta {
-    margin-top: 2px;
+    margin-top: 4px;
     color: #6B7085;
-    font-size: 9.5px;
+    font-size: 12px;
     line-height: 1.3;
     overflow-wrap: anywhere;
 }
 
 .home-outline-button {
-    margin-top: 8px;
-    padding: 5px 9px;
+    margin-top: 12px;
+    padding: 8px 14px;
     border: 1px solid #D5D8E6;
-    border-radius: 6px;
+    border-radius: 8px;
     background: #fff;
     color: #1D4ED8;
     cursor: pointer;
-    font-size: 9.5px;
+    font-size: 12px;
     font-weight: 700;
 }
 
@@ -150,11 +150,11 @@
 
 .home-map {
     position: relative;
-    height: 90px;
+    height: 130px;
     min-width: 0;
     overflow: hidden;
     border: 1px solid #E3E5EE;
-    border-radius: 8px;
+    border-radius: 10px;
     background: #EFF3EC;
 }
 
@@ -166,25 +166,25 @@
 
 .home-map-label {
     position: absolute;
-    bottom: 5px;
-    left: 5px;
-    padding: 2px 5px;
+    bottom: 8px;
+    left: 8px;
+    padding: 4px 8px;
     border: 1px solid rgba(227, 229, 238, .9);
-    border-radius: 4px;
+    border-radius: 6px;
     background: rgba(255, 255, 255, .92);
     color: #4A4E63;
-    font-size: 7.5px;
+    font-size: 10px;
     font-weight: 700;
 }
 
 .home-empty-visit,
 .home-empty-activity {
-    min-height: 90px;
+    min-height: 130px;
     display: flex;
     align-items: center;
     justify-content: center;
     color: #8B90A3;
-    font-size: 11px;
+    font-size: 14px;
     text-align: center;
 }
 
@@ -197,20 +197,20 @@
     display: flex;
     flex: 1;
     flex-direction: column;
-    gap: 8px;
+    gap: 12px;
 }
 
 .home-activity-row {
     min-width: 0;
     display: flex;
     align-items: center;
-    gap: 8px;
+    gap: 12px;
 }
 
 .home-activity-icon {
-    width: 25px;
-    height: 25px;
-    flex: 0 0 25px;
+    width: 36px;
+    height: 36px;
+    flex: 0 0 36px;
     display: inline-flex;
     align-items: center;
     justify-content: center;
@@ -219,8 +219,8 @@
 }
 
 .home-activity-icon svg {
-    width: 13px;
-    height: 13px;
+    width: 18px;
+    height: 18px;
 }
 
 .home-activity-copy {
@@ -231,7 +231,7 @@
 .home-activity-service {
     overflow: hidden;
     color: #14162B;
-    font-size: 9.5px;
+    font-size: 13px;
     font-weight: 700;
     line-height: 1.25;
     text-overflow: ellipsis;
@@ -241,7 +241,7 @@
 .home-activity-client,
 .home-activity-date {
     color: #8B90A3;
-    font-size: 8px;
+    font-size: 11px;
 }
 
 .home-activity-date {
@@ -250,29 +250,29 @@
 }
 
 .home-activity-link {
-    margin-top: 8px;
+    margin-top: 12px;
 }
 
 .home-quick-section {
-    margin-top: 14px;
+    margin-top: 24px;
 }
 
 .home-quick-section h2 {
-    margin-bottom: 8px;
+    margin-bottom: 12px;
 }
 
 .home-quick-grid {
     display: grid;
     grid-template-columns: repeat(5, minmax(0, 1fr));
-    gap: 8px;
+    gap: 12px;
 }
 
 .home-quick-card {
     min-width: 0;
-    min-height: 55px;
-    padding: 8px;
+    min-height: 75px;
+    padding: 12px;
     border: 1px solid #E3E5EE;
-    border-radius: 8px;
+    border-radius: 10px;
     background: #fff;
     color: #14162B;
     cursor: pointer;
@@ -280,17 +280,17 @@
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    gap: 5px;
-    font-size: 9.5px;
+    gap: 8px;
+    font-size: 12px;
     font-weight: 700;
     text-align: center;
     transition: border-color .15s ease, color .15s ease, background-color .15s ease;
 }
 
 .home-quick-card svg {
-    width: 16px;
-    height: 16px;
-    flex: 0 0 16px;
+    width: 22px;
+    height: 22px;
+    flex: 0 0 22px;
 }
 
 .home-quick-card:hover,
