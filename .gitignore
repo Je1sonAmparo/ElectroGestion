@@ -32,3 +32,5 @@ watch-context.*
 # Historiales y parches
 *.patch
 *.diff
+
+IGNORAR/
