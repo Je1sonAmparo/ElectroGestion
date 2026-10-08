@@ -50,8 +50,9 @@
             <div style="display:flex;align-items:center;gap:10px">
                 <span style="font-family:'Manrope';font-weight:800;font-size:15px;color:#14162B">Estado:</span>
                 <select @bind="SearchEstado" style="width:170px;padding:9px 12px;border:1px solid #D5D8E6;border-radius:6px;font-size:14px;background:#fff;color:#4A4E63">
-                    <option value="Todas">Todas</option>
+                    <option value="Todos los estados">Todos los estados</option>
                     <option value="Pendiente">Pendiente</option>
+                    <option value="En proceso">En proceso</option>
                     <option value="Finalizada">Finalizada</option>
                     <option value="Cancelada">Cancelada</option>
                 </select>
@@ -169,7 +170,7 @@
     private string SearchCliente { get; set; } = "";
     private string SearchTipo { get; set; } = "";
     private DateTime? SearchFecha { get; set; } = null;
-    private string SearchEstado { get; set; } = "Todas";
+    private string SearchEstado { get; set; } = "Todos los estados";
 
     private List<ElectroGestion.Models.Solicitud> FilteredSolicitudes = new();
 
@@ -183,8 +184,8 @@
     private DateTime? FormFecha;
     private TimeOnly? FormHora;
     private List<string> TiposServicio = new() {
-        "Instalación Eléctrica", "Reparación Eléctrica", "Mantenimiento Preventivo",
-        "Inspección de Seguridad", "Automatización", "Certificación"
+        "Instalación Solar", "Instalación de Sistema UPS", "Mantenimiento Eléctrico",
+        "Instalación de Planta Eléctrica", "Cableado Estructurado"
     };
 
     protected override void OnInitialized()
@@ -198,7 +199,7 @@
 
         if (!string.IsNullOrWhiteSpace(SearchId))
         {
-            q = q.Where(x => x.Id.ToString().Contains(SearchId));
+            q = q.Where(x => x.Id.ToString("D4").Contains(SearchId, StringComparison.OrdinalIgnoreCase));
         }
 
         if (!string.IsNullOrWhiteSpace(SearchCliente))
@@ -217,7 +218,7 @@
             q = q.Where(x => x.FechaSolicitud.StartsWith(dateStr));
         }
 
-        if (SearchEstado != "Todas")
+        if (SearchEstado != "Todos los estados")
         {
             q = q.Where(x => x.Estado == SearchEstado);
         }

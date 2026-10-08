@@ -11,7 +11,9 @@
     font-size: 14.5px;
     font-weight: 700;
     background: transparent;
-    color: rgba(20, 22, 43, 0.65);
+    color: #4A4E63;
+    --icon-d1: #6B7085;
+    --icon-d2: #A1A5B7;
     transition: all 0.2s;
 }
 
@@ -22,10 +24,16 @@
 .nav-item-btn.active {
     background: #EDEBFF;
     color: #1D4ED8;
+    --icon-d1: #1D4ED8;
+    --icon-d2: #F59E0B;
 }
 
-.nav-item-btn.active svg {
-    stroke: #1D4ED8;
+.nav-item-btn svg .path-d1 {
+    stroke: var(--icon-d1);
+}
+
+.nav-item-btn svg .path-d2 {
+    stroke: var(--icon-d2);
 }
 
 .sidebar-toggle-btn {

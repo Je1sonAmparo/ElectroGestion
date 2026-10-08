@@ -17,24 +17,24 @@
 
 <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:16px" class="resp-grid-4">
     <div style="background:#fff;border:1px solid #E3E5EE;border-radius:14px;padding:18px 20px">
-        <div style="font-size:13px;color:#6B7085;font-weight:700;line-height:1.35">Solicitudes Pendientes</div>
+        <div style="font-size:13px;color:#6B7085;font-weight:700;line-height:1.35">Solicitudes pendientes</div>
         <div style="font-family:'Manrope';font-weight:800;font-size:38px;margin:10px 0 12px;color:#1D4ED8">@Pendientes</div>
         <button @onclick='() => NavManager.NavigateTo("solicitudes")' class="link-btn">Ver solicitudes &rarr;</button>
     </div>
     <div style="background:#fff;border:1px solid #E3E5EE;border-radius:14px;padding:18px 20px">
-        <div style="font-size:13px;color:#6B7085;font-weight:700;line-height:1.35">Levantamientos en Espera</div>
-        <div style="font-family:'Manrope';font-weight:800;font-size:38px;margin:10px 0 12px;color:#1D4ED8">@Levantamientos</div>
-        <button @onclick='() => NavManager.NavigateTo("levantamientos")' class="link-btn">Ir a levantamientos &rarr;</button>
+        <div style="font-size:13px;color:#6B7085;font-weight:700;line-height:1.35">Visitas programadas</div>
+        <div style="font-family:'Manrope';font-weight:800;font-size:38px;margin:10px 0 12px;color:#1D4ED8">@VisitasProgramadas</div>
+        <button @onclick='() => NavManager.NavigateTo("agenda")' class="link-btn">Ver agenda &rarr;</button>
     </div>
     <div style="background:#fff;border:1px solid #E3E5EE;border-radius:14px;padding:18px 20px">
-        <div style="font-size:13px;color:#6B7085;font-weight:700;line-height:1.35">Órdenes Activas</div>
-        <div style="font-family:'Manrope';font-weight:800;font-size:38px;margin:10px 0 12px;color:#1D4ED8">@Ordenes</div>
+        <div style="font-size:13px;color:#6B7085;font-weight:700;line-height:1.35">Levantamientos pendientes</div>
+        <div style="font-family:'Manrope';font-weight:800;font-size:38px;margin:10px 0 12px;color:#1D4ED8">@LevantamientosPendientes</div>
+        <button @onclick='() => NavManager.NavigateTo("levantamientos")' class="link-btn">Ver levantamientos &rarr;</button>
+    </div>
+    <div style="background:#fff;border:1px solid #E3E5EE;border-radius:14px;padding:18px 20px">
+        <div style="font-size:13px;color:#6B7085;font-weight:700;line-height:1.35">Órdenes de trabajo nuevas</div>
+        <div style="font-family:'Manrope';font-weight:800;font-size:38px;margin:10px 0 12px;color:#1D4ED8">@OrdenesNuevas</div>
         <button @onclick='() => NavManager.NavigateTo("ordenes")' class="link-btn">Ver órdenes &rarr;</button>
-    </div>
-    <div style="background:#fff;border:1px solid #E3E5EE;border-radius:14px;padding:18px 20px">
-        <div style="font-size:13px;color:#6B7085;font-weight:700;line-height:1.35">Servicios este Mes</div>
-        <div style="font-family:'Manrope';font-weight:800;font-size:38px;margin:10px 0 12px;color:#1D4ED8">@Completados</div>
-        <button @onclick='() => NavManager.NavigateTo("historial")' class="link-btn">Ir al historial &rarr;</button>
     </div>
 </div>
 
@@ -158,37 +158,53 @@
 
 @code {
     private int Pendientes;
-    private int Levantamientos;
-    private int Ordenes;
-    private int Completados;
+    private int VisitasProgramadas;
+    private int LevantamientosPendientes;
+    private int OrdenesNuevas;
     private ElectroGestion.Models.Solicitud? Proxima;
     private List<ActividadModel> Actividad = new();
 
     protected override void OnInitialized()
     {
         Pendientes = AppState.Solicitudes.Count(s => s.Estado == "Pendiente");
-        Levantamientos = AppState.Levantamientos.Count(l => l.Estado == "En Espera Administración");
-        Ordenes = AppState.Ordenes.Count(o => o.Estado == "En proceso");
-
-        var limit = DateTime.Today.AddDays(-30);
-        Completados = AppState.Solicitudes.Count(s => s.Estado == "Finalizada" && DateTime.TryParse(s.FechaFin ?? s.Fecha, out var d) && d >= limit);
+        VisitasProgramadas = AppState.Solicitudes.Count(s => !string.IsNullOrEmpty(s.Fecha) && !string.IsNullOrEmpty(s.Hora) && s.Estado != "Cancelada" && s.Estado != "Finalizada");
+        LevantamientosPendientes = AppState.Levantamientos.Count(l => l.Estado == "Pendiente");
+        OrdenesNuevas = AppState.Ordenes.Count(o => o.Estado == "En proceso");
 
         Proxima = AppState.Solicitudes
-            .Where(s => s.Estado == "Pendiente" && !string.IsNullOrEmpty(s.Fecha) && !string.IsNullOrEmpty(s.Hora))
+            .Where(s => s.Estado != "Cancelada" && s.Estado != "Finalizada" && !string.IsNullOrEmpty(s.Fecha) && !string.IsNullOrEmpty(s.Hora))
             .OrderBy(s => s.Fecha).ThenBy(s => s.Hora)
             .FirstOrDefault();
 
-        Actividad = AppState.Solicitudes
-            .OrderByDescending(s => s.Id)
-            .Take(3)
-            .Select(s => new ActividadModel
+        var ALIAS = new Dictionary<string, string>
+        {
+            { "Cableado Estructurado", "Instalación de Sistema UPS" },
+            { "Mantenimiento Eléctrico", "Instalación de Planta Eléctrica" }
+        };
+
+        var ICON_SERV = new Dictionary<string, (string d1, string d2)>
+        {
+            { "Instalación Solar", ("M12 4V2m0 20v-2m8-8h2M2 12h2m13.657-5.657l1.414-1.414M4.93 19.07l1.414-1.414m12.728 0l-1.414-1.414M4.93 4.93l1.414 1.414", "M12 16a4 4 0 100-8 4 4 0 000 8z") },
+            { "Instalación de Sistema UPS", ("M16 4h-8a2 2 0 00-2 2v12a2 2 0 002 2h8a2 2 0 002-2V6a2 2 0 00-2-2z", "M12 10v4l-2 2") },
+            { "Instalación de Planta Eléctrica", ("M4 8h16v10a2 2 0 01-2 2H6a2 2 0 01-2-2V8z", "M12 12a3 3 0 100 6 3 3 0 000-6z M12 4v4 M8 4h8") },
+            { "Mantenimiento Eléctrico", ("M12 11V7l-5 6h4v4l5-6h-4z", "M12 21a9 9 0 1 0 0-18 9 9 0 0 0 0 18z") },
+            { "Cableado Estructurado", ("M4 8h16v8H4z", "M8 8v-4 M16 8v-4 M12 16v4") }
+        };
+
+        var recientes = AppState.Solicitudes.OrderByDescending(s => s.Id).Take(3).ToList();
+        Actividad = recientes.Select((s, i) =>
+        {
+            var t = ALIAS.ContainsKey(s.TipoServicio) ? ALIAS[s.TipoServicio] : s.TipoServicio;
+            var ic = ICON_SERV.ContainsKey(t) ? ICON_SERV[t] : ICON_SERV["Mantenimiento Eléctrico"];
+            return new ActividadModel
             {
                 Cliente = s.Cliente,
-                TipoServicio = s.TipoServicio,
-                IconD1 = "M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z",
-                IconD2 = "M14 2v6h6",
-                Hace = "Reciente"
-            }).ToList();
+                TipoServicio = t,
+                IconD1 = ic.d1,
+                IconD2 = ic.d2,
+                Hace = "Hace " + (i + 1) + (i == 0 ? " hora" : " horas")
+            };
+        }).ToList();
     }
 
     private async Task VerMapa()

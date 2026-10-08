@@ -1,4 +1,5 @@
 @page "/agenda"
+@implements IDisposable
 @inject ElectroGestion.Services.AppStateService AppState
 @inject NavigationManager NavManager
 
@@ -16,7 +17,7 @@
 <div style="display:grid;grid-template-columns:1.55fr 1fr;gap:16px;align-items:start">
     <div style="background:#fff;border:1px solid #E3E5EE;border-radius:14px;padding:20px">
         <div style="display:flex;align-items:center;justify-content:space-between;gap:14px;margin-bottom:16px">
-            <select @bind="VistaActual" style="padding:9px 14px;border:1px solid #D5D8E6;border-radius:9px;font-weight:700;font-size:13.5px;background:#fff;color:#14162B;cursor:pointer">
+            <select value="@VistaActual" @onchange="OnVistaActualChanged" style="padding:9px 14px;border:1px solid #D5D8E6;border-radius:9px;font-weight:700;font-size:13.5px;background:#fff;color:#14162B;cursor:pointer">
                 <option value="Semanal">Semanal</option>
                 <option value="Mensual">Mensual</option>
                 <option value="Diaria">Diaria</option>
@@ -161,13 +162,14 @@
 
 @code {
     private string VistaActual = "Semanal";
-    private string AgendaRango = "14 - 20 Octubre 2024";
+    private string AgendaRango = "";
 
     private List<string> DiasSemana = new() { "Lun", "Mar", "Mié", "Jue", "Vie", "Sáb", "Dom" };
     private List<string> HorasSem = new() { "08 AM", "09 AM", "10 AM", "11 AM", "12 PM", "01 PM", "02 PM", "03 PM", "04 PM", "05 PM", "06 PM" };
 
     public class Evento
     {
+        public int Id { get; set; }
         public int Top { get; set; }
         public int H { get; set; }
         public string Bg { get; set; } = "";
@@ -209,39 +211,151 @@
 
     protected override void OnInitialized()
     {
-        // Mock data initialization to match static UI
-        Semana = new List<DiaSemana>
-        {
-            new DiaSemana { Dia = "Lun", Num = "14" },
-            new DiaSemana { Dia = "Mar", Num = "15" },
-            new DiaSemana { Dia = "Mié", Num = "16", PillBg = "#1D4ED8", NumColor = "#fff", ColBg = "rgba(29,78,216,.02)",
-                Eventos = new List<Evento> {
-                    new Evento { Top = 45, H = 60, Bg = "#FFFBEB", Line = "#F59E0B", Hora = "09:00 - 10:20 AM", Cliente = "Constructora Alpha", TipoServicio = "Instalación", Direccion = "Av. Las Américas 120", Estado = "Pendiente", Fg = "#B45309", Fecha = "16 Oct 2024" }
-                }
-            },
-            new DiaSemana { Dia = "Jue", Num = "17",
-                Eventos = new List<Evento> {
-                    new Evento { Top = 135, H = 90, Bg = "#EEF2FF", Line = "#1D4ED8", Hora = "11:00 - 01:00 PM", Cliente = "Torre Norte", TipoServicio = "Mantenimiento", Direccion = "Av. Bolívar 45", Estado = "Aprobada", Fg = "#1D4ED8", Fecha = "17 Oct 2024" }
-                }
-            },
-            new DiaSemana { Dia = "Vie", Num = "18" },
-            new DiaSemana { Dia = "Sáb", Num = "19" },
-            new DiaSemana { Dia = "Dom", Num = "20" }
-        };
+        AppState.OnChange += StateHasChanged;
+        UpdateData();
+    }
 
-        for (int i = 1; i <= 31; i++)
+    public void Dispose()
+    {
+        AppState.OnChange -= StateHasChanged;
+    }
+
+    private void OnVistaActualChanged(ChangeEventArgs e)
+    {
+        VistaActual = e.Value?.ToString() ?? "Semanal";
+        UpdateData();
+    }
+
+    private void UpdateData()
+    {
+        var hoyD = DateTime.Today;
+        var hoyStr = hoyD.ToString("yyyy-MM-dd");
+
+        var MES = new[] { "enero", "febrero", "marzo", "abril", "mayo", "junio", "julio", "agosto", "septiembre", "octubre", "noviembre", "diciembre" };
+
+        var visibles = AppState.Solicitudes.Where(x => !string.IsNullOrEmpty(x.Fecha) && !string.IsNullOrEmpty(x.Hora)).ToList();
+
+        var lunes = hoyD.AddDays(-((int)hoyD.DayOfWeek == 0 ? 6 : (int)hoyD.DayOfWeek - 1));
+        var finSem = lunes.AddDays(6);
+
+        if (VistaActual == "Semanal")
         {
-            Mes.Add(new DiaMes
-            {
-                Num = i.ToString(),
-                Eventos = i == 16 ? new List<Evento> { new Evento { Bg = "#FFFBEB", Line = "#F59E0B", Corto = "09:00 Alpha" } } : new List<Evento>()
+            AgendaRango = $"{lunes.Day} - {finSem.Day} de {MES[finSem.Month - 1]} {finSem.Year}";
+        }
+        else if (VistaActual == "Mensual")
+        {
+            AgendaRango = char.ToUpper(MES[hoyD.Month - 1][0]) + MES[hoyD.Month - 1].Substring(1) + " " + hoyD.Year;
+        }
+        else
+        {
+            AgendaRango = AppStateService.FormatFechaLarga(hoyStr);
+        }
+
+        Semana.Clear();
+        for (int i = 0; i < 7; i++)
+        {
+            var d = lunes.AddDays(i);
+            var f = d.ToString("yyyy-MM-dd");
+            var esHoy = f == hoyStr;
+
+            var evs = visibles.Where(x => x.Fecha == f).OrderBy(x => x.Hora).Select(x => {
+                var hm = x.Hora.Split(':');
+                var hh = int.Parse(hm[0]);
+                var mm = int.Parse(hm[1]);
+                var cancel = x.Estado == "Cancelada";
+                var fin = x.Estado == "Finalizada";
+                var colors = AppStateService.GetBadgeColors(x.Estado);
+                return new Evento {
+                    Id = x.Id,
+                    Top = Math.Max(0, (int)((hh - 8) * 45 + (mm / 60.0) * 45 + 1)),
+                    H = 58,
+                    Bg = cancel ? "#FDE9EA" : (fin ? "#E4F6EA" : "#EAF3EC"),
+                    Line = cancel ? "#E11B22" : (fin ? "#17803D" : "#4E9A63"),
+                    Hora = AppStateService.FormatHora12(x.Hora),
+                    Cliente = x.Cliente,
+                    TipoServicio = x.TipoServicio,
+                    Direccion = x.Direccion,
+                    Estado = x.Estado,
+                    Fg = colors.Fg,
+                    Fecha = AppStateService.FormatFechaLarga(x.Fecha),
+                    Rango = AppStateService.FormatHora12(x.Hora) + " - " + AppStateService.FormatHora12(AppStateService.AddMinutes(x.Hora, 150))
+                };
+            }).ToList();
+
+            Semana.Add(new DiaSemana {
+                Dia = DiasSemana[i],
+                Num = d.Day.ToString(),
+                ColBg = esHoy ? "#FBFBFF" : "transparent",
+                PillBg = esHoy ? "#EDEBFF" : "transparent",
+                NumColor = esHoy ? "#1D4ED8" : "#4A4E63",
+                Eventos = evs
             });
         }
 
-        DiariaEventos = new List<Evento>
+        var prim = new DateTime(hoyD.Year, hoyD.Month, 1);
+        var ini = prim.AddDays(-((int)prim.DayOfWeek == 0 ? 6 : (int)prim.DayOfWeek - 1));
+        
+        Mes.Clear();
+        for (int i = 0; i < 42; i++)
         {
-            new Evento { Top = 64, H = 80, Bg = "#FFFBEB", Line = "#F59E0B", Cliente = "Constructora Alpha", TipoServicio = "Instalación", Rango = "09:00 AM - 10:20 AM", Direccion = "Av. Las Américas 120", Estado = "Pendiente", Fg = "#B45309", Fecha = "16 Oct 2024", Hora = "09:00 AM" }
-        };
+            var d = ini.AddDays(i);
+            var f = d.ToString("yyyy-MM-dd");
+            var esHoy = f == hoyStr;
+            var otro = d.Month != hoyD.Month;
+
+            var evs = visibles.Where(x => x.Fecha == f).OrderBy(x => x.Hora).Select(x => {
+                var cancel = x.Estado == "Cancelada";
+                var fin = x.Estado == "Finalizada";
+                var colors = AppStateService.GetBadgeColors(x.Estado);
+                var horaFmt = AppStateService.FormatHora12(x.Hora);
+                return new Evento {
+                    Id = x.Id,
+                    Bg = cancel ? "#FDE9EA" : (fin ? "#E4F6EA" : "#EAF3EC"),
+                    Line = cancel ? "#E11B22" : (fin ? "#17803D" : "#4E9A63"),
+                    Hora = horaFmt,
+                    Cliente = x.Cliente,
+                    TipoServicio = x.TipoServicio,
+                    Direccion = x.Direccion,
+                    Estado = x.Estado,
+                    Fg = colors.Fg,
+                    Fecha = AppStateService.FormatFechaLarga(x.Fecha),
+                    Rango = horaFmt + " - " + AppStateService.FormatHora12(AppStateService.AddMinutes(x.Hora, 150)),
+                    Corto = (horaFmt.Length > 5 ? horaFmt.Substring(0, 5) : horaFmt) + " " + x.Cliente
+                };
+            }).ToList();
+
+            Mes.Add(new DiaMes {
+                Num = d.Day.ToString(),
+                Bg = esHoy ? "#F5F4FF" : (otro ? "#FAFAFC" : "#fff"),
+                Border = esHoy ? "#C9C3F5" : "#EFF0F6",
+                NumColor = esHoy ? "#1D4ED8" : (otro ? "#C0C4D2" : "#14162B"),
+                Eventos = evs
+            });
+        }
+
+        DiariaEventos = visibles.Where(x => x.Fecha == hoyStr).Select(x => {
+            var hm = x.Hora.Split(':');
+            var hh = int.Parse(hm[0]);
+            var mm = int.Parse(hm[1]);
+            var cancel = x.Estado == "Cancelada";
+            var fin = x.Estado == "Finalizada";
+            var colors = AppStateService.GetBadgeColors(x.Estado);
+            return new Evento {
+                Id = x.Id,
+                Top = Math.Max(0, (int)((hh - 8) * 64 + (mm / 60.0) * 64 + 2)),
+                H = (int)(150 / 60.0 * 64 - 6),
+                Bg = cancel ? "#FDE9EA" : (fin ? "#E4F6EA" : "#EAF3EC"),
+                Line = cancel ? "#E11B22" : (fin ? "#17803D" : "#4E9A63"),
+                Hora = AppStateService.FormatHora12(x.Hora),
+                Cliente = x.Cliente,
+                TipoServicio = x.TipoServicio,
+                Direccion = x.Direccion,
+                Estado = x.Estado,
+                Fg = colors.Fg,
+                Fecha = AppStateService.FormatFechaLarga(x.Fecha),
+                Rango = AppStateService.FormatHora12(x.Hora) + " - " + AppStateService.FormatHora12(AppStateService.AddMinutes(x.Hora, 150))
+            };
+        }).ToList();
     }
 
     private void SelectEvent(Evento ev)

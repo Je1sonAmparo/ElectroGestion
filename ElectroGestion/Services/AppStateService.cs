@@ -112,7 +112,15 @@ public class AppStateService
 
     public static string FormatFecha(string? iso)
     {
-        if (string.IsNullOrEmpty(iso)) return "-";
+        if (string.IsNullOrEmpty(iso)) return "—";
+        var parts = iso.Split('-');
+        if (parts.Length != 3) return iso;
+        return $"{parts[2]}/{parts[1]}/{parts[0]}";
+    }
+
+    public static string FormatFechaLarga(string? iso)
+    {
+        if (string.IsNullOrEmpty(iso)) return "—";
         string[] meses = { "enero", "febrero", "marzo", "abril", "mayo", "junio", "julio", "agosto", "septiembre", "octubre", "noviembre", "diciembre" };
         var parts = iso.Split('-');
         if (parts.Length != 3) return iso;
@@ -121,7 +129,7 @@ public class AppStateService
 
     public static string FormatHora12(string? time)
     {
-        if (string.IsNullOrEmpty(time)) return "-";
+        if (string.IsNullOrEmpty(time)) return "—";
         var parts = time.Split(':');
         if (parts.Length < 2) return time;
         int h = int.Parse(parts[0]);
@@ -130,6 +138,19 @@ public class AppStateService
         int hh = h % 12;
         if (hh == 0) hh = 12;
         return $"{hh:D2}:{m:D2} {ap}";
+    }
+
+    public static string AddMinutes(string? time, int addMin)
+    {
+        if (string.IsNullOrEmpty(time)) return "—";
+        var parts = time.Split(':');
+        if (parts.Length < 2) return time;
+        int h = int.Parse(parts[0]);
+        int m = int.Parse(parts[1]);
+        m += addMin;
+        h += m / 60;
+        m = m % 60;
+        return $"{h % 24:D2}:{m:D2}";
     }
 
     public static (string Bg, string Fg) GetBadgeColors(string estado) => estado switch
