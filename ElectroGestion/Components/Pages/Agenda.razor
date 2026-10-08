@@ -1,0 +1,256 @@
+@page "/agenda"
+@inject ElectroGestion.Services.AppStateService AppState
+@inject NavigationManager NavManager
+
+<PageTitle>Agenda | ElectroGestion</PageTitle>
+
+<div style="display:flex;align-items:flex-start;justify-content:space-between;gap:20px;margin-bottom:24px">
+    <div style="display:flex;align-items:flex-start;">
+        <div>
+            <div class="page-title" style="font-family:'Manrope';font-weight:800;font-size:31px;letter-spacing:-.6px">Agenda de Trabajo</div>
+            <div style="color:#6B7085;font-size:14.5px;margin-top:5px">Calendario de servicios y visitas programadas.</div>
+        </div>
+    </div>
+</div>
+
+<div style="display:grid;grid-template-columns:1.55fr 1fr;gap:16px;align-items:start">
+    <div style="background:#fff;border:1px solid #E3E5EE;border-radius:14px;padding:20px">
+        <div style="display:flex;align-items:center;justify-content:space-between;gap:14px;margin-bottom:16px">
+            <select @bind="VistaActual" style="padding:9px 14px;border:1px solid #D5D8E6;border-radius:9px;font-weight:700;font-size:13.5px;background:#fff;color:#14162B;cursor:pointer">
+                <option value="Semanal">Semanal</option>
+                <option value="Mensual">Mensual</option>
+                <option value="Diaria">Diaria</option>
+            </select>
+            <div style="color:#6B7085;font-size:13.5px">@AgendaRango</div>
+        </div>
+
+        @if (VistaActual == "Semanal")
+        {
+            <div>
+                <div style="display:grid;grid-template-columns:56px repeat(7,1fr);border-bottom:1px solid #E3E5EE">
+                    <div></div>
+                    @foreach (var d in Semana)
+                    {
+                        <div style="text-align:center;padding:6px 0 12px;min-width:0">
+                            <div style="font-size:11px;font-weight:800;color:#8B90A3;text-transform:uppercase;letter-spacing:.07em">@d.Dia</div>
+                            <div style="margin:7px auto 0;width:30px;height:30px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:'Manrope';font-weight:800;font-size:15px;background:@d.PillBg;color:@d.NumColor">@d.Num</div>
+                        </div>
+                    }
+                </div>
+                <div style="display:grid;grid-template-columns:56px repeat(7,1fr);position:relative">
+                    <div>
+                        @foreach (var h in HorasSem)
+                        {
+                            <div style="height:45px;font-size:11px;font-weight:700;color:#8B90A3;text-align:right;padding-right:9px;transform:translateY(-6px)">@h</div>
+                        }
+                    </div>
+                    @foreach (var d in Semana)
+                    {
+                        <div style="position:relative;border-left:1px solid #EFF0F6;background:@d.ColBg;min-width:0">
+                            @foreach (var h in HorasSem)
+                            {
+                                <div style="height:45px;border-bottom:1px solid #F4F5FB"></div>
+                            }
+                            @foreach (var ev in d.Eventos)
+                            {
+                                <div @onclick="() => SelectEvent(ev)" style="position:absolute;left:3px;right:3px;top:@(ev.Top)px;height:@(ev.H)px;background:@ev.Bg;border-left:3px solid @ev.Line;border-radius:6px;padding:4px 5px;cursor:pointer;overflow:hidden;min-width:0">
+                                    <div style="font-size:10px;font-weight:800;color:#4A4E63;line-height:1.2">@ev.Hora</div>
+                                    <div style="font-size:10.5px;font-weight:700;line-height:1.22;margin-top:1px;overflow-wrap:anywhere">@ev.Cliente</div>
+                                </div>
+                            }
+                        </div>
+                    }
+                </div>
+            </div>
+        }
+        else if (VistaActual == "Mensual")
+        {
+            <div>
+                <div style="display:grid;grid-template-columns:repeat(7,1fr);gap:6px;margin-bottom:6px">
+                    @foreach (var ds in DiasSemana)
+                    {
+                        <div style="text-align:center;font-size:11px;font-weight:800;color:#8B90A3;text-transform:uppercase;letter-spacing:.06em;padding:4px 0">@ds</div>
+                    }
+                </div>
+                <div style="display:grid;grid-template-columns:repeat(7,1fr);gap:6px">
+                    @foreach (var d in Mes)
+                    {
+                        <div style="background:@d.Bg;border:1px solid @d.Border;border-radius:9px;min-height:92px;min-width:0;padding:7px 8px;display:flex;flex-direction:column;gap:4px">
+                            <div style="font-size:12.5px;font-weight:800;color:@d.NumColor">@d.Num</div>
+                            @foreach (var ev in d.Eventos)
+                            {
+                                <div @onclick="() => SelectEvent(ev)" style="background:@ev.Bg;border-left:3px solid @ev.Line;border-radius:5px;padding:3px 5px;cursor:pointer;font-size:10.5px;font-weight:700;white-space:nowrap;min-width:0;overflow:hidden;text-overflow:ellipsis">@ev.Corto</div>
+                            }
+                        </div>
+                    }
+                </div>
+            </div>
+        }
+        else if (VistaActual == "Diaria")
+        {
+            <div style="position:relative">
+                @foreach (var h in HorasSem)
+                {
+                    <div style="display:flex;gap:12px;height:64px;border-top:1px solid #F0F1F7">
+                        <div style="width:66px;flex:0 0 66px;font-size:12px;color:#8B90A3;font-weight:700;padding-top:4px">@h</div>
+                    </div>
+                }
+                @foreach (var ev in DiariaEventos)
+                {
+                    <div @onclick="() => SelectEvent(ev)" style="position:absolute;left:78px;right:6px;top:@(ev.Top)px;height:@(ev.H)px;background:@ev.Bg;border-left:4px solid @ev.Line;border-radius:9px;padding:11px 13px;cursor:pointer;overflow:hidden">
+                        <div style="font-weight:700;font-size:14px">@ev.Cliente</div>
+                        <div style="font-size:12.5px;color:#4A4E63;margin-top:3px">@ev.TipoServicio</div>
+                        <div style="font-size:12px;color:#6B7085;margin-top:2px">@ev.Rango</div>
+                    </div>
+                }
+            </div>
+        }
+    </div>
+
+    <div style="background:#fff;border:1px solid #E3E5EE;border-radius:14px;padding:20px">
+        @if (Detalle != null)
+        {
+            <div>
+                <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:18px">
+                    <div style="font-family:'Manrope';font-weight:800;font-size:18px">Detalle</div>
+                    <button class="clear-btn" @onclick="ClearDetalle" style="width:28px;height:28px;border:1px solid #E3E5EE;background:#fff;border-radius:7px;cursor:pointer;color:#6B7085">✕</button>
+                </div>
+                <div style="display:flex;flex-direction:column;gap:15px;font-size:14.5px">
+                    <div>
+                        <div style="font-size:12px;color:#8B90A3;font-weight:800;text-transform:uppercase;letter-spacing:.06em">Cliente</div>
+                        <div style="font-weight:700;margin-top:3px">@Detalle.Cliente</div>
+                    </div>
+                    <div>
+                        <div style="font-size:12px;color:#8B90A3;font-weight:800;text-transform:uppercase;letter-spacing:.06em">Tipo de servicio</div>
+                        <div style="margin-top:3px">@Detalle.TipoServicio</div>
+                    </div>
+                    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px" class="resp-grid-2">
+                        <div>
+                            <div style="font-size:12px;color:#8B90A3;font-weight:800;text-transform:uppercase;letter-spacing:.06em">Fecha</div>
+                            <div style="margin-top:3px">@Detalle.Fecha</div>
+                        </div>
+                        <div>
+                            <div style="font-size:12px;color:#8B90A3;font-weight:800;text-transform:uppercase;letter-spacing:.06em">Hora</div>
+                            <div style="margin-top:3px">@Detalle.Hora</div>
+                        </div>
+                    </div>
+                    <div>
+                        <div style="font-size:12px;color:#8B90A3;font-weight:800;text-transform:uppercase;letter-spacing:.06em">Dirección</div>
+                        <div style="margin-top:3px">@Detalle.Direccion</div>
+                    </div>
+                    <div>
+                        <div style="font-size:12px;color:#8B90A3;font-weight:800;text-transform:uppercase;letter-spacing:.06em">Estado</div>
+                        <div style="margin-top:5px">
+                            <span style="display:inline-block;padding:5px 11px;border-radius:20px;font-size:12px;font-weight:800;background:@Detalle.Bg;color:@Detalle.Fg">@Detalle.Estado</span>
+                        </div>
+                    </div>
+                </div>
+                <div style="display:flex;flex-direction:column;gap:9px;margin-top:22px">
+                    <button class="action-btn" style="padding:11px;border:1px solid #D5D8E6;background:#fff;border-radius:9px;font-size:13.5px;font-weight:700;cursor:pointer">Ver ubicación</button>
+                    <button class="action-btn" style="padding:11px;border:1px solid #D5D8E6;background:#fff;border-radius:9px;font-size:13.5px;font-weight:700;cursor:pointer">Editar visita</button>
+                    <button class="cancel-btn" style="padding:11px;border:1px solid #F5C2C4;background:#fff;border-radius:9px;font-size:13.5px;font-weight:700;cursor:pointer;color:#C4141B">Cancelar visita</button>
+                </div>
+            </div>
+        }
+        else
+        {
+            <div style="color:#8B90A3;font-size:14px;text-align:center;padding:40px 10px">Selecciona una visita del calendario para ver su detalle.</div>
+        }
+    </div>
+</div>
+
+@code {
+    private string VistaActual = "Semanal";
+    private string AgendaRango = "14 - 20 Octubre 2024";
+
+    private List<string> DiasSemana = new() { "Lun", "Mar", "Mié", "Jue", "Vie", "Sáb", "Dom" };
+    private List<string> HorasSem = new() { "08 AM", "09 AM", "10 AM", "11 AM", "12 PM", "01 PM", "02 PM", "03 PM", "04 PM", "05 PM", "06 PM" };
+
+    public class Evento
+    {
+        public int Top { get; set; }
+        public int H { get; set; }
+        public string Bg { get; set; } = "";
+        public string Line { get; set; } = "";
+        public string Hora { get; set; } = "";
+        public string Cliente { get; set; } = "";
+        public string TipoServicio { get; set; } = "";
+        public string Direccion { get; set; } = "";
+        public string Estado { get; set; } = "";
+        public string Fg { get; set; } = "";
+        public string Fecha { get; set; } = "";
+        public string Rango { get; set; } = "";
+        public string Corto { get; set; } = "";
+    }
+
+    public class DiaSemana
+    {
+        public string Dia { get; set; } = "";
+        public string Num { get; set; } = "";
+        public string PillBg { get; set; } = "transparent";
+        public string NumColor { get; set; } = "#4A4E63";
+        public string ColBg { get; set; } = "transparent";
+        public List<Evento> Eventos { get; set; } = new();
+    }
+
+    public class DiaMes
+    {
+        public string Num { get; set; } = "";
+        public string NumColor { get; set; } = "#4A4E63";
+        public string Bg { get; set; } = "#fff";
+        public string Border { get; set; } = "#E3E5EE";
+        public List<Evento> Eventos { get; set; } = new();
+    }
+
+    private List<DiaSemana> Semana = new();
+    private List<DiaMes> Mes = new();
+    private List<Evento> DiariaEventos = new();
+    private Evento? Detalle;
+
+    protected override void OnInitialized()
+    {
+        // Mock data initialization to match static UI
+        Semana = new List<DiaSemana>
+        {
+            new DiaSemana { Dia = "Lun", Num = "14" },
+            new DiaSemana { Dia = "Mar", Num = "15" },
+            new DiaSemana { Dia = "Mié", Num = "16", PillBg = "#1D4ED8", NumColor = "#fff", ColBg = "rgba(29,78,216,.02)",
+                Eventos = new List<Evento> {
+                    new Evento { Top = 45, H = 60, Bg = "#FFFBEB", Line = "#F59E0B", Hora = "09:00 - 10:20 AM", Cliente = "Constructora Alpha", TipoServicio = "Instalación", Direccion = "Av. Las Américas 120", Estado = "Pendiente", Fg = "#B45309", Fecha = "16 Oct 2024" }
+                }
+            },
+            new DiaSemana { Dia = "Jue", Num = "17",
+                Eventos = new List<Evento> {
+                    new Evento { Top = 135, H = 90, Bg = "#EEF2FF", Line = "#1D4ED8", Hora = "11:00 - 01:00 PM", Cliente = "Torre Norte", TipoServicio = "Mantenimiento", Direccion = "Av. Bolívar 45", Estado = "Aprobada", Fg = "#1D4ED8", Fecha = "17 Oct 2024" }
+                }
+            },
+            new DiaSemana { Dia = "Vie", Num = "18" },
+            new DiaSemana { Dia = "Sáb", Num = "19" },
+            new DiaSemana { Dia = "Dom", Num = "20" }
+        };
+
+        for (int i = 1; i <= 31; i++)
+        {
+            Mes.Add(new DiaMes
+            {
+                Num = i.ToString(),
+                Eventos = i == 16 ? new List<Evento> { new Evento { Bg = "#FFFBEB", Line = "#F59E0B", Corto = "09:00 Alpha" } } : new List<Evento>()
+            });
+        }
+
+        DiariaEventos = new List<Evento>
+        {
+            new Evento { Top = 64, H = 80, Bg = "#FFFBEB", Line = "#F59E0B", Cliente = "Constructora Alpha", TipoServicio = "Instalación", Rango = "09:00 AM - 10:20 AM", Direccion = "Av. Las Américas 120", Estado = "Pendiente", Fg = "#B45309", Fecha = "16 Oct 2024", Hora = "09:00 AM" }
+        };
+    }
+
+    private void SelectEvent(Evento ev)
+    {
+        Detalle = ev;
+    }
+
+    private void ClearDetalle()
+    {
+        Detalle = null;
+    }
+}

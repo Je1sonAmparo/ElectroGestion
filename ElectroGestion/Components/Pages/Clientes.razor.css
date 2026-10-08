@@ -1,0 +1,8 @@
+.view-btn, .edit-btn {
+    transition: all 0.2s;
+}
+
+.view-btn:hover, .edit-btn:hover {
+    border-color: #1D4ED8 !important;
+    color: #1D4ED8 !important;
+}

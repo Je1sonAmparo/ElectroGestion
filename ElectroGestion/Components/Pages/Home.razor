@@ -1,0 +1,211 @@
+@page "/"
+@inject ElectroGestion.Services.AppStateService AppState
+@inject NavigationManager NavManager
+
+<PageTitle>Inicio | ElectroGestion</PageTitle>
+
+<div style="display:flex;align-items:flex-start;justify-content:space-between;gap:20px;margin-bottom:24px">
+    <div style="display:flex;align-items:flex-start;">
+        <div>
+            <div class="page-title" style="font-family:'Manrope';font-weight:800;font-size:31px;letter-spacing:-.6px">
+                Bienvenido, @(AppState.Session?.Nombre.Split(' ')[0] ?? "Usuario")
+            </div>
+            <div style="color:#6B7085;font-size:14.5px;margin-top:5px">Resumen de tu actividad en ElectroGestion.</div>
+        </div>
+    </div>
+</div>
+
+<div style="display:grid;grid-template-columns:repeat(4,1fr);gap:16px" class="resp-grid-4">
+    <div style="background:#fff;border:1px solid #E3E5EE;border-radius:14px;padding:18px 20px">
+        <div style="font-size:13px;color:#6B7085;font-weight:700;line-height:1.35">Solicitudes Pendientes</div>
+        <div style="font-family:'Manrope';font-weight:800;font-size:38px;margin:10px 0 12px;color:#1D4ED8">@Pendientes</div>
+        <button @onclick='() => NavManager.NavigateTo("solicitudes")' class="link-btn">Ver solicitudes &rarr;</button>
+    </div>
+    <div style="background:#fff;border:1px solid #E3E5EE;border-radius:14px;padding:18px 20px">
+        <div style="font-size:13px;color:#6B7085;font-weight:700;line-height:1.35">Levantamientos en Espera</div>
+        <div style="font-family:'Manrope';font-weight:800;font-size:38px;margin:10px 0 12px;color:#1D4ED8">@Levantamientos</div>
+        <button @onclick='() => NavManager.NavigateTo("levantamientos")' class="link-btn">Ir a levantamientos &rarr;</button>
+    </div>
+    <div style="background:#fff;border:1px solid #E3E5EE;border-radius:14px;padding:18px 20px">
+        <div style="font-size:13px;color:#6B7085;font-weight:700;line-height:1.35">Órdenes Activas</div>
+        <div style="font-family:'Manrope';font-weight:800;font-size:38px;margin:10px 0 12px;color:#1D4ED8">@Ordenes</div>
+        <button @onclick='() => NavManager.NavigateTo("ordenes")' class="link-btn">Ver órdenes &rarr;</button>
+    </div>
+    <div style="background:#fff;border:1px solid #E3E5EE;border-radius:14px;padding:18px 20px">
+        <div style="font-size:13px;color:#6B7085;font-weight:700;line-height:1.35">Servicios este Mes</div>
+        <div style="font-family:'Manrope';font-weight:800;font-size:38px;margin:10px 0 12px;color:#1D4ED8">@Completados</div>
+        <button @onclick='() => NavManager.NavigateTo("historial")' class="link-btn">Ir al historial &rarr;</button>
+    </div>
+</div>
+
+<div style="display:grid;grid-template-columns:1.4fr 1fr;gap:16px;margin-top:16px" class="resp-grid-2">
+    <div style="background:#fff;border:1px solid #E3E5EE;border-radius:14px;padding:22px">
+        <div style="font-family:'Manrope';font-weight:800;font-size:17px;margin-bottom:16px">Próxima visita</div>
+        @if (Proxima != null)
+        {
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;align-items:center" class="resp-grid-2">
+                <div>
+                    <div style="font-family:'Manrope';font-weight:800;font-size:32px;color:#1D4ED8">@AppStateService.FormatHora12(Proxima.Hora)</div>
+                    <div style="font-weight:700;font-size:15.5px;margin-top:12px">@Proxima.Cliente</div>
+                    <div style="color:#6B7085;font-size:14px;margin-top:3px">@Proxima.TipoServicio</div>
+                    <div style="color:#6B7085;font-size:14px;margin-top:3px">@Proxima.Direccion</div>
+                    <button @onclick="VerMapa" class="outline-btn" style="margin-top:16px;padding:9px 14px;border:1px solid #D5D8E6;background:#fff;border-radius:9px;font-size:13px;font-weight:700;cursor:pointer">Ver ubicación</button>
+                </div>
+                <div style="height:172px;border-radius:12px;border:1px solid #E3E5EE;overflow:hidden;position:relative;background:#EAF0E6">
+                    <svg viewBox="0 0 320 172" width="100%" height="100%" style="display:block">
+                        <rect width="320" height="172" fill="#EDF2E9"></rect>
+                        <path d="M0 0h320v172H0z" fill="#EFF3EC"></path>
+                        <path d="M26 0v172 M118 0v172 M212 0v172 M282 0v172" stroke="#E2E7DC" stroke-width="9"></path>
+                        <path d="M0 34h320 M0 96h320 M0 142h320" stroke="#E2E7DC" stroke-width="9"></path>
+                        <path d="M0 66h320" stroke="#FFFFFF" stroke-width="13"></path>
+                        <path d="M0 66h320" stroke="#F3C64B" stroke-width="7"></path>
+                        <path d="M166 0v172" stroke="#FFFFFF" stroke-width="13"></path>
+                        <path d="M166 0v172" stroke="#F3C64B" stroke-width="7"></path>
+                        <g fill="#DDE4D6">
+                            <rect x="36" y="8" width="70" height="18" rx="2"></rect>
+                            <rect x="36" y="76" width="52" height="14" rx="2"></rect>
+                            <rect x="96" y="106" width="58" height="26" rx="2"></rect>
+                            <rect x="224" y="8" width="48" height="18" rx="2"></rect>
+                            <rect x="224" y="106" width="50" height="26" rx="2"></rect>
+                            <rect x="178" y="150" width="90" height="16" rx="2"></rect>
+                            <rect x="36" y="150" width="66" height="16" rx="2"></rect>
+                        </g>
+                        <rect x="178" y="76" width="26" height="14" rx="2" fill="#CFE0C6"></rect>
+                        <circle cx="290" cy="120" r="22" fill="#D8E6D0"></circle>
+                        <g transform="translate(166 66)">
+                            <ellipse cx="0" cy="16" rx="9" ry="3.5" fill="rgba(20,22,43,.18)"></ellipse>
+                            <path d="M0 14c0 0-11-11.6-11-19A11 11 0 0 1 11-5c0 7.4-11 19-11 19Z" fill="#E11B22"></path>
+                            <circle cx="0" cy="-5.4" r="4" fill="#fff"></circle>
+                        </g>
+                    </svg>
+                    <div style="position:absolute;left:10px;bottom:9px;background:rgba(255,255,255,.92);border:1px solid #E3E5EE;border-radius:7px;padding:4px 9px;font-size:11px;font-weight:700;color:#4A4E63">
+                        Ubicación aproximada
+                    </div>
+                </div>
+            </div>
+        }
+        else
+        {
+            <div style="color:#8B90A3;font-size:14px;padding:20px 0">No hay visitas programadas.</div>
+        }
+    </div>
+
+    <div style="background:#fff;border:1px solid #E3E5EE;border-radius:14px;padding:22px">
+        <div style="font-family:'Manrope';font-weight:800;font-size:17px;margin-bottom:14px">Actividad reciente</div>
+        <div style="display:flex;flex-direction:column;gap:14px">
+            @foreach (var a in Actividad)
+            {
+                <div style="display:flex;align-items:center;gap:12px">
+                    <div style="width:34px;height:34px;border-radius:50%;background:#EDEBFF;flex:0 0 34px;display:flex;align-items:center;justify-content:center">
+                        <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="@a.IconD1" stroke="#1D4ED8"></path>
+                            @if (!string.IsNullOrEmpty(a.IconD2))
+                            {
+                                <path d="@a.IconD2" stroke="#F59E0B"></path>
+                            }
+                        </svg>
+                    </div>
+                    <div style="min-width:0;flex:1">
+                        <div style="font-weight:700;font-size:14px">@a.TipoServicio</div>
+                        <div style="color:#8B90A3;font-size:12.5px">@a.Cliente</div>
+                    </div>
+                    <div style="color:#8B90A3;font-size:12px;white-space:nowrap">@a.Hace</div>
+                </div>
+            }
+        </div>
+        <button @onclick='() => NavManager.NavigateTo("historial")' class="link-btn" style="margin-top:18px;">Ver todas las actividades &rarr;</button>
+    </div>
+</div>
+
+@if (AppState.EsGerente)
+{
+    <div>
+        <div style="font-family:'Manrope';font-weight:800;font-size:18px;margin:28px 0 14px">Accesos rápidos</div>
+        <div style="display:grid;grid-template-columns:repeat(5,1fr);gap:14px" class="resp-grid-5">
+            <button @onclick='() => NavManager.NavigateTo("solicitudes")' class="quick-access-btn" style="background:#fff;border:1px solid #E3E5EE;border-radius:13px;padding:20px 14px;cursor:pointer;text-align:center;font-size:13.5px;font-weight:700;color:#14162B">
+                <svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" style="display:block;margin:0 auto 12px">
+                    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" stroke="#1D4ED8"></path>
+                    <polyline points="14 2 14 8 20 8" stroke="#F59E0B"></polyline>
+                </svg>Solicitudes
+            </button>
+            <button @onclick='() => NavManager.NavigateTo("ordenes")' class="quick-access-btn" style="background:#fff;border:1px solid #E3E5EE;border-radius:13px;padding:20px 14px;cursor:pointer;text-align:center;font-size:13.5px;font-weight:700;color:#14162B">
+                <svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" style="display:block;margin:0 auto 12px">
+                    <path d="M12 2.69l5.66 5.66a8 8 0 1 1-11.31 0z" stroke="#1D4ED8"></path>
+                </svg>Órdenes
+            </button>
+            <button @onclick='() => NavManager.NavigateTo("clientes")' class="quick-access-btn" style="background:#fff;border:1px solid #E3E5EE;border-radius:13px;padding:20px 14px;cursor:pointer;text-align:center;font-size:13.5px;font-weight:700;color:#14162B">
+                <svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" style="display:block;margin:0 auto 12px">
+                    <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" stroke="#1D4ED8"></path>
+                    <circle cx="9" cy="7" r="4" stroke="#F59E0B"></circle>
+                </svg>Clientes
+            </button>
+            <button @onclick='() => NavManager.NavigateTo("reportes")' class="quick-access-btn" style="background:#fff;border:1px solid #E3E5EE;border-radius:13px;padding:20px 14px;cursor:pointer;text-align:center;font-size:13.5px;font-weight:700;color:#14162B">
+                <svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" style="display:block;margin:0 auto 12px">
+                    <line x1="18" y1="20" x2="18" y2="10" stroke="#1D4ED8"></line>
+                    <line x1="12" y1="20" x2="12" y2="4" stroke="#F59E0B"></line>
+                    <line x1="6" y1="20" x2="6" y2="14" stroke="#1D4ED8"></line>
+                </svg>Reportes
+            </button>
+            <button @onclick='() => NavManager.NavigateTo("usuarios")' class="quick-access-btn" style="background:#fff;border:1px solid #E3E5EE;border-radius:13px;padding:20px 14px;cursor:pointer;text-align:center;font-size:13.5px;font-weight:700;color:#14162B">
+                <svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" style="display:block;margin:0 auto 12px">
+                    <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" stroke="#1D4ED8"></path>
+                    <circle cx="12" cy="7" r="4" stroke="#F59E0B"></circle>
+                </svg>Usuarios
+            </button>
+        </div>
+    </div>
+}
+
+@code {
+    private int Pendientes;
+    private int Levantamientos;
+    private int Ordenes;
+    private int Completados;
+    private ElectroGestion.Models.Solicitud? Proxima;
+    private List<ActividadModel> Actividad = new();
+
+    protected override void OnInitialized()
+    {
+        Pendientes = AppState.Solicitudes.Count(s => s.Estado == "Pendiente");
+        Levantamientos = AppState.Levantamientos.Count(l => l.Estado == "En Espera Administración");
+        Ordenes = AppState.Ordenes.Count(o => o.Estado == "En proceso");
+
+        var limit = DateTime.Today.AddDays(-30);
+        Completados = AppState.Solicitudes.Count(s => s.Estado == "Finalizada" && DateTime.TryParse(s.FechaFin ?? s.Fecha, out var d) && d >= limit);
+
+        Proxima = AppState.Solicitudes
+            .Where(s => s.Estado == "Pendiente" && !string.IsNullOrEmpty(s.Fecha) && !string.IsNullOrEmpty(s.Hora))
+            .OrderBy(s => s.Fecha).ThenBy(s => s.Hora)
+            .FirstOrDefault();
+
+        Actividad = AppState.Solicitudes
+            .OrderByDescending(s => s.Id)
+            .Take(3)
+            .Select(s => new ActividadModel
+            {
+                Cliente = s.Cliente,
+                TipoServicio = s.TipoServicio,
+                IconD1 = "M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z",
+                IconD2 = "M14 2v6h6",
+                Hace = "Reciente"
+            }).ToList();
+    }
+
+    private async Task VerMapa()
+    {
+        if (Proxima != null)
+        {
+            var url = "https://www.google.com/maps/search/?api=1&query=" + Uri.EscapeDataString(Proxima.Direccion);
+            // Open in new tab using JS (could use JS interop here later if needed)
+        }
+    }
+
+    public class ActividadModel
+    {
+        public string Cliente { get; set; } = "";
+        public string TipoServicio { get; set; } = "";
+        public string Hace { get; set; } = "";
+        public string IconD1 { get; set; } = "";
+        public string IconD2 { get; set; } = "";
+    }
+}

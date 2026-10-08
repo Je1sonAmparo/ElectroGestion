@@ -1,0 +1,59 @@
+.nav-item-btn {
+    position: relative;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    width: 100%;
+    text-align: left;
+    border: 0;
+    cursor: pointer;
+    border-radius: 10px;
+    font-size: 14.5px;
+    font-weight: 700;
+    background: transparent;
+    color: rgba(20, 22, 43, 0.65);
+    transition: all 0.2s;
+}
+
+.nav-item-btn:hover {
+    background: #F4F5FB;
+}
+
+.nav-item-btn.active {
+    background: #EDEBFF;
+    color: #1D4ED8;
+}
+
+.nav-item-btn.active svg {
+    stroke: #1D4ED8;
+}
+
+.sidebar-toggle-btn {
+    transition: all 0.2s;
+}
+
+.sidebar-toggle-btn:hover {
+    color: #1D4ED8 !important;
+    border-color: #1D4ED8 !important;
+}
+
+.logout-btn {
+    transition: all 0.2s;
+}
+
+.logout-btn:hover {
+    background: #FDE9EA !important;
+    border-color: #F5C2C4 !important;
+}
+
+::deep .is-collapsed {
+    /* transition is inline, this is for responsive media query logic already handled in app.css */
+}
+
+::deep aside.is-open ~ .sidebar-backdrop {
+    display: block !important;
+}
+
+::deep .sidebar-backdrop.show {
+    display: block !important;
+}

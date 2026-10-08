@@ -2,3 +2,7 @@
 .vs/
 *.code-workspace
 .DS_Store
+
+ElectroGestion/bin/
+ElectroGestion/obj/
+ElectroGestion/.vs/

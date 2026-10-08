@@ -1,0 +1,24 @@
+.clear-btn {
+    transition: all 0.2s;
+}
+
+.clear-btn:hover {
+    color: #14162B !important;
+}
+
+.action-btn {
+    transition: all 0.2s;
+}
+
+.action-btn:hover {
+    border-color: #1D4ED8 !important;
+    color: #1D4ED8 !important;
+}
+
+.cancel-btn {
+    transition: all 0.2s;
+}
+
+.cancel-btn:hover {
+    background: #FDE9EA !important;
+}

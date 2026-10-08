@@ -1,0 +1,7 @@
+.finalizar-btn {
+    transition: all 0.2s;
+}
+
+.finalizar-btn:hover {
+    background: #1E40AF !important;
+}

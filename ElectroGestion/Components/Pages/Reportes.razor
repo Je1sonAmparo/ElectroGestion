@@ -1,0 +1,91 @@
+@page "/reportes"
+@page "/historial"
+@inject ElectroGestion.Services.AppStateService AppState
+@inject NavigationManager NavManager
+
+<PageTitle>Historial | ElectroGestion</PageTitle>
+
+<div style="display:flex;align-items:flex-start;justify-content:space-between;gap:20px;margin-bottom:24px">
+    <div style="display:flex;align-items:flex-start;">
+        <div>
+            <div class="page-title" style="font-family:'Manrope';font-weight:800;font-size:31px;letter-spacing:-.6px">Historial de Servicios</div>
+            <div style="color:#6B7085;font-size:14.5px;margin-top:5px">Consulta los servicios finalizados y métricas clave.</div>
+        </div>
+    </div>
+</div>
+
+<div style="background:#fff;border:1px solid #E3E5EE;border-radius:14px;overflow:hidden">
+    <div style="display:flex;gap:14px;padding:18px;border-bottom:1px solid #EFF0F6">
+        <input @bind="SearchTerm" @bind:event="oninput" placeholder="Buscar por cliente o servicio..."
+            style="flex:1;padding:11px 14px;border:1px solid #D5D8E6;border-radius:9px;font-size:14px" />
+        <select @bind="SearchRango" style="padding:11px 14px;border:1px solid #D5D8E6;border-radius:9px;font-size:14px;background:#fff;min-width:190px">
+            <option value="Este Mes">Este Mes</option>
+            <option value="Mes Pasado">Mes Pasado</option>
+            <option value="Este Año">Este Año</option>
+            <option value="Todos">Todos los tiempos</option>
+        </select>
+    </div>
+    
+    <div style="display:grid;grid-template-columns:80px 1.2fr 1.4fr 1fr 1fr 80px;padding:14px 18px;font-size:12px;font-weight:800;color:#8B90A3;text-transform:uppercase;letter-spacing:.06em;border-bottom:1px solid #EFF0F6"
+        class="resp-table-row">
+        <div>ID</div>
+        <div>Cliente</div>
+        <div>Tipo de servicio</div>
+        <div>Fecha finalización</div>
+        <div>Estado</div>
+        <div style="text-align:right">Acción</div>
+    </div>
+
+    @if (!FilteredHistorial.Any())
+    {
+        <div style="padding:38px;text-align:center;color:#8B90A3;font-size:14px">
+            Aún no hay servicios finalizados que coincidan con la búsqueda.
+        </div>
+    }
+    else
+    {
+        @foreach (var h in FilteredHistorial)
+        {
+            <div style="display:grid;grid-template-columns:80px 1.2fr 1.4fr 1fr 1fr 80px;padding:16px 18px;border-bottom:1px solid #F4F5FB;align-items:center;font-size:14px"
+                class="resp-table-row">
+                <div style="font-family:ui-monospace,monospace;color:#6B7085">@h.Id.ToString("D4")</div>
+                <div style="font-weight:700">@h.Cliente</div>
+                <div>@h.TipoServicio</div>
+                <div style="color:#6B7085">@AppStateService.FormatFecha(h.FechaFin)</div>
+                <div>
+                    <span style="display:inline-block;padding:5px 11px;border-radius:20px;font-size:12px;font-weight:800;background:#E4F6EA;color:#17803D">
+                        Finalizada
+                    </span>
+                </div>
+                <div style="display:flex;justify-content:flex-end">
+                    <button class="table-action-btn" title="Ver detalle"
+                        style="width:32px;height:32px;border:1px solid #D5D8E6;background:#fff;border-radius:8px;cursor:pointer;color:#4A4E63">◉</button>
+                </div>
+            </div>
+        }
+    }
+</div>
+
+@code {
+    private string SearchTerm = "";
+    private string SearchRango = "Este Mes";
+
+    private List<ElectroGestion.Models.Solicitud> FilteredHistorial => AppState.Solicitudes
+        .Where(s => s.Estado == "Finalizada")
+        .Where(s => string.IsNullOrEmpty(SearchTerm) || s.Cliente.Contains(SearchTerm, StringComparison.OrdinalIgnoreCase) || s.TipoServicio.Contains(SearchTerm, StringComparison.OrdinalIgnoreCase))
+        .Where(s => {
+            if (SearchRango == "Todos") return true;
+            if (!DateTime.TryParse(s.FechaFin, out var d)) return false;
+            
+            var today = DateTime.Today;
+            if (SearchRango == "Este Mes") return d.Year == today.Year && d.Month == today.Month;
+            if (SearchRango == "Mes Pasado") {
+                var lastMonth = today.AddMonths(-1);
+                return d.Year == lastMonth.Year && d.Month == lastMonth.Month;
+            }
+            if (SearchRango == "Este Año") return d.Year == today.Year;
+            return true;
+        })
+        .OrderByDescending(s => s.FechaFin)
+        .ToList();
+}

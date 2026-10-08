@@ -1,0 +1,2768 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <script src="./support.js"></script>
+</head>
+
+<body>
+  <x-dc>
+    <helmet>
+      <link rel="preconnect" href="https://fonts.googleapis.com" />
+      <link
+        href="https://fonts.googleapis.com/css2?family=Lato:wght@400;700;900&family=Manrope:wght@500;700;800&display=swap"
+        rel="stylesheet" />
+      <style>
+        * {
+          box-sizing: border-box
+        }
+
+        body {
+          margin: 0;
+          background: #F4F5FB;
+          font-family: 'Lato', Helvetica, Arial, sans-serif;
+          color: #14162B;
+          -webkit-font-smoothing: antialiased
+        }
+
+        a {
+          color: #1D4ED8;
+          text-decoration: none
+        }
+
+        a:hover {
+          color: #F59E0B
+        }
+
+        input,
+        select,
+        textarea,
+        button {
+          font-family: inherit
+        }
+
+        input:focus,
+        select:focus,
+        textarea:focus {
+          outline: 2px solid #1D4ED8;
+          outline-offset: 0
+        }
+
+        @keyframes tin {
+          from {
+            opacity: 0;
+            transform: translateY(8px)
+          }
+
+          to {
+            opacity: 1;
+            transform: none
+          }
+        }
+      </style>
+
+      <style>
+        /* Responsive classes */
+        @media (max-width: 1024px) {
+          .resp-grid-3 {
+            grid-template-columns: repeat(2, 1fr) !important;
+          }
+
+          .resp-grid-4 {
+            grid-template-columns: repeat(2, 1fr) !important;
+          }
+
+          .resp-main {
+            padding: 24px 20px !important;
+          }
+        }
+
+        @media (max-width: 768px) {
+
+          .resp-grid-2,
+          .resp-grid-3,
+          .resp-grid-4 {
+            grid-template-columns: 1fr !important;
+          }
+
+          .resp-grid-5 {
+            grid-template-columns: repeat(2, 1fr) !important;
+          }
+
+          .resp-grid-3-2 {
+            grid-template-columns: 1fr !important;
+          }
+
+          .resp-grid-1-1-2 {
+            grid-template-columns: 1fr !important;
+          }
+
+          .resp-flex-col {
+            flex-direction: column !important;
+            align-items: stretch !important;
+          }
+
+          .resp-flex-wrap {
+            flex-wrap: wrap !important;
+          }
+
+          .resp-table-container {
+            overflow-x: auto !important;
+            -webkit-overflow-scrolling: touch;
+          }
+
+          div[style*="border-radius:14px;overflow:hidden"],
+          div[style*="border-radius: 14px; overflow: hidden"] {
+            overflow-x: auto !important;
+          }
+
+          .resp-table-row {
+            min-width: 800px !important;
+          }
+
+
+          .mobile-menu-btn {
+            display: block !important;
+            margin-right: 12px;
+            margin-top: 4px;
+            position: relative;
+            z-index: 9999;
+          }
+          .mobile-menu-btn svg {
+            pointer-events: none;
+          }
+
+
+          main {
+            padding: 16px !important;
+            margin-left: 0 !important;
+            overflow-x: hidden;
+          }
+
+          /* Top stats */
+          div[style*="display:flex;align-items:flex-start;justify-content:space-between;gap:20px;margin-bottom:24px"] {
+            flex-direction: column !important;
+            align-items: flex-start !important;
+          }
+
+          /* Search blocks */
+          .resp-search-block {
+            flex-direction: column !important;
+            align-items: stretch !important;
+            gap: 12px !important;
+          }
+
+          .resp-search-block>div {
+            width: 100% !important;
+            flex-wrap: wrap;
+          }
+
+          .resp-search-block input,
+          .resp-search-block select {
+            width: 100% !important;
+            max-width: 100% !important;
+          }
+        }
+
+        @media (max-width: 480px) {
+          .resp-grid-5 {
+            grid-template-columns: 1fr !important;
+          }
+
+          .modal-content {
+            padding: 20px 16px !important;
+          }
+
+          .resp-text-center {
+            text-align: center !important;
+          }
+        }
+
+        /* Sidebar adjustments for mobile */
+        @media (max-width: 768px) {
+          aside {
+            position: fixed !important;
+            z-index: 1000 !important;
+            height: 100vh !important;
+            left: 0;
+            top: 0;
+            transform: translateX(-100%);
+            transition: transform 0.3s ease-in-out !important;
+            width: 260px !important;
+            max-width: 85% !important;
+            box-shadow: 4px 0 15px rgba(0, 0, 0, 0.15);
+          }
+
+          aside.is-open {
+            transform: translateX(0) !important;
+          }
+
+          .sidebar-backdrop {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 999;
+          }
+
+          aside.is-open ~ .sidebar-backdrop {
+            display: block !important;
+          }
+
+          .page-title {
+            font-size: 22px !important;
+            line-height: 1.2;
+          }
+
+          main {
+            padding: 20px 16px !important;
+          }
+
+          input,
+          select,
+          textarea {
+            padding: 10px 12px !important;
+            font-size: 14px !important;
+          }
+
+          /* Reduce gaps in forms */
+          .resp-grid-2 {
+            gap: 12px !important;
+          }
+        }
+      </style>
+
+    </helmet>
+
+    <sc-if value="{{ loggedOut }}" hint-placeholder-val="{{ true }}">
+      <div
+        style="min-height:100vh;display:flex;align-items:center;justify-content:center;background:#F4F5FB;padding:20px;background-image:radial-gradient(circle at top right, rgba(29,78,216,0.05), transparent 40%), radial-gradient(circle at bottom left, rgba(245,158,11,0.05), transparent 40%)">
+        <div
+          style="width:100%;max-width:440px;background:#fff;border-radius:24px;box-shadow:0 24px 48px rgba(20,22,43,0.04), 0 2px 8px rgba(20,22,43,0.02);padding:48px 44px">
+          <div style="display:flex;flex-direction:column;align-items:center;margin-bottom:40px;text-align:center">
+            <div style="display:flex;align-items:center;margin-bottom:12px;position:relative;margin-left:-8px">
+              <svg viewBox="0 0 100 60" width="76" height="46">
+                <defs>
+                  <mask id="bolt-mask">
+                    <rect width="100" height="60" fill="white" />
+                    <path d="M46 5 L34 32 H46 L38 58 L54 28 H42 Z" fill="black" stroke="black" stroke-width="2.5"
+                      stroke-linejoin="round" />
+                  </mask>
+                </defs>
+                <text x="10" y="48" font-family="'Manrope', sans-serif" font-weight="900" font-size="52" fill="#1D4ED8"
+                  letter-spacing="-1.5">E</text>
+                <text x="44" y="48" font-family="'Manrope', sans-serif" font-weight="900" font-size="52" fill="#F59E0B"
+                  mask="url(#bolt-mask)" letter-spacing="-1.5">G</text>
+                <path d="M46 5 L34 32 H46 L38 58 L54 28 H42 Z" fill="#F59E0B" stroke="#F59E0B" stroke-width="0"
+                  stroke-linejoin="round" />
+              </svg>
+            </div>
+            <div
+              style="font-family:'Manrope';font-weight:900;font-size:24px;letter-spacing:-0.5px;line-height:1.2;margin-bottom:8px">
+              <span style="color:#1D4ED8">ELECTRO</span><span style="color:#334155">GESTIÓN</span>
+            </div>
+            <div style="color:#6B7085;font-size:14.5px;line-height:1.5">Sistema Informático de Servicios Eléctricos
+            </div>
+          </div>
+
+          <div style="font-family:'Manrope';font-weight:800;font-size:22px;margin-bottom:24px;letter-spacing:-0.5px">
+            Iniciar sesión</div>
+
+          <div style="display:flex;gap:16px;margin-top:20px">
+            <button onClick="{{ loginTecnico }}"
+              style="flex:1;padding:15px;background:#1D4ED8;color:#fff;border:0;border-radius:10px;font-size:16px;font-weight:700;cursor:pointer;font-family:'Manrope';box-shadow:0 4px 14px rgba(29,78,216,0.25);transition:all 0.2s"
+              style-hover="background:#1E40AF;transform:translateY(-1px);box-shadow:0 6px 16px rgba(29,78,216,0.3)">Técnico</button>
+            <button onClick="{{ loginGerente }}"
+              style="flex:1;padding:15px;background:#1D4ED8;color:#fff;border:0;border-radius:10px;font-size:16px;font-weight:700;cursor:pointer;font-family:'Manrope';box-shadow:0 4px 14px rgba(29,78,216,0.25);transition:all 0.2s"
+              style-hover="background:#1E40AF;transform:translateY(-1px);box-shadow:0 6px 16px rgba(29,78,216,0.3)">Gerente</button>
+          </div>
+        </div>
+      </div>
+    </sc-if>
+
+    <sc-if value="{{ loggedIn }}" hint-placeholder-val="{{ false }}">
+      <div style="min-height:100vh;display:flex">
+        <aside class="{{ sidebarCollapsed ? \'is-collapsed\' : \'is-open\' }}"
+          style="width:{{ sidebarCollapsed ? '80px' : '250px' }};flex:0 0 {{ sidebarCollapsed ? '80px' : '250px' }};background:#fff;border-right:1px solid #E3E5EE;display:flex;flex-direction:column;padding:24px 0;position:sticky;top:0;height:100vh;transition:width 0.3s cubic-bezier(0.4, 0, 0.2, 1)">
+          <button onClick="{{ toggleSidebar }}"
+            style="position:absolute;top:28px;right:-14px;width:28px;height:28px;border:1px solid #E3E5EE;background:#fff;border-radius:50%;cursor:pointer;display:flex;align-items:center;justify-content:center;color:#6B7085;z-index:10;box-shadow:0 2px 5px rgba(0,0,0,0.05)"
+            style-hover="color:#1D4ED8;border-color:#1D4ED8">
+            <sc-if value="{{ sidebarCollapsed }}" hint-placeholder-val="{{ false }}">
+              <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.3"
+                stroke-linecap="round" stroke-linejoin="round">
+                <path d="M9 18l6-6-6-6" />
+              </svg>
+            </sc-if>
+            <sc-if value="{{ !sidebarCollapsed }}" hint-placeholder-val="{{ true }}">
+              <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.3"
+                stroke-linecap="round" stroke-linejoin="round">
+                <path d="M15 18l-6-6 6-6" />
+              </svg>
+            </sc-if>
+          </button>
+          <div
+            style="padding:32px 0 28px;display:flex;flex-direction:row;align-items:center;justify-content:center;gap:3px;overflow:hidden;width:100%;cursor:pointer"
+            onClick="{{ goInicio }}">
+            <sc-if value="{{ !sidebarCollapsed }}" hint-placeholder-val="{{ true }}">
+              <div
+                style="display:flex;align-items:center;justify-content:center;width:100%;padding-left:14px;padding-right:14px">
+                <svg viewBox="10 0 74 60" width="42" height="34" style="flex:0 0 auto">
+                  <defs>
+                    <mask id="bolt-mask-sidebar-row">
+                      <rect width="100" height="60" fill="white" />
+                      <path d="M46 5 L34 32 H46 L38 58 L54 28 H42 Z" fill="black" stroke="black" stroke-width="2.5"
+                        stroke-linejoin="round" />
+                    </mask>
+                  </defs>
+                  <text x="10" y="48" font-family="'Manrope', sans-serif" font-weight="900" font-size="52"
+                    fill="#1D4ED8" letter-spacing="-1.5">E</text>
+                  <text x="44" y="48" font-family="'Manrope', sans-serif" font-weight="900" font-size="52"
+                    fill="#F59E0B" mask="url(#bolt-mask-sidebar-row)" letter-spacing="-1.5">G</text>
+                  <path d="M46 5 L34 32 H46 L38 58 L54 28 H42 Z" fill="#F59E0B" stroke="#F59E0B" stroke-width="0"
+                    stroke-linejoin="round" />
+                </svg>
+                <div
+                  style="font-family:'Manrope';font-weight:900;font-size:20px;letter-spacing:-0.5px;white-space:nowrap;line-height:1;margin-top:2px;margin-left:4px">
+                  <span style="color:#1D4ED8">ELECTRO</span><span style="color:#334155">GESTIÓN</span>
+                </div>
+              </div>
+            </sc-if>
+            <sc-if value="{{ sidebarCollapsed }}" hint-placeholder-val="{{ false }}">
+              <div style="display:flex;align-items:center;justify-content:center;width:100%">
+                <svg viewBox="10 0 74 60" width="52" height="42">
+                  <defs>
+                    <mask id="bolt-mask-sidebar-col">
+                      <rect width="100" height="60" fill="white" />
+                      <path d="M46 5 L34 32 H46 L38 58 L54 28 H42 Z" fill="black" stroke="black" stroke-width="2.5"
+                        stroke-linejoin="round" />
+                    </mask>
+                  </defs>
+                  <text x="10" y="48" font-family="'Manrope', sans-serif" font-weight="900" font-size="52"
+                    fill="#1D4ED8" letter-spacing="-1.5">E</text>
+                  <text x="44" y="48" font-family="'Manrope', sans-serif" font-weight="900" font-size="52"
+                    fill="#F59E0B" mask="url(#bolt-mask-sidebar-col)" letter-spacing="-1.5">G</text>
+                  <path d="M46 5 L34 32 H46 L38 58 L54 28 H42 Z" fill="#F59E0B" stroke="#F59E0B" stroke-width="0"
+                    stroke-linejoin="round" />
+                </svg>
+              </div>
+            </sc-if>
+          </div>
+          <nav style="display:flex;flex-direction:column;gap:4px;padding:0 12px;overflow:hidden">
+            <sc-for list="{{ navItems }}" as="it" hint-placeholder-count="7">
+              <button onClick="{{ it.go }}"
+                style="position:relative;display:flex;align-items:center;gap:12px;width:100%;text-align:left;border:0;cursor:pointer;padding:12px {{ sidebarCollapsed ? '16px' : '14px' }};border-radius:10px;font-size:14.5px;font-weight:{{ it.w }};background:{{ it.bg }};color:{{ it.fg }};transition:all 0.2s"
+                style-hover="background:{{ it.activo ? '#EDEBFF' : '#F4F5FB' }}"
+                title="{{ sidebarCollapsed ? it.label : '' }}">
+                <div
+                  style="position:relative;display:flex;align-items:center;justify-content:center;width:24px;height:24px;flex:0 0 24px">
+                  <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke-width="1.8" stroke-linecap="round"
+                    stroke-linejoin="round" style="position:relative;z-index:1">
+                    <path d="{{ it.d1 }}" stroke="{{ it.dot1 }}"></path>
+                    <path d="{{ it.d2 }}" stroke="{{ it.dot2 }}"></path>
+                  </svg>
+                </div>
+                <sc-if value="{{ !sidebarCollapsed }}" hint-placeholder-val="{{ true }}">
+                  <span style="white-space:nowrap">{{ it.label }}</span>
+                </sc-if>
+              </button>
+            </sc-for>
+          </nav>
+          <div style="margin-top:auto;border-top:1px solid #EFF0F6;padding-top:18px;width:100%">
+            <sc-if value="{{ !sidebarCollapsed }}" hint-placeholder-val="{{ true }}">
+              <div
+                style="display:flex;align-items:center;gap:11px;padding-left:26px;padding-right:20px;width:100%;box-sizing:border-box">
+                <div
+                  style="width:38px;height:38px;border-radius:50%;background:#1D4ED8;color:#fff;display:flex;align-items:center;justify-content:center;font-weight:800;font-family:'Manrope';flex:0 0 38px">
+                  {{ user.inicial }}</div>
+                <div style="min-width:0">
+                  <div style="font-weight:700;font-size:14px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">
+                    {{ user.nombre }}</div>
+                  <div style="font-size:12px;color:#8B90A3">{{ user.cargo }}</div>
+                </div>
+              </div>
+              <button onClick="{{ askLogout }}"
+                style="margin:12px 20px 0;width:calc(100% - 40px);padding:9px;border:1px solid #E3E5EE;background:#fff;border-radius:9px;font-size:13px;font-weight:700;color:#C4141B;cursor:pointer"
+                style-hover="background:#FDE9EA;border-color:#F5C2C4">Cerrar sesión</button>
+            </sc-if>
+
+            <sc-if value="{{ sidebarCollapsed }}" hint-placeholder-val="{{ false }}">
+              <div style="display:flex;align-items:center;justify-content:center;width:100%">
+                <div
+                  style="width:38px;height:38px;border-radius:50%;background:#1D4ED8;color:#fff;display:flex;align-items:center;justify-content:center;font-weight:800;font-family:'Manrope';flex:0 0 38px"
+                  title="{{ user.nombre }}">{{ user.inicial }}</div>
+              </div>
+            </sc-if>
+          </div>
+          <sc-if value="{{ sidebarCollapsed }}" hint-placeholder-val="{{ false }}">
+            <button onClick="{{ askLogout }}" title="Cerrar sesión"
+              style="margin:12px 12px 0;padding:9px;border:1px solid #E3E5EE;background:#fff;border-radius:9px;font-size:13px;font-weight:700;color:#C4141B;cursor:pointer;display:flex;align-items:center;justify-content:center"
+              style-hover="background:#FDE9EA;border-color:#F5C2C4">
+              <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2"
+                stroke-linecap="round" stroke-linejoin="round">
+                <path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4"></path>
+                <path d="M16 17l5-5-5-5"></path>
+                <path d="M21 12H9"></path>
+              </svg>
+            </button>
+          </sc-if>
+        </aside>
+        <div class="sidebar-backdrop" onClick="{{ toggleSidebar }}"></div>
+
+        <main style="flex:1;min-width:0;padding:32px 38px 60px">
+          <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:20px;margin-bottom:24px">
+            <div style="display:flex;align-items:flex-start;">
+        <button class="mobile-menu-btn" onClick="{{ toggleSidebar }}" style="display:none;background:none;border:none;cursor:pointer;color:#14162B;padding:0;flex-shrink:0">
+          <svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
+        </button>
+        <div>
+              <div class="page-title" style="font-family:'Manrope';font-weight:800;font-size:31px;letter-spacing:-.6px">
+                {{ pageTitle }}</div>
+              <div style="color:#6B7085;font-size:14.5px;margin-top:5px">{{ pageSub }}</div>
+            </div>
+      </div>
+            <sc-if value="{{ primaryAction }}" hint-placeholder-val="{{ false }}">
+              <button onClick="{{ primaryAction.on }}"
+                style="padding:12px 18px;background:#1D4ED8;color:#fff;border:0;border-radius:10px;font-weight:700;font-size:14.5px;cursor:pointer;font-family:'Manrope';white-space:nowrap"
+                style-hover="background:#1E40AF">{{ primaryAction.label }}</button>
+            </sc-if>
+          </div>
+
+          <sc-if value="{{ isInicio }}" hint-placeholder-val="{{ true }}">
+            <div>
+              <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:16px" class="resp-grid-4">
+                <sc-for list="{{ stats }}" as="s" hint-placeholder-count="4">
+                  <div style="background:#fff;border:1px solid #E3E5EE;border-radius:14px;padding:18px 20px">
+                    <div style="font-size:13px;color:#6B7085;font-weight:700;line-height:1.35">{{ s.label }}</div>
+                    <div style="font-family:'Manrope';font-weight:800;font-size:38px;margin:10px 0 12px;color:#1D4ED8">
+                      {{ s.value }}</div>
+                    <button onClick="{{ s.go }}"
+                      style="background:none;border:0;padding:0;color:#1D4ED8;font-weight:700;font-size:13px;cursor:pointer">{{
+                      s.link }} →</button>
+                  </div>
+                </sc-for>
+              </div>
+
+              <div style="display:grid;grid-template-columns:1.4fr 1fr;gap:16px;margin-top:16px" class="resp-grid-2">
+                <div style="background:#fff;border:1px solid #E3E5EE;border-radius:14px;padding:22px">
+                  <div style="font-family:'Manrope';font-weight:800;font-size:17px;margin-bottom:16px">Próxima visita
+                  </div>
+                  <sc-if value="{{ proxima }}" hint-placeholder-val="{{ true }}">
+                    <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;align-items:center"
+                      class="resp-grid-2">
+                      <div>
+                        <div style="font-family:'Manrope';font-weight:800;font-size:32px;color:#1D4ED8">{{ proxima.hora
+                          }}</div>
+                        <div style="font-weight:700;font-size:15.5px;margin-top:12px">{{ proxima.cliente }}</div>
+                        <div style="color:#6B7085;font-size:14px;margin-top:3px">{{ proxima.tipoServicio }}</div>
+                        <div style="color:#6B7085;font-size:14px;margin-top:3px">{{ proxima.direccion }}</div>
+                        <button onClick="{{ proxima.mapa }}"
+                          style="margin-top:16px;padding:9px 14px;border:1px solid #D5D8E6;background:#fff;border-radius:9px;font-size:13px;font-weight:700;cursor:pointer"
+                          style-hover="border-color:#1D4ED8;color:#1D4ED8">Ver ubicación</button>
+                      </div>
+                      <div
+                        style="height:172px;border-radius:12px;border:1px solid #E3E5EE;overflow:hidden;position:relative;background:#EAF0E6">
+                        <svg viewBox="0 0 320 172" width="100%" height="100%" style="display:block">
+                          <rect width="320" height="172" fill="#EDF2E9"></rect>
+                          <path d="M0 0h320v172H0z" fill="#EFF3EC"></path>
+                          <path d="M26 0v172 M118 0v172 M212 0v172 M282 0v172" stroke="#E2E7DC" stroke-width="9"></path>
+                          <path d="M0 34h320 M0 96h320 M0 142h320" stroke="#E2E7DC" stroke-width="9"></path>
+                          <path d="M0 66h320" stroke="#FFFFFF" stroke-width="13"></path>
+                          <path d="M0 66h320" stroke="#F3C64B" stroke-width="7"></path>
+                          <path d="M166 0v172" stroke="#FFFFFF" stroke-width="13"></path>
+                          <path d="M166 0v172" stroke="#F3C64B" stroke-width="7"></path>
+                          <g fill="#DDE4D6">
+                            <rect x="36" y="8" width="70" height="18" rx="2"></rect>
+                            <rect x="36" y="76" width="52" height="14" rx="2"></rect>
+                            <rect x="96" y="106" width="58" height="26" rx="2"></rect>
+                            <rect x="224" y="8" width="48" height="18" rx="2"></rect>
+                            <rect x="224" y="106" width="50" height="26" rx="2"></rect>
+                            <rect x="178" y="150" width="90" height="16" rx="2"></rect>
+                            <rect x="36" y="150" width="66" height="16" rx="2"></rect>
+                          </g>
+                          <rect x="178" y="76" width="26" height="14" rx="2" fill="#CFE0C6"></rect>
+                          <circle cx="290" cy="120" r="22" fill="#D8E6D0"></circle>
+                          <g transform="translate(166 66)">
+                            <ellipse cx="0" cy="16" rx="9" ry="3.5" fill="rgba(20,22,43,.18)"></ellipse>
+                            <path d="M0 14c0 0-11-11.6-11-19A11 11 0 0 1 11-5c0 7.4-11 19-11 19Z" fill="#E11B22"></path>
+                            <circle cx="0" cy="-5.4" r="4" fill="#fff"></circle>
+                          </g>
+                        </svg>
+                        <div
+                          style="position:absolute;left:10px;bottom:9px;background:rgba(255,255,255,.92);border:1px solid #E3E5EE;border-radius:7px;padding:4px 9px;font-size:11px;font-weight:700;color:#4A4E63">
+                          Ubicación aproximada</div>
+                      </div>
+                    </div>
+                  </sc-if>
+                  <sc-if value="{{ sinProxima }}" hint-placeholder-val="{{ false }}">
+                    <div style="color:#8B90A3;font-size:14px;padding:20px 0">No hay visitas programadas.</div>
+                  </sc-if>
+                </div>
+                <div style="background:#fff;border:1px solid #E3E5EE;border-radius:14px;padding:22px">
+                  <div style="font-family:'Manrope';font-weight:800;font-size:17px;margin-bottom:14px">Actividad
+                    reciente</div>
+                  <div style="display:flex;flex-direction:column;gap:14px">
+                    <sc-for list="{{ actividad }}" as="a" hint-placeholder-count="3">
+                      <div style="display:flex;align-items:center;gap:12px">
+                        <div
+                          style="width:34px;height:34px;border-radius:50%;background:#EDEBFF;flex:0 0 34px;display:flex;align-items:center;justify-content:center">
+                          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke-width="1.7"
+                            stroke-linecap="round" stroke-linejoin="round">
+                            <path d="{{ a.d1 }}" stroke="#1D4ED8"></path>
+                            <path d="{{ a.d2 }}" stroke="#F59E0B"></path>
+                          </svg>
+                        </div>
+                        <div style="min-width:0;flex:1">
+                          <div style="font-weight:700;font-size:14px">{{ a.tipoServicio }}</div>
+                          <div style="color:#8B90A3;font-size:12.5px">{{ a.cliente }}</div>
+                        </div>
+                        <div style="color:#8B90A3;font-size:12px;white-space:nowrap">{{ a.hace }}</div>
+                      </div>
+                    </sc-for>
+                  </div>
+                  <button onClick="{{ goHistorial }}"
+                    style="margin-top:18px;background:none;border:0;padding:0;color:#1D4ED8;font-weight:700;font-size:13px;cursor:pointer">Ver
+                    todas las actividades →</button>
+                </div>
+              </div>
+
+              <sc-if value="{{ showAccesos }}" hint-placeholder-val="{{ true }}">
+                <div>
+                  <div style="font-family:'Manrope';font-weight:800;font-size:18px;margin:28px 0 14px">Accesos rápidos
+                  </div>
+                  <div style="display:grid;grid-template-columns:repeat(5,1fr);gap:14px" class="resp-grid-5">
+                    <sc-for list="{{ accesos }}" as="q" hint-placeholder-count="5">
+                      <button onClick="{{ q.on }}"
+                        style="background:#fff;border:1px solid #E3E5EE;border-radius:13px;padding:20px 14px;cursor:pointer;text-align:center;font-size:13.5px;font-weight:700;color:#14162B"
+                        style-hover="border-color:#1D4ED8;color:#1D4ED8">
+                        <svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke-width="1.7"
+                          stroke-linecap="round" stroke-linejoin="round" style="display:block;margin:0 auto 12px">
+                          <path d="{{ q.d1 }}" stroke="#1D4ED8"></path>
+                          <path d="{{ q.d2 }}" stroke="#F59E0B"></path>
+                        </svg>{{ q.label }}
+                      </button>
+                    </sc-for>
+                  </div>
+                </div>
+              </sc-if>
+            </div>
+          </sc-if>
+
+          <sc-if value="{{ isSolicitudes }}" hint-placeholder-val="{{ false }}">
+            <div style="background:#fff;border:1px solid #E3E5EE;border-radius:14px;overflow:hidden">
+              <div style="display:flex;flex-direction:column;gap:18px;padding:22px;border-bottom:1px solid #EFF0F6">
+                <div style="display:flex;align-items:center;gap:40px" class="resp-search-block">
+                  <div style="display:flex;align-items:center;gap:10px">
+                    <span style="font-family:'Manrope';font-weight:800;font-size:15px;color:#14162B">ID:</span>
+                    <input value="{{ search.solId.value }}" onChange="{{ search.solId.onChange }}"
+                      placeholder="ID de solicitud"
+                      style="width:140px;padding:9px 12px;border:1px solid #D5D8E6;border-radius:6px;font-size:14px;color:#4A4E63" />
+                  </div>
+                  <div style="display:flex;align-items:center;gap:10px">
+                    <span style="font-family:'Manrope';font-weight:800;font-size:15px;color:#14162B">Cliente:</span>
+                    <input value="{{ search.solCli.value }}" onChange="{{ search.solCli.onChange }}"
+                      placeholder="Nombre del cliente"
+                      style="width:200px;padding:9px 12px;border:1px solid #D5D8E6;border-radius:6px;font-size:14px;color:#4A4E63" />
+                  </div>
+                  <div style="display:flex;align-items:center;gap:10px">
+                    <span style="font-family:'Manrope';font-weight:800;font-size:15px;color:#14162B">Tipo de
+                      Servicio:</span>
+                    <select value="{{ search.solTipo.value }}" onChange="{{ search.solTipo.onChange }}"
+                      style="width:190px;padding:9px 12px;border:1px solid #D5D8E6;border-radius:6px;font-size:14px;background:#fff;color:#4A4E63">
+                      <option value="">Seleccione Servicio</option>
+                      <sc-for list="{{ tipos }}" as="t" hint-placeholder-count="5">
+                        <option value="{{ t }}">{{ t }}</option>
+                      </sc-for>
+                    </select>
+                  </div>
+                </div>
+                <div style="display:flex;align-items:center;gap:40px" class="resp-search-block">
+                  <div style="display:flex;align-items:center;gap:10px">
+                    <span style="font-family:'Manrope';font-weight:800;font-size:15px;color:#14162B">Fecha
+                      Solicitud:</span>
+                    <input type="date" value="{{ search.solFecha.value }}" onChange="{{ search.solFecha.onChange }}"
+                      style="width:160px;padding:9px 12px;border:1px solid #D5D8E6;border-radius:6px;font-size:14px;background:#fff;color:#4A4E63" />
+                  </div>
+                  <div style="display:flex;align-items:center;gap:10px">
+                    <span style="font-family:'Manrope';font-weight:800;font-size:15px;color:#14162B">Estado:</span>
+                    <select value="{{ filters.sol.value }}" onChange="{{ filters.sol.onChange }}"
+                      style="width:170px;padding:9px 12px;border:1px solid #D5D8E6;border-radius:6px;font-size:14px;background:#fff;color:#4A4E63">
+                      <sc-for list="{{ estadosSolFiltro }}" as="e" hint-placeholder-count="5">
+                        <option value="{{ e }}">{{ e }}</option>
+                      </sc-for>
+                    </select>
+                  </div>
+                  <div style="width:190px;display:flex;justify-content:flex-end;margin-left:auto">
+                    <button
+                      style="display:flex;align-items:center;gap:8px;padding:9px 24px;border:0;background:#1D4ED8;color:#fff;border-radius:6px;font-weight:700;font-size:14px;cursor:pointer;font-family:'Manrope'"
+                      style-hover="background:#1E40AF">
+                      <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor"
+                        stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                        <circle cx="11" cy="11" r="8"></circle>
+                        <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                      </svg>
+                      Buscar
+                    </button>
+                  </div>
+                </div>
+              </div>
+              <div
+                style="display:grid;grid-template-columns:80px 1.2fr 1.4fr 1fr 1fr 110px;padding:14px 18px;font-size:12px;font-weight:800;color:#8B90A3;text-transform:uppercase;letter-spacing:.06em;border-bottom:1px solid #EFF0F6"
+                class="resp-table-row">
+                <div>ID</div>
+                <div>Cliente</div>
+                <div>Tipo de servicio</div>
+                <div>Fecha solicitud</div>
+                <div>Estado</div>
+                <div style="text-align:right">Acciones</div>
+              </div>
+              <sc-for list="{{ solicitudesView }}" as="r" hint-placeholder-count="5">
+                <div
+                  style="display:grid;grid-template-columns:80px 1.2fr 1.4fr 1fr 1fr 110px;padding:16px 18px;border-bottom:1px solid #F4F5FB;align-items:center;font-size:14px"
+                  class="resp-table-row">
+                  <div style="font-family:ui-monospace,monospace;color:#6B7085">{{ r.code }}</div>
+                  <div style="font-weight:700">{{ r.cliente }}</div>
+                  <div>{{ r.tipoServicio }}</div>
+                  <div style="color:#6B7085">{{ r.fechaSolicitud }}</div>
+                  <div><span
+                      style="display:inline-block;padding:5px 11px;border-radius:20px;font-size:12px;font-weight:800;background:{{ r.bg }};color:{{ r.fg }}">{{
+                      r.estado }}</span></div>
+                  <div style="display:flex;gap:8px;justify-content:flex-end">
+                    <button onClick="{{ r.view }}" title="Ver detalle"
+                      style="width:32px;height:32px;border:1px solid #D5D8E6;background:#fff;border-radius:8px;cursor:pointer;color:#4A4E63;font-size:13px"
+                      style-hover="border-color:#1D4ED8;color:#1D4ED8">◉</button>
+                    <button onClick="{{ r.edit }}" title="Editar"
+                      style="width:32px;height:32px;border:1px solid #D5D8E6;background:#fff;border-radius:8px;cursor:pointer;color:#4A4E63;font-size:13px"
+                      style-hover="border-color:#1D4ED8;color:#1D4ED8">✎</button>
+                  </div>
+                </div>
+              </sc-for>
+              <sc-if value="{{ solVacio }}" hint-placeholder-val="{{ false }}">
+                <div style="padding:38px;text-align:center;color:#8B90A3;font-size:14px">No hay solicitudes que
+                  coincidan con la búsqueda.</div>
+              </sc-if>
+            </div>
+          </sc-if>
+
+          <sc-if value="{{ isAgenda }}" hint-placeholder-val="{{ false }}">
+            <div style="display:grid;grid-template-columns:1.55fr 1fr;gap:16px;align-items:start">
+              <div style="background:#fff;border:1px solid #E3E5EE;border-radius:14px;padding:20px">
+                <div style="display:flex;align-items:center;justify-content:space-between;gap:14px;margin-bottom:16px">
+                  <select value="{{ filters.agenda.value }}" onChange="{{ filters.agenda.onChange }}"
+                    style="padding:9px 14px;border:1px solid #D5D8E6;border-radius:9px;font-weight:700;font-size:13.5px;background:#fff;color:#14162B;cursor:pointer">
+                    <sc-for list="{{ vistasAgenda }}" as="v" hint-placeholder-count="3">
+                      <option value="{{ v }}">{{ v }}</option>
+                    </sc-for>
+                  </select>
+                  <div style="color:#6B7085;font-size:13.5px">{{ agendaRango }}</div>
+                </div>
+
+                <sc-if value="{{ agendaSemanal }}" hint-placeholder-val="{{ false }}">
+                  <div>
+                    <div style="display:grid;grid-template-columns:56px repeat(7,1fr);border-bottom:1px solid #E3E5EE">
+                      <div></div>
+                      <sc-for list="{{ semana }}" as="d" hint-placeholder-count="7">
+                        <div style="text-align:center;padding:6px 0 12px;min-width:0">
+                          <div
+                            style="font-size:11px;font-weight:800;color:#8B90A3;text-transform:uppercase;letter-spacing:.07em">
+                            {{ d.dia }}</div>
+                          <div
+                            style="margin:7px auto 0;width:30px;height:30px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:'Manrope';font-weight:800;font-size:15px;background:{{ d.pillBg }};color:{{ d.numColor }}">
+                            {{ d.num }}</div>
+                        </div>
+                      </sc-for>
+                    </div>
+                    <div style="display:grid;grid-template-columns:56px repeat(7,1fr);position:relative">
+                      <div>
+                        <sc-for list="{{ horasSem }}" as="h" hint-placeholder-count="11">
+                          <div
+                            style="height:45px;font-size:11px;font-weight:700;color:#8B90A3;text-align:right;padding-right:9px;transform:translateY(-6px)">
+                            {{ h }}</div>
+                        </sc-for>
+                      </div>
+                      <sc-for list="{{ semana }}" as="d" hint-placeholder-count="7">
+                        <div
+                          style="position:relative;border-left:1px solid #EFF0F6;background:{{ d.colBg }};min-width:0">
+                          <sc-for list="{{ horasSem }}" as="h" hint-placeholder-count="11">
+                            <div style="height:45px;border-bottom:1px solid #F4F5FB"></div>
+                          </sc-for>
+                          <sc-for list="{{ d.eventos }}" as="ev" hint-placeholder-count="0">
+                            <div onClick="{{ ev.select }}"
+                              style="position:absolute;left:3px;right:3px;top:{{ ev.top }}px;height:{{ ev.h }}px;background:{{ ev.bg }};border-left:3px solid {{ ev.line }};border-radius:6px;padding:4px 5px;cursor:pointer;overflow:hidden;min-width:0">
+                              <div style="font-size:10px;font-weight:800;color:#4A4E63;line-height:1.2">{{ ev.hora }}
+                              </div>
+                              <div
+                                style="font-size:10.5px;font-weight:700;line-height:1.22;margin-top:1px;overflow-wrap:anywhere">
+                                {{ ev.cliente }}</div>
+                            </div>
+                          </sc-for>
+                        </div>
+                      </sc-for>
+                    </div>
+                  </div>
+                </sc-if>
+
+                <sc-if value="{{ agendaMensual }}" hint-placeholder-val="{{ false }}">
+                  <div>
+                    <div style="display:grid;grid-template-columns:repeat(7,1fr);gap:6px;margin-bottom:6px">
+                      <sc-for list="{{ diasSemana }}" as="ds" hint-placeholder-count="7">
+                        <div
+                          style="text-align:center;font-size:11px;font-weight:800;color:#8B90A3;text-transform:uppercase;letter-spacing:.06em;padding:4px 0">
+                          {{ ds }}</div>
+                      </sc-for>
+                    </div>
+                    <div style="display:grid;grid-template-columns:repeat(7,1fr);gap:6px">
+                      <sc-for list="{{ mes }}" as="d" hint-placeholder-count="35">
+                        <div
+                          style="background:{{ d.bg }};border:1px solid {{ d.border }};border-radius:9px;min-height:92px;min-width:0;padding:7px 8px;display:flex;flex-direction:column;gap:4px">
+                          <div style="font-size:12.5px;font-weight:800;color:{{ d.numColor }}">{{ d.num }}</div>
+                          <sc-for list="{{ d.eventos }}" as="ev" hint-placeholder-count="0">
+                            <div onClick="{{ ev.select }}"
+                              style="background:{{ ev.bg }};border-left:3px solid {{ ev.line }};border-radius:5px;padding:3px 5px;cursor:pointer;font-size:10.5px;font-weight:700;white-space:nowrap;min-width:0;overflow:hidden;text-overflow:ellipsis">
+                              {{ ev.corto }}</div>
+                          </sc-for>
+                        </div>
+                      </sc-for>
+                    </div>
+                  </div>
+                </sc-if>
+
+                <sc-if value="{{ agendaDiaria }}" hint-placeholder-val="{{ true }}">
+                  <div style="position:relative">
+                    <sc-for list="{{ horas }}" as="h" hint-placeholder-count="10">
+                      <div style="display:flex;gap:12px;height:64px;border-top:1px solid #F0F1F7">
+                        <div
+                          style="width:66px;flex:0 0 66px;font-size:12px;color:#8B90A3;font-weight:700;padding-top:4px">
+                          {{ h }}</div>
+                      </div>
+                    </sc-for>
+                    <sc-for list="{{ eventos }}" as="ev" hint-placeholder-count="2">
+                      <div onClick="{{ ev.select }}"
+                        style="position:absolute;left:78px;right:6px;top:{{ ev.top }}px;height:{{ ev.h }}px;background:{{ ev.bg }};border-left:4px solid {{ ev.line }};border-radius:9px;padding:11px 13px;cursor:pointer;overflow:hidden">
+                        <div style="font-weight:700;font-size:14px">{{ ev.cliente }}</div>
+                        <div style="font-size:12.5px;color:#4A4E63;margin-top:3px">{{ ev.tipoServicio }}</div>
+                        <div style="font-size:12px;color:#6B7085;margin-top:2px">{{ ev.rango }}</div>
+                      </div>
+                    </sc-for>
+                  </div>
+                </sc-if>
+              </div>
+              <div style="background:#fff;border:1px solid #E3E5EE;border-radius:14px;padding:20px">
+                <sc-if value="{{ detalle }}" hint-placeholder-val="{{ true }}">
+                  <div>
+                    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:18px">
+                      <div style="font-family:'Manrope';font-weight:800;font-size:18px">Detalle</div>
+                      <button onClick="{{ clearDetalle }}"
+                        style="width:28px;height:28px;border:1px solid #E3E5EE;background:#fff;border-radius:7px;cursor:pointer;color:#6B7085">✕</button>
+                    </div>
+                    <div style="display:flex;flex-direction:column;gap:15px;font-size:14.5px">
+                      <div>
+                        <div
+                          style="font-size:12px;color:#8B90A3;font-weight:800;text-transform:uppercase;letter-spacing:.06em">
+                          Cliente</div>
+                        <div style="font-weight:700;margin-top:3px">{{ detalle.cliente }}</div>
+                      </div>
+                      <div>
+                        <div
+                          style="font-size:12px;color:#8B90A3;font-weight:800;text-transform:uppercase;letter-spacing:.06em">
+                          Tipo de servicio</div>
+                        <div style="margin-top:3px">{{ detalle.tipoServicio }}</div>
+                      </div>
+                      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px" class="resp-grid-2">
+                        <div>
+                          <div
+                            style="font-size:12px;color:#8B90A3;font-weight:800;text-transform:uppercase;letter-spacing:.06em">
+                            Fecha</div>
+                          <div style="margin-top:3px">{{ detalle.fecha }}</div>
+                        </div>
+                        <div>
+                          <div
+                            style="font-size:12px;color:#8B90A3;font-weight:800;text-transform:uppercase;letter-spacing:.06em">
+                            Hora</div>
+                          <div style="margin-top:3px">{{ detalle.hora }}</div>
+                        </div>
+                      </div>
+                      <div>
+                        <div
+                          style="font-size:12px;color:#8B90A3;font-weight:800;text-transform:uppercase;letter-spacing:.06em">
+                          Dirección</div>
+                        <div style="margin-top:3px">{{ detalle.direccion }}</div>
+                      </div>
+                      <div>
+                        <div
+                          style="font-size:12px;color:#8B90A3;font-weight:800;text-transform:uppercase;letter-spacing:.06em">
+                          Estado</div>
+                        <div style="margin-top:5px"><span
+                            style="display:inline-block;padding:5px 11px;border-radius:20px;font-size:12px;font-weight:800;background:{{ detalle.bg }};color:{{ detalle.fg }}">{{
+                            detalle.estado }}</span></div>
+                      </div>
+                    </div>
+                    <div style="display:flex;flex-direction:column;gap:9px;margin-top:22px">
+                      <button onClick="{{ detalle.mapa }}"
+                        style="padding:11px;border:1px solid #D5D8E6;background:#fff;border-radius:9px;font-size:13.5px;font-weight:700;cursor:pointer"
+                        style-hover="border-color:#1D4ED8;color:#1D4ED8">Ver ubicación</button>
+                      <button onClick="{{ detalle.editar }}"
+                        style="padding:11px;border:1px solid #D5D8E6;background:#fff;border-radius:9px;font-size:13.5px;font-weight:700;cursor:pointer"
+                        style-hover="border-color:#1D4ED8;color:#1D4ED8">Editar visita</button>
+                      <button onClick="{{ detalle.cancelar }}"
+                        style="padding:11px;border:1px solid #F5C2C4;background:#fff;border-radius:9px;font-size:13.5px;font-weight:700;cursor:pointer;color:#C4141B"
+                        style-hover="background:#FDE9EA">Cancelar visita</button>
+                    </div>
+                  </div>
+                </sc-if>
+                <sc-if value="{{ sinDetalle }}" hint-placeholder-val="{{ false }}">
+                  <div style="color:#8B90A3;font-size:14px;text-align:center;padding:40px 10px">Selecciona una visita
+                    del calendario para ver su detalle.</div>
+                </sc-if>
+              </div>
+            </div>
+          </sc-if>
+
+          <sc-if value="{{ isLevantamientos }}" hint-placeholder-val="{{ false }}">
+            <div style="background:#fff;border:1px solid #E3E5EE;border-radius:14px;padding:18px">
+              <div style="display:flex;gap:14px;align-items:center;flex-wrap:wrap" class="resp-search-block">
+                <input value="{{ search.lev.value }}" onChange="{{ search.lev.onChange }}"
+                  placeholder="Buscar levantamiento por nombre..."
+                  style="flex:1;min-width:240px;padding:11px 14px;border:1px solid #D5D8E6;border-radius:9px;font-size:14px" />
+                <div style="display:flex;align-items:center;gap:10px">
+                  <span style="font-size:13.5px;color:#6B7085;font-weight:700">Filtrar por estado:</span>
+                  <select value="{{ filters.lev.value }}" onChange="{{ filters.lev.onChange }}"
+                    style="padding:11px 14px;border:1px solid #D5D8E6;border-radius:9px;font-size:14px;background:#fff;min-width:230px">
+                    <sc-for list="{{ estadosLev }}" as="e" hint-placeholder-count="2">
+                      <option value="{{ e }}">{{ e }}</option>
+                    </sc-for>
+                  </select>
+                </div>
+                <button onClick="{{ guardarLevantamientos }}"
+                  style="padding:11px 18px;border:1px solid #1D4ED8;background:#fff;color:#1D4ED8;border-radius:9px;font-weight:700;font-size:14px;cursor:pointer"
+                  style-hover="background:#EDEBFF">Guardar</button>
+              </div>
+              <div style="margin-top:18px;background:#F7F8FC;border:1px solid #EFF0F6;border-radius:12px;padding:16px">
+                <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:14px" class="resp-grid-3">
+                  <sc-for list="{{ levsView }}" as="l" hint-placeholder-count="6">
+                    <div
+                      style="background:#fff;border:1px solid #D9DCE9;border-radius:12px;padding:16px;display:flex;flex-direction:column;gap:2px">
+                      <div style="display:flex;justify-content:flex-end">
+                        <span
+                          style="display:inline-block;padding:4px 10px;border-radius:20px;font-size:11.5px;font-weight:800;background:{{ l.bg }};color:{{ l.fg }}">{{
+                          l.estado }}</span>
+                      </div>
+                      <div style="font-size:12px;color:#8B90A3;font-weight:700">Cliente</div>
+                      <div style="font-family:'Manrope';font-weight:800;font-size:16.5px">{{ l.cliente }}</div>
+                      <div style="font-size:12px;color:#8B90A3;font-weight:700;margin-top:8px">Tipo de servicio</div>
+                      <div style="font-size:14.5px">{{ l.tipoServicio }}</div>
+                      <div style="font-size:12px;color:#8B90A3;font-weight:700;margin-top:8px">Fecha programada</div>
+                      <div style="font-size:14.5px">{{ l.fechaTexto }}</div>
+                      <sc-if value="{{ l.borrador }}" hint-placeholder-val="{{ false }}">
+                        <div
+                          style="margin-top:9px;font-size:11.5px;font-weight:800;color:#B26A00;background:#FFF3E0;border-radius:6px;padding:5px 8px;display:inline-block;align-self:flex-start">
+                          Borrador guardado</div>
+                      </sc-if>
+                      <button onClick="{{ l.abrir }}"
+                        style="margin-top:14px;align-self:flex-end;padding:9px 14px;border:1px solid #D5D8E6;background:#fff;border-radius:9px;font-size:13px;font-weight:700;cursor:pointer"
+                        style-hover="border-color:#1D4ED8;color:#1D4ED8">{{ l.cta }}</button>
+                    </div>
+                  </sc-for>
+                </div>
+                <sc-if value="{{ levVacio }}" hint-placeholder-val="{{ false }}">
+                  <div style="padding:34px;text-align:center;color:#8B90A3;font-size:14px">No hay levantamientos en este
+                    estado. Solo se muestran solicitudes con fecha y hora definidas.</div>
+                </sc-if>
+              </div>
+            </div>
+          </sc-if>
+
+          <sc-if value="{{ isNuevoLev }}" hint-placeholder-val="{{ false }}">
+            <div style="background:#fff;border:1px solid #E3E5EE;border-radius:14px;padding:26px">
+              <sc-if value="{{ desdeSolicitud }}" hint-placeholder-val="{{ false }}">
+                <div
+                  style="display:flex;align-items:center;gap:14px;flex-wrap:wrap;background:#EDEBFF;border:1px solid #C9C3F5;border-radius:12px;padding:14px 16px;margin-bottom:22px">
+                  <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="#1D4ED8" stroke-width="1.7"
+                    stroke-linecap="round" stroke-linejoin="round" style="flex:0 0 20px">
+                    <path d="M12 20.5a8.5 8.5 0 1 0 0-17 8.5 8.5 0 0 0 0 17 M12 8.2v.2 M12 11.5v4.6"></path>
+                  </svg>
+                  <div style="font-size:13.5px;color:#2A2382;font-weight:700;flex:1;min-width:220px">{{ origenTexto }}
+                  </div>
+                  <button onClick="{{ volverLevantamientos }}"
+                    style="padding:9px 14px;border:1px solid #A79EEE;background:#fff;color:#1D4ED8;border-radius:8px;font-size:13px;font-weight:700;cursor:pointer">Volver
+                    a levantamientos</button>
+                </div>
+              </sc-if>
+              <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:18px" class="resp-grid-3">
+                <div>
+                  <label style="display:block;font-size:13px;font-weight:700;color:#4A4E63;margin-bottom:7px">Cliente
+                    *</label>
+                  <select disabled="{{ desdeSolicitud }}" value="{{ fields.cliente.value }}"
+                    onChange="{{ fields.cliente.onChange }}"
+                    style="width:100%;padding:12px 13px;border:1px solid #D5D8E6;border-radius:9px;font-size:14.5px;background:{{ lockBg }}">
+                    <option value="">Seleccionar cliente...</option>
+                    <sc-for list="{{ clientesNombres }}" as="c" hint-placeholder-count="5">
+                      <option value="{{ c }}">{{ c }}</option>
+                    </sc-for>
+                  </select>
+                  <sc-if value="{{ fields.cliente.error }}" hint-placeholder-val="{{ false }}">
+                    <div style="color:#C4141B;font-size:12.5px;margin-top:6px;font-weight:700">{{ fields.cliente.error
+                      }}</div>
+                  </sc-if>
+                </div>
+                <div style="grid-column:span 2">
+                  <label style="display:block;font-size:13px;font-weight:700;color:#4A4E63;margin-bottom:7px">Tipo de
+                    servicio *</label>
+                  <select disabled="{{ desdeSolicitud }}" value="{{ fields.tipoServicio.value }}"
+                    onChange="{{ fields.tipoServicio.onChange }}"
+                    style="width:100%;padding:12px 13px;border:1px solid #D5D8E6;border-radius:9px;font-size:14.5px;background:{{ lockBg }}">
+                    <option value="">Seleccionar...</option>
+                    <sc-for list="{{ tipos }}" as="t" hint-placeholder-count="5">
+                      <option value="{{ t }}">{{ t }}</option>
+                    </sc-for>
+                  </select>
+                  <sc-if value="{{ fields.tipoServicio.error }}" hint-placeholder-val="{{ false }}">
+                    <div style="color:#C4141B;font-size:12.5px;margin-top:6px;font-weight:700">{{
+                      fields.tipoServicio.error }}</div>
+                  </sc-if>
+                </div>
+                <div>
+                  <label
+                    style="display:block;font-size:13px;font-weight:700;color:#4A4E63;margin-bottom:7px">Disponibilidad
+                    de los espacios físicos *</label>
+                  <input value="{{ fields.espacios.value }}" onChange="{{ fields.espacios.onChange }}"
+                    placeholder="Ej. Sala técnica disponible"
+                    style="width:100%;padding:12px 13px;border:1px solid #D5D8E6;border-radius:9px;font-size:14.5px" />
+                  <sc-if value="{{ fields.espacios.error }}" hint-placeholder-val="{{ false }}">
+                    <div style="color:#C4141B;font-size:12.5px;margin-top:6px;font-weight:700">{{ fields.espacios.error
+                      }}</div>
+                  </sc-if>
+                </div>
+                <div>
+                  <label style="display:block;font-size:13px;font-weight:700;color:#4A4E63;margin-bottom:7px">Cargas
+                    eléctricas *</label>
+                  <input value="{{ fields.cargas.value }}" onChange="{{ fields.cargas.onChange }}"
+                    placeholder="Ej. 12 kW"
+                    style="width:100%;padding:12px 13px;border:1px solid #D5D8E6;border-radius:9px;font-size:14.5px" />
+                  <sc-if value="{{ fields.cargas.error }}" hint-placeholder-val="{{ false }}">
+                    <div style="color:#C4141B;font-size:12.5px;margin-top:6px;font-weight:700">{{ fields.cargas.error }}
+                    </div>
+                  </sc-if>
+                </div>
+                <div>
+                  <label
+                    style="display:block;font-size:13px;font-weight:700;color:#4A4E63;margin-bottom:7px">Estabilidad de
+                    la tensión *</label>
+                  <input value="{{ fields.tension.value }}" onChange="{{ fields.tension.onChange }}"
+                    placeholder="Ej. 118-122 V estable"
+                    style="width:100%;padding:12px 13px;border:1px solid #D5D8E6;border-radius:9px;font-size:14.5px" />
+                  <sc-if value="{{ fields.tension.error }}" hint-placeholder-val="{{ false }}">
+                    <div style="color:#C4141B;font-size:12.5px;margin-top:6px;font-weight:700">{{ fields.tension.error
+                      }}</div>
+                  </sc-if>
+                </div>
+                <div>
+                  <label style="display:block;font-size:13px;font-weight:700;color:#4A4E63;margin-bottom:7px">Recorrido
+                    físico de las tuberías *</label>
+                  <input value="{{ fields.tuberias.value }}" onChange="{{ fields.tuberias.onChange }}"
+                    placeholder="Ej. 18 m EMT 3/4"
+                    style="width:100%;padding:12px 13px;border:1px solid #D5D8E6;border-radius:9px;font-size:14.5px" />
+                  <sc-if value="{{ fields.tuberias.error }}" hint-placeholder-val="{{ false }}">
+                    <div style="color:#C4141B;font-size:12.5px;margin-top:6px;font-weight:700">{{ fields.tuberias.error
+                      }}</div>
+                  </sc-if>
+                </div>
+                <div>
+                  <label style="display:block;font-size:13px;font-weight:700;color:#4A4E63;margin-bottom:7px">Recorrido
+                    físico del cableado *</label>
+                  <input value="{{ fields.cableado.value }}" onChange="{{ fields.cableado.onChange }}"
+                    placeholder="Ej. 24 m THHN #10"
+                    style="width:100%;padding:12px 13px;border:1px solid #D5D8E6;border-radius:9px;font-size:14.5px" />
+                  <sc-if value="{{ fields.cableado.error }}" hint-placeholder-val="{{ false }}">
+                    <div style="color:#C4141B;font-size:12.5px;margin-top:6px;font-weight:700">{{ fields.cableado.error
+                      }}</div>
+                  </sc-if>
+                </div>
+                <div style="grid-row:span 2">
+                  <label
+                    style="display:block;font-size:13px;font-weight:700;color:#4A4E63;margin-bottom:7px">Observaciones</label>
+                  <textarea value="{{ fields.observaciones.value }}" onChange="{{ fields.observaciones.onChange }}"
+                    placeholder="Notas del técnico..."
+                    style="width:100%;height:158px;padding:12px 13px;border:1px solid #D5D8E6;border-radius:9px;font-size:14.5px;resize:vertical"></textarea>
+                </div>
+              </div>
+
+              <div style="margin-top:22px">
+                <div style="font-size:13px;font-weight:700;color:#4A4E63;margin-bottom:10px">Fotografías *</div>
+                <div style="display:flex;gap:12px;flex-wrap:wrap;align-items:center">
+                  <button onClick="{{ addFoto }}"
+                    style="width:132px;height:96px;border:1px dashed #A9AEC4;background:#F0F1F7;border-radius:11px;cursor:pointer;font-size:12.5px;font-weight:700;color:#4A4E63"
+                    style-hover="border-color:#1D4ED8;color:#1D4ED8">+ Agregar foto</button>
+                  <sc-for list="{{ fotos }}" as="f" hint-placeholder-count="0">
+                    <div
+                      style="position:relative;width:132px;height:96px;border:1px solid #D9DCE9;border-radius:11px;background:repeating-linear-gradient(135deg,#EEF0F8 0 8px,#F7F8FC 8px 16px);display:flex;align-items:center;justify-content:center;font-family:ui-monospace,monospace;font-size:11px;color:#8B90A3">
+                      {{ f.label }}
+                      <button onClick="{{ f.remove }}"
+                        style="position:absolute;top:-7px;right:-7px;width:22px;height:22px;border-radius:50%;border:1px solid #D9DCE9;background:#fff;cursor:pointer;color:#C4141B;font-size:12px;line-height:1">✕</button>
+                    </div>
+                  </sc-for>
+                </div>
+                <sc-if value="{{ fields.fotos.error }}" hint-placeholder-val="{{ false }}">
+                  <div style="color:#C4141B;font-size:12.5px;margin-top:8px;font-weight:700">{{ fields.fotos.error }}
+                  </div>
+                </sc-if>
+              </div>
+
+              <div
+                style="display:flex;justify-content:flex-end;gap:11px;margin-top:26px;padding-top:20px;border-top:1px solid #EFF0F6">
+                <button onClick="{{ cancelarLev }}"
+                  style="padding:12px 20px;border:1px solid #D5D8E6;background:#fff;border-radius:9px;font-weight:700;font-size:14px;cursor:pointer">Cancelar</button>
+                <button onClick="{{ guardarBorrador }}"
+                  style="padding:12px 20px;border:1px solid #1D4ED8;background:#fff;color:#1D4ED8;border-radius:9px;font-weight:700;font-size:14px;cursor:pointer"
+                  style-hover="background:#EDEBFF">Guardar</button>
+                <button onClick="{{ rechazarLev }}"
+                  style="padding:12px 20px;border:1px solid #F5C2C4;background:#fff;color:#C4141B;border-radius:9px;font-weight:700;font-size:14px;cursor:pointer"
+                  style-hover="background:#FDE9EA">Cancelar servicio</button>
+                <button onClick="{{ enviarAdmin }}"
+                  style="padding:12px 22px;border:0;background:#1D4ED8;color:#fff;border-radius:9px;font-weight:700;font-size:14px;cursor:pointer;font-family:'Manrope'"
+                  style-hover="background:#1E40AF">Enviar a Administración</button>
+              </div>
+            </div>
+          </sc-if>
+
+          <sc-if value="{{ isOrdenes }}" hint-placeholder-val="{{ false }}">
+            <div style="background:#fff;border:1px solid #E3E5EE;border-radius:14px;padding:18px;margin-bottom:16px">
+              <div style="display:flex;gap:14px;align-items:center;flex-wrap:wrap" class="resp-search-block">
+                <input value="{{ search.ord.value }}" onChange="{{ search.ord.onChange }}"
+                  placeholder="Buscar orden por cliente o servicio..."
+                  style="flex:1;min-width:240px;padding:11px 14px;border:1px solid #D5D8E6;border-radius:9px;font-size:14px" />
+                <div style="display:flex;align-items:center;gap:10px">
+                  <span style="font-size:13.5px;color:#6B7085;font-weight:700">Filtrar por estado:</span>
+                  <select value="{{ filters.ord.value }}" onChange="{{ filters.ord.onChange }}"
+                    style="padding:11px 14px;border:1px solid #D5D8E6;border-radius:9px;font-size:14px;background:#fff;min-width:230px">
+                    <sc-for list="{{ estadosOrd }}" as="e" hint-placeholder-count="2">
+                      <option value="{{ e }}">{{ e }}</option>
+                    </sc-for>
+                  </select>
+                </div>
+              </div>
+            </div>
+            <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:16px">
+              <sc-for list="{{ ordenesView }}" as="o" hint-placeholder-count="2">
+                <div style="background:#fff;border:1px solid #E3E5EE;border-radius:14px;padding:22px">
+                  <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:12px">
+                    <div>
+                      <div style="font-family:ui-monospace,monospace;font-size:12px;color:#8B90A3">ORDEN {{ o.code }}
+                      </div>
+                      <div style="font-family:'Manrope';font-weight:800;font-size:19px;margin-top:4px">{{ o.cliente }}
+                      </div>
+                      <div style="color:#6B7085;font-size:14px;margin-top:2px">{{ o.tipoServicio }}</div>
+                    </div>
+                    <span
+                      style="display:inline-block;padding:5px 11px;border-radius:20px;font-size:12px;font-weight:800;background:{{ o.bg }};color:{{ o.fg }};white-space:nowrap">{{
+                      o.estado }}</span>
+                  </div>
+                  <div
+                    style="margin-top:18px;font-size:12px;color:#8B90A3;font-weight:800;text-transform:uppercase;letter-spacing:.06em">
+                    Trabajo a realizar (por prioridad)</div>
+                  <div style="display:flex;flex-direction:column;gap:8px;margin-top:10px">
+                    <sc-for list="{{ o.trabajos }}" as="t" hint-placeholder-count="3">
+                      <div style="display:flex;gap:10px;align-items:flex-start;font-size:14px">
+                        <span
+                          style="flex:0 0 22px;height:22px;border-radius:6px;background:#EDEBFF;color:#1D4ED8;font-weight:800;font-size:12px;display:flex;align-items:center;justify-content:center">{{
+                          t.n }}</span>
+                        <span>{{ t.desc }}</span>
+                      </div>
+                    </sc-for>
+                  </div>
+                  <div
+                    style="margin-top:18px;font-size:12px;color:#8B90A3;font-weight:800;text-transform:uppercase;letter-spacing:.06em">
+                    Materiales y herramientas</div>
+                  <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:10px">
+                    <sc-for list="{{ o.materiales }}" as="m" hint-placeholder-count="4">
+                      <span
+                        style="padding:5px 11px;border:1px solid #E3E5EE;border-radius:20px;font-size:12.5px;background:#F7F8FC">{{
+                        m }}</span>
+                    </sc-for>
+                  </div>
+                  <div
+                    style="margin-top:18px;font-size:12px;color:#8B90A3;font-weight:800;text-transform:uppercase;letter-spacing:.06em">
+                    Observaciones</div>
+                  <div style="font-size:14px;margin-top:7px;color:#4A4E63;line-height:1.55">{{ o.observaciones }}</div>
+                  <sc-if value="{{ o.puedeFinalizar }}" hint-placeholder-val="{{ true }}">
+                    <button onClick="{{ o.finalizar }}"
+                      style="margin-top:20px;width:100%;padding:12px;border:0;background:#1D4ED8;color:#fff;border-radius:9px;font-weight:700;font-size:14px;cursor:pointer;font-family:'Manrope'"
+                      style-hover="background:#1E40AF">Marcar como Finalizada</button>
+                  </sc-if>
+                </div>
+              </sc-for>
+            </div>
+            <sc-if value="{{ ordVacio }}" hint-placeholder-val="{{ false }}">
+              <div
+                style="background:#fff;border:1px solid #E3E5EE;border-radius:14px;padding:40px;text-align:center;color:#8B90A3;font-size:14px">
+                No hay órdenes de trabajo que coincidan con el filtro.</div>
+            </sc-if>
+          </sc-if>
+
+          <sc-if value="{{ isClientes }}" hint-placeholder-val="{{ false }}">
+            <div style="background:#fff;border:1px solid #E3E5EE;border-radius:14px;overflow:hidden">
+              <div style="padding:18px;border-bottom:1px solid #EFF0F6">
+                <input value="{{ search.cli.value }}" onChange="{{ search.cli.onChange }}"
+                  placeholder="Buscar cliente por nombre..."
+                  style="width:100%;max-width:420px;padding:11px 14px;border:1px solid #D5D8E6;border-radius:9px;font-size:14px" />
+              </div>
+              <div
+                style="display:grid;grid-template-columns:1.3fr 1fr 1.6fr .8fr 110px;padding:14px 18px;font-size:12px;font-weight:800;color:#8B90A3;text-transform:uppercase;letter-spacing:.06em;border-bottom:1px solid #EFF0F6"
+                class="resp-table-row">
+                <div>Cliente</div>
+                <div>Teléfono</div>
+                <div>Dirección</div>
+                <div>Servicios</div>
+                <div style="text-align:right">Acciones</div>
+              </div>
+              <sc-for list="{{ clientesView }}" as="c" hint-placeholder-count="5">
+                <div
+                  style="display:grid;grid-template-columns:1.3fr 1fr 1.6fr .8fr 110px;padding:16px 18px;border-bottom:1px solid #F4F5FB;align-items:center;font-size:14px"
+                  class="resp-table-row">
+                  <div style="font-weight:700">{{ c.nombre }}</div>
+                  <div style="color:#6B7085">{{ c.telefono }}</div>
+                  <div style="color:#6B7085">{{ c.direccion }}</div>
+                  <div style="font-weight:700">{{ c.servicios }}</div>
+                  <div style="display:flex;gap:8px;justify-content:flex-end">
+                    <button onClick="{{ c.view }}" title="Ver detalle"
+                      style="width:32px;height:32px;border:1px solid #D5D8E6;background:#fff;border-radius:8px;cursor:pointer;color:#4A4E63"
+                      style-hover="border-color:#1D4ED8;color:#1D4ED8">◉</button>
+                    <button onClick="{{ c.edit }}" title="Editar"
+                      style="width:32px;height:32px;border:1px solid #D5D8E6;background:#fff;border-radius:8px;cursor:pointer;color:#4A4E63"
+                      style-hover="border-color:#1D4ED8;color:#1D4ED8">✎</button>
+                  </div>
+                </div>
+              </sc-for>
+              <sc-if value="{{ cliVacio }}" hint-placeholder-val="{{ false }}">
+                <div style="padding:38px;text-align:center;color:#8B90A3;font-size:14px">No se encontraron clientes.
+                </div>
+              </sc-if>
+            </div>
+          </sc-if>
+
+          <sc-if value="{{ isHistorial }}" hint-placeholder-val="{{ false }}">
+            <div style="background:#fff;border:1px solid #E3E5EE;border-radius:14px;overflow:hidden">
+              <div style="display:flex;gap:14px;padding:18px;border-bottom:1px solid #EFF0F6">
+                <input value="{{ search.hist.value }}" onChange="{{ search.hist.onChange }}"
+                  placeholder="Buscar por cliente o servicio..."
+                  style="flex:1;padding:11px 14px;border:1px solid #D5D8E6;border-radius:9px;font-size:14px" />
+                <select value="{{ filters.hist.value }}" onChange="{{ filters.hist.onChange }}"
+                  style="padding:11px 14px;border:1px solid #D5D8E6;border-radius:9px;font-size:14px;background:#fff;min-width:190px">
+                  <sc-for list="{{ filtrosFecha }}" as="f" hint-placeholder-count="3">
+                    <option value="{{ f }}">{{ f }}</option>
+                  </sc-for>
+                </select>
+              </div>
+              <div
+                style="display:grid;grid-template-columns:80px 1.2fr 1.4fr 1fr 1fr 80px;padding:14px 18px;font-size:12px;font-weight:800;color:#8B90A3;text-transform:uppercase;letter-spacing:.06em;border-bottom:1px solid #EFF0F6"
+                class="resp-table-row">
+                <div>ID</div>
+                <div>Cliente</div>
+                <div>Tipo de servicio</div>
+                <div>Fecha finalización</div>
+                <div>Estado</div>
+                <div style="text-align:right">Acción</div>
+              </div>
+              <sc-for list="{{ historialView }}" as="h" hint-placeholder-count="5">
+                <div
+                  style="display:grid;grid-template-columns:80px 1.2fr 1.4fr 1fr 1fr 80px;padding:16px 18px;border-bottom:1px solid #F4F5FB;align-items:center;font-size:14px"
+                  class="resp-table-row">
+                  <div style="font-family:ui-monospace,monospace;color:#6B7085">{{ h.code }}</div>
+                  <div style="font-weight:700">{{ h.cliente }}</div>
+                  <div>{{ h.tipoServicio }}</div>
+                  <div style="color:#6B7085">{{ h.fechaFin }}</div>
+                  <div><span
+                      style="display:inline-block;padding:5px 11px;border-radius:20px;font-size:12px;font-weight:800;background:#E4F6EA;color:#17803D">Finalizada</span>
+                  </div>
+                  <div style="display:flex;justify-content:flex-end">
+                    <button onClick="{{ h.view }}" title="Ver detalle"
+                      style="width:32px;height:32px;border:1px solid #D5D8E6;background:#fff;border-radius:8px;cursor:pointer;color:#4A4E63"
+                      style-hover="border-color:#1D4ED8;color:#1D4ED8">◉</button>
+                  </div>
+                </div>
+              </sc-for>
+              <sc-if value="{{ histVacio }}" hint-placeholder-val="{{ false }}">
+                <div style="padding:38px;text-align:center;color:#8B90A3;font-size:14px">Aún no hay servicios
+                  finalizados.</div>
+              </sc-if>
+            </div>
+          </sc-if>
+
+          <sc-if value="{{ isUsuarios }}" hint-placeholder-val="{{ false }}">
+            <div style="background:#fff;border:1px solid #E3E5EE;border-radius:14px;overflow:hidden">
+              <div
+                style="display:grid;grid-template-columns:1fr 1.2fr 1fr .9fr 110px;padding:14px 18px;font-size:12px;font-weight:800;color:#8B90A3;text-transform:uppercase;letter-spacing:.06em;border-bottom:1px solid #EFF0F6"
+                class="resp-table-row">
+                <div>Usuario</div>
+                <div>Nombre</div>
+                <div>Cargo</div>
+                <div>Rol</div>
+                <div style="text-align:right">Acciones</div>
+              </div>
+              <sc-for list="{{ usuariosView }}" as="u" hint-placeholder-count="2">
+                <div
+                  style="display:grid;grid-template-columns:1fr 1.2fr 1fr .9fr 110px;padding:16px 18px;border-bottom:1px solid #F4F5FB;align-items:center;font-size:14px"
+                  class="resp-table-row">
+                  <div style="font-family:ui-monospace,monospace;font-weight:700">{{ u.usuario }}</div>
+                  <div>{{ u.nombre }}</div>
+                  <div style="color:#6B7085">{{ u.cargo }}</div>
+                  <div><span
+                      style="display:inline-block;padding:5px 11px;border-radius:20px;font-size:12px;font-weight:800;background:{{ u.bg }};color:{{ u.fg }}">{{
+                      u.rol }}</span></div>
+                  <div style="display:flex;gap:8px;justify-content:flex-end">
+                    <button onClick="{{ u.edit }}" title="Modificar"
+                      style="width:32px;height:32px;border:1px solid #D5D8E6;background:#fff;border-radius:8px;cursor:pointer;color:#4A4E63"
+                      style-hover="border-color:#1D4ED8;color:#1D4ED8">✎</button>
+                    <button onClick="{{ u.del }}" title="Eliminar"
+                      style="width:32px;height:32px;border:1px solid #F5C2C4;background:#fff;border-radius:8px;cursor:pointer;color:#C4141B"
+                      style-hover="background:#FDE9EA">✕</button>
+                  </div>
+                </div>
+              </sc-for>
+            </div>
+          </sc-if>
+
+          <sc-if value="{{ isEnDesarrollo }}" hint-placeholder-val="{{ false }}">
+            <div
+              style="display:flex;flex-direction:column;align-items:center;justify-content:center;padding:80px 40px;text-align:center">
+              <div
+                style="width:88px;height:88px;border-radius:50%;background:#EFF6FF;display:flex;align-items:center;justify-content:center;margin-bottom:24px">
+                <svg viewBox="0 0 24 24" width="40" height="40" fill="none" stroke="#1D4ED8" stroke-width="1.5"
+                  stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M12 6v6l4 2"></path>
+                  <circle cx="12" cy="12" r="9.5"></circle>
+                </svg>
+              </div>
+              <div style="font-family:'Manrope';font-weight:800;font-size:24px;color:#14162B;margin-bottom:10px">
+                Funcionalidad en desarrollo</div>
+              <div style="color:#6B7085;font-size:15px;max-width:420px;line-height:1.6">Este módulo se encuentra
+                actualmente en construcción. Estamos trabajando para traerte la mejor experiencia. ¡Pronto estará
+                disponible!</div>
+              <div
+                style="margin-top:28px;padding:10px 22px;background:#EFF6FF;border:1px solid #BFDBFE;border-radius:10px;font-size:13px;font-weight:700;color:#1D4ED8">
+                🚧 Próximamente</div>
+            </div>
+          </sc-if>
+
+          <sc-if value="{{ isReportes }}" hint-placeholder-val="{{ false }}">
+            <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:20px" class="resp-grid-2">
+              <div
+                style="background:#fff;border:1px solid #E3E5EE;border-radius:14px;padding:28px 24px;cursor:pointer;transition:box-shadow .15s"
+                style-hover="box-shadow:0 4px 20px rgba(29,78,216,.12)" onClick="{{ goListaReportesConsumo }}">
+                <div
+                  style="width:48px;height:48px;border-radius:12px;background:#EFF6FF;display:flex;align-items:center;justify-content:center;margin-bottom:16px">
+                  <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="#1D4ED8" stroke-width="1.7"
+                    stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M4.5 4.5h15v15h-15z M8 14v2.5 M12 10v6.5 M16 12v4.5"></path>
+                  </svg>
+                </div>
+                <div style="font-family:'Manrope';font-weight:800;font-size:17px;margin-bottom:6px">Consumo en Servicios
+                </div>
+                <div style="color:#6B7085;font-size:13.5px;line-height:1.5">Análisis operativo detallado por tipo de
+                  servicio e inventario consumido del último año.</div>
+                <div style="margin-top:14px;color:#1D4ED8;font-size:13px;font-weight:700">Ver reporte →</div>
+              </div>
+              <div
+                style="background:#fff;border:1px solid #E3E5EE;border-radius:14px;padding:28px 24px;opacity:.55;cursor:default">
+                <div
+                  style="width:48px;height:48px;border-radius:12px;background:#FFF7ED;display:flex;align-items:center;justify-content:center;margin-bottom:16px">
+                  <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="#F59E0B" stroke-width="1.7"
+                    stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M12 21a9 9 0 1 0 0-18 9 9 0 0 0 0 18 M12 7v10 M8.5 13.5h7"></path>
+                  </svg>
+                </div>
+                <div style="font-family:'Manrope';font-weight:800;font-size:17px;margin-bottom:6px">Reportes Financieros
+                </div>
+                <div style="color:#6B7085;font-size:13.5px;line-height:1.5">Ingresos, egresos y balance general por
+                  período.</div>
+                <div style="margin-top:14px;color:#8B90A3;font-size:13px;font-weight:700">Próximamente</div>
+              </div>
+              <div
+                style="background:#fff;border:1px solid #E3E5EE;border-radius:14px;padding:28px 24px;opacity:.55;cursor:default">
+                <div
+                  style="width:48px;height:48px;border-radius:12px;background:#F0FDF4;display:flex;align-items:center;justify-content:center;margin-bottom:16px">
+                  <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="#17803D" stroke-width="1.7"
+                    stroke-linecap="round" stroke-linejoin="round">
+                    <path
+                      d="M9.3 11.2a3.3 3.3 0 1 0 0-6.6 3.3 3.3 0 0 0 0 6.6 M3.5 20.3c0-3.3 2.6-5.7 5.8-5.7s5.8 2.4 5.8 5.7 M16.2 5.3a3.1 3.1 0 0 1 0 5.9 M17.2 15c1.9.7 3.3 2.7 3.3 5.3">
+                    </path>
+                  </svg>
+                </div>
+                <div style="font-family:'Manrope';font-weight:800;font-size:17px;margin-bottom:6px">Rendimiento de
+                  Técnicos</div>
+                <div style="color:#6B7085;font-size:13.5px;line-height:1.5">Productividad, servicios completados y
+                  métricas por técnico.</div>
+                <div style="margin-top:14px;color:#8B90A3;font-size:13px;font-weight:700">Próximamente</div>
+              </div>
+            </div>
+          </sc-if>
+
+          <sc-if value="{{ isListaReportesConsumo }}" hint-placeholder-val="{{ false }}">
+            <div>
+              <div style="display:flex;align-items:center;gap:8px;margin-bottom:16px;font-size:13px;color:#1D4ED8">
+                <span style="cursor:pointer" onClick="{{ volverReportes }}">Reportes</span>
+                <span style="color:#8B90A3">/</span>
+                <span style="color:#334155;font-weight:700">Consumo en Servicios</span>
+              </div>
+
+              <div style="margin-bottom:24px">
+                <h2 style="font-family:'Manrope';font-weight:800;font-size:22px;color:#14162B;margin:0 0 4px 0">Reportes
+                  de Consumo en Servicios</h2>
+                <p style="color:#6B7085;font-size:14.5px;margin:0">Seleccione el reporte que desea visualizar.</p>
+              </div>
+
+              <div style="display:flex;flex-direction:column;gap:12px">
+                <div
+                  style="background:#fff;border:1px solid #E3E5EE;border-radius:12px;padding:20px 24px;display:flex;align-items:center;justify-content:space-between;cursor:pointer;transition:box-shadow .15s"
+                  style-hover="box-shadow:0 4px 12px rgba(29,78,216,.08)" onClick="{{ goReporteConsumo }}">
+                  <div style="display:flex;align-items:center;gap:16px">
+                    <div
+                      style="width:40px;height:40px;border-radius:10px;background:#EFF6FF;display:flex;align-items:center;justify-content:center">
+                      <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="#1D4ED8" stroke-width="2"
+                        stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M4.5 6.5h15v14h-15z M4.5 11h15 M8.5 3.8v4 M15.5 3.8v4"></path>
+                      </svg>
+                    </div>
+                    <div>
+                      <div style="font-family:'Manrope';font-weight:700;font-size:15px;color:#14162B;margin-bottom:4px">
+                        Reporte de Consumo en Servicios del último año</div>
+                      <div style="color:#6B7085;font-size:13px">Vista general de servicios y materiales utilizados
+                        durante el año.</div>
+                    </div>
+                  </div>
+                  <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="#8B90A3" stroke-width="2"
+                    stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M9 18l6-6-6-6" />
+                  </svg>
+                </div>
+
+                <div
+                  style="background:#fff;border:1px solid #E3E5EE;border-radius:12px;padding:20px 24px;display:flex;align-items:center;justify-content:space-between;opacity:0.6;cursor:default">
+                  <div style="display:flex;align-items:center;gap:16px">
+                    <div
+                      style="width:40px;height:40px;border-radius:10px;background:#F1F5F9;display:flex;align-items:center;justify-content:center">
+                      <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="#64748B" stroke-width="2"
+                        stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M4.5 6.5h15v14h-15z M4.5 11h15 M8.5 3.8v4 M15.5 3.8v4"></path>
+                      </svg>
+                    </div>
+                    <div>
+                      <div style="font-family:'Manrope';font-weight:700;font-size:15px;color:#334155;margin-bottom:4px">
+                        Reporte de Consumo Mensual</div>
+                      <div style="color:#94A3B8;font-size:13px">Desglose mensual de recursos consumidos. (Próximamente)
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <div
+                  style="background:#fff;border:1px solid #E3E5EE;border-radius:12px;padding:20px 24px;display:flex;align-items:center;justify-content:space-between;opacity:0.6;cursor:default">
+                  <div style="display:flex;align-items:center;gap:16px">
+                    <div
+                      style="width:40px;height:40px;border-radius:10px;background:#F1F5F9;display:flex;align-items:center;justify-content:center">
+                      <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="#64748B" stroke-width="2"
+                        stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M12 20h9 M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"></path>
+                      </svg>
+                    </div>
+                    <div>
+                      <div style="font-family:'Manrope';font-weight:700;font-size:15px;color:#334155;margin-bottom:4px">
+                        Reporte de Materiales por Técnico</div>
+                      <div style="color:#94A3B8;font-size:13px">Consumo específico asignado a cada técnico de campo.
+                        (Próximamente)</div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </sc-if>
+
+
+          <sc-if value="{{ isReporteConsumo }}" hint-placeholder-val="{{ false }}">
+            <div>
+              <div style="display:flex;align-items:center;gap:8px;margin-bottom:16px;font-size:13px;color:#1D4ED8">
+                <span style="cursor:pointer" onClick="{{ volverReportes }}">Reportes</span>
+                <span style="color:#8B90A3">/</span>
+                <span style="cursor:pointer" onClick="{{ goListaReportesConsumo }}">Consumo en Servicios</span>
+                <span style="color:#8B90A3">/</span>
+                <span style="color:#334155;font-weight:700">Reporte de Consumo en Servicios del último año</span>
+              </div>
+              <div
+                style="background:#fff;border:1px solid #E3E5EE;border-radius:14px;padding:20px 24px;display:flex;align-items:center;justify-content:center;gap:24px;flex-wrap:wrap;margin-bottom:24px;box-shadow:0 4px 12px rgba(20,22,43,0.02)">
+                <div style="display:flex;align-items:center;gap:10px">
+                  <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="#14162B" stroke-width="2">
+                    <path d="M4.5 6.5h15v14h-15z M4.5 11h15 M8.5 3.8v4 M15.5 3.8v4"></path>
+                  </svg>
+                  <span style="font-size:15px;color:#14162B">Período: <b>Último Año</b></span>
+                </div>
+                <select value="{{ reportesConfig.anio.value }}" onChange="{{ reportesConfig.anio.onChange }}"
+                  style="padding:10px 18px;border:1px solid #8B90A3;border-radius:9px;font-size:14.5px;color:#1D4ED8;font-weight:700;background:#fff">
+                  <sc-for list="{{ reportesConfig.anios }}" as="a">
+                    <option value="{{ a }}">{{ a }}</option>
+                  </sc-for>
+                </select>
+                <div style="display:flex;align-items:center;gap:10px">
+                  <span style="font-size:15px;color:#14162B">Categoría:</span>
+                  <select value="{{ reportesConfig.categoria.value }}"
+                    onChange="{{ reportesConfig.categoria.onChange }}"
+                    style="padding:10px 18px;border:1px solid #8B90A3;border-radius:9px;font-size:14.5px;color:#1D4ED8;font-weight:700;background:#fff;min-width:180px;max-width:260px">
+                    <sc-for list="{{ reportesConfig.categorias }}" as="c">
+                      <option value="{{ c }}">{{ c }}</option>
+                    </sc-for>
+                  </select>
+                </div>
+                <button
+                  style="padding:11px 22px;background:#DBEAFE;color:#1D4ED8;border:0;border-radius:9px;font-weight:800;font-size:14.5px;cursor:pointer;font-family:'Manrope'"
+                  style-hover="background:#BFDBFE">Actualizar Reporte</button>
+              </div>
+              <div style="display:grid;grid-template-columns:1fr 1fr 2fr;gap:16px;margin-bottom:24px"
+                class="resp-grid-1-1-2" class="resp-grid-2">
+
+                <!-- Primera Columna -->
+                <div style="display:flex;flex-direction:column;gap:16px">
+                  <div
+                    style="background:#fff;border:1px solid #E3E5EE;border-radius:12px;box-shadow:0 4px 12px rgba(20,22,43,0.02);padding:18px 22px;flex:1;display:flex;flex-direction:column;justify-content:center">
+                    <div
+                      style="font-size:12px;font-weight:700;color:#6B7085;text-transform:uppercase;letter-spacing:.05em;text-align:center">
+                      Total Consumo (RD$)</div>
+                    <div
+                      style="font-family:'Manrope';font-weight:800;font-size:28px;color:#14162B;margin-top:6px;text-align:center">
+                      1,625,000.00</div>
+                  </div>
+                  <div
+                    style="background:#fff;border:1px solid #E3E5EE;border-radius:12px;box-shadow:0 4px 12px rgba(20,22,43,0.02);padding:18px 22px;flex:1;display:flex;flex-direction:column;justify-content:center">
+                    <div
+                      style="font-size:12px;font-weight:700;color:#6B7085;text-transform:uppercase;letter-spacing:.05em;text-align:center">
+                      Costo de Inventario<br>en Riesgo de Merma (RD$)</div>
+                    <div
+                      style="font-family:'Manrope';font-weight:800;font-size:28px;color:#14162B;margin-top:6px;text-align:center">
+                      75,000.00</div>
+                  </div>
+                </div>
+
+                <!-- Segunda Columna -->
+                <div style="display:flex;flex-direction:column;gap:16px">
+                  <div
+                    style="background:#fff;border:1px solid #E3E5EE;border-radius:12px;box-shadow:0 4px 12px rgba(20,22,43,0.02);padding:18px 22px;flex:1;display:flex;flex-direction:column;justify-content:center">
+                    <div
+                      style="font-size:12px;font-weight:700;color:#6B7085;text-transform:uppercase;letter-spacing:.05em;text-align:center">
+                      Costo Promedio de Consumo<br>por Instalación (RD$)</div>
+                    <div
+                      style="font-family:'Manrope';font-weight:800;font-size:28px;color:#14162B;margin-top:6px;text-align:center">
+                      1,696.24</div>
+                  </div>
+                  <div
+                    style="background:#fff;border:1px solid #E3E5EE;border-radius:12px;box-shadow:0 4px 12px rgba(20,22,43,0.02);padding:18px 22px;flex:1;display:flex;flex-direction:column;justify-content:center">
+                    <div
+                      style="font-size:12px;font-weight:700;color:#6B7085;text-transform:uppercase;letter-spacing:.05em;text-align:center">
+                      Servicio con Mayor Consumo</div>
+                    <div
+                      style="font-family:'Manrope';font-weight:800;font-size:20px;color:#14162B;margin-top:6px;text-align:center">
+                      Instalación Paneles Solares</div>
+                  </div>
+                </div>
+
+                <!-- Tercera Columna (Pie Chart) -->
+                <div
+                  style="background:#fff;border:1px solid #E3E5EE;border-radius:12px;box-shadow:0 4px 12px rgba(20,22,43,0.02);padding:24px 32px;display:flex;flex-direction:column;justify-content:center">
+                  <div style="font-size:15px;font-weight:800;color:#14162B;margin-bottom:20px;text-align:center">
+                    Porcentaje de Consumo de Materiales por Categoría</div>
+                  <div style="display:flex;align-items:center;justify-content:center;gap:10px;flex:1">
+                    <div
+                      style="position:relative;flex:1;display:flex;align-items:center;justify-content:center;min-width:240px">
+                      <svg viewBox="0 0 200 200" width="100%" height="100%"
+                        style="max-height:220px; font-family:'Manrope', sans-serif;">
+                        <g transform="translate(100, 100) rotate(-90) translate(-100, -100)">
+                          <circle cx="100" cy="100" r="40" fill="none" stroke="#1D4ED8" stroke-width="30"
+                            stroke-dasharray="75.39822368615503 175.92918860102841" stroke-dashoffset="-0.0" />
+                          <circle cx="100" cy="100" r="40" fill="none" stroke="#3B82F6" stroke-width="30"
+                            stroke-dasharray="62.83185307179586 188.49555921538757"
+                            stroke-dashoffset="-75.39822368615503" />
+                          <circle cx="100" cy="100" r="40" fill="none" stroke="#60A5FA" stroke-width="30"
+                            stroke-dasharray="50.26548245743669 201.06192982974676"
+                            stroke-dashoffset="-138.2300767579509" />
+                          <circle cx="100" cy="100" r="40" fill="none" stroke="#93C5FD" stroke-width="30"
+                            stroke-dasharray="37.69911184307752 213.62830044410595"
+                            stroke-dashoffset="-188.49555921538757" />
+                          <circle cx="100" cy="100" r="40" fill="none" stroke="#BFDBFE" stroke-width="30"
+                            stroke-dasharray="25.132741228718345 226.1946710584651"
+                            stroke-dashoffset="-226.1946710584651" />
+                          <circle cx="100" cy="100" r="40" fill="none" stroke="#14162B" stroke-width="31"
+                            stroke-dasharray="0.7 74.69822368615503 0.7 62.13185307179586 0.7 49.56548245743669 0.7 36.999111843077515 0.7 24.432741228718346"
+                            stroke-dashoffset="0" />
+                          <circle cx="100" cy="100" r="55.0" fill="none" stroke="#14162B" stroke-width="1.5" />
+                          <circle cx="100" cy="100" r="25.0" fill="none" stroke="#14162B" stroke-width="1.5" />
+                        </g>
+                        <polyline
+                          points="144.4959346906221,67.67181112391398 156.63118960624632,58.85503233952688 166.63118960624632,58.85503233952688"
+                          fill="none" stroke="#1D4ED8" stroke-width="1.5" />
+                        <text x="170.63118960624632" y="56.85503233952688" font-size="9" font-weight="700"
+                          fill="#14162B" text-anchor="start">Climatización (AC)</text>
+                        <text x="170.63118960624632" y="67.85503233952687" font-size="9" font-weight="700"
+                          fill="#1D4ED8" text-anchor="start">30%</text>
+                        <polyline
+                          points="124.96947748567507,149.00535883036022 131.77933498176827,162.37045669318576 141.77933498176827,162.37045669318576"
+                          fill="none" stroke="#3B82F6" stroke-width="1.5" />
+                        <text x="145.77933498176827" y="160.37045669318576" font-size="9" font-weight="700"
+                          fill="#14162B" text-anchor="start">Paneles Solares</text>
+                        <text x="145.77933498176827" y="171.37045669318576" font-size="9" font-weight="700"
+                          fill="#3B82F6" text-anchor="start">25%</text>
+                        <polyline
+                          points="55.50406530937789,132.32818887608602 43.368810393753684,141.14496766047313 33.368810393753684,141.14496766047313"
+                          fill="none" stroke="#60A5FA" stroke-width="1.5" />
+                        <text x="29.368810393753684" y="139.14496766047313" font-size="9" font-weight="700"
+                          fill="#14162B" text-anchor="end">Redes</text>
+                        <text x="29.368810393753684" y="150.14496766047313" font-size="9" font-weight="700"
+                          fill="#60A5FA" text-anchor="end">20%</text>
+                        <polyline
+                          points="50.99464116963976,75.03052251432493 37.62954330681425,68.22066501823173 27.62954330681425,68.22066501823173"
+                          fill="none" stroke="#93C5FD" stroke-width="1.5" />
+                        <text x="23.62954330681425" y="66.22066501823173" font-size="9" font-weight="700" fill="#14162B"
+                          text-anchor="end">Automatización</text>
+                        <text x="23.62954330681425" y="77.22066501823173" font-size="9" font-weight="700" fill="#93C5FD"
+                          text-anchor="end">15%</text>
+                        <polyline
+                          points="83.00406530937789,47.69189160376656 78.36881039375368,33.42604385933926 68.36881039375368,33.42604385933926"
+                          fill="none" stroke="#BFDBFE" stroke-width="1.5" />
+                        <text x="64.36881039375368" y="31.42604385933926" font-size="9" font-weight="700" fill="#14162B"
+                          text-anchor="end">Seguridad</text>
+                        <text x="64.36881039375368" y="42.42604385933926" font-size="9" font-weight="700" fill="#BFDBFE"
+                          text-anchor="end">10%</text>
+                      </svg>
+                    </div>
+                    <div style="font-size:12.5px;display:flex;flex-direction:column;gap:8px">
+                      <div style="display:flex;align-items:center;gap:6px"><span
+                          style="width:12px;height:12px;border-radius:3px;background:#1D4ED8;border:1px solid #14162B;display:inline-block"></span>
+                        Climatización (AC) (30%)</div>
+                      <div style="display:flex;align-items:center;gap:6px"><span
+                          style="width:12px;height:12px;border-radius:3px;background:#3B82F6;border:1px solid #14162B;display:inline-block"></span>
+                        Paneles Solares (25%)</div>
+                      <div style="display:flex;align-items:center;gap:6px"><span
+                          style="width:12px;height:12px;border-radius:3px;background:#60A5FA;border:1px solid #14162B;display:inline-block"></span>
+                        Redes (20%)</div>
+                      <div style="display:flex;align-items:center;gap:6px"><span
+                          style="width:12px;height:12px;border-radius:3px;background:#93C5FD;border:1px solid #14162B;display:inline-block"></span>
+                        Automatización (15%)</div>
+                      <div style="display:flex;align-items:center;gap:6px"><span
+                          style="width:12px;height:12px;border-radius:3px;background:#BFDBFE;border:1px solid #14162B;display:inline-block"></span>
+                        Seguridad (10%)</div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div style="display:grid;grid-template-columns:3fr 2fr;gap:16px" class="resp-grid-3-2">
+                <div
+                  style="background:#fff;border:1px solid #E3E5EE;border-radius:12px;box-shadow:0 4px 12px rgba(20,22,43,0.02);overflow:hidden">
+                  <div
+                    style="display:grid;grid-template-columns:1.5fr 1fr 1fr 1fr .8fr;padding:12px 18px;font-size:11.5px;font-weight:800;color:#8B90A3;text-transform:uppercase;letter-spacing:.05em;border-bottom:1px solid #EFF0F6;background:#F8FAFC"
+                    class="resp-table-row">
+                    <div>Servicio de Instalación</div>
+                    <div style="text-align:right">Materiales (RD$)</div>
+                    <div style="text-align:right">Consumibles (RD$)</div>
+                    <div style="text-align:right">Total (RD$)</div>
+                    <div style="text-align:center">Instalaciones</div>
+                  </div>
+                  <div
+                    style="display:grid;grid-template-columns:1.5fr 1fr 1fr 1fr .8fr;padding:12px 18px;font-size:13.5px;border-bottom:1px solid #F4F5FB;align-items:center"
+                    class="resp-table-row">
+                    <div style="font-weight:700">Solar</div>
+                    <div style="text-align:right;color:#6B7085">RD$ 250,000.00</div>
+                    <div style="text-align:right;color:#6B7085">RD$ 120,000.00</div>
+                    <div style="text-align:right;font-weight:700">RD$ 370,000.00</div>
+                    <div style="text-align:center">30</div>
+                  </div>
+                  <div
+                    style="display:grid;grid-template-columns:1.5fr 1fr 1fr 1fr .8fr;padding:12px 18px;font-size:13.5px;border-bottom:1px solid #F4F5FB;align-items:center"
+                    class="resp-table-row">
+                    <div style="font-weight:700">AC (Industrial)</div>
+                    <div style="text-align:right;color:#6B7085">RD$ 180,000.00</div>
+                    <div style="text-align:right;color:#6B7085">RD$ 75,000.00</div>
+                    <div style="text-align:right;font-weight:700">RD$ 255,000.00</div>
+                    <div style="text-align:center">25</div>
+                  </div>
+                  <div
+                    style="display:grid;grid-template-columns:1.5fr 1fr 1fr 1fr .8fr;padding:12px 18px;font-size:13.5px;border-bottom:1px solid #F4F5FB;align-items:center"
+                    class="resp-table-row">
+                    <div style="font-weight:700">AC (Residencial)</div>
+                    <div style="text-align:right;color:#6B7085">RD$ 150,000.00</div>
+                    <div style="text-align:right;color:#6B7085">RD$ 65,000.00</div>
+                    <div style="text-align:right;font-weight:700">RD$ 215,000.00</div>
+                    <div style="text-align:center">16</div>
+                  </div>
+                  <div
+                    style="display:grid;grid-template-columns:1.5fr 1fr 1fr 1fr .8fr;padding:12px 18px;font-size:13.5px;border-bottom:1px solid #F4F5FB;align-items:center"
+                    class="resp-table-row">
+                    <div style="font-weight:700">Cableado Red</div>
+                    <div style="text-align:right;color:#6B7085">RD$ 160,000.00</div>
+                    <div style="text-align:right;color:#6B7085">RD$ 70,000.00</div>
+                    <div style="text-align:right;font-weight:700">RD$ 230,000.00</div>
+                    <div style="text-align:center">22</div>
+                  </div>
+                  <div
+                    style="display:grid;grid-template-columns:1.5fr 1fr 1fr 1fr .8fr;padding:12px 18px;font-size:13.5px;border-bottom:1px solid #F4F5FB;align-items:center"
+                    class="resp-table-row">
+                    <div style="font-weight:700">Seguridad</div>
+                    <div style="text-align:right;color:#6B7085">RD$ 83,000.00</div>
+                    <div style="text-align:right;color:#6B7085">RD$ 23,000.00</div>
+                    <div style="text-align:right;font-weight:700">RD$ 106,000.00</div>
+                    <div style="text-align:center">12</div>
+                  </div>
+                  <div
+                    style="display:grid;grid-template-columns:1.5fr 1fr 1fr 1fr .8fr;padding:12px 18px;font-size:13.5px;border-bottom:1px solid #F4F5FB;align-items:center"
+                    class="resp-table-row">
+                    <div style="font-weight:700">Automatización</div>
+                    <div style="text-align:right;color:#6B7085">RD$ 110,000.00</div>
+                    <div style="text-align:right;color:#6B7085">RD$ 110,000.00</div>
+                    <div style="text-align:right;font-weight:700">RD$ 220,000.00</div>
+                    <div style="text-align:center">3</div>
+                  </div>
+                  <div
+                    style="display:grid;grid-template-columns:1.5fr 1fr 1fr 1fr .8fr;padding:12px 18px;font-size:13.5px;align-items:center;background:#EFF6FF;font-weight:800"
+                    class="resp-table-row">
+                    <div>TOTAL</div>
+                    <div style="text-align:right">RD$ 933,000.00</div>
+                    <div style="text-align:right">RD$ 463,000.00</div>
+                    <div style="text-align:right;color:#1D4ED8">RD$ 1,625,000.00</div>
+                    <div style="text-align:center">108</div>
+                  </div>
+                </div>
+                <div
+                  style="background:#fff;border:1px solid #E3E5EE;border-radius:12px;box-shadow:0 4px 12px rgba(20,22,43,0.02);padding:18px 22px;display:flex;flex-direction:column;min-height:300px">
+                  <div style="font-size:14px;font-weight:800;color:#14162B;margin-bottom:16px">Tendencia Mensual de
+                    Consumo (Costo)</div>
+                  <div style="position:relative;flex:1;display:flex;padding-left:60px">
+                    <div
+                      style="position:absolute;left:0;top:0;bottom:24px;width:100%;display:flex;flex-direction:column;justify-content:space-between;font-size:11px;color:#6B7085;font-weight:700">
+                      <div style="display:flex;align-items:center;height:0"><span
+                          style="width:50px;text-align:right;margin-right:10px">1,000,000</span>
+                        <div style="flex:1;border-top:1px dashed #E3E5EE"></div>
+                      </div>
+                      <div style="display:flex;align-items:center;height:0"><span
+                          style="width:50px;text-align:right;margin-right:10px">800,000</span>
+                        <div style="flex:1;border-top:1px dashed #E3E5EE"></div>
+                      </div>
+                      <div style="display:flex;align-items:center;height:0"><span
+                          style="width:50px;text-align:right;margin-right:10px">600,000</span>
+                        <div style="flex:1;border-top:1px dashed #E3E5EE"></div>
+                      </div>
+                      <div style="display:flex;align-items:center;height:0"><span
+                          style="width:50px;text-align:right;margin-right:10px">400,000</span>
+                        <div style="flex:1;border-top:1px dashed #E3E5EE"></div>
+                      </div>
+                      <div style="display:flex;align-items:center;height:0"><span
+                          style="width:50px;text-align:right;margin-right:10px">200,000</span>
+                        <div style="flex:1;border-top:1px dashed #E3E5EE"></div>
+                      </div>
+                      <div style="display:flex;align-items:center;height:0"><span
+                          style="width:50px;text-align:right;margin-right:10px">0</span>
+                        <div style="flex:1;border-top:1px solid #14162B"></div>
+                      </div>
+                    </div>
+                    <div
+                      style="display:flex;align-items:flex-end;width:100%;height:calc(100% - 24px);position:relative;z-index:1;justify-content:space-around;padding:0 20px">
+                      <div
+                        style="display:flex;flex-direction:column;align-items:center;justify-content:flex-end;height:100%;width:60px">
+                        <div style="font-size:12px;font-weight:800;color:#14162B;margin-bottom:6px">450,000</div>
+                        <div style="width:48px;background:#3B82F6;border:1.5px solid #14162B;height:45%"></div>
+                      </div>
+                      <div
+                        style="display:flex;flex-direction:column;align-items:center;justify-content:flex-end;height:100%;width:60px">
+                        <div style="font-size:12px;font-weight:800;color:#14162B;margin-bottom:6px">380,000</div>
+                        <div style="width:48px;background:#3B82F6;border:1.5px solid #14162B;height:38%"></div>
+                      </div>
+                      <div
+                        style="display:flex;flex-direction:column;align-items:center;justify-content:flex-end;height:100%;width:60px">
+                        <div style="font-size:12px;font-weight:800;color:#14162B;margin-bottom:6px">520,000</div>
+                        <div style="width:48px;background:#3B82F6;border:1.5px solid #14162B;height:52%"></div>
+                      </div>
+                    </div>
+                    <div
+                      style="position:absolute;left:60px;bottom:0;right:0;display:flex;justify-content:space-around;padding:0 20px;height:24px;align-items:flex-end">
+                      <div style="width:60px;text-align:center;font-size:12px;font-weight:700;color:#334155">Oct</div>
+                      <div style="width:60px;text-align:center;font-size:12px;font-weight:700;color:#334155">Sep</div>
+                      <div style="width:60px;text-align:center;font-size:12px;font-weight:700;color:#334155">Ago</div>
+                    </div>
+                  </div>
+                  <div
+                    style="display:flex;align-items:center;gap:8px;justify-content:center;margin-top:18px;font-size:12.5px;color:#334155;font-weight:700">
+                    <span
+                      style="width:14px;height:14px;border-radius:2px;background:#3B82F6;border:1.5px solid #14162B;display:inline-block"></span>
+                    Consumo Total (RD$)
+                  </div>
+                </div>
+              </div>
+            </div>
+          </sc-if>
+
+          <sc-if value="{{ isServicios }}" hint-placeholder-val="{{ false }}">
+            <div>
+              <div style="background:#fff;border:1px solid #E3E5EE;border-radius:14px;overflow:hidden">
+                <div
+                  style="display:flex;gap:14px;padding:18px;border-bottom:1px solid #EFF0F6;align-items:center;flex-wrap:wrap">
+                  <input value="{{ search.srv.value }}" onChange="{{ search.srv.onChange }}"
+                    placeholder="Buscar servicio por nombre..."
+                    style="flex:1;min-width:200px;padding:11px 14px;border:1px solid #D5D8E6;border-radius:9px;font-size:14px" />
+                  <select value="{{ filters.srv.value }}" onChange="{{ filters.srv.onChange }}"
+                    style="padding:11px 14px;border:1px solid #D5D8E6;border-radius:9px;font-size:14px;background:#fff;min-width:200px">
+                    <option value="Todas las categorías">Todas las categorías</option>
+                    <option value="Instalaciones">Instalaciones</option>
+                    <option value="Mantenimiento">Mantenimiento</option>
+                    <option value="Redes y Cableado">Redes y Cableado</option>
+                  </select>
+
+                </div>
+                <div
+                  style="display:grid;grid-template-columns:.5fr 1.5fr 1fr 1fr .8fr;padding:14px 18px;font-size:12px;font-weight:800;color:#8B90A3;text-transform:uppercase;letter-spacing:.06em;border-bottom:1px solid #EFF0F6"
+                  class="resp-table-row">
+                  <div>ID</div>
+                  <div>Servicio</div>
+                  <div>Categoría</div>
+                  <div>Precio base (RD$)</div>
+                  <div style="text-align:center">Estado</div>
+                </div>
+                <sc-for list="{{ servicios }}" as="s" hint-placeholder-count="5">
+                  <div
+                    style="display:grid;grid-template-columns:.5fr 1.5fr 1fr 1fr .8fr;padding:14px 18px;font-size:14px;border-bottom:1px solid #F4F5FB;align-items:center"
+                    class="resp-table-row">
+                    <div style="font-weight:700;color:#8B90A3">{{ s.servicioId }}</div>
+                    <div style="font-weight:700">{{ s.nombre }}</div>
+                    <div style="color:#6B7085">{{ s.categoria }}</div>
+                    <div>RD$ {{ s.precioStr }}</div>
+                    <div style="text-align:center"><span
+                        style="padding:5px 11px;border-radius:20px;font-size:12px;font-weight:800;background:#E4F6EA;color:#17803D">{{
+                        s.estado }}</span></div>
+                  </div>
+                </sc-for>
+              </div>
+            </div>
+          </sc-if>
+
+        </main>
+      </div>
+    </sc-if>
+
+    <sc-if value="{{ modalOpen }}" hint-placeholder-val="{{ false }}">
+      <div
+        style="position:fixed;inset:0;background:rgba(14,16,40,.45);display:flex;align-items:flex-start;justify-content:center;padding:48px 20px;overflow:auto;z-index:60">
+        <div
+          style="background:#fff;border-radius:16px;width:100%;max-width:{{ modal.width }};padding:26px 28px;animation:tin .18s ease-out">
+          <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:16px;margin-bottom:20px">
+            <div>
+              <div style="font-family:'Manrope';font-weight:800;font-size:22px">{{ modal.title }}</div>
+              <div style="color:#6B7085;font-size:13.5px;margin-top:4px">{{ modal.sub }}</div>
+            </div>
+            <button onClick="{{ closeModal }}"
+              style="width:32px;height:32px;border:1px solid #E3E5EE;background:#fff;border-radius:8px;cursor:pointer;color:#6B7085">✕</button>
+          </div>
+
+          <sc-if value="{{ isFormSolicitud }}" hint-placeholder-val="{{ false }}">
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px" class="resp-grid-2">
+              <div style="grid-column:span 2">
+                <label style="display:block;font-size:13px;font-weight:700;color:#4A4E63;margin-bottom:7px">Cliente
+                  *</label>
+                <select value="{{ fields.cliente.value }}" onChange="{{ fields.cliente.onChange }}"
+                  style="width:100%;padding:12px 13px;border:1px solid #D5D8E6;border-radius:9px;font-size:14.5px;background:#fff">
+                  <option value="">Seleccionar cliente...</option>
+                  <sc-for list="{{ clientesNombres }}" as="c" hint-placeholder-count="5">
+                    <option value="{{ c }}">{{ c }}</option>
+                  </sc-for>
+                  <option value="__nuevo">— El cliente no está registrado —</option>
+                </select>
+                <sc-if value="{{ fields.cliente.error }}" hint-placeholder-val="{{ false }}">
+                  <div style="color:#C4141B;font-size:12.5px;margin-top:6px;font-weight:700">{{ fields.cliente.error }}
+                  </div>
+                </sc-if>
+                <sc-if value="{{ clienteNoRegistrado }}" hint-placeholder-val="{{ false }}">
+                  <div
+                    style="margin-top:10px;background:#FFF3E0;border:1px solid #F3DDB6;border-radius:10px;padding:12px 14px;display:flex;align-items:center;gap:14px;flex-wrap:wrap">
+                    <div style="font-size:13.5px;color:#8A5300;font-weight:700;flex:1;min-width:200px">Este cliente no
+                      está registrado en el sistema. Debes registrarlo antes de crear la solicitud.</div>
+                    <button onClick="{{ irARegistroCliente }}"
+                      style="padding:9px 14px;border:0;background:#B26A00;color:#fff;border-radius:8px;font-size:13px;font-weight:700;cursor:pointer">Registrar
+                      cliente</button>
+                  </div>
+                </sc-if>
+              </div>
+              <div style="grid-column:span 2">
+                <label style="display:block;font-size:13px;font-weight:700;color:#4A4E63;margin-bottom:7px">Tipo de
+                  servicio *</label>
+                <select value="{{ fields.tipoServicio.value }}" onChange="{{ fields.tipoServicio.onChange }}"
+                  style="width:100%;padding:12px 13px;border:1px solid #D5D8E6;border-radius:9px;font-size:14.5px;background:#fff">
+                  <option value="">Seleccionar...</option>
+                  <sc-for list="{{ tipos }}" as="t" hint-placeholder-count="5">
+                    <option value="{{ t }}">{{ t }}</option>
+                  </sc-for>
+                </select>
+                <sc-if value="{{ fields.tipoServicio.error }}" hint-placeholder-val="{{ false }}">
+                  <div style="color:#C4141B;font-size:12.5px;margin-top:6px;font-weight:700">{{
+                    fields.tipoServicio.error }}</div>
+                </sc-if>
+              </div>
+              <div style="grid-column:span 2">
+                <label style="display:block;font-size:13px;font-weight:700;color:#4A4E63;margin-bottom:7px">Dirección
+                  *</label>
+                <input value="{{ fields.direccion.value }}" onChange="{{ fields.direccion.onChange }}"
+                  placeholder="Calle, número, sector, ciudad"
+                  style="width:100%;padding:12px 13px;border:1px solid #D5D8E6;border-radius:9px;font-size:14.5px" />
+                <sc-if value="{{ fields.direccion.error }}" hint-placeholder-val="{{ false }}">
+                  <div style="color:#C4141B;font-size:12.5px;margin-top:6px;font-weight:700">{{ fields.direccion.error
+                    }}</div>
+                </sc-if>
+              </div>
+              <div>
+                <label style="display:block;font-size:13px;font-weight:700;color:#4A4E63;margin-bottom:7px">Fecha del
+                  levantamiento</label>
+                <input type="date" value="{{ fields.fecha.value }}" onChange="{{ fields.fecha.onChange }}"
+                  style="width:100%;padding:12px 13px;border:1px solid #D5D8E6;border-radius:9px;font-size:14.5px" />
+                <sc-if value="{{ fields.fecha.error }}" hint-placeholder-val="{{ false }}">
+                  <div style="color:#C4141B;font-size:12.5px;margin-top:6px;font-weight:700">{{ fields.fecha.error }}
+                  </div>
+                </sc-if>
+              </div>
+              <div>
+                <label style="display:block;font-size:13px;font-weight:700;color:#4A4E63;margin-bottom:7px">Hora</label>
+                <input type="time" value="{{ fields.hora.value }}" onChange="{{ fields.hora.onChange }}"
+                  style="width:100%;padding:12px 13px;border:1px solid #D5D8E6;border-radius:9px;font-size:14.5px" />
+                <sc-if value="{{ fields.hora.error }}" hint-placeholder-val="{{ false }}">
+                  <div style="color:#C4141B;font-size:12.5px;margin-top:6px;font-weight:700">{{ fields.hora.error }}
+                  </div>
+                </sc-if>
+              </div>
+            </div>
+          </sc-if>
+
+          <sc-if value="{{ isFormCliente }}" hint-placeholder-val="{{ false }}">
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px" class="resp-grid-2">
+              <div style="grid-column:span 2">
+                <label style="display:block;font-size:13px;font-weight:700;color:#4A4E63;margin-bottom:7px">Nombre
+                  *</label>
+                <input value="{{ fields.nombre.value }}" onChange="{{ fields.nombre.onChange }}"
+                  placeholder="Nombre del cliente"
+                  style="width:100%;padding:12px 13px;border:1px solid #D5D8E6;border-radius:9px;font-size:14.5px" />
+                <sc-if value="{{ fields.nombre.error }}" hint-placeholder-val="{{ false }}">
+                  <div style="color:#C4141B;font-size:12.5px;margin-top:6px;font-weight:700">{{ fields.nombre.error }}
+                  </div>
+                </sc-if>
+              </div>
+              <div style="grid-column:span 2">
+                <label style="display:block;font-size:13px;font-weight:700;color:#4A4E63;margin-bottom:7px">Correo
+                  electrónico *</label>
+                <input type="email" value="{{ fields.correo.value }}" onChange="{{ fields.correo.onChange }}"
+                  placeholder="correo@ejemplo.com"
+                  style="width:100%;padding:12px 13px;border:1px solid #D5D8E6;border-radius:9px;font-size:14.5px" />
+                <sc-if value="{{ fields.correo.error }}" hint-placeholder-val="{{ false }}">
+                  <div style="color:#C4141B;font-size:12.5px;margin-top:6px;font-weight:700">{{ fields.correo.error }}
+                  </div>
+                </sc-if>
+              </div>
+              <div>
+                <label style="display:block;font-size:13px;font-weight:700;color:#4A4E63;margin-bottom:7px">Teléfono
+                  principal *</label>
+                <input value="{{ fields.telefono.value }}" onChange="{{ fields.telefono.onChange }}"
+                  placeholder="809-555-0134"
+                  style="width:100%;padding:12px 13px;border:1px solid #D5D8E6;border-radius:9px;font-size:14.5px" />
+                <sc-if value="{{ fields.telefono.error }}" hint-placeholder-val="{{ false }}">
+                  <div style="color:#C4141B;font-size:12.5px;margin-top:6px;font-weight:700">{{ fields.telefono.error }}
+                  </div>
+                </sc-if>
+              </div>
+              <div>
+                <label style="display:block;font-size:13px;font-weight:700;color:#4A4E63;margin-bottom:7px">Teléfono
+                  alternativo <span style="color:#8B90A3;font-weight:500">(opcional)</span></label>
+                <input value="{{ fields.telefono2.value }}" onChange="{{ fields.telefono2.onChange }}"
+                  placeholder="809-555-0135"
+                  style="width:100%;padding:12px 13px;border:1px solid #D5D8E6;border-radius:9px;font-size:14.5px" />
+              </div>
+              <div>
+                <label style="display:block;font-size:13px;font-weight:700;color:#4A4E63;margin-bottom:7px">RNC / Cédula
+                  *</label>
+                <input value="{{ fields.rnc.value }}" onChange="{{ fields.rnc.onChange }}"
+                  placeholder="Digita tu RNC o Cédula sin guiones"
+                  style="width:100%;padding:12px 13px;border:1px solid #D5D8E6;border-radius:9px;font-size:14.5px" />
+                <sc-if value="{{ fields.rnc.error }}" hint-placeholder-val="{{ false }}">
+                  <div style="color:#C4141B;font-size:12.5px;margin-top:6px;font-weight:700">{{ fields.rnc.error }}
+                  </div>
+                </sc-if>
+              </div>
+              <div>
+                <label style="display:block;font-size:13px;font-weight:700;color:#4A4E63;margin-bottom:7px">Dirección
+                  *</label>
+                <input value="{{ fields.direccion.value }}" onChange="{{ fields.direccion.onChange }}"
+                  placeholder="Calle, número, sector, ciudad"
+                  style="width:100%;padding:12px 13px;border:1px solid #D5D8E6;border-radius:9px;font-size:14.5px" />
+                <sc-if value="{{ fields.direccion.error }}" hint-placeholder-val="{{ false }}">
+                  <div style="color:#C4141B;font-size:12.5px;margin-top:6px;font-weight:700">{{ fields.direccion.error
+                    }}</div>
+                </sc-if>
+              </div>
+            </div>
+          </sc-if>
+
+          <sc-if value="{{ isFormAgenda }}" hint-placeholder-val="{{ false }}">
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px" class="resp-grid-2">
+              <div style="grid-column:span 2">
+                <label style="display:block;font-size:13px;font-weight:700;color:#4A4E63;margin-bottom:7px">Cliente
+                  *</label>
+                <select value="{{ fields.cliente.value }}" onChange="{{ fields.cliente.onChange }}"
+                  style="width:100%;padding:12px 13px;border:1px solid #D5D8E6;border-radius:9px;font-size:14.5px;background:#fff">
+                  <option value="">Seleccionar cliente...</option>
+                  <sc-for list="{{ clientesNombres }}" as="c" hint-placeholder-count="5">
+                    <option value="{{ c }}">{{ c }}</option>
+                  </sc-for>
+                </select>
+                <sc-if value="{{ fields.cliente.error }}" hint-placeholder-val="{{ false }}">
+                  <div style="color:#C4141B;font-size:12.5px;margin-top:6px;font-weight:700">{{ fields.cliente.error }}
+                  </div>
+                </sc-if>
+              </div>
+              <div>
+                <label style="display:block;font-size:13px;font-weight:700;color:#4A4E63;margin-bottom:7px">Tipo de
+                  servicio *</label>
+                <select value="{{ fields.tipoServicio.value }}" onChange="{{ fields.tipoServicio.onChange }}"
+                  style="width:100%;padding:12px 13px;border:1px solid #D5D8E6;border-radius:9px;font-size:14.5px;background:#fff">
+                  <option value="">Seleccionar...</option>
+                  <sc-for list="{{ tipos }}" as="t" hint-placeholder-count="5">
+                    <option value="{{ t }}">{{ t }}</option>
+                  </sc-for>
+                </select>
+                <sc-if value="{{ fields.tipoServicio.error }}" hint-placeholder-val="{{ false }}">
+                  <div style="color:#C4141B;font-size:12.5px;margin-top:6px;font-weight:700">{{
+                    fields.tipoServicio.error }}</div>
+                </sc-if>
+              </div>
+              <div>
+                <label style="display:block;font-size:13px;font-weight:700;color:#4A4E63;margin-bottom:7px">Dirección
+                  *</label>
+                <input value="{{ fields.direccion.value }}" onChange="{{ fields.direccion.onChange }}"
+                  style="width:100%;padding:12px 13px;border:1px solid #D5D8E6;border-radius:9px;font-size:14.5px" />
+                <sc-if value="{{ fields.direccion.error }}" hint-placeholder-val="{{ false }}">
+                  <div style="color:#C4141B;font-size:12.5px;margin-top:6px;font-weight:700">{{ fields.direccion.error
+                    }}</div>
+                </sc-if>
+              </div>
+              <div>
+                <label style="display:block;font-size:13px;font-weight:700;color:#4A4E63;margin-bottom:7px">Fecha
+                  *</label>
+                <input type="date" value="{{ fields.fecha.value }}" onChange="{{ fields.fecha.onChange }}"
+                  style="width:100%;padding:12px 13px;border:1px solid #D5D8E6;border-radius:9px;font-size:14.5px" />
+                <sc-if value="{{ fields.fecha.error }}" hint-placeholder-val="{{ false }}">
+                  <div style="color:#C4141B;font-size:12.5px;margin-top:6px;font-weight:700">{{ fields.fecha.error }}
+                  </div>
+                </sc-if>
+              </div>
+              <div>
+                <label style="display:block;font-size:13px;font-weight:700;color:#4A4E63;margin-bottom:7px">Hora
+                  *</label>
+                <input type="time" value="{{ fields.hora.value }}" onChange="{{ fields.hora.onChange }}"
+                  style="width:100%;padding:12px 13px;border:1px solid #D5D8E6;border-radius:9px;font-size:14.5px" />
+                <sc-if value="{{ fields.hora.error }}" hint-placeholder-val="{{ false }}">
+                  <div style="color:#C4141B;font-size:12.5px;margin-top:6px;font-weight:700">{{ fields.hora.error }}
+                  </div>
+                </sc-if>
+              </div>
+            </div>
+          </sc-if>
+
+          <sc-if value="{{ isFormUsuario }}" hint-placeholder-val="{{ false }}">
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px" class="resp-grid-2">
+              <div>
+                <label style="display:block;font-size:13px;font-weight:700;color:#4A4E63;margin-bottom:7px">Usuario
+                  *</label>
+                <input value="{{ fields.usuario.value }}" onChange="{{ fields.usuario.onChange }}"
+                  placeholder="ej. jperez"
+                  style="width:100%;padding:12px 13px;border:1px solid #D5D8E6;border-radius:9px;font-size:14.5px" />
+                <sc-if value="{{ fields.usuario.error }}" hint-placeholder-val="{{ false }}">
+                  <div style="color:#C4141B;font-size:12.5px;margin-top:6px;font-weight:700">{{ fields.usuario.error }}
+                  </div>
+                </sc-if>
+              </div>
+              <div>
+                <label style="display:block;font-size:13px;font-weight:700;color:#4A4E63;margin-bottom:7px">Contraseña
+                  *</label>
+                <div style="position:relative;display:flex;align-items:center">
+                  <input type="{{ pw.password.type }}" value="{{ fields.password.value }}"
+                    onChange="{{ fields.password.onChange }}" placeholder="Mínimo 4 caracteres"
+                    style="width:100%;padding:12px 44px 12px 13px;border:1px solid #D5D8E6;border-radius:9px;font-size:14.5px" />
+                  <button onClick="{{ pw.password.toggle }}" title="{{ pw.password.title }}"
+                    style="position:absolute;right:5px;width:32px;height:32px;border:0;background:none;cursor:pointer;display:flex;align-items:center;justify-content:center;border-radius:8px"
+                    style-hover="background:#EEF0F8">
+                    <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="#6B7085" stroke-width="1.7"
+                      stroke-linecap="round" stroke-linejoin="round">
+                      <path d="{{ pw.password.d }}"></path>
+                    </svg>
+                  </button>
+                </div>
+                <sc-if value="{{ fields.password.error }}" hint-placeholder-val="{{ false }}">
+                  <div style="color:#C4141B;font-size:12.5px;margin-top:6px;font-weight:700">{{ fields.password.error }}
+                  </div>
+                </sc-if>
+              </div>
+              <div>
+                <label style="display:block;font-size:13px;font-weight:700;color:#4A4E63;margin-bottom:7px">Confirmar
+                  contraseña *</label>
+                <div style="position:relative;display:flex;align-items:center">
+                  <input type="{{ pw.password2.type }}" value="{{ fields.password2.value }}"
+                    onChange="{{ fields.password2.onChange }}" placeholder="Repite la contraseña"
+                    style="width:100%;padding:12px 44px 12px 13px;border:1px solid #D5D8E6;border-radius:9px;font-size:14.5px" />
+                  <button onClick="{{ pw.password2.toggle }}" title="{{ pw.password2.title }}"
+                    style="position:absolute;right:5px;width:32px;height:32px;border:0;background:none;cursor:pointer;display:flex;align-items:center;justify-content:center;border-radius:8px"
+                    style-hover="background:#EEF0F8">
+                    <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="#6B7085" stroke-width="1.7"
+                      stroke-linecap="round" stroke-linejoin="round">
+                      <path d="{{ pw.password2.d }}"></path>
+                    </svg>
+                  </button>
+                </div>
+                <sc-if value="{{ fields.password2.error }}" hint-placeholder-val="{{ false }}">
+                  <div style="color:#C4141B;font-size:12.5px;margin-top:6px;font-weight:700">{{ fields.password2.error
+                    }}</div>
+                </sc-if>
+              </div>
+              <div>
+                <label style="display:block;font-size:13px;font-weight:700;color:#4A4E63;margin-bottom:7px">Nombre
+                  completo *</label>
+                <input value="{{ fields.nombre.value }}" onChange="{{ fields.nombre.onChange }}"
+                  style="width:100%;padding:12px 13px;border:1px solid #D5D8E6;border-radius:9px;font-size:14.5px" />
+                <sc-if value="{{ fields.nombre.error }}" hint-placeholder-val="{{ false }}">
+                  <div style="color:#C4141B;font-size:12.5px;margin-top:6px;font-weight:700">{{ fields.nombre.error }}
+                  </div>
+                </sc-if>
+              </div>
+              <div>
+                <label style="display:block;font-size:13px;font-weight:700;color:#4A4E63;margin-bottom:7px">Cargo
+                  *</label>
+                <input value="{{ fields.cargo.value }}" onChange="{{ fields.cargo.onChange }}" placeholder="ej. Técnico"
+                  style="width:100%;padding:12px 13px;border:1px solid #D5D8E6;border-radius:9px;font-size:14.5px" />
+                <sc-if value="{{ fields.cargo.error }}" hint-placeholder-val="{{ false }}">
+                  <div style="color:#C4141B;font-size:12.5px;margin-top:6px;font-weight:700">{{ fields.cargo.error }}
+                  </div>
+                </sc-if>
+              </div>
+              <div style="grid-column:span 2">
+                <label style="display:block;font-size:13px;font-weight:700;color:#4A4E63;margin-bottom:7px">Rol
+                  *</label>
+                <select value="{{ fields.rol.value }}" onChange="{{ fields.rol.onChange }}"
+                  style="width:100%;padding:12px 13px;border:1px solid #D5D8E6;border-radius:9px;font-size:14.5px;background:#fff">
+                  <option value="Empleado">Empleado</option>
+                  <option value="Administrador">Administrador</option>
+                </select>
+              </div>
+            </div>
+          </sc-if>
+
+          <sc-if value="{{ isFormServicio }}" hint-placeholder-val="{{ false }}">
+            <div style="display:grid;grid-template-columns:1fr;gap:16px">
+              <div>
+                <label style="display:block;font-size:13px;font-weight:700;color:#4A4E63;margin-bottom:7px">ID del
+                  Servicio *</label>
+                <input value="{{ fields.servicioId.value }}" onChange="{{ fields.servicioId.onChange }}"
+                  placeholder="ej. SV-006"
+                  style="width:100%;padding:12px 13px;border:1px solid #D5D8E6;border-radius:9px;font-size:14.5px" />
+                <sc-if value="{{ fields.servicioId.error }}" hint-placeholder-val="{{ false }}">
+                  <div style="color:#C4141B;font-size:12.5px;margin-top:6px;font-weight:700">{{ fields.servicioId.error
+                    }}</div>
+                </sc-if>
+              </div>
+              <div>
+                <label style="display:block;font-size:13px;font-weight:700;color:#4A4E63;margin-bottom:7px">Nombre del
+                  servicio *</label>
+                <input value="{{ fields.nombre.value }}" onChange="{{ fields.nombre.onChange }}"
+                  placeholder="ej. Instalación de Luces LED"
+                  style="width:100%;padding:12px 13px;border:1px solid #D5D8E6;border-radius:9px;font-size:14.5px" />
+                <sc-if value="{{ fields.nombre.error }}" hint-placeholder-val="{{ false }}">
+                  <div style="color:#C4141B;font-size:12.5px;margin-top:6px;font-weight:700">{{ fields.nombre.error }}
+                  </div>
+                </sc-if>
+              </div>
+              <div>
+                <label style="display:block;font-size:13px;font-weight:700;color:#4A4E63;margin-bottom:7px">Categoría
+                  *</label>
+                <select value="{{ fields.categoria.value }}" onChange="{{ fields.categoria.onChange }}"
+                  style="width:100%;padding:12px 13px;border:1px solid #D5D8E6;border-radius:9px;font-size:14.5px;background:#fff">
+                  <option value="">Seleccionar categoría...</option>
+                  <option value="Instalaciones">Instalaciones</option>
+                  <option value="Mantenimiento">Mantenimiento</option>
+                  <option value="Redes y Cableado">Redes y Cableado</option>
+                </select>
+                <sc-if value="{{ fields.categoria.error }}" hint-placeholder-val="{{ false }}">
+                  <div style="color:#C4141B;font-size:12.5px;margin-top:6px;font-weight:700">{{ fields.categoria.error
+                    }}</div>
+                </sc-if>
+              </div>
+              <div>
+                <label style="display:block;font-size:13px;font-weight:700;color:#4A4E63;margin-bottom:7px">Precio base
+                  (RD$) *</label>
+                <input type="number" value="{{ fields.precioBase.value }}" onChange="{{ fields.precioBase.onChange }}"
+                  placeholder="0.00"
+                  style="width:100%;padding:12px 13px;border:1px solid #D5D8E6;border-radius:9px;font-size:14.5px" />
+                <sc-if value="{{ fields.precioBase.error }}" hint-placeholder-val="{{ false }}">
+                  <div style="color:#C4141B;font-size:12.5px;margin-top:6px;font-weight:700">{{ fields.precioBase.error
+                    }}</div>
+                </sc-if>
+              </div>
+            </div>
+          </sc-if>
+
+          <sc-if value="{{ isDetalleModal }}" hint-placeholder-val="{{ false }}">
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px" class="resp-grid-2">
+              <sc-for list="{{ detalleCampos }}" as="d" hint-placeholder-count="6">
+                <div style="background:#F7F8FC;border:1px solid #EFF0F6;border-radius:10px;padding:12px 14px">
+                  <div
+                    style="font-size:11.5px;color:#8B90A3;font-weight:800;text-transform:uppercase;letter-spacing:.06em">
+                    {{ d.k }}</div>
+                  <div style="font-size:14.5px;margin-top:4px;font-weight:700">{{ d.v }}</div>
+                </div>
+              </sc-for>
+            </div>
+          </sc-if>
+
+          <div
+            style="display:flex;justify-content:flex-end;gap:11px;margin-top:24px;padding-top:18px;border-top:1px solid #EFF0F6">
+            <button onClick="{{ closeModal }}"
+              style="padding:12px 20px;border:1px solid #D5D8E6;background:#fff;border-radius:9px;font-weight:700;font-size:14px;cursor:pointer">{{
+              modal.closeLabel }}</button>
+            <sc-if value="{{ modal.save }}" hint-placeholder-val="{{ false }}">
+              <button onClick="{{ modal.save }}"
+                style="padding:12px 22px;border:0;background:#1D4ED8;color:#fff;border-radius:9px;font-weight:700;font-size:14px;cursor:pointer;font-family:'Manrope'"
+                style-hover="background:#1E40AF">{{ modal.saveLabel }}</button>
+            </sc-if>
+          </div>
+        </div>
+      </div>
+    </sc-if>
+
+    <sc-if value="{{ confirm }}" hint-placeholder-val="{{ false }}">
+      <div
+        style="position:fixed;inset:0;background:rgba(14,16,40,.5);display:flex;align-items:center;justify-content:center;padding:20px;z-index:80">
+        <div
+          style="background:#fff;border-radius:16px;max-width:420px;width:100%;padding:26px;animation:tin .18s ease-out">
+          <div style="font-family:'Manrope';font-weight:800;font-size:20px">{{ confirm.title }}</div>
+          <div style="color:#4A4E63;font-size:14.5px;margin-top:10px;line-height:1.55">{{ confirm.msg }}</div>
+          <div style="display:flex;justify-content:flex-end;gap:11px;margin-top:22px">
+            <button onClick="{{ closeConfirm }}"
+              style="padding:11px 18px;border:1px solid #D5D8E6;background:#fff;border-radius:9px;font-weight:700;font-size:14px;cursor:pointer">Cancelar</button>
+            <button onClick="{{ confirm.ok }}"
+              style="padding:11px 20px;border:0;background:{{ confirm.color }};color:#fff;border-radius:9px;font-weight:700;font-size:14px;cursor:pointer;font-family:'Manrope'">{{
+              confirm.okLabel }}</button>
+          </div>
+        </div>
+      </div>
+    </sc-if>
+
+    <div
+      style="position:fixed;right:22px;bottom:22px;display:flex;flex-direction:column;gap:10px;z-index:99;align-items:flex-end">
+      <sc-for list="{{ toasts }}" as="t" hint-placeholder-count="0">
+        <div
+          style="background:#fff;border:1px solid #E3E5EE;border-left:4px solid {{ t.line }};border-radius:11px;padding:13px 17px;box-shadow:0 12px 28px rgba(20,22,43,.14);font-size:14px;font-weight:700;max-width:340px;animation:tin .2s ease-out">
+          {{ t.msg }}</div>
+      </sc-for>
+    </div>
+
+  </x-dc>
+  <script type="text/x-dc" data-dc-script
+    data-props="{&quot;$preview&quot;:{&quot;width&quot;:1440,&quot;height&quot;:900},&quot;mostrarAccesosRapidos&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:true,&quot;tsType&quot;:&quot;boolean&quot;,&quot;section&quot;:&quot;Inicio&quot;},&quot;requiereFechaYHora&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:true,&quot;tsType&quot;:&quot;boolean&quot;,&quot;section&quot;:&quot;Levantamientos&quot;}}">
+const TIPOS = ['Instalación Solar','Instalación de Sistema UPS','Mantenimiento Eléctrico','Instalación de Planta Eléctrica','Cableado Estructurado'];
+const BADGE = {
+  'Pendiente':['#FFF3E0','#B26A00'],
+  'En proceso':['#E7EBFF','#1D4ED8'],
+  'Finalizada':['#E4F6EA','#17803D'],
+  'Cancelada':['#FDE9EA','#C4141B'],
+  'En Espera Administración':['#EDE9FE','#5B21B6'],
+  'Gerente':['#EDEBFF','#1D4ED8'],
+  'Técnico':['#FFF3E0','#B26A00']
+};
+const ICON = {
+  inicio: { d1: 'M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z', d2: 'M9 22V12h6v10' },
+  solicitudes: { d1: 'M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z M14 2v6h6', d2: 'M9 9a2 2 0 1 1 4 0 2 2 0 0 1-4 0 M8 13h8 M8 17h8' },
+  agenda: { d1: 'M19 4H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6a2 2 0 0 0-2-2z M3 10h18', d2: 'M16 2v4 M8 2v4 M8 14h2 M14 14h2 M8 18h2 M14 18h2' },
+  levantamientos: { d1: 'M12 21a9 9 0 1 0 0-18 9 9 0 0 0 0 18z M12 21v2', d2: 'M9.5 14.5l2-5 4-1-2 5z' },
+  ordenes: { d1: 'M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2 M15 2H9a1 1 0 0 0-1 1v2a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1V3a1 1 0 0 0-1-1z', d2: 'M11 11h5 M11 15h5 M11 19h5 M7 11l1.5 1.5 2-2 M7 15l1.5 1.5 2-2 M7 19l1.5 1.5 2-2' },
+  clientes: { d1: 'M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2 M7.5 7a4 4 0 1 1 8 0 4 4 0 0 1-8 0', d2: 'M22 21v-2a4 4 0 0 0-3-3.87 M15 3.13a4 4 0 0 1 0 7.75' },
+  historial: { d1: 'M12 20.5a8.5 8.5 0 1 0 0-17 8.5 8.5 0 0 0 0 17', d2: 'M12 7.6V12l3.4 2.1' },
+  usuarios: { d1: 'M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2 M7.5 7a4 4 0 1 1 8 0 4 4 0 0 1-8 0', d2: 'M11.5 11.6a3.7 3.7 0 1 0 0-7.4 3.7 3.7 0 0 0 0 7.4' },
+  cotizaciones: { d1: 'M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z', d2: 'M14 2v6h6 M8 10h8 M8 14h8 M8 18h5' },
+  cobros: { d1: 'M12 21a9 9 0 1 0 0-18 9 9 0 0 0 0 18', d2: 'M12 7v10 M8.5 13.5h7' },
+  inventario: { d1: 'M6 4h12a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2z M9 4v4h6V4', d2: 'M15 15h5v5h-5z M16 15v-2h3v2' },
+  proveedores: { d1: 'M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2 M7.5 7a4 4 0 1 1 8 0 4 4 0 0 1-8 0 M22 21v-2a4 4 0 0 0-3-3.87', d2: 'M16 16a4 4 0 1 1 8 0 4 4 0 0 1-8 0 M20 14.5a1.5 1.5 0 0 0-3 0v.5l1.5.5v1 M20 18h0' },
+  reportes: { d1: 'M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z M14 2v6h6', d2: 'M8 18v-4 M12 18v-8 M16 18v-6 M7 12l4-4 3 3 4-4' },
+  servicios: { d1: 'M12 3.5L3.5 8v12.5h17V8z M12 3.5v5', d2: 'M9 14.5h6 M9 17.5h6' }
+};
+const EYE = 'M2.6 12S6.2 6 12 6s9.4 6 9.4 6-3.6 6-9.4 6S2.6 12 2.6 12Z M12 15a3 3 0 1 0 0-6 3 3 0 0 0 0 6';
+const EYE_OFF = EYE + ' M4 20 20 4';
+const FIELDS = ['usuario','password','password2','nombre','rol','cargo','cliente','contacto','correo','telefono','telefono2','rnc','direccion','tipoServicio','fecha','hora','espacios','cargas','tension','tuberias','cableado','observaciones','fotos','servicioId','categoria','precioBase'];
+
+const ICON_SERV = {
+  'Instalación Solar': { d1: 'M12 4V2m0 20v-2m8-8h2M2 12h2m13.657-5.657l1.414-1.414M4.93 19.07l1.414-1.414m12.728 0l-1.414-1.414M4.93 4.93l1.414 1.414', d2: 'M12 16a4 4 0 100-8 4 4 0 000 8z' },
+  'Instalación de Sistema UPS': { d1: 'M16 4h-8a2 2 0 00-2 2v12a2 2 0 002 2h8a2 2 0 002-2V6a2 2 0 00-2-2z', d2: 'M12 10v4l-2 2' },
+  'Instalación de Planta Eléctrica': { d1: 'M4 8h16v10a2 2 0 01-2 2H6a2 2 0 01-2-2V8z', d2: 'M12 12a3 3 0 100 6 3 3 0 000-6z M12 4v4 M8 4h8' },
+  'Mantenimiento Eléctrico': { d1: 'M12 11V7l-5 6h4v4l5-6h-4z', d2: 'M12 21a9 9 0 1 0 0-18 9 9 0 0 0 0 18z' },
+  'Cableado Estructurado': { d1: 'M4 8h16v8H4z', d2: 'M8 8v-4 M16 8v-4 M12 16v4' }
+};
+
+function iso(d){ return d.toISOString().slice(0,10); }
+function fmt(s){ if(!s) return '—'; const p=s.split('-'); return p[2]+'/'+p[1]+'/'+p[0]; }
+function fmtLargo(s){
+  const M=['enero','febrero','marzo','abril','mayo','junio','julio','agosto','septiembre','octubre','noviembre','diciembre'];
+  const p=s.split('-'); return Number(p[2])+' de '+M[Number(p[1])-1]+' de '+p[0];
+}
+function h12(t){ if(!t) return '—'; let [h,m]=t.split(':').map(Number); const ap=h>=12?'PM':'AM'; let hh=h%12; if(hh===0)hh=12; return String(hh).padStart(2,'0')+':'+String(m).padStart(2,'0')+' '+ap; }
+function addMin(t,min){ let [h,m]=t.split(':').map(Number); m+=min; h+=Math.floor(m/60); m=m%60; return String(h%24).padStart(2,'0')+':'+String(m).padStart(2,'0'); }
+function esFecha(s){ return /^\d{4}-\d{2}-\d{2}$/.test(s||''); }
+function esTel(s){ return /^[0-9()+\-\s]{7,}$/.test((s||'').trim()); }
+
+class Component extends DCLogic {
+  constructor(props){
+    super(props);
+    const hoy = new Date();
+    const d = (off)=>{ const x=new Date(hoy); x.setDate(x.getDate()+off); return iso(x); };
+    this.state = {
+      sidebarCollapsed: window.innerWidth <= 768, session:null, screen:'inicio', form:{}, errors:{}, loginError:'', modal:null, confirm:null, toasts:[],
+      qSol:'', fSol:'Todos los estados', qCli:'', qHist:'', fHist:'Todas las fechas', qLev:'', fLev:'Pendiente',
+      qOrd:'', fOrd:'Todos los estados', vAgenda:'Hoy',
+      selEvento:null, levEdit:null, showPw:{},
+      usuarios:[
+        {id:1,usuario:'gerente',password:'gerente',nombre:'Ana Hernández',cargo:'Gerente',rol:'Gerente'},
+        {id:2,usuario:'tecnico',password:'tecnico',nombre:'Luis Peña',cargo:'Técnico',rol:'Técnico'}
+      ],
+      clientes:[
+        {id:1,nombre:'Melody Santos',correo:'melody@email.com',telefono:'809-000-0000',telefono2:'829-111-2222',rnc:'402-1234567-1',direccion:'Calle Duarte #24, Santiago',servicios:8,ultimo:'Instalación de Sistema UPS'},
+        {id:2,nombre:'Constructora López',correo:'info@clopez.com',telefono:'809-555-1212',telefono2:'',rnc:'101-987654-2',direccion:'Av. Estrella Sadhalá #102, Santiago',servicios:5,ultimo:'Instalación Solar'},
+        {id:3,nombre:'Farmacia El Sol',correo:'farmacia@elsol.do',telefono:'829-441-8890',telefono2:'',rnc:'130-334455-3',direccion:'Calle 16 #7, La Vega',servicios:6,ultimo:'Mantenimiento Eléctrico'},
+        {id:4,nombre:'Colmado Hernández',correo:'hernandez@colmado.com',telefono:'849-220-3311',telefono2:'',rnc:'402-667788-4',direccion:'Calle Principal #58, Moca',servicios:3,ultimo:'Cableado Estructurado'},
+        {id:5,nombre:'Taller Mecánico RD',correo:'taller@mecanicord.com',telefono:'809-778-4402',telefono2:'809-999-0000',rnc:'130-112233-5',direccion:'Carretera Luperón km 5, Santiago',servicios:1,ultimo:'Instalación de Planta Eléctrica'}
+      ],
+      solicitudes:[
+        {id:1,cliente:'Melody Santos',contacto:'809-000-0000',direccion:'Calle Duarte #24, Santiago',tipoServicio:'Instalación de Sistema UPS',fechaSolicitud:d(-6),fecha:d(0),hora:'09:00',estado:'En proceso'},
+        {id:2,cliente:'Constructora López',contacto:'809-555-1212',direccion:'Av. Estrella Sadhalá #102, Santiago',tipoServicio:'Instalación Solar',fechaSolicitud:d(-5),fecha:d(0),hora:'14:00',estado:'Pendiente'},
+        {id:3,cliente:'Farmacia El Sol',contacto:'829-441-8890',direccion:'Calle 16 #7, La Vega',tipoServicio:'Mantenimiento Eléctrico',fechaSolicitud:d(-4),fecha:d(1),hora:'10:30',estado:'Pendiente'},
+        {id:4,cliente:'Colmado Hernández',contacto:'849-220-3311',direccion:'Calle Principal #58, Moca',tipoServicio:'Cableado Estructurado',fechaSolicitud:d(-3),fecha:d(2),hora:'08:00',estado:'Pendiente'},
+        {id:5,cliente:'Taller Mecánico RD',contacto:'809-778-4402',direccion:'Carretera Luperón km 5, Santiago',tipoServicio:'Instalación de Planta Eléctrica',fechaSolicitud:d(-2),fecha:'',hora:'',estado:'Pendiente'},
+        {id:6,cliente:'Melody Santos',contacto:'809-000-0000',direccion:'Calle Duarte #24, Santiago',tipoServicio:'Mantenimiento Eléctrico',fechaSolicitud:d(-12),fecha:d(-9),hora:'11:00',estado:'Finalizada',fechaFin:d(-8)},
+        {id:7,cliente:'Farmacia El Sol',contacto:'829-441-8890',direccion:'Calle 16 #7, La Vega',tipoServicio:'Cableado Estructurado',fechaSolicitud:d(-20),fecha:d(-18),hora:'09:00',estado:'Finalizada',fechaFin:d(-17)},
+        {id:8,cliente:'Colmado Hernández',contacto:'849-220-3311',direccion:'Calle Principal #58, Moca',tipoServicio:'Instalación Solar',fechaSolicitud:d(-30),fecha:d(-28),hora:'15:00',estado:'Cancelada'}
+      ],
+      levs:[
+        {id:1,solicitudId:2,estado:'Pendiente',datos:{},borrador:false},
+        {id:2,solicitudId:3,estado:'Pendiente',datos:{},borrador:false},
+        {id:3,solicitudId:4,estado:'Pendiente',datos:{},borrador:false},
+        {id:4,solicitudId:1,estado:'En Espera Administración',datos:{},borrador:false}
+      ],
+      ordenes:[
+        {id:1,code:'OT-0001',cliente:'Melody Santos',tipoServicio:'Instalación de Sistema UPS',estado:'En proceso',
+         trabajos:['Montaje del gabinete UPS en sala técnica','Conexión de banco de baterías y puesta a tierra','Pruebas de transferencia y respaldo (30 min)'],
+         materiales:['UPS 6 kVA','Baterías 12V x8','Cable THHN #6','Breaker 60A','Canaleta metálica','Multímetro'],
+         observaciones:'Coordinar con el cliente el corte de energía entre 9:00 y 11:00 AM. Requiere dos técnicos.'},
+        {id:2,code:'OT-0002',cliente:'Constructora López',tipoServicio:'Instalación Solar',estado:'En proceso',
+         trabajos:['Instalación de estructura en techo (12 paneles)','Tendido de tubería y cableado DC','Configuración de inversor y monitoreo'],
+         materiales:['Paneles 550W x12','Inversor híbrido 6kW','Riel de aluminio','Tubería EMT 3/4','Cable solar #10','Herramienta de crimpado'],
+         observaciones:'Verificar disponibilidad de andamio en obra. Entregar informe fotográfico al finalizar.'}
+      ],
+      servicios:[
+        {id:1, servicioId:'SV-001', nombre:'Instalación de Paneles Solares', categoria:'Instalaciones', precioBase:85000, estado:'Activo'},
+        {id:2, servicioId:'SV-002', nombre:'Instalación de Sistema UPS', categoria:'Instalaciones', precioBase:45000, estado:'Activo'},
+        {id:3, servicioId:'SV-003', nombre:'Mantenimiento Eléctrico', categoria:'Mantenimiento', precioBase:12500, estado:'Activo'},
+        {id:4, servicioId:'SV-004', nombre:'Cableado Estructurado', categoria:'Redes y Cableado', precioBase:28000, estado:'Activo'},
+        {id:5, servicioId:'SV-005', nombre:'Instalación de Planta Eléctrica', categoria:'Instalaciones', precioBase:120000, estado:'Activo'}
+      ]
+    };
+  }
+
+  toast(msg,tone){
+    const line = tone==='error' ? '#E11B22' : tone==='warn' ? '#B26A00' : '#1D4ED8';
+    const t = {id:Date.now()+Math.random(), msg, line};
+    this.setState(s=>({toasts:[...s.toasts,t]}));
+    setTimeout(()=>this.setState(s=>({toasts:s.toasts.filter(x=>x.id!==t.id)})),3600);
+  }
+  go(screen){ if(window.innerWidth <= 768){ this.setState({screen, modal:null, errors:{}, sidebarCollapsed:true}); } else { this.setState({screen, modal:null, errors:{}}); } }
+  setForm(k,v){ this.setState(s=>({form:{...s.form,[k]:v}, errors:{...s.errors,[k]:''}})); }
+  openModal(m,form){ this.setState({modal:m, form:form||{}, errors:{}}); }
+  esGerente(){ return this.state.session && this.state.session.rol==='Gerente'; }
+  mapa(dir){ window.open('https://www.google.com/maps/search/?api=1&query='+encodeURIComponent(dir||''),'_blank'); }
+  visibles(){ const req = this.props.requiereFechaYHora !== false; return this.state.solicitudes.filter(s=> req ? (esFecha(s.fecha) && !!s.hora) : true); }
+
+  loginTecnico(){
+    const u=this.state.usuarios.find(x=>x.rol==='Técnico');
+    this.setState({session:u, screen:'solicitudes', form:{}, errors:{}, loginError:''});
+    this.toast('Bienvenido, '+u.nombre.split(' ')[0]+'.');
+  }
+  loginGerente(){
+    const u=this.state.usuarios.find(x=>x.rol==='Gerente');
+    this.setState({session:u, screen:'solicitudes', form:{}, errors:{}, loginError:''});
+    this.toast('Bienvenido, '+u.nombre.split(' ')[0]+'.');
+  }
+
+  guardarSolicitud(){
+    const f=this.state.form, e={};
+    if(!f.cliente || f.cliente==='__nuevo') e.cliente='Selecciona un cliente registrado.';
+    if(!f.tipoServicio) e.tipoServicio='Selecciona el tipo de servicio.';
+    if(!(f.direccion||'').trim()) e.direccion='La dirección es obligatoria.';
+    if(f.fecha && !esFecha(f.fecha)) e.fecha='Fecha inválida.';
+    if(f.hora && !f.fecha) e.fecha='Indica la fecha si defines una hora.';
+    if(Object.keys(e).length){ this.setState({errors:e}); this.toast('Revisa los campos marcados.','error'); return; }
+    this.setState(s=>{
+      let sols, levs=s.levs;
+      if(f.id){
+        sols = s.solicitudes.map(x=> x.id===f.id ? {...x, cliente:f.cliente, direccion:f.direccion, tipoServicio:f.tipoServicio, fecha:f.fecha||'', hora:f.hora||''} : x);
+      } else {
+        const id = Math.max(0,...s.solicitudes.map(x=>x.id))+1;
+        sols = [...s.solicitudes, {id, cliente:f.cliente, direccion:f.direccion, tipoServicio:f.tipoServicio, fechaSolicitud:iso(new Date()), fecha:f.fecha||'', hora:f.hora||'', estado:'Pendiente'}];
+      }
+      const target = f.id || Math.max(0,...sols.map(x=>x.id));
+      const sol = sols.find(x=>x.id===target);
+      if(sol && esFecha(sol.fecha) && sol.hora && !levs.some(l=>l.solicitudId===sol.id)){
+        levs = [...levs, {id:Math.max(0,...levs.map(l=>l.id))+1, solicitudId:sol.id, estado:'Pendiente', datos:{}, borrador:false}];
+      }
+      return {solicitudes:sols, levs, modal:null, form:{}, errors:{}};
+    });
+    this.toast(f.id ? 'Solicitud actualizada correctamente.' : 'Solicitud registrada con estado Pendiente.');
+  }
+
+  guardarCliente(){
+    const f=this.state.form, e={};
+    if(!(f.nombre||'').trim()) e.nombre='El nombre es obligatorio.';
+    else if(!f.id && this.state.clientes.some(c=>c.nombre.toLowerCase()===f.nombre.trim().toLowerCase())) e.nombre='Ya existe un cliente con ese nombre.';
+    if(!(f.correo||'').trim()) e.correo='El correo es obligatorio.';
+    if(!esTel(f.telefono)) e.telefono='El teléfono principal es obligatorio.';
+    if(!(f.rnc||'').trim()) e.rnc='El RNC/Cédula es obligatorio.';
+    if(!(f.direccion||'').trim()) e.direccion='La dirección es obligatoria.';
+    if(Object.keys(e).length){ this.setState({errors:e}); this.toast('Revisa los campos marcados.','error'); return; }
+    this.setState(s=>({
+      clientes: f.id ? s.clientes.map(c=>c.id===f.id?{...c,nombre:f.nombre,correo:f.correo,telefono:f.telefono,telefono2:f.telefono2||'',rnc:f.rnc,direccion:f.direccion}:c)
+                     : [...s.clientes,{id:Math.max(0,...s.clientes.map(c=>c.id))+1,nombre:f.nombre.trim(),correo:f.correo,telefono:f.telefono,telefono2:f.telefono2||'',rnc:f.rnc,direccion:f.direccion,servicios:0,ultimo:'—'}],
+      modal:null, form:{}, errors:{}
+    }));
+    this.toast(f.id?'Cliente actualizado correctamente.':'Cliente registrado correctamente.');
+  }
+
+  guardarAgenda(){
+    const f=this.state.form, e={};
+    if(!f.cliente) e.cliente='Selecciona un cliente.';
+    if(!f.tipoServicio) e.tipoServicio='Selecciona el tipo de servicio.';
+    if(!(f.direccion||'').trim()) e.direccion='La dirección es obligatoria.';
+    if(!esFecha(f.fecha)) e.fecha='La fecha es obligatoria.';
+    if(!f.hora) e.hora='La hora es obligatoria.';
+    if(Object.keys(e).length){ this.setState({errors:e}); this.toast('Revisa los campos marcados.','error'); return; }
+    this.setState(s=>{
+      let sols, levs=s.levs, id=f.id;
+      if(f.id){ sols=s.solicitudes.map(x=>x.id===f.id?{...x,cliente:f.cliente,tipoServicio:f.tipoServicio,direccion:f.direccion,fecha:f.fecha,hora:f.hora}:x); }
+      else { id=Math.max(0,...s.solicitudes.map(x=>x.id))+1;
+        const c=s.clientes.find(c=>c.nombre===f.cliente);
+        sols=[...s.solicitudes,{id,cliente:f.cliente,contacto:c?c.contacto:'',direccion:f.direccion,tipoServicio:f.tipoServicio,fechaSolicitud:iso(new Date()),fecha:f.fecha,hora:f.hora,estado:'Pendiente'}];
+      }
+      if(!levs.some(l=>l.solicitudId===id)) levs=[...levs,{id:Math.max(0,...levs.map(l=>l.id))+1,solicitudId:id,estado:'Pendiente',datos:{},borrador:false}];
+      return {solicitudes:sols, levs, modal:null, form:{}, errors:{}};
+    });
+    this.toast(f.id?'Visita actualizada en la agenda.':'Visita agendada correctamente.');
+  }
+
+  nuevoServicio(){
+    this.setState({modal:'nuevoServicio', form:{}, errors:{}});
+  }
+
+  guardarServicio(){
+    const f=this.state.form, e={};
+    if(!(f.servicioId||'').trim()) e.servicioId='El ID es obligatorio.';
+    if(!(f.nombre||'').trim()) e.nombre='El nombre es obligatorio.';
+    if(!(f.categoria||'').trim()) e.categoria='La categoría es obligatoria.';
+    if(!(f.precioBase||'').trim()) e.precioBase='El precio base es obligatorio.';
+    
+    if(Object.keys(e).length){ this.setState({errors:e}); this.toast('Revisa los campos marcados.','error'); return; }
+    
+    this.setState(s=>({
+      servicios: [...s.servicios, {
+        id: Math.max(0, ...s.servicios.map(x=>x.id))+1,
+        servicioId: f.servicioId,
+        nombre: f.nombre,
+        categoria: f.categoria,
+        precioBase: Number(f.precioBase),
+        estado: 'Activo'
+      }],
+      modal:null, form:{}, errors:{}
+    }));
+    this.toast('Servicio registrado correctamente.');
+  }
+
+  guardarUsuario(){
+    const f=this.state.form, e={};
+    const u=(f.usuario||'').trim().toLowerCase();
+    if(!u) e.usuario='El usuario es obligatorio.';
+    else if(!/^[a-z0-9._]{3,}$/.test(u)) e.usuario='Mín. 3 caracteres: letras, números, punto o guion bajo.';
+    else if(this.state.usuarios.some(x=>x.usuario===u && x.id!==f.id)) e.usuario='Ese nombre de usuario ya existe.';
+    if(!(f.password||'') || f.password.length<4) e.password='La contraseña debe tener al menos 4 caracteres.';
+    if(!(f.password2||'')) e.password2='Confirma la contraseña.';
+    else if(f.password2!==f.password) e.password2='Las contraseñas no coinciden.';
+    if(!(f.nombre||'').trim()) e.nombre='El nombre es obligatorio.';
+    if(!(f.cargo||'').trim()) e.cargo='El cargo es obligatorio.';
+    if(Object.keys(e).length){ this.setState({errors:e}); this.toast('Revisa los campos marcados.','error'); return; }
+    this.setState(s=>({
+      usuarios: f.id ? s.usuarios.map(x=>x.id===f.id?{...x,usuario:u,password:f.password,nombre:f.nombre,cargo:f.cargo,rol:f.rol||'Empleado'}:x)
+                     : [...s.usuarios,{id:Math.max(0,...s.usuarios.map(x=>x.id))+1,usuario:u,password:f.password,nombre:f.nombre.trim(),cargo:f.cargo.trim(),rol:f.rol||'Empleado'}],
+      modal:null, form:{}, errors:{}
+    }));
+    this.toast(f.id?'Usuario modificado correctamente.':'Usuario creado correctamente.');
+  }
+
+  abrirLev(lev, sol){
+    const d=lev.datos||{};
+    this.setState({screen:'levSolicitud', levEdit:lev.id, origen:sol, errors:{}, form:{
+      cliente:d.cliente||sol.cliente, contacto:d.contacto||sol.contacto, tipoServicio:d.tipoServicio||sol.tipoServicio,
+      espacios:d.espacios||'', cargas:d.cargas||'', tension:d.tension||'', tuberias:d.tuberias||'', cableado:d.cableado||'',
+      observaciones:d.observaciones||'', fotos:d.fotos||[]
+    }});
+  }
+  nuevoLevManual(){ this.setState({screen:'nuevoLev', levEdit:null, origen:null, form:{fotos:[]}, errors:{}}); }
+
+  validarLev(){
+    const f=this.state.form, e={};
+    if(!f.cliente) e.cliente='Selecciona el cliente.';
+    if(!esTel(f.contacto)) e.contacto='Ingresa un contacto válido.';
+    if(!f.tipoServicio) e.tipoServicio='Selecciona el tipo de servicio.';
+    ['espacios','cargas','tension','tuberias','cableado'].forEach(k=>{ if(!(f[k]||'').trim()) e[k]='Este campo es obligatorio.'; });
+    if(!(f.fotos||[]).length) e.fotos='Agrega al menos una fotografía del levantamiento.';
+    return e;
+  }
+
+  persistLev(estado, msg){
+    const f=this.state.form;
+    this.setState(s=>{
+      let levs=s.levs, sols=s.solicitudes, id=s.levEdit;
+      const datos={...f, fechaLevantamiento: estado==='Pendiente' ? (f.fechaLevantamiento||'') : iso(new Date())};
+      if(id){ levs=levs.map(l=>l.id===id?{...l,estado,datos,borrador:estado==='Pendiente'}:l); }
+      else {
+        const cli=s.clientes.find(c=>c.nombre===f.cliente);
+        const sid=Math.max(0,...sols.map(x=>x.id))+1;
+        sols=[...sols,{id:sid,cliente:f.cliente,contacto:f.contacto,direccion:cli?cli.direccion:'',tipoServicio:f.tipoServicio,fechaSolicitud:iso(new Date()),fecha:iso(new Date()),hora:'09:00',estado:'Pendiente'}];
+        levs=[...levs,{id:Math.max(0,...levs.map(l=>l.id))+1,solicitudId:sid,estado,datos,borrador:estado==='Pendiente'}];
+        id=null;
+      }
+      const lev=levs.find(l=>l.estado===estado&&l.datos===datos);
+      if(estado==='En Espera Administración'&&lev) sols=sols.map(x=>x.id===lev.solicitudId?{...x,estado:'En proceso'}:x);
+      return {levs, solicitudes:sols, screen:'levantamientos', fLev:estado, form:{}, errors:{}, levEdit:null};
+    });
+    this.toast(msg);
+  }
+
+  render_(){}
+
+  renderVals(){
+    const s=this.state, self=this;
+    const F=(n)=>({value:s.form[n]??'', onChange:e=>self.setForm(n,e.target.value), error:s.errors[n]||''});
+    const fields={}; FIELDS.forEach(n=>fields[n]=F(n));
+    const PW=(n)=>{ const on=!!s.showPw[n]; return {type:on?'text':'password', d:on?EYE_OFF:EYE, title:on?'Ocultar contraseña':'Mostrar contraseña',
+      toggle:()=>self.setState(st=>({showPw:{...st.showPw,[n]:!st.showPw[n]}}))}; };
+    const badge=(k)=>({bg:(BADGE[k]||['#EEF0F8','#4A4E63'])[0], fg:(BADGE[k]||['#EEF0F8','#4A4E63'])[1]});
+    const hoy=iso(new Date());
+    const out={
+      sidebarCollapsed: !!s.sidebarCollapsed, toggleSidebar: () => self.setState({ sidebarCollapsed: !s.sidebarCollapsed }),
+      loggedIn:!!s.session, loggedOut:!s.session, fields, tipos:TIPOS, toasts:s.toasts,
+      pw:{password:PW('password'), password2:PW('password2')},
+      loginError:s.loginError, loginTecnico:()=>self.loginTecnico(), loginGerente:()=>self.loginGerente(),
+      clientesNombres:s.clientes.map(c=>c.nombre),
+      estadosSolFiltro:['Todos los estados','Pendiente','En proceso','Finalizada','Cancelada'],
+      estadosLev:['Pendiente','En Espera Administración'],
+      filtrosFecha:['Todas las fechas','Últimos 7 días','Últimos 30 días'],
+      hoyLargo:fmtLargo(hoy),
+      horas:['08:00 AM','09:00 AM','10:00 AM','11:00 AM','12:00 PM','01:00 PM','02:00 PM','03:00 PM','04:00 PM','05:00 PM'],
+      goHistorial:()=>self.go('historial'),
+      goInicio:()=>self.go('inicio'),
+      goListaReportesConsumo:()=>self.go('listaReportesConsumo'),
+      goReporteConsumo:()=>self.go('reporteConsumo'),
+      reportesConfig:{
+        anio: { value: s.reporteAnio || 'Año 2025', onChange: (e) => self.setState({reporteAnio: e.target.value}) },
+        categoria: { value: s.reporteCategoria || 'Todos los Servicios', onChange: (e) => self.setState({reporteCategoria: e.target.value}) },
+        anios: ['Año 2025', 'Año 2024', 'Año 2023', 'Año 2022', 'Año 2021'],
+        categorias: ['Todos los Servicios', ...TIPOS]
+      },
+      closeModal:()=>self.setState({modal:null,form:{},errors:{}}),
+      closeConfirm:()=>self.setState({confirm:null}),
+      askLogout:()=>self.setState({confirm:{title:'Cerrar sesión',msg:'¿Deseas cerrar la sesión actual? Los cambios guardados se mantienen.',okLabel:'Cerrar sesión',color:'#C4141B',ok:()=>{self.setState({session:null,confirm:null,screen:'inicio',form:{},errors:{},modal:null}); self.toast('Sesión cerrada correctamente.');}}}),
+      showAccesos:this.props.mostrarAccesosRapidos!==false
+    };
+    if(!s.session) return out;
+
+    const esGerente=self.esGerente();
+    out.user={nombre:s.session.nombre, cargo:s.session.cargo, inicial:s.session.nombre.slice(0,1)};
+    let nav;
+    if(esGerente){
+      nav=[['inicio','Inicio'],['solicitudes','Solicitudes'],['cotizaciones','Cotizaciones'],['ordenes','Órdenes'],['clientes','Clientes'],['cobros','Cobros'],['servicios','Servicios'],['inventario','Inventario'],['proveedores','Proveedores'],['reportes','Reportes']];
+    } else {
+      nav=[['inicio','Inicio'],['solicitudes','Solicitudes'],['agenda','Agenda'],['levantamientos','Levantamientos'],['ordenes','Órdenes de trabajo'],['clientes','Clientes'],['historial','Historial']];
+    }
+    const activo = (s.screen==='nuevoLev'||s.screen==='levSolicitud') ? 'levantamientos' : ((s.screen==='reporteConsumo'||s.screen==='listaReportesConsumo')?'reportes':s.screen);
+    out.navItems=nav.map(([k,label])=>({label, d1:ICON[k].d1, d2:ICON[k].d2, w:activo===k?'800':'600', bg:activo===k?'#EDEBFF':'transparent', fg:activo===k?'#1D4ED8':'#4A4E63', dot1:activo===k?'#1D4ED8':'#6B7085', dot2:activo===k?'#F59E0B':'#A1A5B7', activo:activo===k, go:()=>self.go(k)}));
+
+    const titles={inicio:['¡Bienvenido, '+s.session.nombre.split(' ')[0]+'!','Resumen de la operación de hoy.'],
+      solicitudes:['Solicitudes','Registro de las necesidades de los clientes.'],
+      agenda:['Agenda','Visitas programadas y su ubicación.'],
+      levantamientos:['Levantamiento','Solicitudes con fecha y hora definidas.'],
+      nuevoLev:['Nuevo levantamiento','Formulario técnico de la visita al cliente.'],
+      levSolicitud:['Levantamiento técnico','Datos tomados de la solicitud programada.'],
+      ordenes:['Órdenes de trabajo','Documentos enviados por Administración.'],
+      clientes:['Clientes','Clientes registrados en el sistema.'],
+      historial:['Historial de servicios','Servicios finalizados.'],
+      usuarios:['Usuarios','Administración de accesos al sistema.'],
+      cotizaciones:['Cotizaciones','Gestión de cotizaciones para clientes.'],
+      cobros:['Cobros','Control de pagos y facturación.'],
+      inventario:['Inventario','Gestión de materiales y existencias.'],
+      proveedores:['Proveedores','Directorio de proveedores y compras.'],
+      reportes:['Reportes','Análisis operativo y financiero del sistema.'],
+      listaReportesConsumo:['Reportes','Análisis operativo y financiero del sistema.'],
+      reporteConsumo:['Reporte de Consumo en Servicios del último año','Análisis operativo detallado por tipo de servicio e inventario consumido.'],
+      servicios:['Servicios','Catálogo de servicios y categorías.']};
+    out.pageTitle=titles[s.screen][0]; out.pageSub=titles[s.screen][1];
+    
+    out.isSolicitudes=s.screen==='solicitudes'; 
+    out.isClientes=s.screen==='clientes';
+
+    if(esGerente) {
+      out.isReportes=s.screen==='reportes'; 
+      out.isReporteConsumo=s.screen==='reporteConsumo'; 
+      out.isListaReportesConsumo=s.screen==='listaReportesConsumo';
+      out.isEnDesarrollo=['inicio','cotizaciones','ordenes','cobros','servicios','inventario','proveedores','usuarios'].includes(s.screen);
+    } else {
+      out.isReportes=false; out.isReporteConsumo=false; out.isListaReportesConsumo=false;
+      out.isEnDesarrollo=['inicio','agenda','levantamientos','nuevoLev','levSolicitud','ordenes','historial'].includes(s.screen);
+    }
+
+    out.isInicio=false; out.isAgenda=false; out.isLevantamientos=false; out.isNuevoLev=false; 
+    out.isNuevoLevOnly=false; out.isOrdenes=false; out.isHistorial=false; out.isUsuarios=false;
+    out.isCotizaciones=false; out.isCobros=false; out.isInventario=false; out.isProveedores=false; out.isServicios=false;
+
+    out.desdeSolicitud=s.screen==='levSolicitud';
+    out.lockBg=s.screen==='levSolicitud'?'#F4F5FB':'#fff';
+    out.origenTexto=s.origen?('Solicitud '+String(s.origen.id).padStart(4,'0')+' · '+fmt(s.origen.fecha)+' a las '+h12(s.origen.hora)+' · '+(s.origen.direccion||'')):'';
+    out.volverLevantamientos=()=>self.go('levantamientos');
+    out.goReporteConsumo=()=>self.go('reporteConsumo'); out.volverReportes=()=>self.go('reportes');
+
+    const nuevaSolicitud=()=>self.openModal('solicitud',{});
+    const nuevoCliente=()=>self.openModal('cliente',{});
+    const nuevaAgenda=()=>self.openModal('agenda',{});
+    const nuevoUsuario=()=>self.openModal('usuario',{rol:'Empleado'});
+    const pa={solicitudes:{label:'+ Nueva solicitud',on:nuevaSolicitud}, agenda:{label:'+ Nueva agenda',on:nuevaAgenda},
+      clientes:{label:'+ Nuevo cliente',on:nuevoCliente}, levantamientos:{label:'+ Nuevo levantamiento',on:()=>self.nuevoLevManual()},
+      usuarios:{label:'+ Nuevo usuario',on:nuevoUsuario}, servicios:{label:'+ Crear servicio',on:()=>self.nuevoServicio()}};
+    out.primaryAction=pa[s.screen]||null;
+    if(out.isEnDesarrollo) out.primaryAction=null;
+    
+    let servs = s.servicios;
+    if(s.search&&s.search.srv) {
+       const q = s.search.srv.toLowerCase();
+       servs = servs.filter(x => x.nombre.toLowerCase().includes(q) || x.servicioId.toLowerCase().includes(q));
+    }
+    if(s.filters&&s.filters.srv && s.filters.srv !== 'Todas las categorías') {
+       servs = servs.filter(x => x.categoria === s.filters.srv);
+    }
+    out.servicios = servs.map(x => ({...x, precioStr: x.precioBase.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})}));
+    
+
+    // Inicio
+    const visibles=self.visibles();
+    const pend=s.solicitudes.filter(x=>x.estado==='Pendiente').length;
+    const prog=s.solicitudes.filter(x=>esFecha(x.fecha)&&x.hora&&x.estado!=='Cancelada'&&x.estado!=='Finalizada').length;
+    const levPend=s.levs.filter(l=>l.estado==='Pendiente').length;
+    out.stats=[
+      {label:'Solicitudes pendientes',value:pend,link:'Ver solicitudes',go:()=>self.go('solicitudes')},
+      {label:'Visitas programadas',value:prog,link:'Ver agenda',go:()=>self.go('agenda')},
+      {label:'Levantamientos pendientes',value:levPend,link:'Ver levantamientos',go:()=>self.go('levantamientos')},
+      {label:'Órdenes de trabajo nuevas',value:s.ordenes.filter(o=>o.estado==='En proceso').length,link:'Ver órdenes',go:()=>self.go('ordenes')}
+    ];
+    const prox=visibles.filter(x=>x.estado!=='Cancelada'&&x.estado!=='Finalizada').sort((a,b)=>(a.fecha+a.hora).localeCompare(b.fecha+b.hora))[0];
+    out.proxima=prox?{hora:h12(prox.hora),cliente:prox.cliente,tipoServicio:prox.tipoServicio,direccion:prox.direccion,mapa:()=>self.mapa(prox.direccion)}:null;
+    out.sinProxima=!prox;
+    const ALIAS={'Cableado Estructurado':'Instalación de Sistema UPS','Mantenimiento Eléctrico':'Instalación de Planta Eléctrica'};
+    out.actividad=s.solicitudes.slice().reverse().slice(0,3).map((x,i)=>{
+      const t=ALIAS[x.tipoServicio]||x.tipoServicio;
+      const ic=ICON_SERV[t]||ICON_SERV['Mantenimiento Eléctrico'];
+      return {tipoServicio:t, cliente:x.cliente, d1:ic.d1, d2:ic.d2, hace:'Hace '+(i+1)+(i===0?' hora':' horas')};
+    });
+    out.accesos=[{label:'Nueva solicitud',d1:ICON.solicitudes.d1,d2:ICON.solicitudes.d2,on:nuevaSolicitud},{label:'Ver agenda',d1:ICON.agenda.d1,d2:ICON.agenda.d2,on:()=>self.go('agenda')},
+      {label:'Nuevo levantamiento',d1:ICON.levantamientos.d1,d2:ICON.levantamientos.d2,on:()=>self.nuevoLevManual()},{label:'Órdenes de trabajo',d1:ICON.ordenes.d1,d2:ICON.ordenes.d2,on:()=>self.go('ordenes')},{label:'Clientes',d1:ICON.clientes.d1,d2:ICON.clientes.d2,on:()=>self.go('clientes')}];
+
+    // Solicitudes
+    const detalleSol=(x)=>self.setState({modal:'detalleSolicitud',form:{...x},errors:{}});
+    const editarSol=(x)=>self.openModal('solicitud',{...x});
+    out.solicitudesView=s.solicitudes.filter(x=>{
+      const qId = (s.qSolId || '').trim().toLowerCase();
+      const qCli = (s.qSolCli || '').trim().toLowerCase();
+      const qTipo = (s.qSolTipo || '');
+      const mId = !qId || String(x.id).padStart(4,'0').toLowerCase().includes(qId);
+      const mCli = !qCli || (x.cliente || '').toLowerCase().includes(qCli);
+      const mTipo = !qTipo || x.tipoServicio === qTipo;
+      const mEstado = s.fSol === 'Todos los estados' || x.estado === s.fSol;
+      const mFecha = !s.qSolFecha || x.fechaSolicitud === s.qSolFecha;
+      return mId && mCli && mTipo && mEstado && mFecha;
+    }).map(x=>({code:String(x.id).padStart(4,'0'),cliente:x.cliente,tipoServicio:x.tipoServicio,fechaSolicitud:fmt(x.fechaSolicitud),estado:x.estado,...badge(x.estado),view:()=>detalleSol(x),edit:()=>editarSol(x)}));
+    out.solVacio=out.solicitudesView.length===0;
+    out.search={
+      solId:{value:s.qSolId,onChange:e=>self.setState({qSolId:e.target.value})},
+      solCli:{value:s.qSolCli,onChange:e=>self.setState({qSolCli:e.target.value})},
+      solTipo:{value:s.qSolTipo,onChange:e=>self.setState({qSolTipo:e.target.value})},
+      solFecha:{value:s.qSolFecha,onChange:e=>self.setState({qSolFecha:e.target.value})},
+      cli:{value:s.qCli,onChange:e=>self.setState({qCli:e.target.value})},
+      hist:{value:s.qHist,onChange:e=>self.setState({qHist:e.target.value})},lev:{value:s.qLev,onChange:e=>self.setState({qLev:e.target.value})},
+      ord:{value:s.qOrd,onChange:e=>self.setState({qOrd:e.target.value})},srv:{value:s.qSrv,onChange:e=>self.setState({qSrv:e.target.value})}};
+    out.filters={sol:{value:s.fSol,onChange:e=>self.setState({fSol:e.target.value})},hist:{value:s.fHist,onChange:e=>self.setState({fHist:e.target.value})},
+      lev:{value:s.fLev,onChange:e=>self.setState({fLev:e.target.value})},ord:{value:s.fOrd,onChange:e=>self.setState({fOrd:e.target.value})},
+      agenda:{value:s.vAgenda,onChange:e=>self.setState({vAgenda:e.target.value})},srv:{value:s.fSrv,onChange:e=>self.setState({fSrv:e.target.value})}};
+    out.estadosOrd=['Todos los estados','En proceso','Finalizada'];
+    out.vistasAgenda=['Hoy','Semanal','Mensual'];
+    out.diasSemana=['Lun','Mar','Mié','Jue','Vie','Sáb','Dom'];
+
+    // Agenda
+    const delDia=visibles.filter(x=>x.fecha===hoy);
+    out.eventos=delDia.map(x=>{
+      const [hh,mm]=x.hora.split(':').map(Number);
+      const cancel=x.estado==='Cancelada';
+      return {cliente:x.cliente,tipoServicio:x.tipoServicio,rango:h12(x.hora)+' — '+h12(addMin(x.hora,150)),
+        top:Math.max(0,(hh-8)*64+(mm/60)*64+2), h:150/60*64-6,
+        bg:cancel?'#FDE9EA':'#EAF3EC', line:cancel?'#E11B22':'#4E9A63', select:()=>self.setState({selEvento:x.id})};
+    });
+    out.agendaDiaria=s.vAgenda==='Hoy'; out.agendaSemanal=s.vAgenda==='Semanal'; out.agendaMensual=s.vAgenda==='Mensual';
+    const MES=['enero','febrero','marzo','abril','mayo','junio','julio','agosto','septiembre','octubre','noviembre','diciembre'];
+    const hoyD=new Date(); hoyD.setHours(0,0,0,0);
+    const chip=(x)=>{ const cancel=x.estado==='Cancelada'; const fin=x.estado==='Finalizada';
+      return {bg:cancel?'#FDE9EA':fin?'#E4F6EA':'#EAF3EC', line:cancel?'#E11B22':fin?'#17803D':'#4E9A63',
+        hora:h12(x.hora), cliente:x.cliente, corto:h12(x.hora).slice(0,5)+' '+x.cliente,
+        select:()=>self.setState({selEvento:x.id, vAgenda:'Hoy', selFecha:x.fecha})}; };
+    const evDe=(f)=>visibles.filter(x=>x.fecha===f).sort((a,b)=>a.hora.localeCompare(b.hora)).map(chip);
+    const lunes=new Date(hoyD); lunes.setDate(lunes.getDate()-((lunes.getDay()+6)%7));
+    out.horasSem=['8 AM','9 AM','10 AM','11 AM','12 PM','1 PM','2 PM','3 PM','4 PM','5 PM','6 PM'];
+    out.semana=Array.from({length:7},(_,i)=>{
+      const d=new Date(lunes); d.setDate(lunes.getDate()+i); const f=iso(d); const esHoy=f===hoy;
+      const ev=visibles.filter(x=>x.fecha===f).sort((a,b)=>a.hora.localeCompare(b.hora)).map(x=>{
+        const [hh,mm]=x.hora.split(':').map(Number);
+        return {...chip(x), top:Math.max(0,(hh-8)*45+(mm/60)*45+1), h:58};
+      });
+      return {dia:out.diasSemana[i], num:d.getDate(), eventos:ev, vacio:ev.length===0,
+        colBg:esHoy?'#FBFBFF':'transparent', pillBg:esHoy?'#EDEBFF':'transparent', numColor:esHoy?'#1D4ED8':'#4A4E63'};
+    });
+    const prim=new Date(hoyD.getFullYear(),hoyD.getMonth(),1);
+    const ini=new Date(prim); ini.setDate(prim.getDate()-((prim.getDay()+6)%7));
+    out.mes=Array.from({length:42},(_,i)=>{
+      const d=new Date(ini); d.setDate(ini.getDate()+i); const f=iso(d); const esHoy=f===hoy; const otro=d.getMonth()!==hoyD.getMonth();
+      return {num:d.getDate(), eventos:evDe(f), bg:esHoy?'#F5F4FF':otro?'#FAFAFC':'#fff',
+        border:esHoy?'#C9C3F5':'#EFF0F6', numColor:esHoy?'#1D4ED8':otro?'#C0C4D2':'#14162B'};
+    });
+    const finSem=new Date(lunes); finSem.setDate(lunes.getDate()+6);
+    out.agendaRango = s.vAgenda==='Semanal' ? (lunes.getDate()+' – '+finSem.getDate()+' de '+MES[finSem.getMonth()]+' '+finSem.getFullYear())
+      : s.vAgenda==='Mensual' ? (MES[hoyD.getMonth()].charAt(0).toUpperCase()+MES[hoyD.getMonth()].slice(1)+' '+hoyD.getFullYear())
+      : fmtLargo(hoy);
+    const sel=delDia.find(x=>x.id===s.selEvento)||delDia[0];
+    out.detalle=sel?{cliente:sel.cliente,tipoServicio:sel.tipoServicio,fecha:fmt(sel.fecha),hora:h12(sel.hora),direccion:sel.direccion,estado:sel.estado,...badge(sel.estado),
+      mapa:()=>self.mapa(sel.direccion), editar:()=>self.openModal('agenda',{...sel}),
+      cancelar:()=>self.setState({confirm:{title:'Cancelar visita',msg:'¿Confirmas cancelar la visita de '+sel.cliente+'? El estado del servicio pasará a Cancelada.',okLabel:'Sí, cancelar',color:'#C4141B',
+        ok:()=>{ self.setState(st=>({solicitudes:st.solicitudes.map(x=>x.id===sel.id?{...x,estado:'Cancelada'}:x),levs:st.levs.filter(l=>l.solicitudId!==sel.id),confirm:null})); self.toast('Visita cancelada.','warn'); }}})}:null;
+    out.clearDetalle=()=>self.setState({selEvento:-1});
+    out.sinDetalle=!sel;
+
+    // Levantamientos
+    out.levsView=s.levs.map(l=>{
+      const sol=s.solicitudes.find(x=>x.id===l.solicitudId);
+      if(!sol||!esFecha(sol.fecha)||!sol.hora) return null;
+      if(l.estado!==s.fLev) return null;
+      if(!sol.cliente.toLowerCase().includes(s.qLev.toLowerCase())) return null;
+      return {cliente:sol.cliente,tipoServicio:sol.tipoServicio,fechaTexto:fmt(sol.fecha)+' · '+h12(sol.hora),estado:l.estado,...badge(l.estado),
+        borrador:l.borrador, cta:l.estado==='Pendiente'?(l.borrador?'Continuar levantamiento':'Iniciar levantamiento'):'Ver levantamiento',
+        abrir:()=>self.abrirLev(l,sol)};
+    }).filter(Boolean);
+    out.levVacio=out.levsView.length===0;
+    out.guardarLevantamientos=()=>self.toast('Información parcial de los levantamientos guardada.');
+
+    // Nuevo levantamiento
+    out.fotos=(s.form.fotos||[]).map((f,i)=>({label:f,remove:()=>self.setState(st=>({form:{...st.form,fotos:(st.form.fotos||[]).filter((_,j)=>j!==i)}}))}));
+    out.addFoto=()=>self.setState(st=>{const fs=st.form.fotos||[];return {form:{...st.form,fotos:[...fs,'foto '+(fs.length+1)]},errors:{...st.errors,fotos:''}};});
+    out.cancelarLev=()=>self.setState({confirm:{title:'Descartar levantamiento',msg:'Se perderán los datos no guardados de este formulario.',okLabel:'Descartar',color:'#C4141B',
+      ok:()=>{self.setState({confirm:null,screen:'levantamientos',form:{},errors:{},levEdit:null}); self.toast('Formulario descartado.','warn');}}});
+    out.guardarBorrador=()=>{
+      if(!s.form.cliente){ self.setState({errors:{cliente:'Selecciona el cliente para guardar.'}}); self.toast('Selecciona el cliente antes de guardar.','error'); return; }
+      self.persistLev('Pendiente','Información parcial guardada. Puedes completarla más adelante.');
+    };
+    out.enviarAdmin=()=>{
+      const e=self.validarLev();
+      if(Object.keys(e).length){ self.setState({errors:e}); self.toast('Completa los campos obligatorios antes de enviar.','error'); return; }
+      self.setState({confirm:{title:'Enviar a Administración',msg:'Se confirmará el servicio, el estado pasará a En proceso y el levantamiento a En Espera Administración. La fecha se registra automáticamente.',okLabel:'Enviar',color:'#1D4ED8',
+        ok:()=>{ self.setState({confirm:null}); self.persistLev('En Espera Administración','Levantamiento enviado a Administración.'); }}});
+    };
+    out.rechazarLev=()=>self.setState({confirm:{title:'Cancelar servicio',msg:'El servicio será rechazado y su estado pasará a Cancelada.',okLabel:'Cancelar servicio',color:'#C4141B',
+      ok:()=>{ self.setState(st=>{
+        const lev=st.levs.find(l=>l.id===st.levEdit);
+        return {solicitudes:lev?st.solicitudes.map(x=>x.id===lev.solicitudId?{...x,estado:'Cancelada'}:x):st.solicitudes,
+          levs:st.levs.filter(l=>l.id!==st.levEdit), confirm:null, screen:'levantamientos', form:{}, errors:{}, levEdit:null};
+      }); self.toast('Servicio cancelado.','warn'); }}});
+
+    // Órdenes
+    out.ordenesView=s.ordenes.filter(o=>(o.cliente+' '+o.tipoServicio+' '+o.code).toLowerCase().includes(s.qOrd.toLowerCase()))
+      .filter(o=>s.fOrd==='Todos los estados'||o.estado===s.fOrd).map(o=>({code:o.code,cliente:o.cliente,tipoServicio:o.tipoServicio,estado:o.estado,...badge(o.estado),
+      trabajos:o.trabajos.map((t,i)=>({n:i+1,desc:t})), materiales:o.materiales, observaciones:o.observaciones,
+      puedeFinalizar:o.estado!=='Finalizada',
+      finalizar:()=>self.setState({confirm:{title:'Finalizar orden '+o.code,msg:'La orden se marcará como Finalizada y el servicio pasará al Historial.',okLabel:'Marcar finalizada',color:'#1D4ED8',
+        ok:()=>{ self.setState(st=>({ordenes:st.ordenes.map(x=>x.id===o.id?{...x,estado:'Finalizada'}:x),
+          solicitudes:st.solicitudes.map(x=>(x.cliente===o.cliente&&x.tipoServicio===o.tipoServicio&&x.estado!=='Finalizada')?{...x,estado:'Finalizada',fechaFin:iso(new Date())}:x),
+          levs:st.levs.filter(l=>{const sol=st.solicitudes.find(y=>y.id===l.solicitudId); return !(sol&&sol.cliente===o.cliente&&sol.tipoServicio===o.tipoServicio);}),
+          confirm:null})); self.toast('Orden '+o.code+' finalizada. Cargada en el Historial.'); }}})
+    }));
+    out.ordVacio=out.ordenesView.length===0;
+
+    // Clientes
+    out.clientesView=s.clientes.filter(c=>c.nombre.toLowerCase().includes(s.qCli.toLowerCase())).map(c=>({
+      nombre:c.nombre,telefono:c.telefono,direccion:c.direccion,servicios:c.servicios,
+      view:()=>self.setState({modal:'detalleCliente',form:{...c},errors:{}}), edit:()=>self.openModal('cliente',{...c})}));
+    out.cliVacio=out.clientesView.length===0;
+
+    // Historial
+    const dias=s.fHist==='Últimos 7 días'?7:s.fHist==='Últimos 30 días'?30:0;
+    out.historialView=s.solicitudes.filter(x=>x.estado==='Finalizada')
+      .filter(x=>(x.cliente+' '+x.tipoServicio).toLowerCase().includes(s.qHist.toLowerCase()))
+      .filter(x=>{ if(!dias) return true; const lim=new Date(); lim.setDate(lim.getDate()-dias); return new Date(x.fechaFin||x.fecha)>=lim; })
+      .map(x=>({code:String(x.id).padStart(4,'0'),cliente:x.cliente,tipoServicio:x.tipoServicio,fechaFin:fmt(x.fechaFin||x.fecha),
+        view:()=>self.setState({modal:'detalleSolicitud',form:{...x},errors:{}})}));
+    out.histVacio=out.historialView.length===0;
+
+    // Usuarios
+    out.usuariosView=s.usuarios.map(u=>({usuario:u.usuario,nombre:u.nombre,cargo:u.cargo,rol:u.rol,...badge(u.rol),
+      edit:()=>self.openModal('usuario',{...u,password2:u.password}),
+      del:()=>{ if(u.id===s.session.id){ self.toast('No puedes eliminar el usuario con el que estás conectado.','error'); return; }
+        self.setState({confirm:{title:'Eliminar usuario',msg:'¿Eliminar al usuario "'+u.usuario+'"? Esta acción no se puede deshacer.',okLabel:'Eliminar',color:'#C4141B',
+          ok:()=>{ self.setState(st=>({usuarios:st.usuarios.filter(x=>x.id!==u.id),confirm:null})); self.toast('Usuario eliminado.','warn'); }}}); }}));
+
+    // Modales
+    const m=s.modal;
+    out.modalOpen=!!m;
+    out.isFormSolicitud=m==='solicitud'; out.isFormCliente=m==='cliente'; out.isFormAgenda=m==='agenda'; out.isFormUsuario=m==='usuario'; out.isFormServicio=m==='nuevoServicio';
+    out.isDetalleModal=m==='detalleSolicitud'||m==='detalleCliente';
+    out.clienteNoRegistrado=m==='solicitud'&&s.form.cliente==='__nuevo';
+    out.irARegistroCliente=()=>self.openModal('cliente',{});
+    const cfg={
+      solicitud:{title:s.form.id?'Editar solicitud':'Nueva solicitud',sub:'Registra las necesidades del cliente.',width:'640px',saveLabel:s.form.id?'Guardar cambios':'Registrar solicitud',save:()=>self.guardarSolicitud()},
+      cliente:{title:s.form.id?'Editar cliente':'Nuevo cliente',sub:'Datos de contacto y ubicación.',width:'560px',saveLabel:s.form.id?'Guardar cambios':'Registrar cliente',save:()=>self.guardarCliente()},
+      agenda:{title:s.form.id?'Editar visita':'Nueva agenda',sub:'Asigna fecha y hora para la visita.',width:'620px',saveLabel:'Guardar visita',save:()=>self.guardarAgenda()},
+      usuario:{title:s.form.id?'Modificar usuario':'Nuevo usuario',sub:'Define credenciales y rol de acceso.',width:'620px',saveLabel:s.form.id?'Guardar cambios':'Crear usuario',save:()=>self.guardarUsuario()},
+      nuevoServicio:{title:'Registrar nuevo servicio',sub:'Complete los datos para agregar el servicio al catálogo.',width:'560px',saveLabel:'Crear servicio',save:()=>self.guardarServicio()},
+      detalleSolicitud:{title:'Detalle de la solicitud',sub:'Solicitud '+String(s.form.id||'').padStart(4,'0'),width:'620px',save:null,closeLabel:'Cerrar'},
+      detalleCliente:{title:s.form.nombre||'Cliente',sub:'Información del cliente registrado.',width:'620px',save:null,closeLabel:'Cerrar'}
+    };
+    const c=cfg[m]||{};
+    out.modal={title:c.title||'',sub:c.sub||'',width:c.width||'560px',save:c.save||null,saveLabel:c.saveLabel||'Guardar',closeLabel:c.closeLabel||'Cancelar'};
+    if(m==='detalleSolicitud'){
+      const f=s.form;
+      out.detalleCampos=[{k:'Cliente',v:f.cliente},{k:'Contacto',v:f.contacto},{k:'Tipo de servicio',v:f.tipoServicio},
+        {k:'Dirección',v:f.direccion},{k:'Fecha de solicitud',v:fmt(f.fechaSolicitud)},{k:'Fecha del levantamiento',v:fmt(f.fecha)},
+        {k:'Hora',v:h12(f.hora)},{k:'Estado',v:f.estado}];
+    } else if(m==='detalleCliente'){
+      const f=s.form;
+      out.detalleCampos=[{k:'Nombre',v:f.nombre},{k:'Correo',v:f.correo},{k:'Teléfono principal',v:f.telefono},
+        {k:'Teléfono alternativo',v:f.telefono2||'—'},{k:'RNC / Cédula',v:f.rnc},{k:'Dirección',v:f.direccion},
+        {k:'Servicios realizados',v:String(f.servicios)},{k:'Último servicio',v:f.ultimo||'—'}];
+    } else out.detalleCampos=[];
+    out.confirm=s.confirm?{...s.confirm,ok:s.confirm.ok}:null;
+    return out;
+  }
+}
+</script>
+</body>
+
+</html>
