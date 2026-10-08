@@ -359,6 +359,11 @@
     {
         AppState.OnChange += OnStateChanged;
         UpdateData();
+        
+        if (VistaActual == "Hoy")
+        {
+            Detalle = DiariaEventos.FirstOrDefault();
+        }
     }
 
     public void Dispose()
