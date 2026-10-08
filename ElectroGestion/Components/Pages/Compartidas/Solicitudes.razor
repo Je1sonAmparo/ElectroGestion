@@ -1,0 +1,11 @@
+@page "/solicitudes"
+@inject ElectroGestion.Services.AppStateService AppState
+
+@if (AppState.EsGerente)
+{
+    <ElectroGestion.Components.Pages.Gerente.Solicitudes />
+}
+else
+{
+    <ElectroGestion.Components.Pages.Tecnico.Solicitudes />
+}

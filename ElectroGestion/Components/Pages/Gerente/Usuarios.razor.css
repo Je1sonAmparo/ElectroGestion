@@ -1,0 +1,12 @@
+.edit-btn, .del-btn {
+    transition: all 0.2s;
+}
+
+.edit-btn:hover {
+    border-color: #1D4ED8 !important;
+    color: #1D4ED8 !important;
+}
+
+.del-btn:hover {
+    background: #FDE9EA !important;
+}

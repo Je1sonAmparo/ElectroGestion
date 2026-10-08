@@ -1,0 +1,234 @@
+@inject ElectroGestion.Services.AppStateService AppState
+@inject NavigationManager NavManager
+@inject ToastService ToastService
+
+<PageTitle>Clientes | ElectroGestion</PageTitle>
+
+<div style="display:flex;align-items:flex-start;justify-content:space-between;gap:20px;margin-bottom:18px">
+    <div>
+        <div class="page-title" style="font-family:'Manrope';font-weight:800;font-size:31px;letter-spacing:-.8px;color:#1f2430;line-height:1.15">Clientes</div>
+        <div style="color:#6B7085;font-size:14.5px;margin-top:5px">Clientes registrados en el sistema.</div>
+    </div>
+    <button @onclick="NuevoCliente" style="padding:10px 16px 10px 18px;background:#1D4ED8;color:#fff;border:0;border-radius:8px;font-weight:700;font-size:14px;cursor:pointer;font-family:'Manrope';white-space:nowrap;display:flex;align-items:center;gap:8px">
+        <span style="font-size:20px;line-height:1;transform:translateY(-1px)">+</span>
+        <span>Nuevo cliente</span>
+    </button>
+</div>
+
+<div style="background:#fff;border:1px solid #E3E5EE;border-radius:12px;overflow:hidden">
+    <div style="padding:18px;border-bottom:1px solid #EFF0F6">
+        <input @bind="SearchTerm" @bind:event="oninput" placeholder="Buscar cliente por nombre..."
+            style="width:100%;max-width:414px;padding:11px 14px;border:1px solid #D5D8E6;border-radius:9px;font-size:14px" />
+    </div>
+
+    <div style="overflow-x:auto">
+        <table style="width:100%;border-collapse:collapse;font-size:14px;min-width:760px">
+            <thead>
+                <tr style="border-bottom:1px solid #EFF0F6;background:#FAFAFC;color:#6B7085;font-family:'Manrope';font-weight:800;font-size:12px;text-transform:uppercase;letter-spacing:.35px">
+                    <th style="padding:14px 18px;text-align:left;width:23%">Cliente</th>
+                    <th style="padding:14px 18px;text-align:left;width:18%">Teléfono</th>
+                    <th style="padding:14px 18px;text-align:left;width:34%">Dirección</th>
+                    <th style="padding:14px 18px;text-align:left;width:16%">Servicios</th>
+                    <th style="padding:14px 18px;text-align:right;width:9%">Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+                @if (!FilteredClientes.Any())
+                {
+                    <tr>
+                        <td colspan="5" style="padding:32px;text-align:center;color:#6B7085">No se encontraron clientes con el criterio de búsqueda.</td>
+                    </tr>
+                }
+                else
+                {
+                    @foreach (var c in FilteredClientes)
+                    {
+                        <tr style="border-bottom:1px solid #EFF0F6">
+                            <td style="padding:16px 18px;font-weight:700;color:#14162B">@c.Nombre</td>
+                            <td style="padding:16px 18px;color:#6B7085">@c.Telefono</td>
+                            <td style="padding:16px 18px;color:#6B7085">@c.Direccion</td>
+                            <td style="padding:16px 18px;color:#14162B;font-weight:700">@c.Servicios</td>
+                            <td style="padding:16px 18px;text-align:right">
+                                <div style="display:flex;gap:8px;justify-content:flex-end">
+                                    <button @onclick="() => VerDetalle(c.Id)" title="Ver detalle" aria-label="Ver detalle" class="view-btn table-action-icon" style="width:32px;height:32px;border:1px solid #D5D8E6;background:#fff;border-radius:8px;cursor:pointer;color:#5F6479;display:flex;align-items:center;justify-content:center;padding:0">
+                                        <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2 12s3.5-6 10-6 10 6 10 6-3.5 6-10 6S2 12 2 12Z"/><circle cx="12" cy="12" r="3"/></svg>
+                                    </button>
+                                    <button @onclick="() => Editar(c.Id)" title="Editar" aria-label="Editar" class="edit-btn table-action-icon" style="width:32px;height:32px;border:1px solid #D5D8E6;background:#fff;border-radius:8px;cursor:pointer;color:#5F6479;display:flex;align-items:center;justify-content:center;padding:0">
+                                        <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 1 1 3 3L7 19l-4 1 1-4 12.5-12.5Z"/></svg>
+                                    </button>
+                                </div>
+                            </td>
+                        </tr>
+                    }
+                }
+            </tbody>
+        </table>
+    </div>
+</div>
+
+@if (SelectedCliente != null)
+{
+    <div style="position:fixed;inset:0;background:rgba(14,16,40,.48);display:flex;align-items:center;justify-content:center;z-index:9999;padding:20px">
+        <div style="background:#fff;border-radius:16px;width:100%;max-width:612px;padding:28px;box-shadow:0 20px 40px rgba(0,0,0,.2);animation:tin .2s ease-out">
+            <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:18px">
+                <div>
+                    <div style="font-family:'Manrope';font-weight:800;font-size:22px;color:#14162B">@SelectedCliente.Nombre</div>
+                    <div style="font-size:13.5px;color:#6B7085;margin-top:3px">Información del cliente registrado.</div>
+                </div>
+                <button @onclick="CerrarDetalle" aria-label="Cerrar" style="width:32px;height:32px;border:1px solid #E3E5EE;border-radius:8px;background:#fff;display:flex;align-items:center;justify-content:center;color:#8B90A3;cursor:pointer">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M18 6 6 18M6 6l12 12"/></svg>
+                </button>
+            </div>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px" class="resp-grid-2">
+                <div style="background:#F7F8FC;border:1px solid #EFF0F6;border-radius:10px;padding:12px 14px"><div style="font-size:11.5px;color:#8B90A3;font-weight:800;text-transform:uppercase">Nombre</div><div style="font-size:14px;margin-top:4px;font-weight:700;color:#14162B">@SelectedCliente.Nombre</div></div>
+                <div style="background:#F7F8FC;border:1px solid #EFF0F6;border-radius:10px;padding:12px 14px"><div style="font-size:11.5px;color:#8B90A3;font-weight:800;text-transform:uppercase">Correo</div><div style="font-size:14px;margin-top:4px;font-weight:700;color:#14162B">@(string.IsNullOrWhiteSpace(SelectedCliente.Correo) ? "No registrado" : SelectedCliente.Correo)</div></div>
+                <div style="background:#F7F8FC;border:1px solid #EFF0F6;border-radius:10px;padding:12px 14px"><div style="font-size:11.5px;color:#8B90A3;font-weight:800;text-transform:uppercase">Teléfono principal</div><div style="font-size:14px;margin-top:4px;font-weight:700;color:#14162B">@SelectedCliente.Telefono</div></div>
+                <div style="background:#F7F8FC;border:1px solid #EFF0F6;border-radius:10px;padding:12px 14px"><div style="font-size:11.5px;color:#8B90A3;font-weight:800;text-transform:uppercase">Teléfono alternativo</div><div style="font-size:14px;margin-top:4px;font-weight:700;color:#14162B">@(string.IsNullOrWhiteSpace(SelectedCliente.Telefono2) ? "No registrado" : SelectedCliente.Telefono2)</div></div>
+                <div style="background:#F7F8FC;border:1px solid #EFF0F6;border-radius:10px;padding:12px 14px"><div style="font-size:11.5px;color:#8B90A3;font-weight:800;text-transform:uppercase">RNC / Cédula</div><div style="font-size:14px;margin-top:4px;font-weight:700;color:#14162B">@(string.IsNullOrWhiteSpace(SelectedCliente.Rnc) ? "No registrado" : SelectedCliente.Rnc)</div></div>
+                <div style="background:#F7F8FC;border:1px solid #EFF0F6;border-radius:10px;padding:12px 14px"><div style="font-size:11.5px;color:#8B90A3;font-weight:800;text-transform:uppercase">Dirección</div><div style="font-size:14px;margin-top:4px;font-weight:700;color:#14162B">@SelectedCliente.Direccion</div></div>
+                <div style="background:#F7F8FC;border:1px solid #EFF0F6;border-radius:10px;padding:12px 14px"><div style="font-size:11.5px;color:#8B90A3;font-weight:800;text-transform:uppercase">Servicios realizados</div><div style="font-size:14px;margin-top:4px;font-weight:700;color:#14162B">@SelectedCliente.Servicios</div></div>
+                <div style="background:#F7F8FC;border:1px solid #EFF0F6;border-radius:10px;padding:12px 14px"><div style="font-size:11.5px;color:#8B90A3;font-weight:800;text-transform:uppercase">Último servicio</div><div style="font-size:14px;margin-top:4px;font-weight:700;color:#14162B">@(string.IsNullOrWhiteSpace(SelectedCliente.Ultimo) ? "Sin servicios registrados" : SelectedCliente.Ultimo)</div></div>
+            </div>
+            <div style="margin-top:24px;display:flex;justify-content:flex-end;border-top:1px solid #EFF0F6;padding-top:17px">
+                <button @onclick="CerrarDetalle" style="padding:10px 20px;border:1px solid #D5D8E6;background:#fff;border-radius:8px;font-weight:700;cursor:pointer;font-size:14px;color:#14162B">Cerrar</button>
+            </div>
+        </div>
+    </div>
+}
+
+@if (IsModalOpen)
+{
+    <div style="position:fixed;inset:0;background:rgba(14,16,40,.5);display:flex;align-items:center;justify-content:center;z-index:9999;padding:20px">
+        <div style="background:#fff;border-radius:16px;width:100%;max-width:550px;padding:28px;box-shadow:0 20px 40px rgba(0,0,0,.2);animation:tin .2s ease-out">
+            <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:20px">
+                <div>
+                    <div style="font-family:'Manrope';font-weight:800;font-size:22px;color:#14162B">@ModalTitle</div>
+                    <div style="color:#6B7085;font-size:13.5px;margin-top:3px">Datos de contacto y ubicación.</div>
+                </div>
+                <button @onclick="CerrarFormulario" aria-label="Cerrar" style="width:32px;height:32px;border:1px solid #E3E5EE;border-radius:8px;background:#fff;display:flex;align-items:center;justify-content:center;color:#8B90A3;cursor:pointer">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M18 6 6 18M6 6l12 12"/></svg>
+                </button>
+            </div>
+            <div style="display:flex;flex-direction:column;gap:14px">
+                <div><label style="display:block;font-size:13px;font-weight:700;color:#4A4E63;margin-bottom:6px">Nombre *</label><input @bind="FormNombre" placeholder="Nombre o razón social" style="width:100%;padding:11px 13px;border:1px solid #D5D8E6;border-radius:8px;font-size:14px" /></div>
+                <div><label style="display:block;font-size:13px;font-weight:700;color:#4A4E63;margin-bottom:6px">Correo electrónico *</label><input @bind="FormCorreo" type="email" placeholder="correo@empresa.com" style="width:100%;padding:11px 13px;border:1px solid #D5D8E6;border-radius:8px;font-size:14px" /></div>
+                <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px" class="resp-grid-2">
+                    <div><label style="display:block;font-size:13px;font-weight:700;color:#4A4E63;margin-bottom:6px">Teléfono principal *</label><input @bind="FormTelefono" placeholder="809-000-0000" style="width:100%;padding:11px 13px;border:1px solid #D5D8E6;border-radius:8px;font-size:14px" /></div>
+                    <div><label style="display:block;font-size:13px;font-weight:700;color:#4A4E63;margin-bottom:6px">Teléfono alternativo <span style="font-weight:400;color:#8B90A3">(opcional)</span></label><input @bind="FormTelefono2" placeholder="829-000-0000" style="width:100%;padding:11px 13px;border:1px solid #D5D8E6;border-radius:8px;font-size:14px" /></div>
+                </div>
+                <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px" class="resp-grid-2">
+                    <div><label style="display:block;font-size:13px;font-weight:700;color:#4A4E63;margin-bottom:6px">RNC / Cédula *</label><input @bind="FormRnc" placeholder="402-1234567-1" style="width:100%;padding:11px 13px;border:1px solid #D5D8E6;border-radius:8px;font-size:14px" /></div>
+                    <div><label style="display:block;font-size:13px;font-weight:700;color:#4A4E63;margin-bottom:6px">Dirección *</label><input @bind="FormDireccion" placeholder="Calle y ciudad" style="width:100%;padding:11px 13px;border:1px solid #D5D8E6;border-radius:8px;font-size:14px" /></div>
+                </div>
+            </div>
+            <div style="display:flex;justify-content:flex-end;gap:10px;margin-top:24px;border-top:1px solid #EFF0F6;padding-top:16px">
+                <button @onclick="CerrarFormulario" style="padding:10px 18px;border:1px solid #D5D8E6;background:#fff;border-radius:8px;font-weight:700;font-size:14px;cursor:pointer;color:#14162B">Cancelar</button>
+                <button @onclick="GuardarCliente" style="padding:10px 22px;border:0;background:#1D4ED8;color:#fff;border-radius:8px;font-weight:700;font-size:14px;cursor:pointer;font-family:'Manrope'">Guardar cambios</button>
+            </div>
+        </div>
+    </div>
+}
+
+@code {
+    private string SearchTerm = "";
+    private bool IsModalOpen;
+    private string ModalTitle = "";
+    private int? EditId;
+    private ElectroGestion.Models.Cliente? SelectedCliente;
+    private string FormNombre = "";
+    private string FormRnc = "";
+    private string FormCorreo = "";
+    private string FormTelefono = "";
+    private string FormTelefono2 = "";
+    private string FormDireccion = "";
+
+    private List<ElectroGestion.Models.Cliente> FilteredClientes => AppState.Clientes
+        .Where(c => string.IsNullOrEmpty(SearchTerm) ||
+                    c.Nombre.Contains(SearchTerm, StringComparison.OrdinalIgnoreCase) ||
+                    c.Telefono.Contains(SearchTerm, StringComparison.OrdinalIgnoreCase) ||
+                    c.Correo.Contains(SearchTerm, StringComparison.OrdinalIgnoreCase) ||
+                    (!string.IsNullOrEmpty(c.Rnc) && c.Rnc.Contains(SearchTerm, StringComparison.OrdinalIgnoreCase)) ||
+                    c.Direccion.Contains(SearchTerm, StringComparison.OrdinalIgnoreCase))
+        .OrderBy(c => c.Nombre)
+        .ToList();
+
+    private void NuevoCliente()
+    {
+        EditId = null;
+        ModalTitle = "Nuevo cliente";
+        FormNombre = FormRnc = FormCorreo = FormTelefono = FormTelefono2 = FormDireccion = "";
+        IsModalOpen = true;
+    }
+
+    private void Editar(int id)
+    {
+        var cliente = AppState.Clientes.FirstOrDefault(c => c.Id == id);
+        if (cliente == null) return;
+
+        EditId = cliente.Id;
+        ModalTitle = "Editar cliente";
+        FormNombre = cliente.Nombre;
+        FormRnc = cliente.Rnc;
+        FormCorreo = cliente.Correo;
+        FormTelefono = cliente.Telefono;
+        FormTelefono2 = cliente.Telefono2;
+        FormDireccion = cliente.Direccion;
+        IsModalOpen = true;
+    }
+
+    private void GuardarCliente()
+    {
+        if (string.IsNullOrWhiteSpace(FormNombre) || string.IsNullOrWhiteSpace(FormCorreo) || string.IsNullOrWhiteSpace(FormTelefono) || string.IsNullOrWhiteSpace(FormRnc) || string.IsNullOrWhiteSpace(FormDireccion))
+        {
+            ToastService.ShowWarning("Por favor complete los campos obligatorios.", "Atención");
+            return;
+        }
+
+        if (EditId.HasValue)
+        {
+            var cliente = AppState.Clientes.FirstOrDefault(c => c.Id == EditId.Value);
+            if (cliente != null)
+            {
+                cliente.Nombre = FormNombre;
+                cliente.Rnc = FormRnc;
+                cliente.Correo = FormCorreo;
+                cliente.Telefono = FormTelefono;
+                cliente.Telefono2 = FormTelefono2;
+                cliente.Direccion = FormDireccion;
+            }
+        }
+        else
+        {
+            var newId = AppState.Clientes.Any() ? AppState.Clientes.Max(c => c.Id) + 1 : 1;
+            AppState.Clientes.Add(new ElectroGestion.Models.Cliente
+            {
+                Id = newId,
+                Nombre = FormNombre,
+                Rnc = FormRnc,
+                Correo = FormCorreo,
+                Telefono = FormTelefono,
+                Telefono2 = FormTelefono2,
+                Direccion = FormDireccion,
+                Servicios = 0
+            });
+        }
+
+        CerrarFormulario();
+        ToastService.ShowSuccess(EditId.HasValue ? "Cliente actualizado exitosamente." : "Cliente registrado exitosamente.");
+    }
+
+    private void CerrarFormulario()
+    {
+        IsModalOpen = false;
+    }
+
+    private void VerDetalle(int id)
+    {
+        SelectedCliente = AppState.Clientes.FirstOrDefault(c => c.Id == id);
+    }
+
+    private void CerrarDetalle()
+    {
+        SelectedCliente = null;
+    }
+}

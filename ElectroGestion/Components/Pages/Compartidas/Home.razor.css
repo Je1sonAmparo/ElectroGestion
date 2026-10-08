@@ -1,0 +1,32 @@
+.link-btn {
+    background: none;
+    border: 0;
+    padding: 0;
+    color: #1D4ED8;
+    font-weight: 700;
+    font-size: 13px;
+    cursor: pointer;
+    transition: color 0.2s;
+}
+
+.link-btn:hover {
+    color: #F59E0B;
+}
+
+.outline-btn {
+    transition: all 0.2s;
+}
+
+.outline-btn:hover {
+    border-color: #1D4ED8 !important;
+    color: #1D4ED8 !important;
+}
+
+.quick-access-btn {
+    transition: all 0.2s;
+}
+
+.quick-access-btn:hover {
+    border-color: #1D4ED8 !important;
+    color: #1D4ED8 !important;
+}

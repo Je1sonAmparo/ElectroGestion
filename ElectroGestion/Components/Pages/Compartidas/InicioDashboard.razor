@@ -1,0 +1,165 @@
+@inject ElectroGestion.Services.AppStateService AppState
+@inject NavigationManager NavManager
+@inject IJSRuntime JS
+
+<PageTitle>Inicio | ElectroGestion</PageTitle>
+
+<div class="home-dashboard">
+    <header class="home-heading">
+        <h1>¡Bienvenido, @UserName!</h1>
+        <p>Resumen de la operación de hoy.</p>
+    </header>
+
+    <section class="home-metrics" aria-label="Resumen operativo">
+        @foreach (var metric in Metrics)
+        {
+            <article class="home-metric">
+                <div class="home-metric-label">@metric.Label</div>
+                <div class="home-metric-value">@metric.Value</div>
+                <button @onclick="() => NavManager.NavigateTo(metric.Href)" class="home-text-link">@metric.Link <span aria-hidden="true">&rarr;</span></button>
+            </article>
+        }
+    </section>
+
+    <section class="home-operations">
+        <article class="home-panel home-next-visit">
+            <h2>Próxima visita</h2>
+            @if (NextVisit is { } visit)
+            {
+                <div class="home-visit-content">
+                    <div class="home-visit-details">
+                        <div class="home-visit-time">@ElectroGestion.Services.AppStateService.FormatHora12(visit.Hora)</div>
+                        <div class="home-visit-client">@visit.Cliente</div>
+                        <div class="home-visit-meta">@visit.TipoServicio</div>
+                        <div class="home-visit-meta">@visit.Direccion</div>
+                        <button @onclick="() => VerMapa(visit.Direccion)" class="home-outline-button">Ver ubicación</button>
+                    </div>
+                    <div class="home-map" role="img" aria-label="Mapa de ubicación aproximada">
+                        <svg viewBox="0 0 320 172" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+                            <rect width="320" height="172" fill="#EFF3EC" />
+                            <path d="M26 0v172M118 0v172M212 0v172M282 0v172M0 34h320M0 96h320M0 142h320" stroke="#E2E7DC" stroke-width="9" />
+                            <path d="M0 66h320M166 0v172" stroke="#fff" stroke-width="14" />
+                            <path d="M0 66h320M166 0v172" stroke="#F59E0B" stroke-width="7" />
+                            <g fill="#DDE4D6">
+                                <rect x="36" y="8" width="70" height="18" rx="2" />
+                                <rect x="36" y="76" width="52" height="14" rx="2" />
+                                <rect x="96" y="106" width="58" height="26" rx="2" />
+                                <rect x="224" y="8" width="48" height="18" rx="2" />
+                                <rect x="224" y="106" width="50" height="26" rx="2" />
+                            </g>
+                            <circle cx="290" cy="120" r="22" fill="#D8E6D0" />
+                            <g transform="translate(166 66)">
+                                <ellipse cx="0" cy="16" rx="9" ry="3.5" fill="rgba(20,22,43,.18)" />
+                                <path d="M0 14s-11-11.6-11-19a11 11 0 0 1 22 0c0 7.4-11 19-11 19Z" fill="#1D4ED8" />
+                                <circle cx="0" cy="-5.4" r="4" fill="#fff" />
+                            </g>
+                        </svg>
+                        <span class="home-map-label">Ubicación aproximada</span>
+                    </div>
+                </div>
+            }
+            else
+            {
+                <div class="home-empty-visit">No hay visitas programadas para hoy.</div>
+            }
+        </article>
+
+        <article class="home-panel home-activity">
+            <h2>Actividad reciente</h2>
+            @if (RecentActivity.Any())
+            {
+                <div class="home-activity-list">
+                    @foreach (var item in RecentActivity)
+                    {
+                        var icon = GetServiceIcon(item.TipoServicio);
+                        <div class="home-activity-row">
+                            <span class="home-activity-icon" aria-hidden="true">
+                                <svg viewBox="0 0 24 24" fill="none" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+                                    <path d="@icon.D1" stroke="#1D4ED8" />
+                                    <path d="@icon.D2" stroke="#F59E0B" />
+                                </svg>
+                            </span>
+                            <div class="home-activity-copy">
+                                <div class="home-activity-service">@item.TipoServicio</div>
+                                <div class="home-activity-client">@item.Cliente</div>
+                            </div>
+                            <time class="home-activity-date">@ElectroGestion.Services.AppStateService.FormatFecha(item.FechaSolicitud)</time>
+                        </div>
+                    }
+                </div>
+            }
+            else
+            {
+                <div class="home-empty-activity">Todavía no hay actividad registrada.</div>
+            }
+            <button @onclick='() => NavManager.NavigateTo("/solicitudes")' class="home-text-link home-activity-link">Ver todas las actividades <span aria-hidden="true">&rarr;</span></button>
+        </article>
+    </section>
+
+    <section class="home-quick-section" aria-label="Accesos rápidos">
+        <h2>Accesos rápidos</h2>
+        <div class="home-quick-grid">
+            @foreach (var access in QuickAccesses)
+            {
+                <button @onclick="() => NavManager.NavigateTo(access.Href)" class="home-quick-card">
+                    <svg viewBox="0 0 24 24" fill="none" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                        <path d="@access.D1" stroke="#1D4ED8" />
+                        <path d="@access.D2" stroke="#F59E0B" />
+                    </svg>
+                    <span>@access.Label</span>
+                </button>
+            }
+        </div>
+    </section>
+</div>
+
+@code {
+    private string UserName => AppState.Session?.Nombre ?? "Usuario";
+
+    private IEnumerable<ElectroGestion.Models.Solicitud> VisitsToday => AppState.Solicitudes
+        .Where(s => s.Fecha == DateTime.Today.ToString("yyyy-MM-dd") &&
+                    !string.IsNullOrWhiteSpace(s.Hora) &&
+                    s.Estado != "Cancelada" && s.Estado != "Finalizada")
+        .OrderBy(s => s.Hora);
+
+    private ElectroGestion.Models.Solicitud? NextVisit => VisitsToday.FirstOrDefault();
+
+    private IEnumerable<ElectroGestion.Models.Solicitud> RecentActivity => AppState.Solicitudes
+        .OrderByDescending(s => s.FechaSolicitud)
+        .ThenByDescending(s => s.Id)
+        .Take(3);
+
+    private IEnumerable<HomeMetric> Metrics => new[]
+    {
+        new HomeMetric("Solicitudes pendientes", AppState.Solicitudes.Count(s => s.Estado == "Pendiente"), "Ver solicitudes", "/solicitudes"),
+        new HomeMetric("Visitas programadas", VisitsToday.Count(), "Ver agenda", "/agenda"),
+        new HomeMetric("Levantamientos pendientes", AppState.Levantamientos.Count(l => l.Estado == "Pendiente"), "Ver levantamientos", "/levantamientos"),
+        new HomeMetric("Órdenes de trabajo nuevas", AppState.Ordenes.Count(o => o.Estado == "En proceso"), "Ver órdenes", "/ordenes")
+    };
+
+    private readonly HomeQuickAccess[] QuickAccesses =
+    [
+        new("Nueva solicitud", "/solicitudes", "M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z M14 2v6h6", "M12 18v-6 M9 15h6"),
+        new("Crear visita", "/agenda", "M19 4H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6a2 2 0 0 0-2-2z M3 10h18", "M16 2v4 M8 2v4 M8 14h2 M14 14h2 M8 18h2 M14 18h2"),
+        new("Nuevo levantamiento", "/levantamientos", "M12 21a9 9 0 1 0 0-18 9 9 0 0 0 0 18z M12 21v2", "M9.5 14.5l2-5 4-1-2 5z"),
+        new("Órdenes de trabajo", "/ordenes", "M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2 M15 2H9a1 1 0 0 0-1 1v2a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1V3a1 1 0 0 0-1-1z", "M11 11h5 M11 15h5 M11 19h5 M7 11l1.5 1.5 2-2"),
+        new("Clientes", "/clientes", "M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2 M7.5 7a4 4 0 1 1 8 0 4 4 0 0 1-8 0", "M22 21v-2a4 4 0 0 0-3-3.87 M15 3.13a4 4 0 0 1 0 7.75")
+    ];
+
+    private async Task VerMapa(string direccion)
+    {
+        var url = $"https://www.google.com/maps/search/?api=1&query={Uri.EscapeDataString(direccion)}";
+        await JS.InvokeVoidAsync("open", url, "_blank");
+    }
+
+    private static (string D1, string D2) GetServiceIcon(string tipoServicio) => tipoServicio switch
+    {
+        "Instalación Solar" => ("M12 4v2 M12 18v2 M4 12h2 M18 12h2 M6.3 6.3l1.4 1.4 M16.3 16.3l1.4 1.4 M6.3 17.7l1.4-1.4 M16.3 7.7l1.4-1.4", "M16 12a4 4 0 1 1-8 0 4 4 0 0 1 8 0"),
+        "Instalación de Sistema UPS" => ("M7 4h10a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2z", "M12 8v5l-2 2"),
+        "Cableado Estructurado" => ("M4 7h16v10H4z", "M8 7V4 M16 7V4 M12 17v3"),
+        _ => ("M12 3v4 M12 17v4 M3 12h4 M17 12h4", "M8 8l8 8 M16 8l-8 8")
+    };
+
+    private sealed record HomeMetric(string Label, int Value, string Link, string Href);
+    private sealed record HomeQuickAccess(string Label, string Href, string D1, string D2);
+}

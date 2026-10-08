@@ -1,0 +1,81 @@
+@page "/usuarios"
+@inject ElectroGestion.Services.AppStateService AppState
+@inject NavigationManager NavManager
+
+<PageTitle>Usuarios | ElectroGestion</PageTitle>
+
+<div style="display:flex;align-items:flex-start;justify-content:space-between;gap:20px;margin-bottom:24px">
+    <div style="display:flex;align-items:flex-start;">
+        <div>
+            <div class="page-title" style="font-family:'Manrope';font-weight:800;font-size:31px;letter-spacing:-.6px">Gestión de Usuarios</div>
+            <div style="color:#6B7085;font-size:14.5px;margin-top:5px">Administra los accesos al sistema.</div>
+        </div>
+    </div>
+</div>
+
+<div style="background:#fff;border:1px solid #E3E5EE;border-radius:14px;overflow:hidden">
+    <div style="display:grid;grid-template-columns:1fr 1.2fr 1fr .9fr 110px;padding:14px 18px;font-size:12px;font-weight:800;color:#8B90A3;text-transform:uppercase;letter-spacing:.06em;border-bottom:1px solid #EFF0F6"
+        class="resp-table-row">
+        <div>Usuario</div>
+        <div>Nombre</div>
+        <div>Cargo</div>
+        <div>Rol</div>
+        <div style="text-align:right">Acciones</div>
+    </div>
+    
+    @if (!UsuariosList.Any())
+    {
+        <div style="padding:38px;text-align:center;color:#8B90A3;font-size:14px">
+            No hay usuarios registrados.
+        </div>
+    }
+    else
+    {
+        @foreach (var u in UsuariosList)
+        {
+            var colors = GetRolColors(u.Rol);
+            <div style="display:grid;grid-template-columns:1fr 1.2fr 1fr .9fr 110px;padding:16px 18px;border-bottom:1px solid #F4F5FB;align-items:center;font-size:14px"
+                class="resp-table-row">
+                <div style="font-family:ui-monospace,monospace;font-weight:700">@u.UsuarioLogin</div>
+                <div>@u.Nombre</div>
+                <div style="color:#6B7085">@u.Cargo</div>
+                <div>
+                    <span style="display:inline-block;padding:5px 11px;border-radius:20px;font-size:12px;font-weight:800;background:@colors.Bg;color:@colors.Fg">
+                        @u.Rol
+                    </span>
+                </div>
+                <div style="display:flex;gap:8px;justify-content:flex-end">
+                    <button class="edit-btn" title="Modificar"
+                        style="width:32px;height:32px;border:1px solid #D5D8E6;background:#fff;border-radius:8px;cursor:pointer;color:#4A4E63">✎</button>
+                    <button class="del-btn" title="Eliminar"
+                        style="width:32px;height:32px;border:1px solid #F5C2C4;background:#fff;border-radius:8px;cursor:pointer;color:#C4141B">✕</button>
+                </div>
+            </div>
+        }
+    }
+</div>
+
+@code {
+    private List<ElectroGestion.Models.Usuario> UsuariosList = new();
+
+    protected override void OnInitialized()
+    {
+        if (!AppState.EsGerente)
+        {
+            NavManager.NavigateTo("/");
+            return;
+        }
+
+        UsuariosList = AppState.Usuarios.OrderBy(x => x.Nombre).ToList();
+    }
+
+    private (string Bg, string Fg) GetRolColors(string rol)
+    {
+        return rol switch
+        {
+            "Gerente" => ("#F3E8FF", "#6B21A8"),
+            "Administrador" => ("#FEF2F2", "#991B1B"),
+            _ => ("#F0F9FF", "#075985") // Tecnico
+        };
+    }
+}

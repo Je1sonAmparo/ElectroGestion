@@ -1,0 +1,48 @@
+.primary-btn {
+    transition: all 0.2s;
+}
+
+.primary-btn:hover {
+    background: #1E40AF !important;
+}
+
+.search-btn {
+    transition: all 0.2s;
+}
+
+.search-btn:hover {
+    background: #1E40AF !important;
+}
+
+.table-action-btn {
+    transition: all 0.2s;
+}
+
+.table-action-btn:hover {
+    border-color: #1D4ED8 !important;
+    color: #1D4ED8 !important;
+}
+
+.modal-close-btn {
+    transition: all 0.2s;
+}
+
+.modal-close-btn:hover {
+    color: #14162B !important;
+}
+
+.modal-cancel-btn {
+    transition: all 0.2s;
+}
+
+.modal-cancel-btn:hover {
+    background: #F4F5FB !important;
+}
+
+.modal-save-btn {
+    transition: all 0.2s;
+}
+
+.modal-save-btn:hover {
+    background: #1E40AF !important;
+}

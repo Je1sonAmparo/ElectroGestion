@@ -1,0 +1,40 @@
+.action-btn-guardar, .guardar-btn {
+    transition: all 0.2s;
+}
+
+.action-btn-guardar:hover, .guardar-btn:hover {
+    background: #EDEBFF !important;
+}
+
+.action-btn-card, .foto-btn {
+    transition: all 0.2s;
+}
+
+.action-btn-card:hover, .foto-btn:hover {
+    border-color: #1D4ED8 !important;
+    color: #1D4ED8 !important;
+}
+
+.volver-btn, .cancelar-btn {
+    transition: all 0.2s;
+}
+
+.volver-btn:hover, .cancelar-btn:hover {
+    opacity: 0.8;
+}
+
+.rechazar-btn {
+    transition: all 0.2s;
+}
+
+.rechazar-btn:hover {
+    background: #FDE9EA !important;
+}
+
+.enviar-btn {
+    transition: all 0.2s;
+}
+
+.enviar-btn:hover {
+    background: #1E40AF !important;
+}

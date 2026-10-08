@@ -1,0 +1,303 @@
+@page "/reportes"
+
+<PageTitle>@(View == AnnualView ? "Reporte de Consumo en Servicios del último año" : "Reportes") | ElectroGestion</PageTitle>
+
+<div class="reports-page">
+    <header class="reports-header">
+        <div>
+            <h1 class="page-title">@(View == AnnualView ? "Reporte de Consumo en Servicios del último año" : "Reportes")</h1>
+            <p>@(View == AnnualView ? "Análisis operativo detallado por tipo de servicio e inventario consumido." : "Análisis operativo y financiero del sistema.")</p>
+        </div>
+    </header>
+
+    @if (View == OverviewView)
+    {
+        <section class="report-overview-grid" aria-label="Tipos de reporte">
+            <button class="report-overview-card report-overview-active" @onclick="OpenConsumptionList">
+                <span class="report-icon report-icon-blue" aria-hidden="true">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4.5 4.5h15v15h-15z"/><path d="M8 14v2.5M12 10v6.5M16 12v4.5"/></svg>
+                </span>
+                <span class="report-card-title">Consumo en Servicios</span>
+                <span class="report-card-description">Análisis operativo detallado por tipo de servicio e inventario consumido del último año.</span>
+                <span class="report-card-link">Ver reporte <span aria-hidden="true">&rarr;</span></span>
+            </button>
+
+            <div class="report-overview-card report-overview-disabled" aria-disabled="true">
+                <span class="report-icon report-icon-amber" aria-hidden="true">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v10M8.5 13.5h7"/></svg>
+                </span>
+                <span class="report-card-title">Reportes Financieros</span>
+                <span class="report-card-description">Ingresos, egresos y balance general por período.</span>
+                <span class="report-card-disabled-label">Próximamente</span>
+            </div>
+
+            <div class="report-overview-card report-overview-disabled" aria-disabled="true">
+                <span class="report-icon report-icon-green" aria-hidden="true">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9.3 11.2a3.3 3.3 0 1 0 0-6.6 3.3 3.3 0 0 0 0 6.6ZM3.5 20.3c0-3.3 2.6-5.7 5.8-5.7s5.8 2.4 5.8 5.7M16.2 5.3a3.1 3.1 0 0 1 0 5.9M17.2 15c1.9.7 3.3 2.7 3.3 5.3"/></svg>
+                </span>
+                <span class="report-card-title">Rendimiento de Técnicos</span>
+                <span class="report-card-description">Productividad, servicios completados y métricas por técnico.</span>
+                <span class="report-card-disabled-label">Próximamente</span>
+            </div>
+        </section>
+    }
+    else if (View == ConsumptionListView)
+    {
+        <nav class="report-breadcrumb" aria-label="Ruta de navegación">
+            <button @onclick="GoOverview">Reportes</button>
+            <span aria-hidden="true">/</span>
+            <span aria-current="page">Consumo en Servicios</span>
+        </nav>
+
+        <div class="report-section-heading">
+            <h2>Reportes de Consumo en Servicios</h2>
+            <p>Seleccione el reporte que desea visualizar.</p>
+        </div>
+
+        <section class="report-list" aria-label="Reportes de consumo">
+            <button class="report-list-item report-list-active" @onclick="OpenAnnualReport">
+                <span class="report-icon report-icon-blue" aria-hidden="true">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4.5 6.5h15v14h-15zM4.5 11h15M8.5 3.8v4M15.5 3.8v4"/></svg>
+                </span>
+                <span class="report-list-copy">
+                    <span class="report-list-title">Reporte de Consumo en Servicios del último año</span>
+                    <span class="report-list-description">Vista general de servicios y materiales utilizados durante el año.</span>
+                </span>
+                <svg class="report-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m9 18 6-6-6-6"/></svg>
+            </button>
+
+            <div class="report-list-item report-list-disabled" aria-disabled="true">
+                <span class="report-icon report-icon-muted" aria-hidden="true">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4.5 6.5h15v14h-15zM4.5 11h15M8.5 3.8v4M15.5 3.8v4"/></svg>
+                </span>
+                <span class="report-list-copy">
+                    <span class="report-list-title">Reporte de Consumo Mensual</span>
+                    <span class="report-list-description">Desglose mensual de recursos consumidos. (Próximamente)</span>
+                </span>
+            </div>
+
+            <div class="report-list-item report-list-disabled" aria-disabled="true">
+                <span class="report-icon report-icon-muted" aria-hidden="true">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9M16.5 3.5a2.12 2.12 0 1 1 3 3L7 19l-4 1 1-4 12.5-12.5Z"/></svg>
+                </span>
+                <span class="report-list-copy">
+                    <span class="report-list-title">Reporte de Materiales por Técnico</span>
+                    <span class="report-list-description">Consumo específico asignado a cada técnico de campo. (Próximamente)</span>
+                </span>
+            </div>
+        </section>
+    }
+    else
+    {
+        <nav class="report-breadcrumb" aria-label="Ruta de navegación">
+            <button @onclick="GoOverview">Reportes</button>
+            <span aria-hidden="true">/</span>
+            <button @onclick="OpenConsumptionList">Consumo en Servicios</button>
+            <span aria-hidden="true">/</span>
+            <span aria-current="page">Reporte de Consumo en Servicios del último año</span>
+        </nav>
+
+        <section class="report-filter-bar" aria-label="Filtros del reporte">
+            <div class="report-period">
+                <svg viewBox="0 0 24 24" width="21" height="21" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4.5 6.5h15v14h-15zM4.5 11h15M8.5 3.8v4M15.5 3.8v4"/></svg>
+                <span>Período: <strong>Último Año</strong></span>
+            </div>
+            <label class="report-filter-control">
+                <span class="visually-hidden">Año del reporte</span>
+                <select @bind="SelectedYear">
+                    @foreach (var year in Years)
+                    {
+                        <option value="@year">@year</option>
+                    }
+                </select>
+            </label>
+            <label class="report-filter-control report-category-control">
+                <span>Categoría:</span>
+                <select @bind="SelectedCategory">
+                    <option value="Todos los Servicios">Todos los Servicios</option>
+                    @foreach (var row in ReportRows)
+                    {
+                        <option value="@row.Name">@row.Name</option>
+                    }
+                </select>
+            </label>
+            <button class="report-update-button" @onclick="UpdateReport">Actualizar Reporte</button>
+        </section>
+
+        <section class="report-metrics-layout" aria-label="Indicadores del reporte @AppliedYear">
+            <div class="report-metric-stack">
+                <article class="report-metric-card">
+                    <div class="report-metric-label">Total Consumo (RD$)</div>
+                    <div class="report-metric-value">@FormatMoney(TotalConsumption)</div>
+                </article>
+                <article class="report-metric-card">
+                    <div class="report-metric-label">Costo de Inventario<br />en Riesgo de Merma (RD$)</div>
+                    <div class="report-metric-value">@FormatMoney(InventoryRisk)</div>
+                </article>
+            </div>
+            <div class="report-metric-stack">
+                <article class="report-metric-card">
+                    <div class="report-metric-label">Costo Promedio de Consumo<br />por Instalación (RD$)</div>
+                    <div class="report-metric-value">@FormatMoney(AverageConsumption)</div>
+                </article>
+                <article class="report-metric-card">
+                    <div class="report-metric-label">Servicio con Mayor Consumo</div>
+                    <div class="report-metric-service">@HighestConsumptionService</div>
+                </article>
+            </div>
+            <article class="report-chart-card">
+                <h2>Porcentaje de Consumo de Materiales por Categoría</h2>
+                <div class="report-donut-layout">
+                    <svg class="report-donut-svg" viewBox="-55 0 400 210" role="img" aria-label="Consumo: Climatización 30%, Paneles Solares 25%, Redes 20%, Automatización 15%, Seguridad 10%">
+                        <g transform="translate(45 0)">
+                        <g transform="translate(100 105) rotate(-90) translate(-100 -105)">
+                            <circle cx="100" cy="105" r="55" fill="none" stroke="#1D4ED8" stroke-width="30" stroke-dasharray="103.67 241.90" />
+                            <circle cx="100" cy="105" r="55" fill="none" stroke="#3B82F6" stroke-width="30" stroke-dasharray="86.39 259.18" stroke-dashoffset="-103.67" />
+                            <circle cx="100" cy="105" r="55" fill="none" stroke="#60A5FA" stroke-width="30" stroke-dasharray="69.12 276.46" stroke-dashoffset="-190.06" />
+                            <circle cx="100" cy="105" r="55" fill="none" stroke="#93C5FD" stroke-width="30" stroke-dasharray="51.84 293.74" stroke-dashoffset="-259.18" />
+                            <circle cx="100" cy="105" r="55" fill="none" stroke="#BFDBFE" stroke-width="30" stroke-dasharray="34.56 311.02" stroke-dashoffset="-311.02" />
+                        </g>
+                        <circle cx="100" cy="105" r="70" fill="none" stroke="#14162B" stroke-width="1.5" />
+                        <circle cx="100" cy="105" r="40" fill="#fff" stroke="#14162B" stroke-width="1.5" />
+                        <path d="M100 35v30 M121.6 38.4 112.4 67 M166.6 126.6 138 117.4 M100 175v-30 M43.4 146.2 67.7 128.5 M30 105h30" fill="none" stroke="#14162B" stroke-width="1.2" />
+
+                        <polyline points="135,66 149,54 165,54" fill="none" stroke="#1D4ED8" stroke-width="1.4" />
+                        <text x="169" y="52" class="pie-label" text-anchor="start">Climatización (AC)</text>
+                        <text x="169" y="64" class="pie-percent" text-anchor="start" fill="#1D4ED8">30%</text>
+
+                        <polyline points="128,158 138,177 151,177" fill="none" stroke="#3B82F6" stroke-width="1.4" />
+                        <text x="155" y="175" class="pie-label" text-anchor="start">Paneles Solares</text>
+                        <text x="155" y="187" class="pie-percent" text-anchor="start" fill="#3B82F6">25%</text>
+
+                        <polyline points="35,146 21,158 8,158" fill="none" stroke="#60A5FA" stroke-width="1.4" />
+                        <text x="7" y="156" class="pie-label" text-anchor="end">Redes</text>
+                        <text x="7" y="168" class="pie-percent" text-anchor="end" fill="#60A5FA">20%</text>
+
+                        <polyline points="34,81 20,70 6,70" fill="none" stroke="#93C5FD" stroke-width="1.4" />
+                        <text x="5" y="68" class="pie-label" text-anchor="end">Automatización</text>
+                        <text x="5" y="80" class="pie-percent" text-anchor="end" fill="#93C5FD">15%</text>
+
+                        <polyline points="79,38 72,20 58,20" fill="none" stroke="#BFDBFE" stroke-width="1.4" />
+                        <text x="57" y="18" class="pie-label" text-anchor="end">Seguridad</text>
+                        <text x="57" y="30" class="pie-percent" text-anchor="end" fill="#BFDBFE">10%</text>
+                        </g>
+                    </svg>
+                    <div class="report-legend">
+                        <div><span class="legend-swatch swatch-blue"></span>Climatización (AC) (30%)</div>
+                        <div><span class="legend-swatch swatch-blue-2"></span>Paneles Solares (25%)</div>
+                        <div><span class="legend-swatch swatch-blue-3"></span>Redes (20%)</div>
+                        <div><span class="legend-swatch swatch-blue-4"></span>Automatización (15%)</div>
+                        <div><span class="legend-swatch swatch-blue-5"></span>Seguridad (10%)</div>
+                    </div>
+                </div>
+            </article>
+        </section>
+
+        <section class="report-data-layout" aria-label="Detalle del consumo">
+            <div class="report-table-wrap">
+                <table class="report-data-table">
+                    <thead>
+                        <tr>
+                            <th>Servicio de Instalación</th>
+                            <th>Materiales (RD$)</th>
+                            <th>Consumibles (RD$)</th>
+                            <th>Total (RD$)</th>
+                            <th>Instalaciones</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var row in VisibleRows)
+                        {
+                            <tr>
+                                <th scope="row">@row.Name</th>
+                                <td>RD$ @FormatMoney(row.MaterialCost)</td>
+                                <td>RD$ @FormatMoney(row.ConsumableCost)</td>
+                                <td class="report-row-total">RD$ @FormatMoney(row.TotalCost)</td>
+                                <td class="report-installations">@row.Installations</td>
+                            </tr>
+                        }
+                        @if (SelectedCategory == AllServices)
+                        {
+                            <tr class="report-total-row">
+                                <th scope="row">TOTAL</th>
+                                <td>RD$ @FormatMoney(933000m)</td>
+                                <td>RD$ @FormatMoney(463000m)</td>
+                                <td>RD$ @FormatMoney(1625000m)</td>
+                                <td class="report-installations">108</td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+
+            <article class="report-monthly-card">
+                <h2>Tendencia Mensual de Consumo (Costo)</h2>
+                <div class="report-bar-chart" role="img" aria-label="Tendencia de consumo: octubre 450 mil, septiembre 380 mil, agosto 520 mil pesos">
+                    <div class="report-y-axis"><span>1,000,000</span><span>800,000</span><span>600,000</span><span>400,000</span><span>200,000</span><span>0</span></div>
+                    <div class="report-bars">
+                        <div class="report-bar-column"><strong>450,000</strong><span class="report-bar" style="--bar-height:45%"></span><span class="report-month">Oct</span></div>
+                        <div class="report-bar-column"><strong>380,000</strong><span class="report-bar" style="--bar-height:38%"></span><span class="report-month">Sep</span></div>
+                        <div class="report-bar-column"><strong>520,000</strong><span class="report-bar" style="--bar-height:52%"></span><span class="report-month">Ago</span></div>
+                    </div>
+                </div>
+                <div class="report-chart-caption"><span class="legend-swatch swatch-blue-2"></span>Consumo Total (RD$)</div>
+            </article>
+        </section>
+    }
+</div>
+
+@code {
+    private const string OverviewView = "overview";
+    private const string ConsumptionListView = "consumption-list";
+    private const string AnnualView = "annual-consumption";
+    private const string AllServices = "Todos los Servicios";
+
+    private string View = OverviewView;
+    private string SelectedYear = "Año 2025";
+    private string SelectedCategory = AllServices;
+    private string AppliedYear = "Año 2025";
+    private string AppliedCategory = AllServices;
+    private readonly string[] Years = ["Año 2025", "Año 2024", "Año 2023", "Año 2022", "Año 2021"];
+
+    private readonly List<ReportRow> ReportRows =
+    [
+        new("Solar", "Instalación Paneles Solares", 250000m, 120000m, 30, 12000m),
+        new("AC (Industrial)", "Instalación de Sistema UPS", 180000m, 75000m, 25, 15000m),
+        new("AC (Residencial)", "Instalación de Sistema UPS", 150000m, 65000m, 16, 10000m),
+        new("Cableado Red", "Cableado Estructurado", 160000m, 70000m, 22, 9000m),
+        new("Seguridad", "Mantenimiento Eléctrico", 83000m, 23000m, 12, 8000m),
+        new("Automatización", "Instalación de Planta Eléctrica", 110000m, 110000m, 3, 21000m)
+    ];
+
+    private IEnumerable<ReportRow> VisibleRows => AppliedCategory == AllServices
+        ? ReportRows
+        : ReportRows.Where(row => row.Name == AppliedCategory);
+
+    private bool IsAllServices => AppliedCategory == AllServices;
+    private decimal TotalConsumption => IsAllServices ? 1625000m : VisibleRows.Sum(row => row.TotalCost);
+    private decimal InventoryRisk => IsAllServices ? 75000m : VisibleRows.Sum(row => row.InventoryRisk);
+    private int InstallationCount => IsAllServices ? 108 : VisibleRows.Sum(row => row.Installations);
+    private decimal AverageConsumption => IsAllServices
+        ? 1696.24m
+        : InstallationCount == 0 ? 0 : TotalConsumption / InstallationCount;
+    private string HighestConsumptionService => IsAllServices
+        ? "Instalación Paneles Solares"
+        : VisibleRows.FirstOrDefault()?.ServiceLabel ?? "—";
+
+    private void OpenConsumptionList() => View = ConsumptionListView;
+    private void OpenAnnualReport() => View = AnnualView;
+    private void GoOverview() => View = OverviewView;
+
+    private void UpdateReport()
+    {
+        AppliedYear = SelectedYear;
+        AppliedCategory = SelectedCategory;
+    }
+
+    private static string FormatMoney(decimal value) => value.ToString("#,##0.00", System.Globalization.CultureInfo.InvariantCulture);
+
+    private sealed record ReportRow(string Name, string ServiceLabel, decimal MaterialCost, decimal ConsumableCost, int Installations, decimal InventoryRisk)
+    {
+        public decimal TotalCost => MaterialCost + ConsumableCost;
+    }
+}
