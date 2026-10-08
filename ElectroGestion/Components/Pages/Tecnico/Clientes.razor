@@ -1,0 +1,89 @@
+@inject ElectroGestion.Services.AppStateService AppState
+@inject NavigationManager NavManager
+@inject IJSRuntime JS
+
+<PageTitle>Contactos de Clientes (Campo) | ElectroGestion</PageTitle>
+
+<div style="display:flex;align-items:flex-start;justify-content:space-between;gap:20px;margin-bottom:24px">
+    <div>
+        <div class="page-title" style="font-family:'Manrope';font-weight:800;font-size:31px;letter-spacing:-.6px">Contactos de Clientes</div>
+        <div style="color:#6B7085;font-size:14.5px;margin-top:5px">Directorio telefónico y direcciones para visitas de campo.</div>
+    </div>
+</div>
+
+<div style="background:#fff;border:1px solid #E3E5EE;border-radius:14px;padding:18px;margin-bottom:20px">
+    <input @bind="SearchTerm" @bind:event="oninput" placeholder="Buscar por cliente, teléfono o dirección de obra..."
+        style="width:100%;max-width:440px;padding:11px 14px;border:1px solid #D5D8E6;border-radius:9px;font-size:14px" />
+</div>
+
+<div style="display:grid;grid-template-columns:repeat(2,1fr);gap:16px" class="resp-grid-2">
+    @foreach (var c in FilteredClientes)
+    {
+        <div style="background:#fff;border:1px solid #E3E5EE;border-radius:14px;padding:22px;display:flex;flex-direction:column;justify-content:space-between">
+            <div>
+                <div style="display:flex;justify-content:space-between;align-items:flex-start">
+                    <div style="font-family:'Manrope';font-weight:800;font-size:18px;color:#14162B">@c.Nombre</div>
+                    <span style="font-size:12px;font-weight:700;color:#1D4ED8;background:#EDEBFF;padding:4px 8px;border-radius:6px">
+                        @c.Servicios serv.
+                    </span>
+                </div>
+                
+                <div style="margin-top:14px;display:flex;flex-direction:column;gap:8px">
+                    <div style="display:flex;align-items:center;gap:10px;font-size:14px;color:#4A4E63">
+                        <span style="color:#1D4ED8;font-weight:800">📞</span>
+                        <a href="tel:@c.Telefono" style="color:#1D4ED8;font-weight:700;text-decoration:none">@c.Telefono</a>
+                        @if (!string.IsNullOrEmpty(c.Telefono2))
+                        {
+                            <span style="color:#A1A5B7">·</span>
+                            <a href="tel:@c.Telefono2" style="color:#6B7085;text-decoration:none">@c.Telefono2</a>
+                        }
+                    </div>
+                    <div style="display:flex;align-items:flex-start;gap:10px;font-size:14px;color:#4A4E63">
+                        <span style="color:#1D4ED8;font-weight:800">📍</span>
+                        <span>@c.Direccion</span>
+                    </div>
+                    @if (!string.IsNullOrEmpty(c.Ultimo))
+                    {
+                        <div style="font-size:12.5px;color:#8B90A3;margin-top:4px">
+                            Último trabajo: <strong style="color:#4A4E63">@c.Ultimo</strong>
+                        </div>
+                    }
+                </div>
+            </div>
+
+            <div style="display:flex;gap:10px;margin-top:20px;padding-top:16px;border-top:1px solid #EFF0F6">
+                <a href="tel:@c.Telefono" style="flex:1;text-align:center;padding:10px;background:#EDEBFF;color:#1D4ED8;border-radius:8px;font-size:13.5px;font-weight:700;text-decoration:none">
+                    Llamar
+                </a>
+                <button @onclick="() => AbrirMapa(c.Direccion)" style="flex:1;padding:10px;background:#1D4ED8;color:#fff;border:0;border-radius:8px;font-size:13.5px;font-weight:700;cursor:pointer">
+                    Ver en Maps
+                </button>
+            </div>
+        </div>
+    }
+</div>
+
+@if (!FilteredClientes.Any())
+{
+    <div style="background:#fff;border:1px solid #E3E5EE;border-radius:14px;padding:40px;text-align:center;color:#8B90A3">
+        No se encontraron clientes para la búsqueda ingresada.
+    </div>
+}
+
+@code {
+    private string SearchTerm = "";
+
+    private List<ElectroGestion.Models.Cliente> FilteredClientes => AppState.Clientes
+        .Where(c => string.IsNullOrEmpty(SearchTerm) ||
+                    c.Nombre.Contains(SearchTerm, StringComparison.OrdinalIgnoreCase) ||
+                    c.Telefono.Contains(SearchTerm, StringComparison.OrdinalIgnoreCase) ||
+                    c.Direccion.Contains(SearchTerm, StringComparison.OrdinalIgnoreCase))
+        .OrderBy(c => c.Nombre)
+        .ToList();
+
+    private void AbrirMapa(string direccion)
+    {
+        var url = $"https://www.google.com/maps/search/?api=1&query={Uri.EscapeDataString(direccion)}";
+        JS.InvokeVoidAsync("open", url, "_blank");
+    }
+}

@@ -213,8 +213,182 @@ textarea:focus {
     font-size: 14px !important;
   }
 
-  /* Reduce gaps in forms */
+/* Reduce gaps in forms */
   .resp-grid-2 {
     gap: 12px !important;
   }
 }
+
+/* Sidebar Nav Items */
+.nav-item-btn {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  text-align: left;
+  border: 0;
+  cursor: pointer;
+  border-radius: 10px;
+  font-size: 14.5px;
+  transition: all 0.2s;
+  font-weight: 600;
+  background: transparent;
+  color: #4A4E63;
+  text-decoration: none;
+}
+
+.nav-item-btn:hover {
+  background: #F4F5FB;
+  color: #4A4E63;
+}
+
+.nav-item-btn .path-d1 { stroke: #6B7085; }
+.nav-item-btn .path-d2 { stroke: #A1A5B7; }
+
+.nav-item-btn.active {
+  font-weight: 800;
+  background: #EDEBFF;
+  color: #1D4ED8;
+}
+
+.nav-item-btn.active:hover {
+  background: #EDEBFF;
+  color: #1D4ED8;
+}
+
+.nav-item-btn.active .path-d1 { stroke: #1D4ED8; }
+.nav-item-btn.active .path-d2 { stroke: #F59E0B; }
+
+/* ===== TOASTS OVERRIDES (To match original design) ===== */
+.toast-container {
+    bottom: 22px !important;
+    right: 22px !important;
+    top: auto !important;
+    left: auto !important;
+    gap: 10px;
+    z-index: 9999;
+    padding: 0 !important;
+    margin: 0 !important;
+}
+
+.toast-container .toast {
+    background: #fff !important;
+    border: 1px solid #E3E5EE !important;
+    border-radius: 11px !important;
+    padding: 0 !important;
+    box-shadow: 0 12px 28px rgba(20,22,43,.14) !important;
+    font-size: 14px !important;
+    font-family: 'Lato', sans-serif !important;
+    font-weight: 700 !important;
+    max-width: 340px !important;
+    color: #14162B !important;
+    overflow: hidden !important;
+    opacity: 1 !important;
+    animation: tin .2s ease-out;
+}
+
+@keyframes tin {
+    0% { transform: translateY(20px); opacity: 0; }
+    100% { transform: translateY(0); opacity: 1; }
+}
+
+.toast-container .toast-header {
+    display: none !important;
+}
+
+.toast-container .toast-body {
+    padding: 13px 17px !important;
+    color: #14162B !important;
+    background-color: transparent !important;
+}
+
+.toast-container .toast.bg-primary {
+    border-left: 4px solid #1D4ED8 !important;
+}
+.toast-container .toast.bg-success {
+    border-left: 4px solid #1D4ED8 !important; /* using primary blue as default success */
+}
+.toast-container .toast.bg-danger {
+    border-left: 4px solid #E11B22 !important;
+}
+.toast-container .toast.bg-warning {
+    border-left: 4px solid #B26A00 !important;
+}
+.toast-container .toast.bg-info {
+    border-left: 4px solid #1D4ED8 !important;
+}
+.acceso-rapido-btn:hover {
+    border-color: #1D4ED8 !important;
+    color: #1D4ED8 !important;
+}
+.acceso-rapido-btn:hover .path-d1 {
+    stroke: #1D4ED8 !important;
+}
+.acceso-rapido-btn:hover .path-d2 {
+    stroke: #F59E0B !important;
+}
+.toast-container .toast .btn-close { display: none !important; }
+.toast-container .toast .bi { display: none !important; }
+.toast-container .toast .d-flex { gap: 0 !important; align-items: center; }
+.toast-container .toast-body { padding: 13px 17px !important; display: flex !important; width: 100%; }
+
+/* ===== TOASTS OVERRIDES (To match original design) ===== */
+.toast-container {
+    position: fixed;
+    bottom: 24px !important;
+    right: 24px !important;
+    z-index: 9999 !important;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    align-items: flex-end;
+}
+.toast-container .toast {
+    background: #fff !important;
+    border: 1px solid #E3E5EE !important;
+    border-left: 4px solid #1D4ED8 !important; /* Default border */
+    border-radius: 11px !important;
+    padding: 13px 17px !important;
+    box-shadow: 0 12px 28px rgba(20, 22, 43, .14) !important;
+    font-size: 14px !important;
+    font-weight: 700 !important;
+    max-width: 340px !important;
+    animation: tin .2s ease-out !important;
+    color: #14162B !important;
+    display: block !important;
+    margin: 0 !important;
+    opacity: 1 !important;
+    width: auto !important;
+}
+
+/* Different colors based on type, Blazor Bootstrap adds bg-* classes or text-* classes */
+.toast-container .toast.bg-success {
+    border-left-color: #10B981 !important;
+    background: #fff !important;
+}
+.toast-container .toast.bg-danger {
+    border-left-color: #EF4444 !important;
+    background: #fff !important;
+}
+.toast-container .toast.bg-warning {
+    border-left-color: #F59E0B !important;
+    background: #fff !important;
+}
+.toast-container .toast.bg-info {
+    border-left-color: #3B82F6 !important;
+    background: #fff !important;
+}
+
+/* Hide unnecessary Blazor Bootstrap toast headers, icons, and close buttons */
+.toast-container .toast .toast-header { display: none !important; }
+.toast-container .toast .btn-close { display: none !important; }
+.toast-container .toast .bi { display: none !important; }
+.toast-container .toast .toast-body {
+    padding: 0 !important;
+    color: #14162B !important;
+    background: transparent !important;
+    font-weight: 700 !important;
+    font-family: 'Manrope', sans-serif !important;
+}
+

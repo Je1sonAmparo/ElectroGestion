@@ -1,0 +1,180 @@
+@implements IDisposable
+@inject ElectroGestion.Services.AppStateService AppState
+@inject NavigationManager NavManager
+@inject ToastService ToastService
+
+<PageTitle>Órdenes de Trabajo (Administración) | ElectroGestion</PageTitle>
+
+<div style="display:flex;align-items:flex-start;justify-content:space-between;gap:20px;margin-bottom:24px">
+    <div>
+        <div class="page-title" style="font-family:'Manrope';font-weight:800;font-size:31px;letter-spacing:-.6px">Control de Órdenes de Trabajo</div>
+        <div style="color:#6B7085;font-size:14.5px;margin-top:5px">Supervisión, asignación de materiales y monitoreo de órdenes emitidas por administración.</div>
+    </div>
+    <button @onclick="NuevaOrden" style="padding:12px 18px;background:#1D4ED8;color:#fff;border:0;border-radius:10px;font-weight:700;font-size:14.5px;cursor:pointer;font-family:'Manrope';white-space:nowrap">
+        + Nueva Orden de Trabajo
+    </button>
+</div>
+
+@* Resumen métrico *@
+<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-bottom:20px" class="resp-grid-3">
+    <div style="background:#fff;border:1px solid #E3E5EE;border-radius:12px;padding:16px 20px">
+        <div style="font-size:12.5px;color:#6B7085;font-weight:700">Total Órdenes Emitidas</div>
+        <div style="font-family:'Manrope';font-weight:800;font-size:30px;color:#1D4ED8;margin-top:4px">@AppState.Ordenes.Count</div>
+    </div>
+    <div style="background:#fff;border:1px solid #E3E5EE;border-radius:12px;padding:16px 20px">
+        <div style="font-size:12.5px;color:#6B7085;font-weight:700">Órdenes en Ejecución</div>
+        <div style="font-family:'Manrope';font-weight:800;font-size:30px;color:#F59E0B;margin-top:4px">@AppState.Ordenes.Count(o => o.Estado == "En proceso")</div>
+    </div>
+    <div style="background:#fff;border:1px solid #E3E5EE;border-radius:12px;padding:16px 20px">
+        <div style="font-size:12.5px;color:#6B7085;font-weight:700">Órdenes Finalizadas</div>
+        <div style="font-family:'Manrope';font-weight:800;font-size:30px;color:#10B981;margin-top:4px">@AppState.Ordenes.Count(o => o.Estado == "Finalizada")</div>
+    </div>
+</div>
+
+<div style="background:#fff;border:1px solid #E3E5EE;border-radius:14px;padding:18px;margin-bottom:16px">
+    <div style="display:flex;gap:14px;align-items:center;flex-wrap:wrap">
+        <input @bind="SearchTerm" @bind:event="oninput" placeholder="Buscar por código, cliente o tipo de servicio..."
+            style="flex:1;min-width:240px;padding:11px 14px;border:1px solid #D5D8E6;border-radius:9px;font-size:14px" />
+        <div style="display:flex;align-items:center;gap:10px">
+            <span style="font-size:13.5px;color:#6B7085;font-weight:700">Estado:</span>
+            <select @bind="SearchEstado" style="padding:11px 14px;border:1px solid #D5D8E6;border-radius:9px;font-size:14px;background:#fff;min-width:180px">
+                <option value="Todas">Todas</option>
+                <option value="En proceso">En proceso</option>
+                <option value="Finalizada">Finalizada</option>
+            </select>
+        </div>
+    </div>
+</div>
+
+<div style="display:flex;flex-direction:column;gap:16px">
+    @foreach (var o in FilteredOrdenes)
+    {
+        var s = AppState.Solicitudes.FirstOrDefault(x => x.Id == o.SolicitudId);
+        var cliente = string.IsNullOrEmpty(o.Cliente) ? (s?.Cliente ?? "Cliente") : o.Cliente;
+        var tipoServicio = string.IsNullOrEmpty(o.TipoServicio) ? (s?.TipoServicio ?? "Servicio Eléctrico") : o.TipoServicio;
+        var colors = AppStateService.GetBadgeColors(o.Estado);
+
+        <div style="background:#fff;border:1px solid #E3E5EE;border-radius:14px;padding:22px">
+            <div style="display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:12px">
+                <div>
+                    <div style="display:flex;align-items:center;gap:10px">
+                        <span style="font-family:ui-monospace,monospace;font-size:13px;font-weight:800;color:#1D4ED8;background:#EDEBFF;padding:4px 8px;border-radius:6px">
+                            @(string.IsNullOrEmpty(o.Code) ? "OT-" + o.Id.ToString("D4") : o.Code)
+                        </span>
+                        <span style="font-family:'Manrope';font-weight:800;font-size:18px">@cliente</span>
+                    </div>
+                    <div style="color:#6B7085;font-size:14px;margin-top:4px">@tipoServicio</div>
+                </div>
+                <div style="display:flex;align-items:center;gap:10px">
+                    <span style="display:inline-block;padding:5px 12px;border-radius:20px;font-size:12px;font-weight:800;background:@colors.Bg;color:@colors.Fg">
+                        @o.Estado
+                    </span>
+                    <button @onclick="() => ToggleEstado(o.Id)" style="padding:6px 12px;border:1px solid #D5D8E6;background:#fff;border-radius:7px;font-size:12px;font-weight:700;cursor:pointer;color:#1D4ED8">
+                        Cambiar Estado
+                    </button>
+                </div>
+            </div>
+
+            <div style="display:grid;grid-template-columns:1.2fr 1fr;gap:20px;margin-top:16px" class="resp-grid-2">
+                <div>
+                    <div style="font-size:12px;color:#8B90A3;font-weight:800;text-transform:uppercase;letter-spacing:.05em">
+                        Tareas Asignadas
+                    </div>
+                    <div style="display:flex;flex-direction:column;gap:6px;margin-top:8px">
+                        @if (o.Trabajos != null)
+                        {
+                            @foreach (var t in o.Trabajos)
+                            {
+                                <div style="font-size:13.5px;color:#334155;display:flex;gap:8px">
+                                    <span style="color:#1D4ED8;font-weight:800">•</span>
+                                    <span>@t</span>
+                                </div>
+                            }
+                        }
+                    </div>
+                </div>
+
+                <div>
+                    <div style="font-size:12px;color:#8B90A3;font-weight:800;text-transform:uppercase;letter-spacing:.05em">
+                        Materiales y Repuestos Despachados
+                    </div>
+                    <div style="display:flex;gap:6px;flex-wrap:wrap;margin-top:8px">
+                        @if (o.Materiales != null)
+                        {
+                            @foreach (var m in o.Materiales)
+                            {
+                                <span style="padding:4px 9px;border:1px solid #E3E5EE;border-radius:16px;font-size:12px;background:#F8FAFC;color:#475569">
+                                    @m
+                                </span>
+                            }
+                        }
+                    </div>
+                </div>
+            </div>
+
+            @if (!string.IsNullOrEmpty(o.Observaciones))
+            {
+                <div style="margin-top:14px;padding-top:12px;border-top:1px solid #EFF0F6;font-size:13px;color:#64748B">
+                    <strong>Notas de Administración:</strong> @o.Observaciones
+                </div>
+            }
+        </div>
+    }
+</div>
+
+@if (!FilteredOrdenes.Any())
+{
+    <div style="background:#fff;border:1px solid #E3E5EE;border-radius:14px;padding:40px;text-align:center;color:#8B90A3">
+        No se encontraron órdenes registradas.
+    </div>
+}
+
+@code {
+    private string SearchTerm = "";
+    private string SearchEstado = "Todas";
+
+    private List<ElectroGestion.Models.OrdenTrabajo> FilteredOrdenes => AppState.Ordenes
+        .Where(o => {
+            var s = AppState.Solicitudes.FirstOrDefault(x => x.Id == o.SolicitudId);
+            var cliente = string.IsNullOrEmpty(o.Cliente) ? (s?.Cliente ?? "") : o.Cliente;
+            var tipo = string.IsNullOrEmpty(o.TipoServicio) ? (s?.TipoServicio ?? "") : o.TipoServicio;
+            var code = o.Code ?? "";
+            bool matchTerm = string.IsNullOrEmpty(SearchTerm) || 
+                             cliente.Contains(SearchTerm, StringComparison.OrdinalIgnoreCase) || 
+                             tipo.Contains(SearchTerm, StringComparison.OrdinalIgnoreCase) ||
+                             code.Contains(SearchTerm, StringComparison.OrdinalIgnoreCase);
+            bool matchEstado = SearchEstado == "Todas" || o.Estado == SearchEstado;
+            return matchTerm && matchEstado;
+        })
+        .OrderByDescending(x => x.Id).ToList();
+
+    protected override void OnInitialized()
+    {
+        AppState.OnChange += OnStateChanged;
+    }
+
+    public void Dispose()
+    {
+        AppState.OnChange -= OnStateChanged;
+    }
+
+    private async void OnStateChanged()
+    {
+        await InvokeAsync(StateHasChanged);
+    }
+
+    private void ToggleEstado(int id)
+    {
+        var o = AppState.Ordenes.FirstOrDefault(x => x.Id == id);
+        if (o != null)
+        {
+            o.Estado = o.Estado == "En proceso" ? "Finalizada" : "En proceso";
+            ToastService.ShowToast(ToastType.Info, "Info", $"Estado de orden #{o.Code ?? o.Id.ToString()} actualizado a '{o.Estado}'.");
+        }
+    }
+
+    private void NuevaOrden()
+    {
+        ToastService.ShowSuccess("Apertura de nueva orden de trabajo en desarrollo.", "Éxito");
+    }
+}

@@ -201,12 +201,17 @@ else
 
     protected override void OnInitialized()
     {
-        AppState.OnChange += StateHasChanged;
+        AppState.OnChange += OnStateChanged;
     }
 
     public void Dispose()
     {
-        AppState.OnChange -= StateHasChanged;
+        AppState.OnChange -= OnStateChanged;
+    }
+
+    private async void OnStateChanged()
+    {
+        await InvokeAsync(StateHasChanged);
     }
 
     private void GuardarLevantamientos()

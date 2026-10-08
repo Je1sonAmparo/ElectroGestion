@@ -15,8 +15,24 @@ public class AppStateService
     public List<OrdenTrabajo> Ordenes { get; set; } = new();
     public List<Servicio> Servicios { get; set; } = new();
 
+
+
     public event Action? OnChange;
-    public void NotifyStateChanged() => OnChange?.Invoke();
+    public void NotifyStateChanged()
+    {
+        if (OnChange == null) return;
+        foreach (Action handler in OnChange.GetInvocationList())
+        {
+            try
+            {
+                handler();
+            }
+            catch
+            {
+                // Prevent thread dispatch issues from crashing circuit
+            }
+        }
+    }
 
     private static string Iso(DateTime d) => d.ToString("yyyy-MM-dd");
     private static string DateOffset(int days) => Iso(DateTime.Today.AddDays(days));

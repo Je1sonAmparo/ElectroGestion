@@ -6,3 +6,29 @@
 ElectroGestion/bin/
 ElectroGestion/obj/
 ElectroGestion/.vs/
+
+# Empaquetadores, mapas de contexto y scripts de auto-refresh
+repomix-output.xml
+repomix-output.txt
+repomix.config.json
+watch-context.*
+
+# Ecosistema ECC y Agentes IA
+.claude
+.cursor
+.agents
+.ecc
+.codex
+.hermes
+.kiro
+.adal
+.qwen
+.trae
+.zed
+.gemini
+.openclaw
+.codebuddy
+
+# Historiales y parches
+*.patch
+*.diff

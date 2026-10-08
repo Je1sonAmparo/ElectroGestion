@@ -1,0 +1,8 @@
+ElectroGestion/wwwroot/lib/
+ElectroGestion/bin/
+ElectroGestion/obj/
+.vs/
+.git/
+repomix-output.*
+uploads/
+Nuevas funcionalidades/
