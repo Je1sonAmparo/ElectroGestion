@@ -80,11 +80,11 @@ else
                          style="@($"position:relative;display:flex;align-items:center;gap:12px;width:100%;text-align:left;border:0;cursor:pointer;padding:12px {(SidebarCollapsed ? "16px" : "14px")};border-radius:10px;font-size:14.5px;font-weight:{(isActive ? "800" : "600")};background:{(isActive ? "#EDEBFF" : "transparent")};color:{(isActive ? "#1D4ED8" : "#4A4E63")};transition:all 0.2s;text-decoration:none;")"
                          title="@(SidebarCollapsed ? item.Label : "")">
                     <div style="position:relative;display:flex;align-items:center;justify-content:center;width:24px;height:24px;flex:0 0 24px">
-                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="22" height="22" fill="none" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="position:relative;z-index:1;display:block">
-                            <path class="path-d1" d="@item.D1" stroke="@(isActive ? "#1D4ED8" : "#6B7085")"></path>
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="22" height="22" fill="none" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="position:relative;z-index:1;display:block;stroke: @(isActive ? "#1D4ED8" : "#6B7085")">
+                            <path class="path-d1" d="@item.D1" stroke="@(isActive ? "#1D4ED8" : "#6B7085")" fill="none"></path>
                             @if (!string.IsNullOrEmpty(item.D2))
                             {
-                                <path class="path-d2" d="@item.D2" stroke="@(isActive ? "#F59E0B" : "#A1A5B7")"></path>
+                                <path class="path-d2" d="@item.D2" stroke="@(isActive ? "#F59E0B" : "#A1A5B7")" fill="none"></path>
                             }
                         </svg>
                     </div>

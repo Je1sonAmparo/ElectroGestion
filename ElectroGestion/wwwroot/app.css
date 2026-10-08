@@ -258,6 +258,18 @@ textarea:focus {
 }
 
 .nav-item-btn.active .path-d1 { stroke: #1D4ED8; }
+
+.table-action-icon {
+  transition: background-color 0.15s ease, border-color 0.15s ease, color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.table-action-icon:hover,
+.table-action-icon:focus-visible {
+  background: #EEF2FF !important;
+  border-color: #1D4ED8 !important;
+  color: #1D4ED8 !important;
+  box-shadow: 0 1px 3px rgba(29, 78, 216, 0.16);
+}
 .nav-item-btn.active .path-d2 { stroke: #F59E0B; }
 
 /* ===== TOASTS OVERRIDES (To match original design) ===== */
