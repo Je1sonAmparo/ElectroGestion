@@ -1,43 +1,44 @@
 .home-dashboard {
     min-width: 0;
+    max-width: 950px; /* Evita que se estire demasiado en pantallas grandes */
 }
 
 .home-heading {
-    margin-bottom: 16px;
+    margin-bottom: 12px;
 }
 
 .home-heading h1 {
     margin: 0;
     color: #14162B;
     font-family: 'Manrope', sans-serif;
-    font-size: 25px;
+    font-size: 22px;
     font-weight: 800;
     line-height: 1.2;
 }
 
 .home-heading p {
-    margin: 4px 0 0;
+    margin: 3px 0 0;
     color: #6B7085;
-    font-size: 13px;
+    font-size: 12px;
 }
 
 .home-metrics {
     display: grid;
     grid-template-columns: repeat(4, minmax(0, 1fr));
-    gap: 12px;
+    gap: 10px;
 }
 
 .home-metric,
 .home-panel {
     min-width: 0;
     border: 1px solid #E3E5EE;
-    border-radius: 12px;
+    border-radius: 10px;
     background: #fff;
 }
 
 .home-metric {
-    min-height: 101px;
-    padding: 13px 14px 12px;
+    min-height: 80px;
+    padding: 10px 12px 9px;
     display: flex;
     flex-direction: column;
     align-items: flex-start;
@@ -45,16 +46,16 @@
 
 .home-metric-label {
     color: #6B7085;
-    font-size: 10.5px;
+    font-size: 9.5px;
     font-weight: 700;
     line-height: 1.35;
 }
 
 .home-metric-value {
-    margin: 6px 0 4px;
+    margin: 4px 0 2px;
     color: #1D4ED8;
     font-family: 'Manrope', sans-serif;
-    font-size: 28px;
+    font-size: 22px;
     font-weight: 800;
     line-height: 1;
     font-variant-numeric: tabular-nums;
@@ -66,7 +67,7 @@
     padding: 0;
     color: #1D4ED8;
     cursor: pointer;
-    font-size: 10.5px;
+    font-size: 9.5px;
     font-weight: 700;
     text-align: left;
 }
@@ -78,29 +79,29 @@
 .home-operations {
     display: grid;
     grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr);
-    gap: 12px;
-    margin-top: 12px;
+    gap: 10px;
+    margin-top: 10px;
 }
 
 .home-panel {
-    padding: 16px;
+    padding: 12px 14px;
 }
 
 .home-panel h2,
 .home-quick-section h2 {
-    margin: 0 0 12px;
+    margin: 0 0 10px;
     color: #14162B;
     font-family: 'Manrope', sans-serif;
-    font-size: 14px;
+    font-size: 12.5px;
     font-weight: 800;
 }
 
 .home-visit-content {
-    min-height: 116px;
+    min-height: 90px;
     display: grid;
     grid-template-columns: minmax(0, .95fr) minmax(0, 1.05fr);
     align-items: center;
-    gap: 14px;
+    gap: 12px;
 }
 
 .home-visit-details {
@@ -110,35 +111,35 @@
 .home-visit-time {
     color: #1D4ED8;
     font-family: 'Manrope', sans-serif;
-    font-size: 24px;
+    font-size: 20px;
     font-weight: 800;
     line-height: 1.1;
 }
 
 .home-visit-client {
-    margin-top: 8px;
+    margin-top: 6px;
     color: #14162B;
-    font-size: 12px;
+    font-size: 11px;
     font-weight: 700;
 }
 
 .home-visit-meta {
     margin-top: 2px;
     color: #6B7085;
-    font-size: 10.5px;
+    font-size: 9.5px;
     line-height: 1.3;
     overflow-wrap: anywhere;
 }
 
 .home-outline-button {
-    margin-top: 10px;
-    padding: 6px 10px;
+    margin-top: 8px;
+    padding: 5px 9px;
     border: 1px solid #D5D8E6;
-    border-radius: 8px;
+    border-radius: 6px;
     background: #fff;
     color: #1D4ED8;
     cursor: pointer;
-    font-size: 10.5px;
+    font-size: 9.5px;
     font-weight: 700;
 }
 
@@ -149,11 +150,11 @@
 
 .home-map {
     position: relative;
-    height: 116px;
+    height: 90px;
     min-width: 0;
     overflow: hidden;
     border: 1px solid #E3E5EE;
-    border-radius: 10px;
+    border-radius: 8px;
     background: #EFF3EC;
 }
 
@@ -165,25 +166,25 @@
 
 .home-map-label {
     position: absolute;
-    bottom: 7px;
-    left: 7px;
-    padding: 3px 7px;
+    bottom: 5px;
+    left: 5px;
+    padding: 2px 5px;
     border: 1px solid rgba(227, 229, 238, .9);
-    border-radius: 5px;
+    border-radius: 4px;
     background: rgba(255, 255, 255, .92);
     color: #4A4E63;
-    font-size: 8px;
+    font-size: 7.5px;
     font-weight: 700;
 }
 
 .home-empty-visit,
 .home-empty-activity {
-    min-height: 116px;
+    min-height: 90px;
     display: flex;
     align-items: center;
     justify-content: center;
     color: #8B90A3;
-    font-size: 12px;
+    font-size: 11px;
     text-align: center;
 }
 
@@ -196,20 +197,20 @@
     display: flex;
     flex: 1;
     flex-direction: column;
-    gap: 10px;
+    gap: 8px;
 }
 
 .home-activity-row {
     min-width: 0;
     display: flex;
     align-items: center;
-    gap: 9px;
+    gap: 8px;
 }
 
 .home-activity-icon {
-    width: 29px;
-    height: 29px;
-    flex: 0 0 29px;
+    width: 25px;
+    height: 25px;
+    flex: 0 0 25px;
     display: inline-flex;
     align-items: center;
     justify-content: center;
@@ -218,8 +219,8 @@
 }
 
 .home-activity-icon svg {
-    width: 15px;
-    height: 15px;
+    width: 13px;
+    height: 13px;
 }
 
 .home-activity-copy {
@@ -230,7 +231,7 @@
 .home-activity-service {
     overflow: hidden;
     color: #14162B;
-    font-size: 10.5px;
+    font-size: 9.5px;
     font-weight: 700;
     line-height: 1.25;
     text-overflow: ellipsis;
@@ -240,7 +241,7 @@
 .home-activity-client,
 .home-activity-date {
     color: #8B90A3;
-    font-size: 9px;
+    font-size: 8px;
 }
 
 .home-activity-date {
@@ -249,29 +250,29 @@
 }
 
 .home-activity-link {
-    margin-top: 10px;
+    margin-top: 8px;
 }
 
 .home-quick-section {
-    margin-top: 18px;
+    margin-top: 14px;
 }
 
 .home-quick-section h2 {
-    margin-bottom: 10px;
+    margin-bottom: 8px;
 }
 
 .home-quick-grid {
     display: grid;
     grid-template-columns: repeat(5, minmax(0, 1fr));
-    gap: 10px;
+    gap: 8px;
 }
 
 .home-quick-card {
     min-width: 0;
-    min-height: 65px;
-    padding: 10px 8px;
+    min-height: 55px;
+    padding: 8px;
     border: 1px solid #E3E5EE;
-    border-radius: 10px;
+    border-radius: 8px;
     background: #fff;
     color: #14162B;
     cursor: pointer;
@@ -279,17 +280,17 @@
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    gap: 6px;
-    font-size: 10.5px;
+    gap: 5px;
+    font-size: 9.5px;
     font-weight: 700;
     text-align: center;
     transition: border-color .15s ease, color .15s ease, background-color .15s ease;
 }
 
 .home-quick-card svg {
-    width: 18px;
-    height: 18px;
-    flex: 0 0 18px;
+    width: 16px;
+    height: 16px;
+    flex: 0 0 16px;
 }
 
 .home-quick-card:hover,
