@@ -149,7 +149,7 @@
                 </div>
                 <div style="display:flex;flex-direction:column;gap:9px;margin-top:22px">
                     <button class="action-btn" style="padding:11px;border:1px solid #D5D8E6;background:#fff;border-radius:9px;font-size:13.5px;font-weight:700;cursor:pointer">Ver ubicación</button>
-                    <button class="action-btn" style="padding:11px;border:1px solid #D5D8E6;background:#fff;border-radius:9px;font-size:13.5px;font-weight:700;cursor:pointer">Editar visita</button>
+                    <button class="action-btn" @onclick="OpenEditarVisitaModal" style="padding:11px;border:1px solid #D5D8E6;background:#fff;border-radius:9px;font-size:13.5px;font-weight:700;cursor:pointer">Editar visita</button>
                     @if (Detalle.Estado == "Cancelada")
                     {
                         <button class="reactivate-btn" @onclick="OpenReactivarModal" style="padding:11px;border:1px solid #4E9A63;background:#fff;border-radius:9px;font-size:13.5px;font-weight:700;cursor:pointer;color:#17803D">Reactivar visita</button>
@@ -217,6 +217,55 @@
     </div>
 }
 
+@if (showEditarVisita)
+{
+    <div style="position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.4);display:flex;align-items:center;justify-content:center;z-index:9999">
+        <div style="background:#fff;border-radius:14px;width:100%;max-width:540px;padding:24px;box-shadow:0 10px 25px rgba(0,0,0,0.1)">
+            <h2 style="margin:0 0 4px;font-family:'Manrope';font-weight:800;font-size:20px;color:#14162B">Editar visita</h2>
+            <p style="margin:0 0 20px;color:#6B7085;font-size:14px">Modifica los detalles de la visita seleccionada.</p>
+
+            <div style="display:flex;flex-direction:column;gap:16px">
+                <div>
+                    <label style="display:block;font-size:13px;font-weight:700;color:#14162B;margin-bottom:6px">Cliente *</label>
+                    <select style="width:100%;padding:10px 14px;border:1px solid #D5D8E6;border-radius:8px;font-size:14px;color:#14162B;background:#fff">
+                        <option>@Detalle?.Cliente</option>
+                    </select>
+                </div>
+                <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
+                    <div>
+                        <label style="display:block;font-size:13px;font-weight:700;color:#14162B;margin-bottom:6px">Tipo de servicio *</label>
+                        <select style="width:100%;padding:10px 14px;border:1px solid #D5D8E6;border-radius:8px;font-size:14px;color:#14162B;background:#fff">
+                            <option>@Detalle?.TipoServicio</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label style="display:block;font-size:13px;font-weight:700;color:#14162B;margin-bottom:6px">Dirección *</label>
+                        <input type="text" value="@Detalle?.Direccion" style="width:100%;padding:10px 14px;border:1px solid #D5D8E6;border-radius:8px;font-size:14px;color:#14162B" />
+                    </div>
+                </div>
+                <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
+                    <div>
+                        <label style="display:block;font-size:13px;font-weight:700;color:#14162B;margin-bottom:6px">Fecha *</label>
+                        <input type="date" value="2026-08-03" style="width:100%;padding:10px 14px;border:1px solid #D5D8E6;border-radius:8px;font-size:14px;color:#14162B" />
+                    </div>
+                    <div>
+                        <label style="display:block;font-size:13px;font-weight:700;color:#14162B;margin-bottom:6px">Hora *</label>
+                        <input type="time" value="09:00" style="width:100%;padding:10px 14px;border:1px solid #D5D8E6;border-radius:8px;font-size:14px;color:#14162B" />
+                    </div>
+                </div>
+                <div style="background:#F4F5FB;padding:12px 14px;border-radius:8px;font-size:13px;color:#6B7085;margin-top:4px">
+                    El estado de la cita se llena automáticamente con el estado de la solicitud.
+                </div>
+            </div>
+
+            <div style="display:flex;justify-content:flex-end;gap:12px;margin-top:24px">
+                <button @onclick="CloseModals" style="padding:10px 18px;border:1px solid #D5D8E6;background:#fff;border-radius:8px;font-weight:700;cursor:pointer;color:#14162B">Cancelar</button>
+                <button @onclick="CloseModals" style="padding:10px 18px;border:none;background:#1D4ED8;color:#fff;border-radius:8px;font-weight:700;cursor:pointer">Guardar cambios</button>
+            </div>
+        </div>
+    </div>
+}
+
 @if (showCancelar)
 {
     <div style="position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.4);display:flex;align-items:center;justify-content:center;z-index:9999">
@@ -257,6 +306,7 @@
     private string AgendaRango = "";
 
     private bool showNuevaVisita = false;
+    private bool showEditarVisita = false;
     private bool showCancelar = false;
     private bool showReactivar = false;
 
@@ -470,12 +520,14 @@
     }
 
     private void OpenNuevaVisitaModal() => showNuevaVisita = true;
+    private void OpenEditarVisitaModal() => showEditarVisita = true;
     private void OpenCancelarModal() => showCancelar = true;
     private void OpenReactivarModal() => showReactivar = true;
 
     private void CloseModals()
     {
         showNuevaVisita = false;
+        showEditarVisita = false;
         showCancelar = false;
         showReactivar = false;
     }
