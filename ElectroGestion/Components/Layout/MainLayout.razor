@@ -193,7 +193,7 @@ else
         if (u != null)
         {
             AppState.Login(u);
-            ToastService.Notify(new ToastMessage(ToastType.Success, $"Bienvenido, {u.Nombre.Split(' ')[0]}."));
+            ToastService.Notify(new ToastMessage(ToastType.Primary, $"Bienvenido, {u.Nombre.Split(' ')[0]}."));
             NavManager.NavigateTo("/solicitudes");
         }
     }
@@ -204,7 +204,7 @@ else
         if (u != null)
         {
             AppState.Login(u);
-            ToastService.Notify(new ToastMessage(ToastType.Success, $"Bienvenido, {u.Nombre.Split(' ')[0]}."));
+            ToastService.Notify(new ToastMessage(ToastType.Primary, $"Bienvenido, {u.Nombre.Split(' ')[0]}."));
             NavManager.NavigateTo("/solicitudes");
         }
     }

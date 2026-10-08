@@ -55,7 +55,7 @@
     {
         var u = AppState.Usuarios.First(x => x.Rol == "Técnico");
         AppState.Login(u);
-        ToastService.Notify(new ToastMessage(ToastType.Success, $"Bienvenido, {u.Nombre.Split(' ')[0]}."));
+        ToastService.Notify(new ToastMessage(ToastType.Primary, $"Bienvenido, {u.Nombre.Split(' ')[0]}."));
         NavManager.NavigateTo("/");
     }
 
@@ -63,7 +63,7 @@
     {
         var u = AppState.Usuarios.First(x => x.Rol == "Gerente");
         AppState.Login(u);
-        ToastService.Notify(new ToastMessage(ToastType.Success, $"Bienvenido, {u.Nombre.Split(' ')[0]}."));
+        ToastService.Notify(new ToastMessage(ToastType.Primary, $"Bienvenido, {u.Nombre.Split(' ')[0]}."));
         NavManager.NavigateTo("/");
     }
 }
