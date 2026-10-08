@@ -16,8 +16,8 @@
 </div>
 
 <div style="background:#fff;border:1px solid #E3E5EE;border-radius:12px;overflow:hidden">
-    <div style="display:flex;flex-direction:column;gap:18px;padding:18px 18px 12px;border-bottom:1px solid #EFF0F6">
-        <div style="display:flex;align-items:center;gap:20px;flex-wrap:wrap" class="resp-search-block">
+    <div style="padding:18px 18px 12px;border-bottom:1px solid #EFF0F6">
+        <div style="display:flex;align-items:center;gap:20px;flex-wrap:wrap">
             <div style="display:flex;align-items:center;gap:10px">
                 <span style="font-family:'Manrope';font-weight:800;font-size:15px;color:#14162B">ID:</span>
                 <input @bind="SearchId" @bind:event="oninput" placeholder="ID de cliente"
@@ -33,14 +33,12 @@
                 <input @bind="SearchRnc" @bind:event="oninput" placeholder="RNC o Cédula"
                     style="width:190px;padding:9px 12px;border:1px solid #D5D8E6;border-radius:6px;font-size:14px;color:#4A4E63" />
             </div>
-        </div>
-        <div style="display:flex;align-items:center;gap:20px;flex-wrap:wrap" class="resp-search-block">
             <div style="display:flex;align-items:center;gap:10px">
                 <span style="font-family:'Manrope';font-weight:800;font-size:15px;color:#14162B">Dirección:</span>
                 <input @bind="SearchDireccion" @bind:event="oninput" placeholder="Dirección del cliente"
-                    style="width:300px;padding:9px 12px;border:1px solid #D5D8E6;border-radius:6px;font-size:14px;color:#4A4E63" />
+                    style="width:250px;padding:9px 12px;border:1px solid #D5D8E6;border-radius:6px;font-size:14px;color:#4A4E63" />
             </div>
-            <div style="width:190px;display:flex;justify-content:flex-end;margin-left:auto">
+            <div style="display:flex;justify-content:flex-end;margin-left:auto">
                 <button class="primary-btn" @onclick="Filtrar"
                     style="padding:9px 16px;background:#1D4ED8;color:#fff;border:0;border-radius:6px;font-weight:700;font-size:14px;cursor:pointer;font-family:'Manrope'">Buscar</button>
             </div>
