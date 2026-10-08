@@ -12,15 +12,38 @@
 </div>
 
 <div style="background:#fff;border:1px solid #E3E5EE;border-radius:14px;overflow:hidden">
-    <div style="display:flex;gap:12px;padding:16px 18px;border-bottom:1px solid #EFF0F6">
-        <input type="text" placeholder="Buscar por cliente o tipo..." @bind="SearchText" @bind:event="oninput"
-               style="flex:1;padding:11px 14px;border:1px solid #D5D8E6;border-radius:9px;font-size:14px" />
-        <select @bind="FiltroFecha"
-                style="padding:11px 14px;border:1px solid #D5D8E6;border-radius:9px;font-size:14px;background:#fff;min-width:190px">
-            <option value="Todas las fechas">Todas las fechas</option>
-            <option value="Últimos 7 días">Últimos 7 días</option>
-            <option value="Últimos 30 días">Últimos 30 días</option>
-        </select>
+    <div style="display:flex;flex-direction:column;gap:18px;padding:18px 18px 12px;border-bottom:1px solid #EFF0F6">
+        <div style="display:flex;align-items:center;gap:20px;flex-wrap:wrap" class="resp-search-block">
+            <div style="display:flex;align-items:center;gap:10px">
+                <span style="font-family:'Manrope';font-weight:800;font-size:15px;color:#14162B">ID:</span>
+                <input @bind="SearchId" @bind:event="oninput" placeholder="ID"
+                    style="width:140px;padding:9px 12px;border:1px solid #D5D8E6;border-radius:6px;font-size:14px;color:#4A4E63" />
+            </div>
+            <div style="display:flex;align-items:center;gap:10px">
+                <span style="font-family:'Manrope';font-weight:800;font-size:15px;color:#14162B">Cliente:</span>
+                <input @bind="SearchCliente" @bind:event="oninput" placeholder="Nombre del cliente"
+                    style="width:200px;padding:9px 12px;border:1px solid #D5D8E6;border-radius:6px;font-size:14px;color:#4A4E63" />
+            </div>
+            <div style="display:flex;align-items:center;gap:10px">
+                <span style="font-family:'Manrope';font-weight:800;font-size:15px;color:#14162B">Tipo:</span>
+                <input @bind="SearchTipo" @bind:event="oninput" placeholder="Tipo de servicio"
+                    style="width:190px;padding:9px 12px;border:1px solid #D5D8E6;border-radius:6px;font-size:14px;color:#4A4E63" />
+            </div>
+        </div>
+        <div style="display:flex;align-items:center;gap:20px;flex-wrap:wrap" class="resp-search-block">
+            <div style="display:flex;align-items:center;gap:10px">
+                <span style="font-family:'Manrope';font-weight:800;font-size:15px;color:#14162B">Fecha Rango:</span>
+                <select @bind="FiltroFecha" style="width:170px;padding:9px 12px;border:1px solid #D5D8E6;border-radius:6px;font-size:14px;background:#fff;color:#4A4E63">
+                    <option value="Todas las fechas">Todas las fechas</option>
+                    <option value="Últimos 7 días">Últimos 7 días</option>
+                    <option value="Últimos 30 días">Últimos 30 días</option>
+                </select>
+            </div>
+            <div style="width:190px;display:flex;justify-content:flex-end;margin-left:auto">
+                <button class="primary-btn" @onclick="Filtrar"
+                    style="padding:9px 16px;background:#1D4ED8;color:#fff;border:0;border-radius:6px;font-weight:700;font-size:14px;cursor:pointer;font-family:'Manrope'">Buscar</button>
+            </div>
+        </div>
     </div>
 
     <div style="display:grid;grid-template-columns:80px 1.2fr 1.4fr 1fr 1fr 80px;padding:14px 18px;font-size:12px;font-weight:800;color:#8B90A3;text-transform:uppercase;letter-spacing:.06em;border-bottom:1px solid #EFF0F6"
@@ -69,8 +92,15 @@
 </div>
 
 @code {
-    private string SearchText = "";
+    private string SearchId = "";
+    private string SearchCliente = "";
+    private string SearchTipo = "";
     private string FiltroFecha = "Todas las fechas";
+
+    private void Filtrar()
+    {
+        StateHasChanged();
+    }
 
     private IEnumerable<ElectroGestion.Models.Solicitud> HistorialFiltrado
     {
@@ -78,10 +108,17 @@
         {
             var res = AppState.Solicitudes.Where(x => x.Estado == "Finalizada");
 
-            if (!string.IsNullOrWhiteSpace(SearchText))
+            if (!string.IsNullOrWhiteSpace(SearchId))
             {
-                var q = SearchText.Trim().ToLower();
-                res = res.Where(x => (x.Cliente + " " + x.TipoServicio).ToLower().Contains(q));
+                res = res.Where(x => x.Id.ToString().Contains(SearchId));
+            }
+            if (!string.IsNullOrWhiteSpace(SearchCliente))
+            {
+                res = res.Where(x => x.Cliente.Contains(SearchCliente, StringComparison.OrdinalIgnoreCase));
+            }
+            if (!string.IsNullOrWhiteSpace(SearchTipo))
+            {
+                res = res.Where(x => x.TipoServicio.Contains(SearchTipo, StringComparison.OrdinalIgnoreCase));
             }
 
             if (FiltroFecha == "Últimos 7 días")

@@ -12,17 +12,43 @@
     </div>
 </div>
 
-<div style="background:#fff;border:1px solid #E3E5EE;border-radius:14px;padding:18px;margin-bottom:16px">
-    <div style="display:flex;gap:14px;align-items:center;flex-wrap:wrap" class="resp-search-block">
-        <input @bind="SearchTerm" @bind:event="oninput" placeholder="Buscar orden por cliente o servicio..."
-            style="flex:1;min-width:240px;padding:11px 14px;border:1px solid #D5D8E6;border-radius:9px;font-size:14px" />
-        <div style="display:flex;align-items:center;gap:10px">
-            <span style="font-size:13.5px;color:#6B7085;font-weight:700">Filtrar por estado:</span>
-            <select @bind="SearchEstado" style="padding:11px 14px;border:1px solid #D5D8E6;border-radius:9px;font-size:14px;background:#fff;min-width:200px">
-                <option value="Todas">Todas</option>
-                <option value="En proceso">En proceso</option>
-                <option value="Finalizada">Finalizada</option>
-            </select>
+<div style="background:#fff;border:1px solid #E3E5EE;border-radius:14px;overflow:hidden;margin-bottom:16px">
+    <div style="display:flex;flex-direction:column;gap:18px;padding:18px 18px 12px;border-bottom:1px solid #EFF0F6">
+        <div style="display:flex;align-items:center;gap:20px;flex-wrap:wrap" class="resp-search-block">
+            <div style="display:flex;align-items:center;gap:10px">
+                <span style="font-family:'Manrope';font-weight:800;font-size:15px;color:#14162B">ID:</span>
+                <input @bind="SearchId" @bind:event="oninput" placeholder="ID de orden"
+                    style="width:140px;padding:9px 12px;border:1px solid #D5D8E6;border-radius:6px;font-size:14px;color:#4A4E63" />
+            </div>
+            <div style="display:flex;align-items:center;gap:10px">
+                <span style="font-family:'Manrope';font-weight:800;font-size:15px;color:#14162B">Cliente:</span>
+                <input @bind="SearchCliente" @bind:event="oninput" placeholder="Nombre del cliente"
+                    style="width:200px;padding:9px 12px;border:1px solid #D5D8E6;border-radius:6px;font-size:14px;color:#4A4E63" />
+            </div>
+            <div style="display:flex;align-items:center;gap:10px">
+                <span style="font-family:'Manrope';font-weight:800;font-size:15px;color:#14162B">Tipo de Servicio:</span>
+                <input @bind="SearchTipo" @bind:event="oninput" placeholder="Tipo de servicio"
+                    style="width:190px;padding:9px 12px;border:1px solid #D5D8E6;border-radius:6px;font-size:14px;color:#4A4E63" />
+            </div>
+        </div>
+        <div style="display:flex;align-items:center;gap:20px;flex-wrap:wrap" class="resp-search-block">
+            <div style="display:flex;align-items:center;gap:10px">
+                <span style="font-family:'Manrope';font-weight:800;font-size:15px;color:#14162B">Fecha:</span>
+                <input type="date" @bind="SearchFecha"
+                    style="width:160px;padding:9px 12px;border:1px solid #D5D8E6;border-radius:6px;font-size:14px;background:#fff;color:#4A4E63" />
+            </div>
+            <div style="display:flex;align-items:center;gap:10px">
+                <span style="font-family:'Manrope';font-weight:800;font-size:15px;color:#14162B">Estado:</span>
+                <select @bind="SearchEstado" style="width:170px;padding:9px 12px;border:1px solid #D5D8E6;border-radius:6px;font-size:14px;background:#fff;color:#4A4E63">
+                    <option value="Todas">Todas</option>
+                    <option value="En proceso">En proceso</option>
+                    <option value="Finalizada">Finalizada</option>
+                </select>
+            </div>
+            <div style="width:190px;display:flex;justify-content:flex-end;margin-left:auto">
+                <button class="primary-btn" @onclick="Filtrar"
+                    style="padding:9px 16px;background:#1D4ED8;color:#fff;border:0;border-radius:6px;font-weight:700;font-size:14px;cursor:pointer;font-family:'Manrope'">Buscar</button>
+            </div>
         </div>
     </div>
 </div>
@@ -115,19 +141,28 @@
 }
 
 @code {
-    private string SearchTerm = "";
+    private string SearchId = "";
+    private string SearchCliente = "";
+    private string SearchTipo = "";
+    private DateTime? SearchFecha = null;
     private string SearchEstado = "Todas";
+
+    private void Filtrar()
+    {
+        StateHasChanged();
+    }
 
     private List<ElectroGestion.Models.OrdenTrabajo> FilteredOrdenes => AppState.Ordenes
         .Where(o => {
             var s = AppState.Solicitudes.FirstOrDefault(x => x.Id == o.SolicitudId);
             var cliente = string.IsNullOrEmpty(o.Cliente) ? (s?.Cliente ?? "") : o.Cliente;
             var tipo = string.IsNullOrEmpty(o.TipoServicio) ? (s?.TipoServicio ?? "") : o.TipoServicio;
-            bool matchTerm = string.IsNullOrEmpty(SearchTerm) || 
-                             cliente.Contains(SearchTerm, StringComparison.OrdinalIgnoreCase) || 
-                             tipo.Contains(SearchTerm, StringComparison.OrdinalIgnoreCase);
+            bool matchId = string.IsNullOrEmpty(SearchId) || o.Id.ToString().Contains(SearchId) || (!string.IsNullOrEmpty(o.Code) && o.Code.Contains(SearchId, StringComparison.OrdinalIgnoreCase));
+            bool matchCliente = string.IsNullOrEmpty(SearchCliente) || cliente.Contains(SearchCliente, StringComparison.OrdinalIgnoreCase);
+            bool matchTipo = string.IsNullOrEmpty(SearchTipo) || tipo.Contains(SearchTipo, StringComparison.OrdinalIgnoreCase);
+            bool matchFecha = !SearchFecha.HasValue || (s != null && s.Fecha == SearchFecha.Value.ToString("yyyy-MM-dd"));
             bool matchEstado = SearchEstado == "Todas" || o.Estado == SearchEstado;
-            return matchTerm && matchEstado;
+            return matchId && matchCliente && matchTipo && matchFecha && matchEstado;
         })
         .OrderByDescending(x => x.Id).ToList();
 
