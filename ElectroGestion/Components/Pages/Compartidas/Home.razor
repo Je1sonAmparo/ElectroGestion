@@ -1,11 +1,3 @@
 @page "/"
-@inject ElectroGestion.Services.AppStateService AppState
 
-@if (AppState.EsGerente)
-{
-    <ElectroGestion.Components.Pages.Gerente.Inicio />
-}
-else
-{
-    <ElectroGestion.Components.Pages.Tecnico.Inicio />
-}
+<ElectroGestion.Components.Pages.Compartidas.InicioDashboard />
