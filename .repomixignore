@@ -1,6 +1,6 @@
-ElectroGestion/wwwroot/lib/
-ElectroGestion/bin/
-ElectroGestion/obj/
+wwwroot/lib/
+bin/
+obj/
 .vs/
 .git/
 repomix-output.*

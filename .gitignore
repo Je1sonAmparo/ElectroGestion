@@ -3,12 +3,11 @@
 *.code-workspace
 .DS_Store
 
-ElectroGestion/bin/
-ElectroGestion/obj/
-ElectroGestion/.vs/
+bin/
+obj/
+.vs/
 
 # Empaquetadores, mapas de contexto y scripts de auto-refresh
-repomix-output.xml
 repomix-output.txt
 repomix.config.json
 watch-context.*
