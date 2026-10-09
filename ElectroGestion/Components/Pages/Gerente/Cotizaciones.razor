@@ -1,4 +1,6 @@
 @page "/cotizaciones"
+@inject ElectroGestion.Services.AppStateService AppState
+@inject BlazorBootstrap.ToastService ToastService
 
 <PageTitle>Cotizaciones | ElectroGestion</PageTitle>
 
@@ -7,6 +9,288 @@
         <div class="page-title" style="font-family:'Manrope';font-weight:800;font-size:31px;letter-spacing:-.6px">Cotizaciones</div>
         <div style="color:#6B7085;font-size:14.5px;margin-top:5px">Gestión de cotizaciones para clientes.</div>
     </div>
+    <button class="primary-btn" @onclick="() => AbrirModal()"
+        style="padding:11px 20px;background:#1D4ED8;color:#fff;border:0;border-radius:9px;font-weight:700;font-size:14.5px;cursor:pointer;font-family:'Manrope';display:flex;align-items:center;gap:8px;box-shadow:0 4px 12px rgba(29,78,216,0.25)">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="12" y1="5" x2="12" y2="19"></line>
+            <line x1="5" y1="12" x2="19" y2="12"></line>
+        </svg>
+        Nueva Cotización
+    </button>
 </div>
 
-<ModuloEnConstruccion />
+<div style="background:#fff;border:1px solid #E3E5EE;border-radius:12px;overflow:hidden">
+    <div style="display:flex;flex-direction:column;gap:18px;padding:18px 18px 12px;border-bottom:1px solid #EFF0F6">
+        <div style="display:flex;align-items:center;gap:20px;flex-wrap:wrap" class="resp-search-block">
+            <div style="display:flex;align-items:center;gap:10px">
+                <span style="font-family:'Manrope';font-weight:800;font-size:15px;color:#14162B">ID:</span>
+                <input @bind="SearchId" @bind:event="oninput" placeholder="ID"
+                    style="width:140px;padding:9px 12px;border:1px solid #D5D8E6;border-radius:6px;font-size:14px;color:#4A4E63" />
+            </div>
+            <div style="display:flex;align-items:center;gap:10px">
+                <span style="font-family:'Manrope';font-weight:800;font-size:15px;color:#14162B">Solicitud:</span>
+                <input @bind="SearchSolicitud" @bind:event="oninput" placeholder="ID Solicitud"
+                    style="width:200px;padding:9px 12px;border:1px solid #D5D8E6;border-radius:6px;font-size:14px;color:#4A4E63" />
+            </div>
+            <div style="display:flex;align-items:center;gap:10px">
+                <span style="font-family:'Manrope';font-weight:800;font-size:15px;color:#14162B">Cliente:</span>
+                <input @bind="SearchCliente" @bind:event="oninput" placeholder="Nombre cliente"
+                    style="width:200px;padding:9px 12px;border:1px solid #D5D8E6;border-radius:6px;font-size:14px;color:#4A4E63" />
+            </div>
+            <div style="display:flex;align-items:center;gap:10px">
+                <span style="font-family:'Manrope';font-weight:800;font-size:15px;color:#14162B">Estado:</span>
+                <select @bind="SearchEstado"
+                    style="width:160px;padding:9px 12px;border:1px solid #D5D8E6;border-radius:6px;font-size:14px;background:#fff;color:#4A4E63">
+                    <option value="">Todos</option>
+                    <option value="Pendiente">Pendiente</option>
+                    <option value="Aprobada">Aprobada</option>
+                    <option value="Rechazada">Rechazada</option>
+                </select>
+            </div>
+            <div style="display:flex;justify-content:flex-end;margin-left:auto">
+                <button class="primary-btn" @onclick="Filtrar"
+                    style="padding:9px 16px;background:#1D4ED8;color:#fff;border:0;border-radius:6px;font-weight:700;font-size:14px;cursor:pointer;font-family:'Manrope'">Buscar</button>
+            </div>
+        </div>
+    </div>
+
+    <div style="overflow-x:auto">
+        <table style="width:100%;border-collapse:collapse;font-size:14px">
+            <thead style="background:#F8F9FC;border-bottom:1px solid #E3E5EE">
+                <tr>
+                    <th style="padding:14px 18px;text-align:left;color:#4A4E63;font-weight:700">ID</th>
+                    <th style="padding:14px 18px;text-align:left;color:#4A4E63;font-weight:700">Solicitud</th>
+                    <th style="padding:14px 18px;text-align:left;color:#4A4E63;font-weight:700">Cliente</th>
+                    <th style="padding:14px 18px;text-align:left;color:#4A4E63;font-weight:700">Fecha</th>
+                    <th style="padding:14px 18px;text-align:left;color:#4A4E63;font-weight:700">Monto</th>
+                    <th style="padding:14px 18px;text-align:left;color:#4A4E63;font-weight:700">Estado</th>
+                    <th style="padding:14px 18px;text-align:center;color:#4A4E63;font-weight:700">Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+                @if (!FilteredCotizaciones.Any())
+                {
+                    <tr>
+                        <td colspan="7" style="padding:24px;text-align:center;color:#6B7085">No se encontraron cotizaciones.</td>
+                    </tr>
+                }
+                else
+                {
+                    @foreach (var cot in FilteredCotizaciones)
+                    {
+                        var (bg, fg) = ElectroGestion.Services.AppStateService.GetBadgeColors(cot.Estado);
+                        <tr style="border-bottom:1px solid #EFF0F6;background:#fff">
+                            <td style="padding:14px 18px;color:#14162B;font-weight:600">@cot.Id</td>
+                            <td style="padding:14px 18px;color:#4A4E63">@cot.SolicitudId</td>
+                            <td style="padding:14px 18px;color:#4A4E63">@cot.Cliente</td>
+                            <td style="padding:14px 18px;color:#4A4E63">@cot.Fecha.ToString("dd/MM/yyyy")</td>
+                            <td style="padding:14px 18px;color:#4A4E63;font-weight:700">RD$ @cot.MontoTotal.ToString("N2")</td>
+                            <td style="padding:14px 18px">
+                                <span style="display:inline-block;padding:4px 10px;border-radius:20px;font-size:12.5px;font-weight:700;background:@bg;color:@fg">
+                                    @cot.Estado
+                                </span>
+                            </td>
+                            <td style="padding:14px 18px;text-align:center">
+                                <div style="display:flex;gap:8px;justify-content:center">
+                                    <button @onclick="() => VerDetalle(cot.Id)" title="Ver Detalle"
+                                        style="width:32px;height:32px;border:1px solid #D5D8E6;background:#fff;border-radius:6px;display:flex;align-items:center;justify-content:center;cursor:pointer;color:#4A4E63">
+                                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"></path><circle cx="12" cy="12" r="3"></circle></svg>
+                                    </button>
+                                    <button @onclick="() => AbrirModal(cot.Id)" title="Editar"
+                                        style="width:32px;height:32px;border:1px solid #D5D8E6;background:#fff;border-radius:6px;display:flex;align-items:center;justify-content:center;cursor:pointer;color:#4A4E63">
+                                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"></path><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"></path></svg>
+                                    </button>
+                                </div>
+                            </td>
+                        </tr>
+                    }
+                }
+            </tbody>
+        </table>
+    </div>
+</div>
+
+@if (IsModalOpen)
+{
+    <div style="position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(20,22,43,0.4);backdrop-filter:blur(4px);display:flex;align-items:center;justify-content:center;z-index:9999;padding:20px" @onclick="CerrarModal">
+        <div style="background:#fff;width:100%;max-width:550px;border-radius:16px;box-shadow:0 20px 40px rgba(0,0,0,0.1);display:flex;flex-direction:column;max-height:90vh" @onclick:stopPropagation>
+            <div style="padding:24px;border-bottom:1px solid #E3E5EE;display:flex;align-items:center;justify-content:space-between">
+                <h3 style="margin:0;font-family:'Manrope';font-weight:800;font-size:20px;color:#14162B">@ModalTitle</h3>
+                <button @onclick="CerrarModal" style="background:none;border:0;color:#6B7085;cursor:pointer;padding:4px">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+                </button>
+            </div>
+            
+            <div style="padding:24px;overflow-y:auto;display:flex;flex-direction:column;gap:16px">
+                <div>
+                    <label style="display:block;font-family:'Manrope';font-weight:700;font-size:14px;color:#4A4E63;margin-bottom:6px">ID Solicitud</label>
+                    <input @bind="FormSolicitudId" style="width:100%;padding:10px 14px;border:1px solid #D5D8E6;border-radius:8px;font-size:14px;color:#14162B" placeholder="Ej: REQ-001" />
+                </div>
+                <div>
+                    <label style="display:block;font-family:'Manrope';font-weight:700;font-size:14px;color:#4A4E63;margin-bottom:6px">Cliente</label>
+                    <input @bind="FormCliente" style="width:100%;padding:10px 14px;border:1px solid #D5D8E6;border-radius:8px;font-size:14px;color:#14162B" placeholder="Nombre del cliente" />
+                </div>
+                <div>
+                    <label style="display:block;font-family:'Manrope';font-weight:700;font-size:14px;color:#4A4E63;margin-bottom:6px">Monto Total</label>
+                    <input @bind="FormMonto" type="number" step="0.01" style="width:100%;padding:10px 14px;border:1px solid #D5D8E6;border-radius:8px;font-size:14px;color:#14162B" placeholder="0.00" />
+                </div>
+                @if (EditId.HasValue)
+                {
+                    <div>
+                        <label style="display:block;font-family:'Manrope';font-weight:700;font-size:14px;color:#4A4E63;margin-bottom:6px">Estado</label>
+                        <select @bind="FormEstado" style="width:100%;padding:10px 14px;border:1px solid #D5D8E6;border-radius:8px;font-size:14px;color:#14162B;background:#fff">
+                            <option value="Pendiente">Pendiente</option>
+                            <option value="Aprobada">Aprobada</option>
+                            <option value="Rechazada">Rechazada</option>
+                        </select>
+                    </div>
+                }
+            </div>
+
+            <div style="padding:20px 24px;border-top:1px solid #E3E5EE;display:flex;justify-content:flex-end;gap:12px;background:#F8F9FC;border-radius:0 0 16px 16px">
+                <button @onclick="CerrarModal" style="padding:10px 18px;border:1px solid #D5D8E6;background:#fff;color:#4A4E63;border-radius:8px;font-weight:700;font-size:14px;cursor:pointer;font-family:'Manrope'">Cancelar</button>
+                <button @onclick="GuardarCotizacion" style="padding:10px 22px;border:0;background:#1D4ED8;color:#fff;border-radius:8px;font-weight:700;font-size:14px;cursor:pointer;font-family:'Manrope'">Guardar</button>
+            </div>
+        </div>
+    </div>
+}
+
+@if (SelectedCotizacion != null)
+{
+    <div style="position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(20,22,43,0.4);backdrop-filter:blur(4px);display:flex;align-items:center;justify-content:center;z-index:9999;padding:20px" @onclick="CerrarDetalle">
+        <div style="background:#fff;width:100%;max-width:550px;border-radius:16px;box-shadow:0 20px 40px rgba(0,0,0,0.1);display:flex;flex-direction:column;max-height:90vh" @onclick:stopPropagation>
+            <div style="padding:24px;border-bottom:1px solid #E3E5EE;display:flex;align-items:center;justify-content:space-between">
+                <h3 style="margin:0;font-family:'Manrope';font-weight:800;font-size:20px;color:#14162B">Detalle de Cotización</h3>
+                <button @onclick="CerrarDetalle" style="background:none;border:0;color:#6B7085;cursor:pointer;padding:4px">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+                </button>
+            </div>
+            
+            <div style="padding:24px;overflow-y:auto;display:flex;flex-direction:column;gap:16px;font-size:14px;color:#4A4E63">
+                <div style="display:flex;gap:10px"><strong style="color:#14162B;width:120px">ID:</strong> <span>@SelectedCotizacion.Id</span></div>
+                <div style="display:flex;gap:10px"><strong style="color:#14162B;width:120px">Solicitud:</strong> <span>@SelectedCotizacion.SolicitudId</span></div>
+                <div style="display:flex;gap:10px"><strong style="color:#14162B;width:120px">Cliente:</strong> <span>@SelectedCotizacion.Cliente</span></div>
+                <div style="display:flex;gap:10px"><strong style="color:#14162B;width:120px">Fecha:</strong> <span>@SelectedCotizacion.Fecha.ToString("dd/MM/yyyy")</span></div>
+                <div style="display:flex;gap:10px"><strong style="color:#14162B;width:120px">Monto Total:</strong> <span style="font-weight:700">RD$ @SelectedCotizacion.MontoTotal.ToString("N2")</span></div>
+                <div style="display:flex;gap:10px">
+                    <strong style="color:#14162B;width:120px">Estado:</strong>
+                    <span>
+                        @{
+                            var (bg, fg) = ElectroGestion.Services.AppStateService.GetBadgeColors(SelectedCotizacion.Estado);
+                        }
+                        <span style="display:inline-block;padding:4px 10px;border-radius:20px;font-size:12.5px;font-weight:700;background:@bg;color:@fg">
+                            @SelectedCotizacion.Estado
+                        </span>
+                    </span>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+
+@code {
+    private string SearchId = "";
+    private string SearchSolicitud = "";
+    private string SearchCliente = "";
+    private string SearchEstado = "";
+
+    private void Filtrar()
+    {
+        StateHasChanged();
+    }
+
+    private bool IsModalOpen = false;
+    private string ModalTitle = "";
+    private int? EditId = null;
+    private ElectroGestion.Models.Cotizacion? SelectedCotizacion;
+
+    private string FormSolicitudId = "";
+    private string FormCliente = "";
+    private decimal FormMonto = 0;
+    private string FormEstado = "Pendiente";
+
+    private List<ElectroGestion.Models.Cotizacion> FilteredCotizaciones => AppState.Cotizaciones
+        .Where(c => {
+            bool matchId = string.IsNullOrEmpty(SearchId) || c.Id.ToString().Contains(SearchId);
+            bool matchSol = string.IsNullOrEmpty(SearchSolicitud) || c.SolicitudId.Contains(SearchSolicitud, StringComparison.OrdinalIgnoreCase);
+            bool matchCliente = string.IsNullOrEmpty(SearchCliente) || c.Cliente.Contains(SearchCliente, StringComparison.OrdinalIgnoreCase);
+            bool matchEst = string.IsNullOrEmpty(SearchEstado) || c.Estado.Equals(SearchEstado, StringComparison.OrdinalIgnoreCase);
+            return matchId && matchSol && matchCliente && matchEst;
+        })
+        .OrderByDescending(c => c.Id)
+        .ToList();
+
+    private void AbrirModal(int? id = null)
+    {
+        EditId = id;
+        if (id.HasValue)
+        {
+            ModalTitle = "Editar Cotización";
+            var item = AppState.Cotizaciones.First(x => x.Id == id.Value);
+            FormSolicitudId = item.SolicitudId;
+            FormCliente = item.Cliente;
+            FormMonto = item.MontoTotal;
+            FormEstado = item.Estado;
+        }
+        else
+        {
+            ModalTitle = "Nueva Cotización";
+            FormSolicitudId = "";
+            FormCliente = "";
+            FormMonto = 0;
+            FormEstado = "Pendiente";
+        }
+        IsModalOpen = true;
+    }
+
+    private void CerrarModal()
+    {
+        IsModalOpen = false;
+    }
+
+    private void GuardarCotizacion()
+    {
+        if (string.IsNullOrWhiteSpace(FormSolicitudId) || string.IsNullOrWhiteSpace(FormCliente) || FormMonto <= 0)
+        {
+            ToastService.Notify(new ToastMessage(ToastType.Warning, "Complete todos los campos correctamente."));
+            return;
+        }
+
+        if (EditId.HasValue)
+        {
+            var item = AppState.Cotizaciones.First(x => x.Id == EditId.Value);
+            item.SolicitudId = FormSolicitudId;
+            item.Cliente = FormCliente;
+            item.MontoTotal = FormMonto;
+            item.Estado = FormEstado;
+            ToastService.Notify(new ToastMessage(ToastType.Success, "Cotización actualizada con éxito."));
+        }
+        else
+        {
+            var nueva = new ElectroGestion.Models.Cotizacion
+            {
+                Id = AppState.NextCotizacionId(),
+                SolicitudId = FormSolicitudId,
+                Cliente = FormCliente,
+                MontoTotal = FormMonto,
+                Fecha = DateTime.Today,
+                Estado = "Pendiente"
+            };
+            AppState.Cotizaciones.Add(nueva);
+            ToastService.Notify(new ToastMessage(ToastType.Success, "Cotización creada con éxito."));
+        }
+
+        AppState.NotifyStateChanged();
+        CerrarModal();
+    }
+
+    private void VerDetalle(int id)
+    {
+        SelectedCotizacion = AppState.Cotizaciones.FirstOrDefault(c => c.Id == id);
+    }
+
+    private void CerrarDetalle()
+    {
+        SelectedCotizacion = null;
+    }
+}
