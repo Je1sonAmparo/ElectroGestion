@@ -136,7 +136,6 @@ wwwroot/
 .gitignore
 .repomixignore
 .thumbnail
-appsettings.Development.json
 appsettings.json
 ElectroGestion.csproj
 ElectroGestion.csproj.user
@@ -12661,20 +12660,6 @@ textarea:focus {
 }
 </file>
 
-<file path="appsettings.Development.json">
-{
-  "ConnectionStrings": {
-    "SqlConStr": "Server=.\\SQLExpress;Database=ElectroGestionDB;Trusted_Connection=True;TrustServerCertificate=true;"
-  },
-  "Logging": {
-    "LogLevel": {
-      "Default": "Information",
-      "Microsoft.AspNetCore": "Warning"
-    }
-  }
-}
-</file>
-
 <file path="appsettings.json">
 {
   "ConnectionStrings": {
@@ -12824,89 +12809,6 @@ app.MapRazorComponents<App>()
     .AddInteractiveServerRenderMode();
 
 app.Run();
-</file>
-
-<file path="test_home.html">
-<!DOCTYPE html>
-<html lang="en"><head><meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <base href="/">
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Lato:wght@400;700;900&family=Manrope:wght@500;700;800&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="lib/bootstrap/dist/css/bootstrap.min.46ein0sx1k.css" />
-    <link rel="stylesheet" href="app.css">
-    <link rel="stylesheet" href="ElectroGestion.c3n4gr79od.styles.css" />
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
-    <link href="_content/Blazor.Bootstrap/blazor.bootstrap.css" rel="stylesheet">
-    <script type="importmap">{
-  "imports": {
-    "./Components/Layout/ReconnectModal.razor.js": "./Components/Layout/ReconnectModal.abdmv1u4y3.razor.js",
-    "./_content/Blazor.Bootstrap/blazor.bootstrap.js": "./_content/Blazor.Bootstrap/blazor.bootstrap.jbj5vv28m9.js",
-    "./_content/Blazor.Bootstrap/blazor.bootstrap.pdf.js": "./_content/Blazor.Bootstrap/blazor.bootstrap.pdf.30xw9wihir.js",
-    "./_content/Blazor.Bootstrap/blazor.bootstrap.rich-text-editor.js": "./_content/Blazor.Bootstrap/blazor.bootstrap.rich-text-editor.f6r6spnkpf.js",
-    "./_content/Blazor.Bootstrap/blazor.bootstrap.sortable-list.js": "./_content/Blazor.Bootstrap/blazor.bootstrap.sortable-list.ezlxc6gzv3.js",
-    "./_content/Blazor.Bootstrap/blazor.bootstrap.theme-switcher.js": "./_content/Blazor.Bootstrap/blazor.bootstrap.theme-switcher.pisakkcwob.js",
-    "./_content/Blazor.Bootstrap/pdfjs-4.0.379.min.js": "./_content/Blazor.Bootstrap/pdfjs-4.0.379.min.j8zp7bt7w3.js",
-    "./_content/Blazor.Bootstrap/pdfjs-4.0.379.worker.min.js": "./_content/Blazor.Bootstrap/pdfjs-4.0.379.worker.min.79hai7knhw.js",
-    "./_content/Microsoft.AspNetCore.Components.QuickGrid/QuickGrid.razor.js": "./_content/Microsoft.AspNetCore.Components.QuickGrid/QuickGrid.eu7w3d5g1a.razor.js",
-    "./_framework/blazor.server.js": "./_framework/blazor.server.dwu72t6gfx.js",
-    "./_framework/blazor.web.js": "./_framework/blazor.web.9hsif5t8mt.js",
-    "./lib/bootstrap/dist/js/bootstrap.bundle.js": "./lib/bootstrap/dist/js/bootstrap.bundle.6cfz1n2cew.js",
-    "./lib/bootstrap/dist/js/bootstrap.bundle.min.js": "./lib/bootstrap/dist/js/bootstrap.bundle.min.493y06b0oq.js",
-    "./lib/bootstrap/dist/js/bootstrap.esm.min.js": "./lib/bootstrap/dist/js/bootstrap.esm.min.jj8uyg4cgr.js",
-    "./lib/bootstrap/dist/js/bootstrap.esm.js": "./lib/bootstrap/dist/js/bootstrap.esm.vr1egmr9el.js",
-    "./lib/bootstrap/dist/js/bootstrap.min.js": "./lib/bootstrap/dist/js/bootstrap.min.63fj8s7r0e.js",
-    "./lib/bootstrap/dist/js/bootstrap.js": "./lib/bootstrap/dist/js/bootstrap.notf2xhcfb.js"
-  }
-}</script>
-    <link rel="icon" type="image/png" href="favicon.png">
-    <!--Blazor:{"type":"server","key":{"locationHash":"77D12F14A8105320B1AAED6AE7E689DA0EC4483270A645E84079EAA0FFDF550D:15","formattedComponentKey":""},"sequence":0,"descriptor":"CfDJ8KqluDWmhjNDul2DwgT6LYzfcXcndeJwvT4sasciNzSooXiTU2j/sACq0dleX6fOMkS\u002B3W4/cZ3snv/DdR3h3OYNoXbuAn19M\u002B2YZ7FAUztvSgXxxejnoiGhZg29e6h/QrxSe36Ahcd3RhraPr0SLUI/CYaePjm8Xvnk8UxX9rIXWIpuSpcmEEo19Rwa9r10Swm\u002BsTvcjYT5iBkxQtGQ6nn64DvWHeSY\u002BkzvhG42yhbvqQxr6Znj7JaKZm2P8i63\u002BQyOeBfsHUmSHEexhIDrOvl84lN433LP/AJnLZrCGDxp4h89f2A8r6ivmLR2jYBB\u002BFbxwQ6r8em0KNSOFrvjUulhLIWbvvFnbg6LLLFoT\u002BlcyWxQcZhs0caPu0gmQL0qfklWXAR3LduMSwuyhWejVY6qgwAs7hrjjVE31F4Op7\u002BCFvV7U5srMvxI4Psn8MylNHyXxznVhabMtdceGbN9DpjSH1BgslGKf9BImGzcEk9IFTzydfbJP58tMwgg9oGmT0qDZzxQoMSoFLJT7Jl7IbRRA\u002BSbtxrZKoa4drTBjk52da7jYoJsnNbZgTzK\u002ByRtDhpzc436UxjeUcnB5lIBRgI="}--></head>
-
-<body><!--Blazor:{"type":"server","key":{"locationHash":"B7CD511D6460625BF4FBFA414AC4675AB4E37DFB7382CDD93D3EA2A612C7633B:18","formattedComponentKey":""},"sequence":1,"descriptor":"CfDJ8KqluDWmhjNDul2DwgT6LYwrs/spZ8lBRhreFPjG5caSd/qYTZtdJ31vwl\u002BFZ9EU\u002BPfk8osyvFsmBGT5Fk6AHPSuNIAT0cY6oj3Yes1oOc6dBmlj\u002BoRDauuMQUzeiOexFPgO4NvKqqZvNImTeOSoS4aw36caY0QA30QVE/z4myFnjuABBToZmLPqedt8K/kSoa\u002BjN1rDJx8VvxlyEJVCF9vuBuwput0vADOE58jxprN4Py6YhvssTOApzjJd5sR5A1pKLLNTssEHgJ3NWZ9v34CTx2IDIteJzZzLpyJBQhVe/w7jpX\u002B8T/WjCLEWmuER9plL2FvJZqNR9ayq8HVvvsQq\u002BRrjn1GpM8ADPlx\u002BWUW75KLYwq/zi/eMxE1f77qS5S4C/RGNSBoBLevifsYNJP1ul4JCAUhdbucFz4uXMw8PUFoq608jpEnZikDo6MnL5fRzPhV12ELyKm5fGXZ0xJrZEFtWSxCUU14iJiUersUEjjz3vNA8hyYd1Lh1MV/DAO3fs1lHL4tMuE5szFp4gn0umo3FiRUm8I4SSmFnkGjX"}-->
-    <script type="module" src="Components/Layout/ReconnectModal.abdmv1u4y3.razor.js" b-c3iylxcopy></script>
-
-<dialog id="components-reconnect-modal" data-nosnippet b-c3iylxcopy><div class="components-reconnect-container" b-c3iylxcopy><div class="components-rejoining-animation" aria-hidden="true" b-c3iylxcopy><div b-c3iylxcopy></div>
-            <div b-c3iylxcopy></div></div>
-        <p class="components-reconnect-first-attempt-visible" b-c3iylxcopy>
-            Rejoining the server...
-        </p>
-        <p class="components-reconnect-repeated-attempt-visible" b-c3iylxcopy>
-            Rejoin failed... trying again in <span id="components-seconds-to-next-attempt" b-c3iylxcopy></span> seconds.
-        </p>
-        <p class="components-reconnect-failed-visible" b-c3iylxcopy>
-            Failed to rejoin.<br b-c3iylxcopy>Please retry or reload the page.
-        </p>
-        <button id="components-reconnect-button" class="components-reconnect-failed-visible" b-c3iylxcopy>
-            Retry
-        </button>
-        <p class="components-pause-visible" b-c3iylxcopy>
-            The session has been paused by the server.
-        </p>
-        <p class="components-resume-failed-visible" b-c3iylxcopy>
-            Failed to resume the session.<br b-c3iylxcopy>Please retry or reload the page.
-        </p>
-        <button id="components-resume-button" class="components-pause-visible components-resume-failed-visible" b-c3iylxcopy>
-            Resume
-        </button></div></dialog>
-    <script src="lib/bootstrap/dist/js/bootstrap.bundle.min.493y06b0oq.js"></script>
-    <script src="_framework/blazor.web.js"></script>
-    <script src="_content/Blazor.Bootstrap/blazor.bootstrap.js"></script></body></html><!--Blazor-Server-Component-State:CfDJ8KqluDWmhjNDul2DwgT6LYzS1z89aPX9NdhhfhB6PWG5xBfij27cfnuJo/YU5EKTCsX8rFrSqEjJoVGGbH8qbRXPC2gN0zuEBBcBUPAYt/OPzad0Ec7P8Pnuxz0Kc+nOyAam84/VEYaNcbTDj8+8tjRIPxqNbLRNhiXOt2SUcd2j72WiuLNUSeNvJixy1lzXLDJQtA5GFlYJOivjvLG4zymyo2e3KR4iDScDKlyE6rzihlfYPrq3IZi4Tm4qmmNyjOdGMh5sOPN2mQ9PgNjxvEn4TTbYLv3lyw2IOPlY9UB+dIvOdjcDO3QtPF+dKpV2b1AqdJXasjRU0RU4W3CKqkNpfU9zIL3QiUDx8nDIQkpdXBxPav5hmzDFRq2UVj7P0/XFoopXMgNZ/OyoD4BYVWLkTZGDveVSmyJ3hYAhTC5F9kC+cGvLKNni2tEj0AIJUfOUjvDakzfCusuxRrycl28zEpbwxAwIjfhyu1Q9vANAmgv/f+CSBkBE5WEWlZnSdnL8BbVZ+9NZqJAYUKJ8Ecer9NepYy0B4CI31DMl5R6Vn18tfqI5/5/cpsSQtPufPF/Yq6OpaSHCGXfaddcjPt+dsSGYav36S9+TSZCANaXNo/m3L5uVHfHHwxAbYg7fExnptCLJ8C9u5OgUpC7WiSlUwFfwrDukI2ZSLxnuXvH4CxRdVDnJZ3p1xff65/mh+kWXknX+xgfFnZr8FOWQUIl34/4mXRwelrDSS1TELwLQdI6G1YvuOdCcGUxykchd0XD0J+uzxqVeI8zhCp2opiqffZteaE1L3S26ChzMEu3/0r3D+DsLQaVDks10zGnB92gEDoPEfnvKx0dgsDr7Rhzs+x1MFjDPlP0I4/iRfbIhW76hAbC96FFxxKOU2Z3erqu03Hw9dy+itpX2cTnkR12JUdOh33Pfuq7/F3qZ+anLShGqfmaU5xAQ7AnWt9foba5APp7sHmSrSQkr/ZdQAXJx0oviZR6mwHP0CltgWMJrjx8ZwLTmi4xsWt5xHuAsnMZQM/13ZyePfzcxe2ctew61/tvb50zKbxbGT+8QKdsH0OcbpZtxVucRBLIMC7KEvR/t4KFjpWtyyBPErgOOzZrUcG9Nt6UnaLKxrCwln6xpShvm8Ur2YlUPKgp5ZioQqQ==-->
-</file>
-
-<file path="toast_out.txt">
-No toast
-</file>
-
-<file path=".repomixignore">
-wwwroot/lib/
-bin/
-obj/
-.vs/
-.git/
-repomix-output.*
-uploads/
-Nuevas funcionalidades/
 </file>
 
 <file path="support.js">
@@ -14824,10 +14726,270 @@ Nuevas funcionalidades/
 })();
 </file>
 
+<file path="test_home.html">
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <base href="/">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Lato:wght@400;700;900&family=Manrope:wght@500;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="lib/bootstrap/dist/css/bootstrap.min.46ein0sx1k.css" />
+    <link rel="stylesheet" href="app.css">
+    <link rel="stylesheet" href="ElectroGestion.c3n4gr79od.styles.css" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <link href="_content/Blazor.Bootstrap/blazor.bootstrap.css" rel="stylesheet">
+    <script type="importmap">{
+  "imports": {
+    "./Components/Layout/ReconnectModal.razor.js": "./Components/Layout/ReconnectModal.abdmv1u4y3.razor.js",
+    "./_content/Blazor.Bootstrap/blazor.bootstrap.js": "./_content/Blazor.Bootstrap/blazor.bootstrap.jbj5vv28m9.js",
+    "./_content/Blazor.Bootstrap/blazor.bootstrap.pdf.js": "./_content/Blazor.Bootstrap/blazor.bootstrap.pdf.30xw9wihir.js",
+    "./_content/Blazor.Bootstrap/blazor.bootstrap.rich-text-editor.js": "./_content/Blazor.Bootstrap/blazor.bootstrap.rich-text-editor.f6r6spnkpf.js",
+    "./_content/Blazor.Bootstrap/blazor.bootstrap.sortable-list.js": "./_content/Blazor.Bootstrap/blazor.bootstrap.sortable-list.ezlxc6gzv3.js",
+    "./_content/Blazor.Bootstrap/blazor.bootstrap.theme-switcher.js": "./_content/Blazor.Bootstrap/blazor.bootstrap.theme-switcher.pisakkcwob.js",
+    "./_content/Blazor.Bootstrap/pdfjs-4.0.379.min.js": "./_content/Blazor.Bootstrap/pdfjs-4.0.379.min.j8zp7bt7w3.js",
+    "./_content/Blazor.Bootstrap/pdfjs-4.0.379.worker.min.js": "./_content/Blazor.Bootstrap/pdfjs-4.0.379.worker.min.79hai7knhw.js",
+    "./_content/Microsoft.AspNetCore.Components.QuickGrid/QuickGrid.razor.js": "./_content/Microsoft.AspNetCore.Components.QuickGrid/QuickGrid.eu7w3d5g1a.razor.js",
+    "./_framework/blazor.server.js": "./_framework/blazor.server.dwu72t6gfx.js",
+    "./_framework/blazor.web.js": "./_framework/blazor.web.9hsif5t8mt.js",
+    "./lib/bootstrap/dist/js/bootstrap.bundle.js": "./lib/bootstrap/dist/js/bootstrap.bundle.6cfz1n2cew.js",
+    "./lib/bootstrap/dist/js/bootstrap.bundle.min.js": "./lib/bootstrap/dist/js/bootstrap.bundle.min.493y06b0oq.js",
+    "./lib/bootstrap/dist/js/bootstrap.esm.min.js": "./lib/bootstrap/dist/js/bootstrap.esm.min.jj8uyg4cgr.js",
+    "./lib/bootstrap/dist/js/bootstrap.esm.js": "./lib/bootstrap/dist/js/bootstrap.esm.vr1egmr9el.js",
+    "./lib/bootstrap/dist/js/bootstrap.min.js": "./lib/bootstrap/dist/js/bootstrap.min.63fj8s7r0e.js",
+    "./lib/bootstrap/dist/js/bootstrap.js": "./lib/bootstrap/dist/js/bootstrap.notf2xhcfb.js"
+  }
+}</script>
+    <link rel="icon" type="image/png" href="favicon.png">
+    <!--Blazor:{"type":"server","key":{"locationHash":"77D12F14A8105320B1AAED6AE7E689DA0EC4483270A645E84079EAA0FFDF550D:15","formattedComponentKey":""},"sequence":0,"descriptor":"CfDJ8KqluDWmhjNDul2DwgT6LYzfcXcndeJwvT4sasciNzSooXiTU2j/sACq0dleX6fOMkS\u002B3W4/cZ3snv/DdR3h3OYNoXbuAn19M\u002B2YZ7FAUztvSgXxxejnoiGhZg29e6h/QrxSe36Ahcd3RhraPr0SLUI/CYaePjm8Xvnk8UxX9rIXWIpuSpcmEEo19Rwa9r10Swm\u002BsTvcjYT5iBkxQtGQ6nn64DvWHeSY\u002BkzvhG42yhbvqQxr6Znj7JaKZm2P8i63\u002BQyOeBfsHUmSHEexhIDrOvl84lN433LP/AJnLZrCGDxp4h89f2A8r6ivmLR2jYBB\u002BFbxwQ6r8em0KNSOFrvjUulhLIWbvvFnbg6LLLFoT\u002BlcyWxQcZhs0caPu0gmQL0qfklWXAR3LduMSwuyhWejVY6qgwAs7hrjjVE31F4Op7\u002BCFvV7U5srMvxI4Psn8MylNHyXxznVhabMtdceGbN9DpjSH1BgslGKf9BImGzcEk9IFTzydfbJP58tMwgg9oGmT0qDZzxQoMSoFLJT7Jl7IbRRA\u002BSbtxrZKoa4drTBjk52da7jYoJsnNbZgTzK\u002ByRtDhpzc436UxjeUcnB5lIBRgI="}--></head>
+
+<body><!--Blazor:{"type":"server","key":{"locationHash":"B7CD511D6460625BF4FBFA414AC4675AB4E37DFB7382CDD93D3EA2A612C7633B:18","formattedComponentKey":""},"sequence":1,"descriptor":"CfDJ8KqluDWmhjNDul2DwgT6LYwrs/spZ8lBRhreFPjG5caSd/qYTZtdJ31vwl\u002BFZ9EU\u002BPfk8osyvFsmBGT5Fk6AHPSuNIAT0cY6oj3Yes1oOc6dBmlj\u002BoRDauuMQUzeiOexFPgO4NvKqqZvNImTeOSoS4aw36caY0QA30QVE/z4myFnjuABBToZmLPqedt8K/kSoa\u002BjN1rDJx8VvxlyEJVCF9vuBuwput0vADOE58jxprN4Py6YhvssTOApzjJd5sR5A1pKLLNTssEHgJ3NWZ9v34CTx2IDIteJzZzLpyJBQhVe/w7jpX\u002B8T/WjCLEWmuER9plL2FvJZqNR9ayq8HVvvsQq\u002BRrjn1GpM8ADPlx\u002BWUW75KLYwq/zi/eMxE1f77qS5S4C/RGNSBoBLevifsYNJP1ul4JCAUhdbucFz4uXMw8PUFoq608jpEnZikDo6MnL5fRzPhV12ELyKm5fGXZ0xJrZEFtWSxCUU14iJiUersUEjjz3vNA8hyYd1Lh1MV/DAO3fs1lHL4tMuE5szFp4gn0umo3FiRUm8I4SSmFnkGjX"}-->
+    <script type="module" src="Components/Layout/ReconnectModal.abdmv1u4y3.razor.js" b-c3iylxcopy></script>
+
+<dialog id="components-reconnect-modal" data-nosnippet b-c3iylxcopy><div class="components-reconnect-container" b-c3iylxcopy><div class="components-rejoining-animation" aria-hidden="true" b-c3iylxcopy><div b-c3iylxcopy></div>
+            <div b-c3iylxcopy></div></div>
+        <p class="components-reconnect-first-attempt-visible" b-c3iylxcopy>
+            Rejoining the server...
+        </p>
+        <p class="components-reconnect-repeated-attempt-visible" b-c3iylxcopy>
+            Rejoin failed... trying again in <span id="components-seconds-to-next-attempt" b-c3iylxcopy></span> seconds.
+        </p>
+        <p class="components-reconnect-failed-visible" b-c3iylxcopy>
+            Failed to rejoin.<br b-c3iylxcopy>Please retry or reload the page.
+        </p>
+        <button id="components-reconnect-button" class="components-reconnect-failed-visible" b-c3iylxcopy>
+            Retry
+        </button>
+        <p class="components-pause-visible" b-c3iylxcopy>
+            The session has been paused by the server.
+        </p>
+        <p class="components-resume-failed-visible" b-c3iylxcopy>
+            Failed to resume the session.<br b-c3iylxcopy>Please retry or reload the page.
+        </p>
+        <button id="components-resume-button" class="components-pause-visible components-resume-failed-visible" b-c3iylxcopy>
+            Resume
+        </button></div></dialog>
+    <script src="lib/bootstrap/dist/js/bootstrap.bundle.min.493y06b0oq.js"></script>
+    <script src="_framework/blazor.web.js"></script>
+    <script src="_content/Blazor.Bootstrap/blazor.bootstrap.js"></script></body></html><!--Blazor-Server-Component-State:CfDJ8KqluDWmhjNDul2DwgT6LYzS1z89aPX9NdhhfhB6PWG5xBfij27cfnuJo/YU5EKTCsX8rFrSqEjJoVGGbH8qbRXPC2gN0zuEBBcBUPAYt/OPzad0Ec7P8Pnuxz0Kc+nOyAam84/VEYaNcbTDj8+8tjRIPxqNbLRNhiXOt2SUcd2j72WiuLNUSeNvJixy1lzXLDJQtA5GFlYJOivjvLG4zymyo2e3KR4iDScDKlyE6rzihlfYPrq3IZi4Tm4qmmNyjOdGMh5sOPN2mQ9PgNjxvEn4TTbYLv3lyw2IOPlY9UB+dIvOdjcDO3QtPF+dKpV2b1AqdJXasjRU0RU4W3CKqkNpfU9zIL3QiUDx8nDIQkpdXBxPav5hmzDFRq2UVj7P0/XFoopXMgNZ/OyoD4BYVWLkTZGDveVSmyJ3hYAhTC5F9kC+cGvLKNni2tEj0AIJUfOUjvDakzfCusuxRrycl28zEpbwxAwIjfhyu1Q9vANAmgv/f+CSBkBE5WEWlZnSdnL8BbVZ+9NZqJAYUKJ8Ecer9NepYy0B4CI31DMl5R6Vn18tfqI5/5/cpsSQtPufPF/Yq6OpaSHCGXfaddcjPt+dsSGYav36S9+TSZCANaXNo/m3L5uVHfHHwxAbYg7fExnptCLJ8C9u5OgUpC7WiSlUwFfwrDukI2ZSLxnuXvH4CxRdVDnJZ3p1xff65/mh+kWXknX+xgfFnZr8FOWQUIl34/4mXRwelrDSS1TELwLQdI6G1YvuOdCcGUxykchd0XD0J+uzxqVeI8zhCp2opiqffZteaE1L3S26ChzMEu3/0r3D+DsLQaVDks10zGnB92gEDoPEfnvKx0dgsDr7Rhzs+x1MFjDPlP0I4/iRfbIhW76hAbC96FFxxKOU2Z3erqu03Hw9dy+itpX2cTnkR12JUdOh33Pfuq7/F3qZ+anLShGqfmaU5xAQ7AnWt9foba5APp7sHmSrSQkr/ZdQAXJx0oviZR6mwHP0CltgWMJrjx8ZwLTmi4xsWt5xHuAsnMZQM/13ZyePfzcxe2ctew61/tvb50zKbxbGT+8QKdsH0OcbpZtxVucRBLIMC7KEvR/t4KFjpWtyyBPErgOOzZrUcG9Nt6UnaLKxrCwln6xpShvm8Ur2YlUPKgp5ZioQqQ==-->
+</file>
+
+<file path="toast_out.txt">
+No toast
+</file>
+
+<file path=".repomixignore">
+wwwroot/lib/
+bin/
+obj/
+.vs/
+.git/
+repomix-output.*
+uploads/
+Nuevas funcionalidades/
+</file>
+
 <file path="README.md">
 # ElectroGestion
 
-Sistema de gestión para instalaciones y servicios eléctricos.
+Sistema de gestión operativa y comercial para empresas de ingeniería eléctrica, contratistas e instalaciones de energía. Permite administrar el ciclo completo de atención: registro de clientes, catálogo de servicios, gestión de solicitudes técnicas y asignación de trabajos en campo.
+
+---
+
+## Sustentado por
+
+| Nombre | Matrícula |
+| :--- | :--- |
+| **Jeison Amparo Abreu** | 1000-5296 |
+| **Dionicio Hernández Pujols** | 1000-5331 |
+| **Julymar Santos Balbi** | 1000-5890 |
+| **Isaac Rosario Paulino** | 2023-0532 |
+| **Williams Rafael Sanchez Acosta** | 2023-0136 |
+
+**Carrera:** Ingeniería en Sistemas y Computación  
+**Asignatura:** Proyecto Aplicado  
+
+---
+
+## Descripción del Proyecto
+
+ElectroGestion centraliza las operaciones entre la administración y los técnicos de campo. Sustituye el manejo informal de órdenes de trabajo por un flujo estructurado que garantiza trazabilidad desde la primera llamada del cliente hasta la finalización del servicio.
+
+### Roles del Sistema
+
+- **Gerencia (Administración):**
+  - Supervisión global de solicitudes, órdenes de trabajo y cobros.
+  - Gestión completa (CRUD) de clientes y catálogo de servicios con precios base.
+  - Asignación de prioridades y seguimiento del estado operativo.
+  - Reportes de facturación, servicios realizados y volumen por cliente.
+
+- **Técnico (Campo):**
+  - Consulta de agenda operativa y solicitudes asignadas.
+  - Registro de datos de levantamiento técnico (cargas eléctricas, tensión, metraje de tuberías y cableado).
+  - Consulta de clientes y especificaciones de las visitas programadas.
+  - Acceso restringido a funciones críticas (no eliminación de registros sensibles).
+
+---
+
+## Arquitectura y Tecnologías
+
+El sistema está desarrollado sobre la plataforma .NET utilizando una arquitectura por capas orientada a servicios:
+
+- **Framework:** .NET 10 (C#)
+- **Interfaz de Usuario:** ASP.NET Core Blazor (Interactive Server Components)
+- **Persistencia de Datos:** Entity Framework Core 10 (Code-First)
+- **Base de Datos:** Microsoft SQL Server / SQL Server Express
+- **Componentes UI:** Blazor Bootstrap + diseño CSS estructurado
+- **Inyección de Dependencias:** `IDbContextFactory<Contexto>` para manejo seguro de contextos asíncronos en Blazor Server
+
+---
+
+## Modelo de Base de Datos
+
+La base de datos se encuentra normalizada (3FN). La estructura contempla la separación de números de contacto mediante la entidad `ClientesTelefonos`, catálogos para estados de solicitud y detalles desagregados de servicios por solicitud.
+
+```mermaid
+erDiagram
+    CLIENTES ||--o{ CLIENTES_TELEFONOS : "tiene (1:N)"
+    CLIENTES ||--o{ SOLICITUDES : "genera (1:N)"
+    SERVICIOS ||--o{ SOLICITUDES : "asociado a (1:N)"
+    SERVICIOS ||--o{ DETALLES_SOLICITUD : "incluido en (1:N)"
+    ESTADOS_SOLICITUD ||--o{ SOLICITUDES : "clasifica (1:N)"
+    SOLICITUDES ||--o{ DETALLES_SOLICITUD : "contiene (1:N)"
+
+    CLIENTES {
+        int Id PK
+        string Nombre
+        string Correo
+        string Rnc
+        string Direccion
+        int Servicios
+        string Ultimo
+    }
+
+    CLIENTES_TELEFONOS {
+        int Id PK
+        int ClienteId FK
+        string Numero
+        string Tipo
+    }
+
+    SERVICIOS {
+        int Id PK
+        string ServicioId
+        string Nombre
+        string Categoria
+        decimal PrecioBase
+        string Estado
+    }
+
+    ESTADOS_SOLICITUD {
+        int Id PK
+        string Nombre
+    }
+
+    SOLICITUDES {
+        int Id PK
+        int ClienteId FK
+        int ServicioId FK
+        string Contacto
+        string Direccion
+        datetime FechaSolicitud
+        datetime Fecha
+        string Hora
+        int EstadoSolicitudId FK
+        string TecnicoAsignado
+        datetime FechaFin
+    }
+
+    DETALLES_SOLICITUD {
+        int Id PK
+        int SolicitudId FK
+        int ServicioId FK
+        int Cantidad
+        decimal Precio
+        string Descripcion
+    }
+```
+
+### Reglas de Integridad Referencial
+- **Clientes a Teléfonos:** Cascada (`Cascade`). Al eliminar un cliente, se eliminan sus teléfonos de contacto.
+- **Clientes / Servicios a Solicitudes:** Restricción (`Restrict`). No es posible eliminar un cliente o un servicio que tenga solicitudes registradas.
+- **Solicitudes a Detalles:** Cascada (`Cascade`). Al remover una solicitud, se eliminan sus renglones de detalle.
+
+---
+
+## Configuración y Ejecución Local
+
+### 1. Requisitos Previos
+- [.NET 10 SDK](https://dotnet.microsoft.com/) instalado.
+- Instancia activa de SQL Server (SQL Express, LocalDB o SQL Server estándar).
+- Herramienta de línea de comandos de EF Core (`dotnet tool install --global dotnet-ef`).
+
+### 2. Clonar el Repositorio
+```bash
+git clone https://github.com/Je1sonAmparo/ElectroGestion.git
+cd ElectroGestion
+```
+
+### 3. Configurar Cadena de Conexión
+Verificar el archivo `appsettings.json` en la raíz del proyecto y ajustar la cadena según su servidor local:
+
+```json
+{
+  "ConnectionStrings": {
+    "SqlConStr": "Server=.\\SQLExpress;Database=ElectroGestionDB;Trusted_Connection=True;TrustServerCertificate=true;"
+  }
+}
+```
+
+### 4. Aplicar Migraciones
+Ejecutar el comando de Entity Framework para crear la base de datos y sembrar los datos iniciales de prueba:
+
+```bash
+dotnet ef database update
+```
+
+### 5. Iniciar la Aplicación
+```bash
+dotnet run
+```
+O con recarga en vivo para desarrollo:
+```bash
+dotnet watch
+```
+
+La aplicación iniciará en `https://localhost:7198` (o el puerto configurado en `Properties/launchSettings.json`).
+
+---
+
+## Verificación Automatizada del CRUD
+
+El proyecto incluye un módulo de pruebas directas contra la base de datos configurada para validar las operaciones de inserción, lectura, actualización y restricciones de borrado de Clientes, Servicios y Solicitudes:
+
+```bash
+dotnet run --environment Development -- --test-crud
+```
 </file>
 
 <file path=".gitignore">
