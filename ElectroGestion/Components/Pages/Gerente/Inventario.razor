@@ -146,22 +146,26 @@
 
 @if (SelectedArticulo != null)
 {
-    <div style="position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(20,22,43,0.4);backdrop-filter:blur(4px);display:flex;align-items:center;justify-content:center;z-index:9999;padding:20px" @onclick="CerrarDetalle">
-        <div style="background:#fff;width:100%;max-width:550px;border-radius:16px;box-shadow:0 20px 40px rgba(0,0,0,0.1);display:flex;flex-direction:column;max-height:90vh" @onclick:stopPropagation>
-            <div style="padding:24px;border-bottom:1px solid #E3E5EE;display:flex;align-items:center;justify-content:space-between">
-                <h3 style="margin:0;font-family:'Manrope';font-weight:800;font-size:20px;color:#14162B">Detalle de Artículo</h3>
-                <button @onclick="CerrarDetalle" style="background:none;border:0;color:#6B7085;cursor:pointer;padding:4px">
-                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+    <div style="position:fixed;inset:0;background:rgba(14,16,40,.5);display:flex;align-items:center;justify-content:center;z-index:9999;padding:20px" @onclick="CerrarDetalle">
+        <div style="background:#fff;border-radius:16px;width:100%;max-width:620px;padding:32px;box-shadow:0 20px 40px rgba(0,0,0,.2);animation:tin .2s ease-out">
+            <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:20px">
+                <div>
+                    <div style="font-family:'Manrope';font-weight:800;font-size:22px;color:#14162B">Detalle de Artículo</div>
+                    <div style="font-size:14px;color:#6B7085;margin-top:3px">Artículo @SelectedArticulo.Id.ToString("D4")</div>
+                </div>
+                <button @onclick="CerrarDetalle" aria-label="Cerrar" style="width:32px;height:32px;border:1px solid #E3E5EE;border-radius:8px;background:#fff;display:flex;align-items:center;justify-content:center;color:#8B90A3;cursor:pointer">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M18 6 6 18M6 6l12 12"/></svg>
                 </button>
             </div>
-            
-            <div style="padding:24px;overflow-y:auto;display:flex;flex-direction:column;gap:16px;font-size:14px;color:#4A4E63">
-                <div style="display:flex;gap:10px"><strong style="color:#14162B;width:120px">ID:</strong> <span>@SelectedArticulo.Id</span></div>
-                <div style="display:flex;gap:10px"><strong style="color:#14162B;width:120px">Código:</strong> <span>@SelectedArticulo.Codigo</span></div>
-                <div style="display:flex;gap:10px"><strong style="color:#14162B;width:120px">Nombre:</strong> <span>@SelectedArticulo.Nombre</span></div>
-                <div style="display:flex;gap:10px"><strong style="color:#14162B;width:120px">Categoría:</strong> <span>@SelectedArticulo.Categoria</span></div>
-                <div style="display:flex;gap:10px"><strong style="color:#14162B;width:120px">Stock Actual:</strong> <span>@SelectedArticulo.Cantidad unid.</span></div>
-                <div style="display:flex;gap:10px"><strong style="color:#14162B;width:120px">Precio Unitario:</strong> <span style="font-weight:700">RD$ @SelectedArticulo.PrecioUnidad.ToString("N2")</span></div>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px" class="resp-grid-2">
+                <div style="background:#F7F8FC;border:1px solid #EFF0F6;border-radius:10px;padding:12px 14px"><div style="font-size:11.5px;color:#8B90A3;font-weight:800;text-transform:uppercase">Código</div><div style="font-size:14px;margin-top:4px;font-weight:700;color:#14162B">@SelectedArticulo.Codigo</div></div>
+                <div style="background:#F7F8FC;border:1px solid #EFF0F6;border-radius:10px;padding:12px 14px"><div style="font-size:11.5px;color:#8B90A3;font-weight:800;text-transform:uppercase">Nombre</div><div style="font-size:14px;margin-top:4px;font-weight:700;color:#14162B">@SelectedArticulo.Nombre</div></div>
+                <div style="background:#F7F8FC;border:1px solid #EFF0F6;border-radius:10px;padding:12px 14px"><div style="font-size:11.5px;color:#8B90A3;font-weight:800;text-transform:uppercase">Categoría</div><div style="font-size:14px;margin-top:4px;font-weight:700;color:#14162B">@SelectedArticulo.Categoria</div></div>
+                <div style="background:#F7F8FC;border:1px solid #EFF0F6;border-radius:10px;padding:12px 14px"><div style="font-size:11.5px;color:#8B90A3;font-weight:800;text-transform:uppercase">Stock Actual</div><div style="font-size:14px;margin-top:4px;font-weight:700;color:#14162B">@SelectedArticulo.Cantidad unid.</div></div>
+                <div style="background:#F7F8FC;border:1px solid #EFF0F6;border-radius:10px;padding:12px 14px"><div style="font-size:11.5px;color:#8B90A3;font-weight:800;text-transform:uppercase">Precio Unitario</div><div style="font-size:14px;margin-top:4px;font-weight:700;color:#14162B">RD$ @SelectedArticulo.PrecioUnidad.ToString("N2")</div></div>
+            </div>
+            <div style="margin-top:24px;display:flex;justify-content:flex-end;border-top:1px solid #EFF0F6;padding-top:17px">
+                <button @onclick="CerrarDetalle" style="padding:10px 20px;border:1px solid #D5D8E6;background:#fff;border-radius:8px;font-weight:700;cursor:pointer;color:#14162B">Cerrar</button>
             </div>
         </div>
     </div>
