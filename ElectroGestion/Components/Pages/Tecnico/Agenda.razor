@@ -1,6 +1,7 @@
 @page "/agenda"
 @implements IDisposable
 @inject ElectroGestion.Services.AppStateService AppState
+@inject ElectroGestion.Services.SolicitudService SolicitudService
 @inject NavigationManager NavManager
 
 <PageTitle>Agenda | ElectroGestion</PageTitle>
@@ -340,11 +341,12 @@
     private List<DiaMes> Mes = new();
     private List<Evento> DiariaEventos = new();
     private Evento? Detalle;
+    private List<ElectroGestion.Models.Solicitud> solicitudes = new();
 
-    protected override void OnInitialized()
+    protected override async Task OnInitializedAsync()
     {
         AppState.OnChange += OnStateChanged;
-        UpdateData();
+        await UpdateData();
         
         if (VistaActual == "Hoy")
         {
@@ -359,23 +361,25 @@
 
     private async void OnStateChanged()
     {
+        await UpdateData();
         await InvokeAsync(StateHasChanged);
     }
 
-    private void OnVistaActualChanged(ChangeEventArgs e)
+    private async Task OnVistaActualChanged(ChangeEventArgs e)
     {
         VistaActual = e.Value?.ToString() ?? "Semanal";
-        UpdateData();
+        await UpdateData();
     }
 
-    private void UpdateData()
+    private async Task UpdateData()
     {
+        solicitudes = await SolicitudService.GetList(s => true);
         var hoyD = DateTime.Today;
         var hoyStr = hoyD.ToString("yyyy-MM-dd");
 
         var MES = new[] { "enero", "febrero", "marzo", "abril", "mayo", "junio", "julio", "agosto", "septiembre", "octubre", "noviembre", "diciembre" };
 
-        var visibles = AppState.Solicitudes.Where(x => x.Fecha != DateTime.MinValue && !string.IsNullOrEmpty(x.Hora)).ToList();
+        var visibles = solicitudes.Where(x => x.Fecha != DateTime.MinValue && !string.IsNullOrEmpty(x.Hora)).ToList();
 
         var lunes = hoyD.AddDays(-((int)hoyD.DayOfWeek == 0 ? 6 : (int)hoyD.DayOfWeek - 1));
         var finSem = lunes.AddDays(6);

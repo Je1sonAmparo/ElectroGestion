@@ -1,4 +1,7 @@
 @inject ElectroGestion.Services.AppStateService AppState
+@inject ElectroGestion.Services.SolicitudService SolicitudService
+@inject ElectroGestion.Services.ClienteService ClienteService
+@inject ElectroGestion.Services.ServicioService ServicioService
 @inject NavigationManager NavManager
 @inject IJSRuntime JS
 @inject ToastService ToastService
@@ -161,7 +164,7 @@
                 <button @onclick="CloseModal" aria-label="Cerrar" style="width:32px;height:32px;border:1px solid #E3E5EE;border-radius:8px;background:#fff;display:flex;align-items:center;justify-content:center;color:#8B90A3;cursor:pointer"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M18 6 6 18M6 6l12 12"/></svg></button>
             </div>
             <div style="display:flex;flex-direction:column;gap:16px">
-                <div><label style="display:block;font-size:13px;font-weight:700;color:#14162B;margin-bottom:6px">Cliente *</label><select @bind="FormCliente" style="width:100%;padding:10px 14px;border:1px solid #D5D8E6;border-radius:8px;font-size:14px;background:#fff"><option value="">Seleccione un cliente registrado</option>@foreach (var cliente in AppState.Clientes) { <option value="@cliente.Nombre">@cliente.Nombre</option> }</select></div>
+                <div><label style="display:block;font-size:13px;font-weight:700;color:#14162B;margin-bottom:6px">Cliente *</label><select @bind="FormCliente" style="width:100%;padding:10px 14px;border:1px solid #D5D8E6;border-radius:8px;font-size:14px;background:#fff"><option value="">Seleccione un cliente registrado</option>@foreach (var cliente in clientes) { <option value="@cliente.Nombre">@cliente.Nombre</option> }</select></div>
                 <div><label style="display:block;font-size:13px;font-weight:700;color:#14162B;margin-bottom:6px">Tipo de Servicio *</label><select @bind="FormTipo" style="width:100%;padding:10px 14px;border:1px solid #D5D8E6;border-radius:8px;font-size:14px;background:#fff"><option value="">Seleccione el tipo de servicio</option>@foreach (var tipo in TiposServicio) { <option value="@tipo">@tipo</option> }</select></div>
                 <div><label style="display:block;font-size:13px;font-weight:700;color:#14162B;margin-bottom:6px">Dirección del Servicio *</label><input @bind="FormDireccion" placeholder="ej. Calle Principal #12, Santiago" style="width:100%;padding:10px 14px;border:1px solid #D5D8E6;border-radius:8px;font-size:14px" /></div>
                 <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px" class="resp-grid-2">
@@ -205,28 +208,63 @@
     private string FormDireccion = "";
     private DateTime? FormFecha;
     private TimeOnly? FormHora;
-    private List<string> TiposServicio => AppState.Servicios.Select(s => s.Nombre).Distinct().ToList();
+    private List<string> TiposServicio = new();
 
-    private string SearchTerm { get; set; } = "";
-    private string FilterEstado { get; set; } = "Todos";
+    private List<ElectroGestion.Models.Solicitud> solicitudes = new();
+    private List<ElectroGestion.Models.Cliente> clientes = new();
+    private List<ElectroGestion.Models.Servicio> servicios = new();
+    private List<ElectroGestion.Models.Solicitud> FilteredSolicitudes = new();
 
-    private List<ElectroGestion.Models.Solicitud> FilteredSolicitudes => AppState.Solicitudes
-        .Where(s =>
-        {
-            bool matchId = string.IsNullOrWhiteSpace(SearchId) || s.Id.ToString("D4").Contains(SearchId, StringComparison.OrdinalIgnoreCase);
-            bool matchCliente = string.IsNullOrWhiteSpace(SearchCliente) || (s.Cliente?.Nombre.Contains(SearchCliente, StringComparison.OrdinalIgnoreCase) ?? false);
-            bool matchTipo = string.IsNullOrWhiteSpace(SearchTipo) || s.Servicio?.Nombre == SearchTipo;
-            bool matchFecha = !SearchFecha.HasValue || s.FechaSolicitud.ToString("yyyy-MM-dd") == SearchFecha.Value.ToString("yyyy-MM-dd");
-            bool matchEstado = SearchEstado == "Todos los estados" || s.EstadoSolicitud?.Nombre == SearchEstado;
-            return matchId && matchCliente && matchTipo && matchFecha && matchEstado;
-        })
-        .OrderByDescending(s => s.Id)
-        .ToList();
-
-    private void Filtrar() { }
-
-    private void NuevaSolicitud()
+    protected override async Task OnInitializedAsync()
     {
+        await CargarDatos();
+    }
+
+    private async Task CargarDatos()
+    {
+        solicitudes = await SolicitudService.GetList(s => true);
+        clientes = await ClienteService.GetList(c => true);
+        servicios = await ServicioService.GetList(s => true);
+        TiposServicio = servicios.Select(s => s.Nombre).Distinct().ToList();
+        Filtrar();
+    }
+
+    private void Filtrar()
+    {
+        var q = solicitudes.AsEnumerable();
+
+        if (!string.IsNullOrWhiteSpace(SearchId))
+        {
+            q = q.Where(x => x.Id.ToString("D4").Contains(SearchId, StringComparison.OrdinalIgnoreCase));
+        }
+
+        if (!string.IsNullOrWhiteSpace(SearchCliente))
+        {
+            q = q.Where(x => x.Cliente != null && x.Cliente.Nombre.Contains(SearchCliente, StringComparison.OrdinalIgnoreCase));
+        }
+
+        if (!string.IsNullOrWhiteSpace(SearchTipo))
+        {
+            q = q.Where(x => x.Servicio != null && x.Servicio.Nombre == SearchTipo);
+        }
+
+        if (SearchFecha.HasValue)
+        {
+            var dateStr = SearchFecha.Value.ToString("yyyy-MM-dd");
+            q = q.Where(x => x.FechaSolicitud.ToString("yyyy-MM-dd").StartsWith(dateStr));
+        }
+
+        if (SearchEstado != "Todos los estados")
+        {
+            q = q.Where(x => x.EstadoSolicitud != null && x.EstadoSolicitud.Nombre == SearchEstado);
+        }
+
+        FilteredSolicitudes = q.OrderByDescending(x => x.Id).ToList();
+    }
+
+    private async Task NuevaSolicitud()
+    {
+        await CargarDatos();
         ModalTitle = "Nueva Solicitud";
         ModalSub = "Complete los datos para registrar una nueva solicitud de servicio.";
         FormId = null;
@@ -236,9 +274,10 @@
         IsFormModalOpen = true;
     }
 
-    private void Editar(int id)
+    private async Task Editar(int id)
     {
-        var solicitud = AppState.Solicitudes.FirstOrDefault(s => s.Id == id);
+        await CargarDatos();
+        var solicitud = solicitudes.FirstOrDefault(s => s.Id == id);
         if (solicitud == null) return;
 
         ModalTitle = "Editar Solicitud";
@@ -252,7 +291,7 @@
         IsFormModalOpen = true;
     }
 
-    private void SaveModal()
+    private async Task SaveModal()
     {
         if (string.IsNullOrWhiteSpace(FormCliente) || string.IsNullOrWhiteSpace(FormTipo) || string.IsNullOrWhiteSpace(FormDireccion))
         {
@@ -260,46 +299,52 @@
             return;
         }
 
-        var clienteEntity = AppState.Clientes.FirstOrDefault(c => c.Nombre == FormCliente);
-        var servicioEntity = AppState.Servicios.FirstOrDefault(serv => serv.Nombre == FormTipo);
+        var clienteEntity = clientes.FirstOrDefault(c => c.Nombre == FormCliente);
+        var servicioEntity = servicios.FirstOrDefault(serv => serv.Nombre == FormTipo);
 
         var editing = FormId.HasValue;
         if (editing)
         {
             var solicitudId = FormId.GetValueOrDefault();
-            var solicitud = AppState.Solicitudes.FirstOrDefault(s => s.Id == solicitudId);
+            var solicitud = solicitudes.FirstOrDefault(s => s.Id == solicitudId);
             if (solicitud != null)
             {
-                if (clienteEntity != null) { solicitud.ClienteId = clienteEntity.Id; solicitud.Cliente = clienteEntity; }
-                if (servicioEntity != null) { solicitud.ServicioId = servicioEntity.Id; solicitud.Servicio = servicioEntity; }
+                if (clienteEntity != null)
+                {
+                    solicitud.ClienteId = clienteEntity.Id;
+                    solicitud.Contacto = clienteEntity.Nombre;
+                }
+                if (servicioEntity != null) solicitud.ServicioId = servicioEntity.Id;
                 solicitud.Direccion = FormDireccion;
                 if (FormFecha.HasValue) solicitud.Fecha = FormFecha.Value;
                 solicitud.Hora = FormHora?.ToString("HH:mm") ?? "";
+
+                var resultado = await SolicitudService.Guardar(solicitud);
+                if (resultado) ToastService.ShowSuccess("Solicitud actualizada correctamente.");
+                else ToastService.ShowError("Error al actualizar la solicitud.");
             }
         }
         else
         {
-            var newId = AppState.Solicitudes.Any() ? AppState.Solicitudes.Max(s => s.Id) + 1 : 1;
-            var pendiente = AppState.EstadosSolicitud.FirstOrDefault(e => e.Nombre == "Pendiente");
-            AppState.Solicitudes.Add(new ElectroGestion.Models.Solicitud
+            var s = new ElectroGestion.Models.Solicitud
             {
-                Id = newId,
                 ClienteId = clienteEntity?.Id ?? 0,
-                Cliente = clienteEntity,
                 ServicioId = servicioEntity?.Id ?? 0,
-                Servicio = servicioEntity,
+                Contacto = clienteEntity?.Nombre ?? FormCliente,
                 Direccion = FormDireccion,
                 FechaSolicitud = DateTime.Today,
                 Fecha = FormFecha ?? DateTime.Today,
                 Hora = FormHora?.ToString("HH:mm") ?? "",
-                EstadoSolicitudId = pendiente?.Id ?? 1,
-                EstadoSolicitud = pendiente
-            });
+                EstadoSolicitudId = 1
+            };
+
+            var resultado = await SolicitudService.Guardar(s);
+            if (resultado) ToastService.ShowSuccess("Solicitud registrada correctamente.");
+            else ToastService.ShowError("Error al registrar la solicitud.");
         }
 
         IsFormModalOpen = false;
-        ToastService.ShowSuccess(editing ? "Solicitud actualizada correctamente." : "Solicitud registrada correctamente.");
-        AppState.NotifyStateChanged();
+        await CargarDatos();
     }
 
     private void CloseModal() => IsFormModalOpen = false;
@@ -310,16 +355,19 @@
         IsDeleteModalOpen = true;
     }
 
-    private void EjecutarEliminar()
+    private async Task EjecutarEliminar()
     {
         if (DeleteId.HasValue)
         {
-            var s = AppState.Solicitudes.FirstOrDefault(x => x.Id == DeleteId.Value);
-            if (s != null)
+            var resultado = await SolicitudService.Eliminar(DeleteId.Value);
+            if (resultado)
             {
-                AppState.Solicitudes.Remove(s);
                 ToastService.ShowSuccess("Solicitud eliminada correctamente.");
-                AppState.NotifyStateChanged();
+                await CargarDatos();
+            }
+            else
+            {
+                ToastService.ShowError("Error al eliminar la solicitud.");
             }
         }
         IsDeleteModalOpen = false;
@@ -337,7 +385,7 @@
 
     private void VerDetalle(int id)
     {
-        SelectedSolicitud = AppState.Solicitudes.FirstOrDefault(s => s.Id == id);
+        SelectedSolicitud = solicitudes.FirstOrDefault(s => s.Id == id);
         IsDetalleModalOpen = SelectedSolicitud != null;
     }
 

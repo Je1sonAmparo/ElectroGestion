@@ -53,16 +53,6 @@ namespace ElectroGestion.Migrations
                     b.Property<int>("Servicios")
                         .HasColumnType("int");
 
-                    b.Property<string>("Telefono")
-                        .IsRequired()
-                        .HasMaxLength(30)
-                        .HasColumnType("nvarchar(30)");
-
-                    b.Property<string>("Telefono2")
-                        .IsRequired()
-                        .HasMaxLength(30)
-                        .HasColumnType("nvarchar(30)");
-
                     b.Property<string>("Ultimo")
                         .IsRequired()
                         .HasMaxLength(150)
@@ -81,8 +71,6 @@ namespace ElectroGestion.Migrations
                             Nombre = "Melody Santos",
                             Rnc = "402-1234567-1",
                             Servicios = 8,
-                            Telefono = "809-000-0000",
-                            Telefono2 = "829-111-2222",
                             Ultimo = "Instalación de Sistema UPS"
                         },
                         new
@@ -93,8 +81,6 @@ namespace ElectroGestion.Migrations
                             Nombre = "Constructora López",
                             Rnc = "101-987654-2",
                             Servicios = 5,
-                            Telefono = "809-555-1212",
-                            Telefono2 = "",
                             Ultimo = "Instalación Solar"
                         },
                         new
@@ -105,8 +91,6 @@ namespace ElectroGestion.Migrations
                             Nombre = "Farmacia El Sol",
                             Rnc = "130-334455-3",
                             Servicios = 6,
-                            Telefono = "829-441-8890",
-                            Telefono2 = "",
                             Ultimo = "Mantenimiento Eléctrico"
                         },
                         new
@@ -117,8 +101,6 @@ namespace ElectroGestion.Migrations
                             Nombre = "Colmado Hernández",
                             Rnc = "402-667788-4",
                             Servicios = 3,
-                            Telefono = "849-220-3311",
-                            Telefono2 = "",
                             Ultimo = "Cableado Estructurado"
                         },
                         new
@@ -129,13 +111,11 @@ namespace ElectroGestion.Migrations
                             Nombre = "Taller Mecánico RD",
                             Rnc = "130-112233-5",
                             Servicios = 1,
-                            Telefono = "809-778-4402",
-                            Telefono2 = "809-999-0000",
                             Ultimo = "Instalación de Planta Eléctrica"
                         });
                 });
 
-            modelBuilder.Entity("ElectroGestion.Models.ClienteDireccion", b =>
+            modelBuilder.Entity("ElectroGestion.Models.ClienteTelefono", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -146,57 +126,71 @@ namespace ElectroGestion.Migrations
                     b.Property<int>("ClienteId")
                         .HasColumnType("int");
 
-                    b.Property<string>("Direccion")
+                    b.Property<string>("Numero")
                         .IsRequired()
-                        .HasMaxLength(250)
-                        .HasColumnType("nvarchar(250)");
+                        .HasMaxLength(30)
+                        .HasColumnType("nvarchar(30)");
 
                     b.Property<string>("Tipo")
                         .IsRequired()
-                        .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
+                        .HasMaxLength(30)
+                        .HasColumnType("nvarchar(30)");
 
                     b.HasKey("Id");
 
                     b.HasIndex("ClienteId");
 
-                    b.ToTable("ClientesDirecciones");
+                    b.ToTable("ClientesTelefonos");
 
                     b.HasData(
                         new
                         {
                             Id = 1,
                             ClienteId = 1,
-                            Direccion = "Calle Duarte #24, Santiago",
+                            Numero = "809-000-0000",
                             Tipo = "Principal"
                         },
                         new
                         {
                             Id = 2,
-                            ClienteId = 2,
-                            Direccion = "Av. Estrella Sadhalá #102, Santiago",
-                            Tipo = "Principal"
+                            ClienteId = 1,
+                            Numero = "829-111-2222",
+                            Tipo = "Alternativo"
                         },
                         new
                         {
                             Id = 3,
-                            ClienteId = 3,
-                            Direccion = "Calle 16 #7, La Vega",
+                            ClienteId = 2,
+                            Numero = "809-555-1212",
                             Tipo = "Principal"
                         },
                         new
                         {
                             Id = 4,
-                            ClienteId = 4,
-                            Direccion = "Calle Principal #58, Moca",
+                            ClienteId = 3,
+                            Numero = "829-441-8890",
                             Tipo = "Principal"
                         },
                         new
                         {
                             Id = 5,
-                            ClienteId = 5,
-                            Direccion = "Carretera Luperón km 5, Santiago",
+                            ClienteId = 4,
+                            Numero = "849-220-3311",
                             Tipo = "Principal"
+                        },
+                        new
+                        {
+                            Id = 6,
+                            ClienteId = 5,
+                            Numero = "809-778-4402",
+                            Tipo = "Principal"
+                        },
+                        new
+                        {
+                            Id = 7,
+                            ClienteId = 5,
+                            Numero = "809-999-0000",
+                            Tipo = "Alternativo"
                         });
                 });
 
@@ -414,10 +408,10 @@ namespace ElectroGestion.Migrations
                     b.ToTable("Solicitudes");
                 });
 
-            modelBuilder.Entity("ElectroGestion.Models.ClienteDireccion", b =>
+            modelBuilder.Entity("ElectroGestion.Models.ClienteTelefono", b =>
                 {
                     b.HasOne("ElectroGestion.Models.Cliente", "Cliente")
-                        .WithMany("Direcciones")
+                        .WithMany("Telefonos")
                         .HasForeignKey("ClienteId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -473,9 +467,9 @@ namespace ElectroGestion.Migrations
 
             modelBuilder.Entity("ElectroGestion.Models.Cliente", b =>
                 {
-                    b.Navigation("Direcciones");
-
                     b.Navigation("Solicitudes");
+
+                    b.Navigation("Telefonos");
                 });
 
             modelBuilder.Entity("ElectroGestion.Models.EstadoSolicitud", b =>

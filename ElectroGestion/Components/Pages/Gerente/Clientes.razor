@@ -346,11 +346,29 @@
             Nombre = FormNombre,
             Rnc = FormRnc,
             Correo = FormCorreo,
-            Telefono = FormTelefono,
-            Telefono2 = FormTelefono2,
             Direccion = FormDireccion,
             Servicios = 0
         };
+
+        if (!string.IsNullOrWhiteSpace(FormTelefono))
+        {
+            cliente.Telefonos.Add(new ElectroGestion.Models.ClienteTelefono
+            {
+                ClienteId = cliente.Id,
+                Numero = FormTelefono,
+                Tipo = "Principal"
+            });
+        }
+
+        if (!string.IsNullOrWhiteSpace(FormTelefono2))
+        {
+            cliente.Telefonos.Add(new ElectroGestion.Models.ClienteTelefono
+            {
+                ClienteId = cliente.Id,
+                Numero = FormTelefono2,
+                Tipo = "Alternativo"
+            });
+        }
 
         var resultado = await ClienteService.Guardar(cliente);
         if (resultado)

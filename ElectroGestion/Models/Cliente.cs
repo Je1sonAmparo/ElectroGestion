@@ -15,12 +15,6 @@ public class Cliente
     public string Correo { get; set; } = "";
 
     [StringLength(30)]
-    public string Telefono { get; set; } = "";
-
-    [StringLength(30)]
-    public string Telefono2 { get; set; } = "";
-
-    [StringLength(30)]
     public string Rnc { get; set; } = "";
 
     [StringLength(250)]
@@ -31,6 +25,30 @@ public class Cliente
     [StringLength(150)]
     public string Ultimo { get; set; } = "";
 
-    public ICollection<ClienteDireccion> Direcciones { get; set; } = new List<ClienteDireccion>();
+    public ICollection<ClienteTelefono> Telefonos { get; set; } = new List<ClienteTelefono>();
     public ICollection<Solicitud> Solicitudes { get; set; } = new List<Solicitud>();
+
+    [NotMapped]
+    public string Telefono
+    {
+        get => Telefonos.FirstOrDefault(t => t.Tipo == "Principal")?.Numero ?? Telefonos.FirstOrDefault()?.Numero ?? "";
+        set
+        {
+            var p = Telefonos.FirstOrDefault(t => t.Tipo == "Principal");
+            if (p != null) p.Numero = value;
+            else if (!string.IsNullOrWhiteSpace(value)) Telefonos.Add(new ClienteTelefono { Numero = value, Tipo = "Principal" });
+        }
+    }
+
+    [NotMapped]
+    public string Telefono2
+    {
+        get => Telefonos.FirstOrDefault(t => t.Tipo == "Alternativo")?.Numero ?? Telefonos.Skip(1).FirstOrDefault()?.Numero ?? "";
+        set
+        {
+            var a = Telefonos.FirstOrDefault(t => t.Tipo == "Alternativo");
+            if (a != null) a.Numero = value;
+            else if (!string.IsNullOrWhiteSpace(value)) Telefonos.Add(new ClienteTelefono { Numero = value, Tipo = "Alternativo" });
+        }
+    }
 }

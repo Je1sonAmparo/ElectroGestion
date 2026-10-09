@@ -35,7 +35,25 @@ public class ClienteService(IDbContextFactory<Contexto> contextFactory) : Aplica
     private async Task<bool> Modificar(Cliente cliente)
     {
         await using var contexto = await contextFactory.CreateDbContextAsync();
-        contexto.Update(cliente);
+        var existente = await contexto.Clientes
+            .Include(c => c.Telefonos)
+            .FirstOrDefaultAsync(c => c.Id == cliente.Id);
+
+        if (existente == null) return false;
+
+        contexto.Entry(existente).CurrentValues.SetValues(cliente);
+
+        contexto.ClientesTelefonos.RemoveRange(existente.Telefonos);
+        foreach (var t in cliente.Telefonos)
+        {
+            existente.Telefonos.Add(new ClienteTelefono
+            {
+                ClienteId = cliente.Id,
+                Numero = t.Numero,
+                Tipo = t.Tipo
+            });
+        }
+
         return await contexto.SaveChangesAsync() > 0;
     }
 
@@ -43,7 +61,7 @@ public class ClienteService(IDbContextFactory<Contexto> contextFactory) : Aplica
     {
         await using var contexto = await contextFactory.CreateDbContextAsync();
         return await contexto.Clientes
-            .Include(c => c.Direcciones)
+            .Include(c => c.Telefonos)
             .Include(c => c.Solicitudes)
             .FirstOrDefaultAsync(c => c.Id == id);
     }
@@ -52,7 +70,7 @@ public class ClienteService(IDbContextFactory<Contexto> contextFactory) : Aplica
     {
         await using var contexto = await contextFactory.CreateDbContextAsync();
         return await contexto.Clientes
-            .Include(c => c.Direcciones)
+            .Include(c => c.Telefonos)
             .Include(c => c.Solicitudes)
             .Where(criterio)
             .AsNoTracking()

@@ -1,4 +1,5 @@
 @inject ElectroGestion.Services.AppStateService AppState
+@inject ElectroGestion.Services.ClienteService ClienteService
 @inject NavigationManager NavManager
 @inject ToastService ToastService
 
@@ -92,6 +93,9 @@
                                     <button @onclick="() => Editar(c.Id)" title="Editar" aria-label="Editar" class="edit-btn table-action-icon" style="width:32px;height:32px;border:1px solid #D5D8E6;background:#fff;border-radius:8px;cursor:pointer;color:#5F6479;display:flex;align-items:center;justify-content:center;padding:0">
                                         <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 1 1 3 3L7 19l-4 1 1-4 12.5-12.5Z"/></svg>
                                     </button>
+                                    <button @onclick="() => ConfirmarEliminar(c.Id)" title="Eliminar" aria-label="Eliminar" class="table-action-icon" style="width:32px;height:32px;border:1px solid #D5D8E6;background:#fff;border-radius:8px;cursor:pointer;color:#C0392B;display:flex;align-items:center;justify-content:center;padding:0">
+                                        <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 6h18M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2M10 11v6M14 11v6"/></svg>
+                                    </button>
                                 </div>
                             </td>
                         </tr>
@@ -165,6 +169,24 @@
     </div>
 }
 
+@if (IsDeleteModalOpen)
+{
+    <div style="position:fixed;inset:0;background:rgba(14,16,40,0.5);display:flex;align-items:center;justify-content:center;z-index:9999;padding:20px">
+        <div style="background:#fff;border-radius:16px;width:100%;max-width:400px;padding:32px;box-shadow:0 20px 40px rgba(0,0,0,0.2);animation:tin 0.2s ease-out">
+            <div style="font-family:'Manrope';font-weight:800;font-size:22px;color:#14162B;margin-bottom:10px">Eliminar Cliente</div>
+            <div style="color:#4A4E63;font-size:14px;margin-bottom:24px">¿Está seguro que desea eliminar este cliente? Esta acción no se puede deshacer.</div>
+            <div style="display:flex;justify-content:flex-end;gap:12px">
+                <button @onclick="CerrarEliminar" style="padding:10px 20px;border:1px solid #D5D8E6;background:#fff;border-radius:8px;font-weight:700;font-size:14px;cursor:pointer;color:#4A4E63">
+                    Cancelar
+                </button>
+                <button @onclick="EjecutarEliminar" style="padding:10px 24px;border:0;background:#C0392B;color:#fff;border-radius:8px;font-weight:700;font-size:14px;cursor:pointer;font-family:'Manrope'">
+                    Eliminar
+                </button>
+            </div>
+        </div>
+    </div>
+}
+
 @code {
     private string SearchId = "";
     private string SearchNombre = "";
@@ -179,6 +201,8 @@
     }
 
     private bool IsModalOpen;
+    private bool IsDeleteModalOpen = false;
+    private int? DeleteId;
     private string ModalTitle = "";
     private int? EditId;
     private ElectroGestion.Models.Cliente? SelectedCliente;
@@ -189,7 +213,19 @@
     private string FormTelefono2 = "";
     private string FormDireccion = "";
 
-    private List<ElectroGestion.Models.Cliente> FilteredClientes => AppState.Clientes
+    private List<ElectroGestion.Models.Cliente> clientes = new();
+
+    protected override async Task OnInitializedAsync()
+    {
+        await CargarClientes();
+    }
+
+    private async Task CargarClientes()
+    {
+        clientes = await ClienteService.GetList(c => true);
+    }
+
+    private List<ElectroGestion.Models.Cliente> FilteredClientes => clientes
         .Where(c => {
             bool matchId = string.IsNullOrEmpty(SearchId) || c.Id.ToString().Contains(SearchId);
             bool matchNombre = string.IsNullOrEmpty(SearchNombre) || c.Nombre.Contains(SearchNombre, StringComparison.OrdinalIgnoreCase);
@@ -212,7 +248,7 @@
 
     private void Editar(int id)
     {
-        var cliente = AppState.Clientes.FirstOrDefault(c => c.Id == id);
+        var cliente = clientes.FirstOrDefault(c => c.Id == id);
         if (cliente == null) return;
 
         EditId = cliente.Id;
@@ -226,7 +262,7 @@
         IsModalOpen = true;
     }
 
-    private void GuardarCliente()
+    private async Task GuardarCliente()
     {
         if (string.IsNullOrWhiteSpace(FormNombre) || string.IsNullOrWhiteSpace(FormCorreo) || string.IsNullOrWhiteSpace(FormTelefono) || string.IsNullOrWhiteSpace(FormRnc) || string.IsNullOrWhiteSpace(FormDireccion))
         {
@@ -234,37 +270,79 @@
             return;
         }
 
-        if (EditId.HasValue)
+        var cliente = new ElectroGestion.Models.Cliente
         {
-            var cliente = AppState.Clientes.FirstOrDefault(c => c.Id == EditId.Value);
-            if (cliente != null)
-            {
-                cliente.Nombre = FormNombre;
-                cliente.Rnc = FormRnc;
-                cliente.Correo = FormCorreo;
-                cliente.Telefono = FormTelefono;
-                cliente.Telefono2 = FormTelefono2;
-                cliente.Direccion = FormDireccion;
-            }
-        }
-        else
+            Id = EditId ?? 0,
+            Nombre = FormNombre,
+            Rnc = FormRnc,
+            Correo = FormCorreo,
+            Direccion = FormDireccion,
+            Servicios = 0
+        };
+
+        if (!string.IsNullOrWhiteSpace(FormTelefono))
         {
-            var newId = AppState.Clientes.Any() ? AppState.Clientes.Max(c => c.Id) + 1 : 1;
-            AppState.Clientes.Add(new ElectroGestion.Models.Cliente
+            cliente.Telefonos.Add(new ElectroGestion.Models.ClienteTelefono
             {
-                Id = newId,
-                Nombre = FormNombre,
-                Rnc = FormRnc,
-                Correo = FormCorreo,
-                Telefono = FormTelefono,
-                Telefono2 = FormTelefono2,
-                Direccion = FormDireccion,
-                Servicios = 0
+                ClienteId = cliente.Id,
+                Numero = FormTelefono,
+                Tipo = "Principal"
             });
         }
 
+        if (!string.IsNullOrWhiteSpace(FormTelefono2))
+        {
+            cliente.Telefonos.Add(new ElectroGestion.Models.ClienteTelefono
+            {
+                ClienteId = cliente.Id,
+                Numero = FormTelefono2,
+                Tipo = "Alternativo"
+            });
+        }
+
+        var resultado = await ClienteService.Guardar(cliente);
+        if (resultado)
+        {
+            ToastService.ShowSuccess(EditId.HasValue ? "Cliente actualizado exitosamente." : "Cliente registrado exitosamente.");
+            await CargarClientes();
+        }
+        else
+        {
+            ToastService.ShowError("Error al guardar el cliente.");
+        }
+
         CerrarFormulario();
-        ToastService.ShowSuccess(EditId.HasValue ? "Cliente actualizado exitosamente." : "Cliente registrado exitosamente.");
+    }
+
+    private void ConfirmarEliminar(int id)
+    {
+        DeleteId = id;
+        IsDeleteModalOpen = true;
+    }
+
+    private async Task EjecutarEliminar()
+    {
+        if (DeleteId.HasValue)
+        {
+            var resultado = await ClienteService.Eliminar(DeleteId.Value);
+            if (resultado)
+            {
+                ToastService.ShowSuccess("Cliente eliminado exitosamente.");
+                await CargarClientes();
+            }
+            else
+            {
+                ToastService.ShowError("Error al eliminar el cliente.");
+            }
+        }
+        IsDeleteModalOpen = false;
+        DeleteId = null;
+    }
+
+    private void CerrarEliminar()
+    {
+        IsDeleteModalOpen = false;
+        DeleteId = null;
     }
 
     private void CerrarFormulario()
@@ -274,7 +352,7 @@
 
     private void VerDetalle(int id)
     {
-        SelectedCliente = AppState.Clientes.FirstOrDefault(c => c.Id == id);
+        SelectedCliente = clientes.FirstOrDefault(c => c.Id == id);
     }
 
     private void CerrarDetalle()

@@ -12,7 +12,7 @@ public class Contexto : DbContext
     public DbSet<Servicio> Servicios { get; set; }
     public DbSet<EstadoSolicitud> EstadosSolicitud { get; set; }
     public DbSet<DetalleSolicitud> DetallesSolicitud { get; set; }
-    public DbSet<ClienteDireccion> ClientesDirecciones { get; set; }
+    public DbSet<ClienteTelefono> ClientesTelefonos { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -20,9 +20,9 @@ public class Contexto : DbContext
 
         modelBuilder.Entity<Cliente>(entity =>
         {
-            entity.HasMany(c => c.Direcciones)
-                .WithOne(d => d.Cliente)
-                .HasForeignKey(d => d.ClienteId)
+            entity.HasMany(c => c.Telefonos)
+                .WithOne(t => t.Cliente)
+                .HasForeignKey(t => t.ClienteId)
                 .OnDelete(DeleteBehavior.Cascade);
 
             entity.HasMany(c => c.Solicitudes)
@@ -68,19 +68,21 @@ public class Contexto : DbContext
         );
 
         modelBuilder.Entity<Cliente>().HasData(
-            new Cliente { Id = 1, Nombre = "Melody Santos", Correo = "melody@email.com", Telefono = "809-000-0000", Telefono2 = "829-111-2222", Rnc = "402-1234567-1", Direccion = "Calle Duarte #24, Santiago", Servicios = 8, Ultimo = "Instalación de Sistema UPS" },
-            new Cliente { Id = 2, Nombre = "Constructora López", Correo = "info@clopez.com", Telefono = "809-555-1212", Telefono2 = "", Rnc = "101-987654-2", Direccion = "Av. Estrella Sadhalá #102, Santiago", Servicios = 5, Ultimo = "Instalación Solar" },
-            new Cliente { Id = 3, Nombre = "Farmacia El Sol", Correo = "farmacia@elsol.do", Telefono = "829-441-8890", Telefono2 = "", Rnc = "130-334455-3", Direccion = "Calle 16 #7, La Vega", Servicios = 6, Ultimo = "Mantenimiento Eléctrico" },
-            new Cliente { Id = 4, Nombre = "Colmado Hernández", Correo = "hernandez@colmado.com", Telefono = "849-220-3311", Telefono2 = "", Rnc = "402-667788-4", Direccion = "Calle Principal #58, Moca", Servicios = 3, Ultimo = "Cableado Estructurado" },
-            new Cliente { Id = 5, Nombre = "Taller Mecánico RD", Correo = "taller@mecanicord.com", Telefono = "809-778-4402", Telefono2 = "809-999-0000", Rnc = "130-112233-5", Direccion = "Carretera Luperón km 5, Santiago", Servicios = 1, Ultimo = "Instalación de Planta Eléctrica" }
+            new Cliente { Id = 1, Nombre = "Melody Santos", Correo = "melody@email.com", Rnc = "402-1234567-1", Direccion = "Calle Duarte #24, Santiago", Servicios = 8, Ultimo = "Instalación de Sistema UPS" },
+            new Cliente { Id = 2, Nombre = "Constructora López", Correo = "info@clopez.com", Rnc = "101-987654-2", Direccion = "Av. Estrella Sadhalá #102, Santiago", Servicios = 5, Ultimo = "Instalación Solar" },
+            new Cliente { Id = 3, Nombre = "Farmacia El Sol", Correo = "farmacia@elsol.do", Rnc = "130-334455-3", Direccion = "Calle 16 #7, La Vega", Servicios = 6, Ultimo = "Mantenimiento Eléctrico" },
+            new Cliente { Id = 4, Nombre = "Colmado Hernández", Correo = "hernandez@colmado.com", Rnc = "402-667788-4", Direccion = "Calle Principal #58, Moca", Servicios = 3, Ultimo = "Cableado Estructurado" },
+            new Cliente { Id = 5, Nombre = "Taller Mecánico RD", Correo = "taller@mecanicord.com", Rnc = "130-112233-5", Direccion = "Carretera Luperón km 5, Santiago", Servicios = 1, Ultimo = "Instalación de Planta Eléctrica" }
         );
 
-        modelBuilder.Entity<ClienteDireccion>().HasData(
-            new ClienteDireccion { Id = 1, ClienteId = 1, Direccion = "Calle Duarte #24, Santiago", Tipo = "Principal" },
-            new ClienteDireccion { Id = 2, ClienteId = 2, Direccion = "Av. Estrella Sadhalá #102, Santiago", Tipo = "Principal" },
-            new ClienteDireccion { Id = 3, ClienteId = 3, Direccion = "Calle 16 #7, La Vega", Tipo = "Principal" },
-            new ClienteDireccion { Id = 4, ClienteId = 4, Direccion = "Calle Principal #58, Moca", Tipo = "Principal" },
-            new ClienteDireccion { Id = 5, ClienteId = 5, Direccion = "Carretera Luperón km 5, Santiago", Tipo = "Principal" }
+        modelBuilder.Entity<ClienteTelefono>().HasData(
+            new ClienteTelefono { Id = 1, ClienteId = 1, Numero = "809-000-0000", Tipo = "Principal" },
+            new ClienteTelefono { Id = 2, ClienteId = 1, Numero = "829-111-2222", Tipo = "Alternativo" },
+            new ClienteTelefono { Id = 3, ClienteId = 2, Numero = "809-555-1212", Tipo = "Principal" },
+            new ClienteTelefono { Id = 4, ClienteId = 3, Numero = "829-441-8890", Tipo = "Principal" },
+            new ClienteTelefono { Id = 5, ClienteId = 4, Numero = "849-220-3311", Tipo = "Principal" },
+            new ClienteTelefono { Id = 6, ClienteId = 5, Numero = "809-778-4402", Tipo = "Principal" },
+            new ClienteTelefono { Id = 7, ClienteId = 5, Numero = "809-999-0000", Tipo = "Alternativo" }
         );
 
         modelBuilder.Entity<Servicio>().HasData(
