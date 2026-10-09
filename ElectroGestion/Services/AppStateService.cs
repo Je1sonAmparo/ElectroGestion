@@ -14,7 +14,10 @@ public class AppStateService
     public List<Levantamiento> Levantamientos { get; set; } = new();
     public List<OrdenTrabajo> Ordenes { get; set; } = new();
     public List<Servicio> Servicios { get; set; } = new();
-
+    public List<Cotizacion> Cotizaciones { get; set; } = new();
+    public List<Cobro> Cobros { get; set; } = new();
+    public List<ArticuloInventario> Inventario { get; set; } = new();
+    public List<Proveedor> Proveedores { get; set; } = new();
 
 
     public event Action? OnChange;
@@ -117,6 +120,29 @@ public class AppStateService
             new() { Id = 4, ServicioId = "SV-004", Nombre = "Cableado Estructurado", Categoria = "Redes y Cableado", PrecioBase = 28000, Estado = "Activo" },
             new() { Id = 5, ServicioId = "SV-005", Nombre = "Instalación de Planta Eléctrica", Categoria = "Instalaciones", PrecioBase = 120000, Estado = "Activo" }
         };
+        Cotizaciones = new List<Cotizacion>
+        {
+            new() { Id = 1, SolicitudId = "REQ-001", Cliente = "Acme Corp", Fecha = DateTime.Today.AddDays(-2), MontoTotal = 15000.00m, Estado = "Aprobada" },
+            new() { Id = 2, SolicitudId = "REQ-002", Cliente = "Globex S.A.", Fecha = DateTime.Today.AddDays(-1), MontoTotal = 8500.50m, Estado = "Pendiente" }
+        };
+
+        Cobros = new List<Cobro>
+        {
+            new() { Id = 1, Cliente = "Acme Corp", FacturaId = 1001, Fecha = DateTime.Today.AddDays(-1), Monto = 7500.00m, MetodoPago = "Transferencia", Estado = "Completado" },
+            new() { Id = 2, Cliente = "Globex S.A.", FacturaId = 1002, Fecha = DateTime.Today, Monto = 4000.00m, MetodoPago = "Cheque", Estado = "Pendiente" }
+        };
+
+        Inventario = new List<ArticuloInventario>
+        {
+            new() { Id = 1, Codigo = "ART-001", Nombre = "Cable de Cobre", Categoria = "Materiales", Cantidad = 500, PrecioUnidad = 15.00m },
+            new() { Id = 2, Codigo = "ART-002", Nombre = "Transformador 50kVA", Categoria = "Equipos", Cantidad = 10, PrecioUnidad = 25000.00m }
+        };
+
+        Proveedores = new List<Proveedor>
+        {
+            new() { Id = 1, Nombre = "Ferretería Industrial", Rnc = "101-23456-7", Correo = "ventas@ferreind.com", Telefono = "809-555-1234", Direccion = "Av. Principal #123" },
+            new() { Id = 2, Nombre = "Equipos Eléctricos S.R.L.", Rnc = "130-98765-4", Correo = "contacto@equiposelec.com", Telefono = "829-555-9876", Direccion = "Zona Industrial Haina" }
+        };
     }
 
     public int NextSolicitudId() => Solicitudes.Count > 0 ? Solicitudes.Max(s => s.Id) + 1 : 1;
@@ -125,6 +151,10 @@ public class AppStateService
     public int NextOrdenId() => Ordenes.Count > 0 ? Ordenes.Max(o => o.Id) + 1 : 1;
     public int NextLevantamientoId() => Levantamientos.Count > 0 ? Levantamientos.Max(l => l.Id) + 1 : 1;
     public int NextServicioId() => Servicios.Count > 0 ? Servicios.Max(s => s.Id) + 1 : 1;
+    public int NextCotizacionId() => Cotizaciones.Count > 0 ? Cotizaciones.Max(c => c.Id) + 1 : 1;
+    public int NextCobroId() => Cobros.Count > 0 ? Cobros.Max(c => c.Id) + 1 : 1;
+    public int NextArticuloId() => Inventario.Count > 0 ? Inventario.Max(a => a.Id) + 1 : 1;
+    public int NextProveedorId() => Proveedores.Count > 0 ? Proveedores.Max(p => p.Id) + 1 : 1;
 
     public static string FormatFecha(string? iso)
     {

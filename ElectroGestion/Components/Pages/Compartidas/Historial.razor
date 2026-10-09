@@ -1,0 +1,180 @@
+@page "/historial"
+@inject ElectroGestion.Services.AppStateService AppState
+@inject NavigationManager NavManager
+
+<PageTitle>Historial de servicios | ElectroGestion</PageTitle>
+
+<div style="display:flex;align-items:flex-start;justify-content:space-between;gap:20px;margin-bottom:24px">
+    <div>
+        <div class="page-title" style="font-family:'Manrope';font-weight:800;font-size:31px;letter-spacing:-.6px">Historial de servicios</div>
+        <div style="color:#6B7085;font-size:14.5px;margin-top:5px">Servicios finalizados.</div>
+    </div>
+</div>
+
+<div style="background:#fff;border:1px solid #E3E5EE;border-radius:14px;overflow:hidden">
+    <div style="padding:18px 18px 12px;border-bottom:1px solid #EFF0F6">
+        <div style="display:flex;align-items:center;gap:20px;white-space:nowrap;overflow-x:auto" class="resp-search-block">
+            <div style="display:flex;align-items:center;gap:10px">
+                <span style="font-family:'Manrope';font-weight:800;font-size:15px;color:#14162B">ID:</span>
+                <input @bind="SearchId" @bind:event="oninput" placeholder="ID"
+                    style="width:120px;padding:9px 12px;border:1px solid #D5D8E6;border-radius:6px;font-size:14px;color:#4A4E63" />
+            </div>
+            <div style="display:flex;align-items:center;gap:10px">
+                <span style="font-family:'Manrope';font-weight:800;font-size:15px;color:#14162B">Cliente:</span>
+                <input @bind="SearchCliente" @bind:event="oninput" placeholder="Nombre"
+                    style="width:170px;padding:9px 12px;border:1px solid #D5D8E6;border-radius:6px;font-size:14px;color:#4A4E63" />
+            </div>
+            <div style="display:flex;align-items:center;gap:10px">
+                <span style="font-family:'Manrope';font-weight:800;font-size:15px;color:#14162B">Tipo:</span>
+                <input @bind="SearchTipo" @bind:event="oninput" placeholder="Tipo"
+                    style="width:150px;padding:9px 12px;border:1px solid #D5D8E6;border-radius:6px;font-size:14px;color:#4A4E63" />
+            </div>
+            <div style="display:flex;align-items:center;gap:10px">
+                <span style="font-family:'Manrope';font-weight:800;font-size:15px;color:#14162B">Fecha:</span>
+                <select @bind="FiltroFecha" style="width:160px;padding:9px 12px;border:1px solid #D5D8E6;border-radius:6px;font-size:14px;background:#fff;color:#4A4E63">
+                    <option value="Todas las fechas">Todas las fechas</option>
+                    <option value="Últimos 7 días">Últimos 7 días</option>
+                    <option value="Últimos 30 días">Últimos 30 días</option>
+                </select>
+            </div>
+            <div style="display:flex;justify-content:flex-end;flex:1;min-width:90px">
+                <button class="primary-btn" @onclick="Filtrar"
+                    style="padding:9px 16px;background:#1D4ED8;color:#fff;border:0;border-radius:6px;font-weight:700;font-size:14px;cursor:pointer;font-family:'Manrope'">Buscar</button>
+            </div>
+        </div>
+    </div>
+
+    <div style="display:grid;grid-template-columns:80px 1.2fr 1.4fr 1fr 1fr 80px;padding:14px 18px;font-size:12px;font-weight:800;color:#8B90A3;text-transform:uppercase;letter-spacing:.06em;border-bottom:1px solid #EFF0F6"
+         class="resp-table-row">
+        <div>ID</div>
+        <div>Cliente</div>
+        <div>Tipo de servicio</div>
+        <div>Fecha finalización</div>
+        <div>Estado</div>
+        <div style="text-align:right">Acción</div>
+    </div>
+
+    @if (HistorialFiltrado.Any())
+    {
+        @foreach (var h in HistorialFiltrado)
+        {
+            <div style="display:grid;grid-template-columns:80px 1.2fr 1.4fr 1fr 1fr 80px;padding:16px 18px;border-bottom:1px solid #F4F5FB;align-items:center;font-size:14px"
+                 class="resp-table-row">
+                <div style="font-family:ui-monospace,monospace;color:#6B7085">@h.Id.ToString("D4")</div>
+                <div style="font-weight:700">@h.Cliente</div>
+                <div>@h.TipoServicio</div>
+                <div style="color:#6B7085">@ElectroGestion.Services.AppStateService.FormatFecha(h.FechaFin ?? h.Fecha)</div>
+                <div>
+                    <span style="display:inline-block;padding:5px 11px;border-radius:20px;font-size:12px;font-weight:800;background:#E4F6EA;color:#17803D">
+                        Finalizada
+                    </span>
+                </div>
+                <div style="display:flex;justify-content:flex-end">
+                    <button title="Ver detalle" @onclick="() => AbrirDetalle(h)"
+                            style="width:32px;height:32px;border:1px solid #D5D8E6;background:#fff;border-radius:8px;cursor:pointer;color:#4A4E63;display:flex;align-items:center;justify-content:center">
+                        <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                            <circle cx="12" cy="12" r="3"></circle>
+                        </svg>
+                    </button>
+                </div>
+            </div>
+        }
+    }
+    else
+    {
+        <div style="padding:38px;text-align:center;color:#8B90A3;font-size:14px">
+            Aún no hay servicios finalizados.
+        </div>
+    }
+</div>
+
+@if (IsModalOpen && SelectedHistorial != null)
+{
+    <div style="position:fixed;inset:0;background:rgba(14,16,40,.5);display:flex;align-items:center;justify-content:center;z-index:9999;padding:20px" @onclick="CerrarDetalle">
+        <div style="background:#fff;border-radius:16px;width:100%;max-width:620px;padding:32px;box-shadow:0 20px 40px rgba(0,0,0,.2);animation:tin .2s ease-out" @onclick:stopPropagation>
+            <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:20px">
+                <div>
+                    <div style="font-family:'Manrope';font-weight:800;font-size:22px;color:#14162B">Detalle de Historial</div>
+                    <div style="font-size:14px;color:#6B7085;margin-top:3px">Historial @SelectedHistorial.Id.ToString("D4")</div>
+                </div>
+                <button @onclick="CerrarDetalle" aria-label="Cerrar" style="width:32px;height:32px;border:1px solid #E3E5EE;border-radius:8px;background:#fff;display:flex;align-items:center;justify-content:center;color:#8B90A3;cursor:pointer">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M18 6 6 18M6 6l12 12"/></svg>
+                </button>
+            </div>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px" class="resp-grid-2">
+                <div style="background:#F7F8FC;border:1px solid #EFF0F6;border-radius:10px;padding:12px 14px"><div style="font-size:11.5px;color:#8B90A3;font-weight:800;text-transform:uppercase">Cliente</div><div style="font-size:14px;margin-top:4px;font-weight:700;color:#14162B">@SelectedHistorial.Cliente</div></div>
+                <div style="background:#F7F8FC;border:1px solid #EFF0F6;border-radius:10px;padding:12px 14px"><div style="font-size:11.5px;color:#8B90A3;font-weight:800;text-transform:uppercase">Tipo de Servicio</div><div style="font-size:14px;margin-top:4px;font-weight:700;color:#14162B">@SelectedHistorial.TipoServicio</div></div>
+                <div style="background:#F7F8FC;border:1px solid #EFF0F6;border-radius:10px;padding:12px 14px"><div style="font-size:11.5px;color:#8B90A3;font-weight:800;text-transform:uppercase">Fecha Finalización</div><div style="font-size:14px;margin-top:4px;font-weight:700;color:#14162B">@ElectroGestion.Services.AppStateService.FormatFecha(SelectedHistorial.FechaFin ?? SelectedHistorial.Fecha)</div></div>
+                <div style="background:#F7F8FC;border:1px solid #EFF0F6;border-radius:10px;padding:12px 14px"><div style="font-size:11.5px;color:#8B90A3;font-weight:800;text-transform:uppercase">Técnico Asignado</div><div style="font-size:14px;margin-top:4px;font-weight:700;color:#14162B">@SelectedHistorial.TecnicoAsignado</div></div>
+                <div style="grid-column:1 / -1;background:#F7F8FC;border:1px solid #EFF0F6;border-radius:10px;padding:12px 14px"><div style="font-size:11.5px;color:#8B90A3;font-weight:800;text-transform:uppercase">Dirección</div><div style="font-size:14px;margin-top:4px;font-weight:700;color:#14162B">@SelectedHistorial.Direccion</div></div>
+            </div>
+            <div style="margin-top:24px;display:flex;justify-content:flex-end;border-top:1px solid #EFF0F6;padding-top:17px">
+                <button @onclick="CerrarDetalle" style="padding:10px 20px;border:1px solid #D5D8E6;background:#fff;border-radius:8px;font-weight:700;cursor:pointer;color:#14162B">Cerrar</button>
+            </div>
+        </div>
+    </div>
+}
+
+@code {
+    private string SearchId = "";
+    private string SearchCliente = "";
+    private string SearchTipo = "";
+    private string FiltroFecha = "Todas las fechas";
+    
+    private bool IsModalOpen = false;
+    private ElectroGestion.Models.Solicitud? SelectedHistorial;
+
+    private void AbrirDetalle(ElectroGestion.Models.Solicitud s)
+    {
+        SelectedHistorial = s;
+        IsModalOpen = true;
+        StateHasChanged();
+    }
+
+    private void CerrarDetalle()
+    {
+        IsModalOpen = false;
+        SelectedHistorial = null;
+        StateHasChanged();
+    }
+
+    private void Filtrar()
+    {
+        StateHasChanged();
+    }
+
+    private IEnumerable<ElectroGestion.Models.Solicitud> HistorialFiltrado
+    {
+        get
+        {
+            var res = AppState.Solicitudes.Where(x => x.Estado == "Finalizada");
+
+            if (!string.IsNullOrWhiteSpace(SearchId))
+            {
+                res = res.Where(x => x.Id.ToString().Contains(SearchId));
+            }
+            if (!string.IsNullOrWhiteSpace(SearchCliente))
+            {
+                res = res.Where(x => x.Cliente.Contains(SearchCliente, StringComparison.OrdinalIgnoreCase));
+            }
+            if (!string.IsNullOrWhiteSpace(SearchTipo))
+            {
+                res = res.Where(x => x.TipoServicio.Contains(SearchTipo, StringComparison.OrdinalIgnoreCase));
+            }
+
+            if (FiltroFecha == "Últimos 7 días")
+            {
+                var lim = DateTime.Today.AddDays(-7);
+                res = res.Where(x => DateTime.TryParse(x.FechaFin ?? x.Fecha, out var d) && d >= lim);
+            }
+            else if (FiltroFecha == "Últimos 30 días")
+            {
+                var lim = DateTime.Today.AddDays(-30);
+                res = res.Where(x => DateTime.TryParse(x.FechaFin ?? x.Fecha, out var d) && d >= lim);
+            }
+
+            return res;
+        }
+    }
+}
