@@ -120,8 +120,13 @@
             }
 
             <div style="margin-top:auto;padding-top:20px;display:flex;gap:10px">
+                <button @onclick="() => EditarOrden(o.Id)"
+                    style="width:50%;padding:12px;border:1px solid #E3E5EE;background:#fff;color:#4A4E63;border-radius:9px;font-weight:700;font-size:14px;cursor:pointer;font-family:'Manrope';transition:all 0.2s;display:flex;align-items:center;justify-content:center;gap:8px">
+                    <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 1 1 3 3L7 19l-4 1 1-4 12.5-12.5Z"/></svg>
+                    Editar
+                </button>
                 <button @onclick="() => ToggleEstado(o.Id)"
-                    style="width:100%;padding:12px;border:1px solid #1D4ED8;background:#fff;color:#1D4ED8;border-radius:9px;font-weight:700;font-size:14px;cursor:pointer;font-family:'Manrope';transition:all 0.2s">
+                    style="width:50%;padding:12px;border:1px solid #1D4ED8;background:#1D4ED8;color:#fff;border-radius:9px;font-weight:700;font-size:14px;cursor:pointer;font-family:'Manrope';transition:all 0.2s">
                     Cambiar Estado
                 </button>
             </div>
@@ -274,8 +279,11 @@
         }
     }
 
+    private int? EditId = null;
+
     private void AbrirModal()
     {
+        EditId = null;
         FormCotizacionId = 0;
         FormCliente = "";
         FormTipoServicio = "";
@@ -285,24 +293,27 @@
         IsModalOpen = true;
     }
 
+    private void EditarOrden(int id)
+    {
+        var o = AppState.Ordenes.FirstOrDefault(x => x.Id == id);
+        if (o != null)
+        {
+            EditId = id;
+            var s = AppState.Solicitudes.FirstOrDefault(x => x.Id == o.SolicitudId);
+            FormCotizacionId = 0; // Opcional: buscar la cotización si se requiere
+            FormCliente = o.Cliente;
+            FormTipoServicio = o.TipoServicio;
+            FormTrabajos = o.Trabajos != null ? string.Join("\n", o.Trabajos) : "";
+            FormMateriales = o.Materiales != null ? string.Join(", ", o.Materiales) : "";
+            FormObservaciones = o.Observaciones ?? "";
+            IsModalOpen = true;
+        }
+    }
+
     private void CerrarModal()
     {
         IsModalOpen = false;
     }
-
-    private void GuardarOrden()
-    {
-        if (FormCotizacionId <= 0)
-        {
-            ToastService.Notify(new ToastMessage(ToastType.Warning, "Debe seleccionar una cotización aprobada."));
-            return;
-        }
-
-        if (string.IsNullOrWhiteSpace(FormTipoServicio))
-        {
-            ToastService.Notify(new ToastMessage(ToastType.Warning, "Especifique el tipo de servicio."));
-            return;
-        }
 
         var listTrabajos = FormTrabajos.Split(new[] { '\r', '\n' }, StringSplitOptions.RemoveEmptyEntries)
                                        .Select(x => x.Trim()).ToList();
@@ -310,25 +321,47 @@
         var listMateriales = FormMateriales.Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries)
                                          .Select(x => x.Trim()).ToList();
 
-        var id = AppState.NextOrdenId();
-        var code = "OT-" + id.ToString("D4");
-
-        var nuevaOrden = new ElectroGestion.Models.OrdenTrabajo
+        if (EditId.HasValue)
         {
-            Id = id,
-            Code = code,
-            Cliente = FormCliente,
-            TipoServicio = FormTipoServicio,
-            Estado = "En proceso",
-            Trabajos = listTrabajos,
-            Materiales = listMateriales,
-            Observaciones = FormObservaciones
-        };
+            var o = AppState.Ordenes.FirstOrDefault(x => x.Id == EditId.Value);
+            if (o != null)
+            {
+                o.Cliente = FormCliente;
+                o.TipoServicio = FormTipoServicio;
+                o.Trabajos = listTrabajos;
+                o.Materiales = listMateriales;
+                o.Observaciones = FormObservaciones;
+                ToastService.Notify(new ToastMessage(ToastType.Success, $"Orden de Trabajo {o.Code ?? o.Id.ToString("D4")} actualizada exitosamente."));
+            }
+        }
+        else
+        {
+            if (FormCotizacionId <= 0)
+            {
+                ToastService.Notify(new ToastMessage(ToastType.Warning, "Debe seleccionar una cotización aprobada."));
+                return;
+            }
 
-        AppState.Ordenes.Add(nuevaOrden);
+            var id = AppState.NextOrdenId();
+            var code = "OT-" + id.ToString("D4");
+
+            var nuevaOrden = new ElectroGestion.Models.OrdenTrabajo
+            {
+                Id = id,
+                Code = code,
+                Cliente = FormCliente,
+                TipoServicio = FormTipoServicio,
+                Estado = "En proceso",
+                Trabajos = listTrabajos,
+                Materiales = listMateriales,
+                Observaciones = FormObservaciones
+            };
+
+            AppState.Ordenes.Add(nuevaOrden);
+            ToastService.Notify(new ToastMessage(ToastType.Success, $"Orden de Trabajo {code} creada exitosamente."));
+        }
+
         AppState.NotifyStateChanged();
-        
-        ToastService.Notify(new ToastMessage(ToastType.Success, $"Orden de Trabajo {code} creada exitosamente."));
         CerrarModal();
     }
 }
