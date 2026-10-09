@@ -314,7 +314,8 @@
     {
         IsModalOpen = false;
     }
-
+    private void GuardarOrden()
+    {
         var listTrabajos = FormTrabajos.Split(new[] { '\r', '\n' }, StringSplitOptions.RemoveEmptyEntries)
                                        .Select(x => x.Trim()).ToList();
                                        
