@@ -1,0 +1,26 @@
+name: Deploy to Production
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+permissions:
+  deployments: write
+  contents: read
+
+jobs:
+  deploy:
+    name: MonsterASP Production
+    runs-on: ubuntu-latest
+    environment:
+      name: Production
+      url: https://electrogestion.runasp.net/
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Confirm Deployment
+        run: |
+          echo "Despliegue activo en https://electrogestion.runasp.net/"
