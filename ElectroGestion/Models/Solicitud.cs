@@ -1,16 +1,37 @@
+using System.ComponentModel.DataAnnotations;
+
 namespace ElectroGestion.Models;
 
 public class Solicitud
 {
+    [Key]
     public int Id { get; set; }
-    public string Cliente { get; set; } = "";
+
+    public int ClienteId { get; set; }
+    public Cliente? Cliente { get; set; }
+
+    public int ServicioId { get; set; }
+    public Servicio? Servicio { get; set; }
+
+    [StringLength(50)]
     public string Contacto { get; set; } = "";
+
+    [StringLength(250)]
     public string Direccion { get; set; } = "";
-    public string TipoServicio { get; set; } = "";
-    public string FechaSolicitud { get; set; } = "";
-    public string Fecha { get; set; } = "";
+
+    public DateTime FechaSolicitud { get; set; }
+    public DateTime Fecha { get; set; }
+
+    [StringLength(10)]
     public string Hora { get; set; } = "";
-    public string Estado { get; set; } = "Pendiente"; // Pendiente, En proceso, Finalizada, Cancelada
-    public string? FechaFin { get; set; }
+
+    public int EstadoSolicitudId { get; set; }
+    public EstadoSolicitud? EstadoSolicitud { get; set; }
+
+    public DateTime? FechaFin { get; set; }
+
+    [StringLength(150)]
     public string TecnicoAsignado { get; set; } = "";
+
+    public ICollection<DetalleSolicitud> Detalles { get; set; } = new List<DetalleSolicitud>();
 }

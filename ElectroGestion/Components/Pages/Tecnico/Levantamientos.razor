@@ -70,9 +70,9 @@
                 {
                     var colors = AppStateService.GetBadgeColors(l.Estado);
                     var s = AppState.Solicitudes.FirstOrDefault(x => x.Id == l.SolicitudId);
-                    var cliente = s?.Cliente ?? "Desconocido";
-                    var tipoServicio = s?.TipoServicio ?? "Desconocido";
-                    var fecha = string.IsNullOrEmpty(s?.Fecha) ? "Sin programar" : $"{AppStateService.FormatFecha(s.Fecha)} {AppStateService.FormatHora12(s.Hora)}";
+                    var clienteNombre = s?.Cliente?.Nombre ?? "Desconocido";
+                    var servicioNombre = s?.Servicio?.Nombre ?? "Desconocido";
+                    var fecha = s == null ? "Sin programar" : $"{AppStateService.FormatFecha(s.Fecha.ToString("yyyy-MM-dd"))} {AppStateService.FormatHora12(s.Hora)}";
 
                     <div style="background:#fff;border:1px solid #D9DCE9;border-radius:12px;padding:16px;display:flex;flex-direction:column;gap:2px">
                         <div style="display:flex;justify-content:flex-end">
@@ -81,9 +81,9 @@
                             </span>
                         </div>
                         <div style="font-size:12px;color:#8B90A3;font-weight:700">Cliente</div>
-                        <div style="font-family:'Manrope';font-weight:800;font-size:16.5px">@cliente</div>
+                        <div style="font-family:'Manrope';font-weight:800;font-size:16.5px">@clienteNombre</div>
                         <div style="font-size:12px;color:#8B90A3;font-weight:700;margin-top:8px">Tipo de servicio</div>
-                        <div style="font-size:14.5px">@tipoServicio</div>
+                        <div style="font-size:14.5px">@servicioNombre</div>
                         <div style="font-size:12px;color:#8B90A3;font-weight:700;margin-top:8px">Fecha programada</div>
                         <div style="font-size:14.5px">@fecha</div>
 
@@ -229,9 +229,9 @@ else
         .Where(l => {
             var s = AppState.Solicitudes.FirstOrDefault(x => x.Id == l.SolicitudId);
             bool matchId = string.IsNullOrEmpty(SearchId) || l.Id.ToString().Contains(SearchId);
-            bool matchCliente = string.IsNullOrEmpty(SearchCliente) || (s != null && s.Cliente.Contains(SearchCliente, StringComparison.OrdinalIgnoreCase));
-            bool matchTipo = string.IsNullOrEmpty(SearchTipo) || (s != null && s.TipoServicio == SearchTipo);
-            bool matchFecha = !SearchFecha.HasValue || (s != null && s.Fecha == SearchFecha.Value.ToString("yyyy-MM-dd"));
+            bool matchCliente = string.IsNullOrEmpty(SearchCliente) || (s != null && s.Cliente?.Nombre != null && s.Cliente.Nombre.Contains(SearchCliente, StringComparison.OrdinalIgnoreCase));
+            bool matchTipo = string.IsNullOrEmpty(SearchTipo) || (s != null && s.Servicio?.Nombre == SearchTipo);
+            bool matchFecha = !SearchFecha.HasValue || (s != null && s.Fecha.Date == SearchFecha.Value.Date);
             bool matchEstado = SearchEstado == "Todos" || l.Estado == SearchEstado;
             return matchId && matchCliente && matchTipo && matchFecha && matchEstado;
         })
@@ -270,9 +270,9 @@ else
             if (s != null)
             {
                 DesdeSolicitud = true;
-                OrigenTexto = $"Levantamiento de: {s.Cliente} - {s.TipoServicio}";
-                FormCliente = s.Cliente;
-                FormTipo = s.TipoServicio;
+                OrigenTexto = $"Levantamiento de: {s.Cliente?.Nombre} - {s.Servicio?.Nombre}";
+                FormCliente = s.Cliente?.Nombre ?? "";
+                FormTipo = s.Servicio?.Nombre ?? "";
             }
             else
             {

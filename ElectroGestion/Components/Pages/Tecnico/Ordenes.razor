@@ -57,8 +57,8 @@
     @foreach (var o in FilteredOrdenes)
     {
         var s = AppState.Solicitudes.FirstOrDefault(x => x.Id == o.SolicitudId);
-        var cliente = string.IsNullOrEmpty(o.Cliente) ? (s?.Cliente ?? "Cliente") : o.Cliente;
-        var tipoServicio = string.IsNullOrEmpty(o.TipoServicio) ? (s?.TipoServicio ?? "Servicio Eléctrico") : o.TipoServicio;
+        var cliente = s?.Cliente?.Nombre ?? "Cliente";
+        var servicioNombre = s?.Servicio?.Nombre ?? "Servicio Eléctrico";
         var colors = AppStateService.GetBadgeColors(o.Estado);
 
         <div style="background:#fff;border:1px solid #E3E5EE;border-radius:14px;padding:22px;display:flex;flex-direction:column">
@@ -66,7 +66,7 @@
                 <div>
                     <div style="font-family:ui-monospace,monospace;font-size:12px;color:#8B90A3;font-weight:700">ORDEN @(string.IsNullOrEmpty(o.Code) ? o.Id.ToString("D4") : o.Code)</div>
                     <div style="font-family:'Manrope';font-weight:800;font-size:19px;margin-top:4px">@cliente</div>
-                    <div style="color:#6B7085;font-size:14px;margin-top:2px">@tipoServicio</div>
+                    <div style="color:#6B7085;font-size:14px;margin-top:2px">@servicioNombre</div>
                 </div>
                 <span style="display:inline-block;padding:5px 11px;border-radius:20px;font-size:12px;font-weight:800;background:@colors.Bg;color:@colors.Fg;white-space:nowrap">
                     @o.Estado
@@ -155,12 +155,12 @@
     private List<ElectroGestion.Models.OrdenTrabajo> FilteredOrdenes => AppState.Ordenes
         .Where(o => {
             var s = AppState.Solicitudes.FirstOrDefault(x => x.Id == o.SolicitudId);
-            var cliente = string.IsNullOrEmpty(o.Cliente) ? (s?.Cliente ?? "") : o.Cliente;
-            var tipo = string.IsNullOrEmpty(o.TipoServicio) ? (s?.TipoServicio ?? "") : o.TipoServicio;
+            var cliente = s?.Cliente?.Nombre ?? "";
+            var tipo = s?.Servicio?.Nombre ?? "";
             bool matchId = string.IsNullOrEmpty(SearchId) || o.Id.ToString().Contains(SearchId) || (!string.IsNullOrEmpty(o.Code) && o.Code.Contains(SearchId, StringComparison.OrdinalIgnoreCase));
             bool matchCliente = string.IsNullOrEmpty(SearchCliente) || cliente.Contains(SearchCliente, StringComparison.OrdinalIgnoreCase);
             bool matchTipo = string.IsNullOrEmpty(SearchTipo) || tipo.Contains(SearchTipo, StringComparison.OrdinalIgnoreCase);
-            bool matchFecha = !SearchFecha.HasValue || (s != null && s.Fecha == SearchFecha.Value.ToString("yyyy-MM-dd"));
+            bool matchFecha = !SearchFecha.HasValue || (s != null && s.Fecha.ToString("yyyy-MM-dd") == SearchFecha.Value.ToString("yyyy-MM-dd"));
             bool matchEstado = SearchEstado == "Todas" || o.Estado == SearchEstado;
             return matchId && matchCliente && matchTipo && matchFecha && matchEstado;
         })
@@ -190,7 +190,8 @@
             var s = AppState.Solicitudes.FirstOrDefault(x => x.Id == o.SolicitudId);
             if (s != null)
             {
-                s.Estado = "Finalizada";
+                s.EstadoSolicitudId = 3;
+                s.EstadoSolicitud = AppState.EstadosSolicitud.FirstOrDefault(e => e.Id == 3);
             }
             ToastService.ShowSuccess($"Orden #{o.Code ?? o.Id.ToString()} finalizada con éxito.", "Éxito");
         }
