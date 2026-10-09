@@ -27,16 +27,40 @@ public class ServicioService(IDbContextFactory<Contexto> contextFactory) : Aplic
 
     private async Task<bool> Insertar(Servicio servicio)
     {
-        await using var contexto = await contextFactory.CreateDbContextAsync();
-        contexto.Servicios.Add(servicio);
-        return await contexto.SaveChangesAsync() > 0;
+        try
+        {
+            await using var contexto = await contextFactory.CreateDbContextAsync();
+            servicio.Solicitudes.Clear();
+            servicio.Detalles.Clear();
+            contexto.Servicios.Add(servicio);
+            return await contexto.SaveChangesAsync() > 0;
+        }
+        catch
+        {
+            return false;
+        }
     }
 
     private async Task<bool> Modificar(Servicio servicio)
     {
-        await using var contexto = await contextFactory.CreateDbContextAsync();
-        contexto.Update(servicio);
-        return await contexto.SaveChangesAsync() > 0;
+        try
+        {
+            await using var contexto = await contextFactory.CreateDbContextAsync();
+            var existente = await contexto.Servicios.FirstOrDefaultAsync(s => s.Id == servicio.Id);
+            if (existente == null) return false;
+
+            existente.ServicioId = servicio.ServicioId;
+            existente.Nombre = servicio.Nombre;
+            existente.Categoria = servicio.Categoria;
+            existente.PrecioBase = servicio.PrecioBase;
+            existente.Estado = servicio.Estado;
+
+            return await contexto.SaveChangesAsync() > 0;
+        }
+        catch
+        {
+            return false;
+        }
     }
 
     public async Task<Servicio?> Buscar(int id)
@@ -57,9 +81,22 @@ public class ServicioService(IDbContextFactory<Contexto> contextFactory) : Aplic
 
     public async Task<bool> Eliminar(int id)
     {
-        await using var contexto = await contextFactory.CreateDbContextAsync();
-        return await contexto.Servicios
-            .Where(s => s.Id == id)
-            .ExecuteDeleteAsync() > 0;
+        try
+        {
+            await using var contexto = await contextFactory.CreateDbContextAsync();
+            var tieneSolicitudes = await contexto.Solicitudes.AnyAsync(s => s.ServicioId == id);
+            if (tieneSolicitudes)
+            {
+                return false;
+            }
+
+            return await contexto.Servicios
+                .Where(s => s.Id == id)
+                .ExecuteDeleteAsync() > 0;
+        }
+        catch
+        {
+            return false;
+        }
     }
 }

@@ -469,21 +469,23 @@
             return;
         }
 
+        var clienteEntity = clientes.FirstOrDefault(c => c.Nombre == FormCliente);
+        var servicioEntity = servicios.FirstOrDefault(serv => serv.Nombre == FormTipo);
+
+        if (clienteEntity == null || servicioEntity == null)
+        {
+            ToastService.ShowWarning("Por favor seleccione un cliente y tipo de servicio válidos.", "Atención");
+            return;
+        }
+
         if (FormId.HasValue)
         {
             var s = solicitudes.FirstOrDefault(x => x.Id == FormId.Value);
             if (s != null)
             {
-                var clienteEntity = clientes.FirstOrDefault(c => c.Nombre == FormCliente);
-                var servicioEntity = servicios.FirstOrDefault(serv => serv.Nombre == FormTipo);
-
-                if (clienteEntity != null)
-                {
-                    s.ClienteId = clienteEntity.Id;
-                    s.Contacto = clienteEntity.Nombre;
-                }
-                if (servicioEntity != null) s.ServicioId = servicioEntity.Id;
-
+                s.ClienteId = clienteEntity.Id;
+                s.Contacto = clienteEntity.Nombre;
+                s.ServicioId = servicioEntity.Id;
                 s.Direccion = FormDireccion;
                 if (FormFecha.HasValue) s.Fecha = FormFecha.Value;
                 s.Hora = FormHora?.ToString("HH:mm") ?? "";
@@ -495,14 +497,11 @@
         }
         else
         {
-            var clienteEntity = clientes.FirstOrDefault(c => c.Nombre == FormCliente);
-            var servicioEntity = servicios.FirstOrDefault(serv => serv.Nombre == FormTipo);
-
             var s = new ElectroGestion.Models.Solicitud
             {
-                ClienteId = clienteEntity?.Id ?? 0,
-                ServicioId = servicioEntity?.Id ?? 0,
-                Contacto = clienteEntity?.Nombre ?? FormCliente,
+                ClienteId = clienteEntity.Id,
+                ServicioId = servicioEntity.Id,
+                Contacto = clienteEntity.Nombre,
                 Direccion = FormDireccion,
                 FechaSolicitud = DateTime.Today,
                 Fecha = FormFecha ?? DateTime.Today,
@@ -511,8 +510,17 @@
             };
             
             var resultado = await SolicitudService.Guardar(s);
-            if (resultado) ToastService.ShowSuccess("Solicitud registrada correctamente.");
-            else ToastService.ShowError("Error al registrar la solicitud.");
+            if (resultado)
+            {
+                clienteEntity.Servicios++;
+                clienteEntity.Ultimo = servicioEntity.Nombre;
+                await ClienteService.Guardar(clienteEntity);
+                ToastService.ShowSuccess("Solicitud registrada correctamente.");
+            }
+            else
+            {
+                ToastService.ShowError("Error al registrar la solicitud.");
+            }
         }
         
         IsFormModalOpen = false;

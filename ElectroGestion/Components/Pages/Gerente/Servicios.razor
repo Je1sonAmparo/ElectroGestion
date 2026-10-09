@@ -361,7 +361,7 @@
             }
             else
             {
-                ToastService.Notify(new ToastMessage(ToastType.Danger, "Error al eliminar el servicio."));
+                ToastService.Notify(new ToastMessage(ToastType.Danger, "No se pudo eliminar el servicio. Verifique si tiene solicitudes asociadas."));
             }
         }
         IsDeleteModalOpen = false;

@@ -27,34 +27,55 @@ public class ClienteService(IDbContextFactory<Contexto> contextFactory) : Aplica
 
     private async Task<bool> Insertar(Cliente cliente)
     {
-        await using var contexto = await contextFactory.CreateDbContextAsync();
-        contexto.Clientes.Add(cliente);
-        return await contexto.SaveChangesAsync() > 0;
+        try
+        {
+            await using var contexto = await contextFactory.CreateDbContextAsync();
+            contexto.Clientes.Add(cliente);
+            return await contexto.SaveChangesAsync() > 0;
+        }
+        catch
+        {
+            return false;
+        }
     }
 
     private async Task<bool> Modificar(Cliente cliente)
     {
-        await using var contexto = await contextFactory.CreateDbContextAsync();
-        var existente = await contexto.Clientes
-            .Include(c => c.Telefonos)
-            .FirstOrDefaultAsync(c => c.Id == cliente.Id);
-
-        if (existente == null) return false;
-
-        contexto.Entry(existente).CurrentValues.SetValues(cliente);
-
-        contexto.ClientesTelefonos.RemoveRange(existente.Telefonos);
-        foreach (var t in cliente.Telefonos)
+        try
         {
-            existente.Telefonos.Add(new ClienteTelefono
-            {
-                ClienteId = cliente.Id,
-                Numero = t.Numero,
-                Tipo = t.Tipo
-            });
-        }
+            await using var contexto = await contextFactory.CreateDbContextAsync();
+            var existente = await contexto.Clientes
+                .Include(c => c.Telefonos)
+                .FirstOrDefaultAsync(c => c.Id == cliente.Id);
 
-        return await contexto.SaveChangesAsync() > 0;
+            if (existente == null) return false;
+
+            existente.Nombre = cliente.Nombre;
+            existente.Correo = cliente.Correo;
+            existente.Rnc = cliente.Rnc;
+            existente.Direccion = cliente.Direccion;
+            if (cliente.Servicios > 0)
+                existente.Servicios = cliente.Servicios;
+            if (!string.IsNullOrWhiteSpace(cliente.Ultimo))
+                existente.Ultimo = cliente.Ultimo;
+
+            contexto.ClientesTelefonos.RemoveRange(existente.Telefonos);
+            foreach (var t in cliente.Telefonos)
+            {
+                existente.Telefonos.Add(new ClienteTelefono
+                {
+                    ClienteId = cliente.Id,
+                    Numero = t.Numero,
+                    Tipo = t.Tipo
+                });
+            }
+
+            return await contexto.SaveChangesAsync() > 0;
+        }
+        catch
+        {
+            return false;
+        }
     }
 
     public async Task<Cliente?> Buscar(int id)
@@ -79,9 +100,23 @@ public class ClienteService(IDbContextFactory<Contexto> contextFactory) : Aplica
 
     public async Task<bool> Eliminar(int id)
     {
-        await using var contexto = await contextFactory.CreateDbContextAsync();
-        return await contexto.Clientes
-            .Where(c => c.Id == id)
-            .ExecuteDeleteAsync() > 0;
+        try
+        {
+            await using var contexto = await contextFactory.CreateDbContextAsync();
+            var tieneSolicitudes = await contexto.Solicitudes.AnyAsync(s => s.ClienteId == id);
+            if (tieneSolicitudes)
+            {
+                return false;
+            }
+
+            await contexto.ClientesTelefonos.Where(t => t.ClienteId == id).ExecuteDeleteAsync();
+            return await contexto.Clientes
+                .Where(c => c.Id == id)
+                .ExecuteDeleteAsync() > 0;
+        }
+        catch
+        {
+            return false;
+        }
     }
 }

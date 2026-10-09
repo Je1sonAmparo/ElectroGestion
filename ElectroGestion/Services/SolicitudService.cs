@@ -27,16 +27,43 @@ public class SolicitudService(IDbContextFactory<Contexto> contextFactory) : Apli
 
     private async Task<bool> Insertar(Solicitud solicitud)
     {
-        await using var contexto = await contextFactory.CreateDbContextAsync();
-        contexto.Solicitudes.Add(solicitud);
-        return await contexto.SaveChangesAsync() > 0;
+        try
+        {
+            await using var contexto = await contextFactory.CreateDbContextAsync();
+            solicitud.Cliente = null;
+            solicitud.Servicio = null;
+            solicitud.EstadoSolicitud = null;
+            contexto.Solicitudes.Add(solicitud);
+            return await contexto.SaveChangesAsync() > 0;
+        }
+        catch
+        {
+            return false;
+        }
     }
 
     private async Task<bool> Modificar(Solicitud solicitud)
     {
-        await using var contexto = await contextFactory.CreateDbContextAsync();
-        contexto.Update(solicitud);
-        return await contexto.SaveChangesAsync() > 0;
+        try
+        {
+            await using var contexto = await contextFactory.CreateDbContextAsync();
+            var existente = await contexto.Solicitudes.FirstOrDefaultAsync(s => s.Id == solicitud.Id);
+            if (existente == null) return false;
+
+            existente.ClienteId = solicitud.ClienteId;
+            existente.ServicioId = solicitud.ServicioId;
+            existente.Contacto = solicitud.Contacto;
+            existente.Direccion = solicitud.Direccion;
+            existente.Fecha = solicitud.Fecha;
+            existente.Hora = solicitud.Hora;
+            existente.EstadoSolicitudId = solicitud.EstadoSolicitudId;
+
+            return await contexto.SaveChangesAsync() > 0;
+        }
+        catch
+        {
+            return false;
+        }
     }
 
     public async Task<Solicitud?> Buscar(int id)

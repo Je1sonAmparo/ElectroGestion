@@ -72,7 +72,7 @@
                 @foreach (var l in FilteredLevantamientos)
                 {
                     var colors = AppStateService.GetBadgeColors(l.Estado);
-                    var s = AppState.Solicitudes.FirstOrDefault(x => x.Id == l.SolicitudId);
+                    var s = solicitudes.FirstOrDefault(x => x.Id == l.SolicitudId);
                     var clienteNombre = s?.Cliente?.Nombre ?? "Desconocido";
                     var servicioNombre = s?.Servicio?.Nombre ?? "Desconocido";
                     var fecha = s == null ? "Sin programar" : $"{AppStateService.FormatFecha(s.Fecha.ToString("yyyy-MM-dd"))} {AppStateService.FormatHora12(s.Hora)}";

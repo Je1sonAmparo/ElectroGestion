@@ -309,7 +309,7 @@
             }
             else
             {
-                ToastService.ShowError("Error al eliminar el cliente.");
+                ToastService.ShowError("No se pudo eliminar el cliente. Verifique si tiene solicitudes asociadas.");
             }
         }
         IsDeleteModalOpen = false;
@@ -393,6 +393,7 @@
             return;
         }
 
+        var existingCliente = EditId.HasValue ? clientes.FirstOrDefault(x => x.Id == EditId.Value) : null;
         var cliente = new ElectroGestion.Models.Cliente
         {
             Id = EditId ?? 0,
@@ -400,7 +401,8 @@
             Rnc = FormRnc,
             Correo = FormCorreo,
             Direccion = FormDireccion,
-            Servicios = 0
+            Servicios = existingCliente?.Servicios ?? 0,
+            Ultimo = existingCliente?.Ultimo ?? ""
         };
 
         if (!string.IsNullOrWhiteSpace(FormTelefono))
