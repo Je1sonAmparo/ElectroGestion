@@ -29,8 +29,8 @@
                 <div class="home-visit-content">
                     <div class="home-visit-details">
                         <div class="home-visit-time">@ElectroGestion.Services.AppStateService.FormatHora12(visit.Hora)</div>
-                        <div class="home-visit-client">@visit.Cliente</div>
-                        <div class="home-visit-meta">@visit.TipoServicio</div>
+                        <div class="home-visit-client">@visit.Cliente?.Nombre</div>
+                        <div class="home-visit-meta">@visit.Servicio?.Nombre</div>
                         <div class="home-visit-meta">@visit.Direccion</div>
                         <button @onclick="() => VerMapa(visit.Direccion)" class="home-outline-button">Ver ubicación</button>
                     </div>
@@ -71,7 +71,7 @@
                 <div class="home-activity-list">
                     @foreach (var item in RecentActivity)
                     {
-                        var icon = GetServiceIcon(item.TipoServicio);
+                        var icon = GetServiceIcon(item.Servicio?.Nombre);
                         <div class="home-activity-row">
                             <span class="home-activity-icon" aria-hidden="true">
                                 <svg viewBox="0 0 24 24" fill="none" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
@@ -80,10 +80,10 @@
                                 </svg>
                             </span>
                             <div class="home-activity-copy">
-                                <div class="home-activity-service">@item.TipoServicio</div>
-                                <div class="home-activity-client">@item.Cliente</div>
+                                <div class="home-activity-service">@item.Servicio?.Nombre</div>
+                                <div class="home-activity-client">@item.Cliente?.Nombre</div>
                             </div>
-                            <time class="home-activity-date">@ElectroGestion.Services.AppStateService.FormatFecha(item.FechaSolicitud)</time>
+                            <time class="home-activity-date">@ElectroGestion.Services.AppStateService.FormatFecha(item.FechaSolicitud.ToString("yyyy-MM-dd"))</time>
                         </div>
                     }
                 </div>
@@ -117,9 +117,9 @@
     private string UserName => AppState.Session?.Nombre ?? "Usuario";
 
     private IEnumerable<ElectroGestion.Models.Solicitud> VisitsToday => AppState.Solicitudes
-        .Where(s => s.Fecha == DateTime.Today.ToString("yyyy-MM-dd") &&
+        .Where(s => s.Fecha.ToString("yyyy-MM-dd") == DateTime.Today.ToString("yyyy-MM-dd") &&
                     !string.IsNullOrWhiteSpace(s.Hora) &&
-                    s.Estado != "Cancelada" && s.Estado != "Finalizada")
+                    s.EstadoSolicitud?.Nombre != "Cancelada" && s.EstadoSolicitud?.Nombre != "Finalizada")
         .OrderBy(s => s.Hora);
 
     private ElectroGestion.Models.Solicitud? NextVisit => VisitsToday.FirstOrDefault();
@@ -131,7 +131,7 @@
 
     private IEnumerable<HomeMetric> Metrics => new[]
     {
-        new HomeMetric("Solicitudes pendientes", AppState.Solicitudes.Count(s => s.Estado == "Pendiente"), "Ver solicitudes", "/solicitudes"),
+        new HomeMetric("Solicitudes pendientes", AppState.Solicitudes.Count(s => s.EstadoSolicitud?.Nombre == "Pendiente"), "Ver solicitudes", "/solicitudes"),
         new HomeMetric("Visitas programadas", VisitsToday.Count(), "Ver agenda", "/agenda"),
         new HomeMetric("Levantamientos pendientes", AppState.Levantamientos.Count(l => l.Estado == "Pendiente"), "Ver levantamientos", "/levantamientos"),
         new HomeMetric("Órdenes de trabajo nuevas", AppState.Ordenes.Count(o => o.Estado == "En proceso"), "Ver órdenes", "/ordenes")
@@ -152,9 +152,9 @@
         await JS.InvokeVoidAsync("open", url, "_blank");
     }
 
-    private static (string D1, string D2) GetServiceIcon(string tipoServicio) => tipoServicio switch
+    private static (string D1, string D2) GetServiceIcon(string? tipoServicio) => tipoServicio switch
     {
-        "Instalación Solar" => ("M12 4v2 M12 18v2 M4 12h2 M18 12h2 M6.3 6.3l1.4 1.4 M16.3 16.3l1.4 1.4 M6.3 17.7l1.4-1.4 M16.3 7.7l1.4-1.4", "M16 12a4 4 0 1 1-8 0 4 4 0 0 1 8 0"),
+        "Instalación de Paneles Solares" => ("M12 4v2 M12 18v2 M4 12h2 M18 12h2 M6.3 6.3l1.4 1.4 M16.3 16.3l1.4 1.4 M6.3 17.7l1.4-1.4 M16.3 7.7l1.4-1.4", "M16 12a4 4 0 1 1-8 0 4 4 0 0 1 8 0"),
         "Instalación de Sistema UPS" => ("M7 4h10a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2z", "M12 8v5l-2 2"),
         "Cableado Estructurado" => ("M4 7h16v10H4z", "M8 7V4 M16 7V4 M12 17v3"),
         _ => ("M12 3v4 M12 17v4 M3 12h4 M17 12h4", "M8 8l8 8 M16 8l-8 8")

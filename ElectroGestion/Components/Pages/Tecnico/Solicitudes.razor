@@ -1,4 +1,7 @@
 @inject ElectroGestion.Services.AppStateService AppState
+@inject ElectroGestion.Services.SolicitudService SolicitudService
+@inject ElectroGestion.Services.ClienteService ClienteService
+@inject ElectroGestion.Services.ServicioService ServicioService
 @inject NavigationManager NavManager
 @inject IJSRuntime JS
 @inject ToastService ToastService
@@ -66,11 +69,36 @@
         <table style="width:100%;border-collapse:collapse;font-size:14px;table-layout:fixed">
             <thead>
                 <tr style="border-bottom:1px solid #EFF0F6;background:#FAFAFC;color:#6B7085;font-family:'Manrope';font-weight:800;font-size:13px;text-transform:uppercase;letter-spacing:0.5px">
-                    <th style="padding:14px 18px;text-align:left;width:12%">ID</th>
-                    <th style="padding:14px 18px;text-align:left;width:22%">Cliente</th>
-                    <th style="padding:14px 18px;text-align:left;width:22%">Tipo de Servicio</th>
-                    <th style="padding:14px 18px;text-align:left;width:18%">Fecha Solicitud</th>
-                    <th style="padding:14px 18px;text-align:left;width:15%">Estado</th>
+                    <th @onclick='() => OrdenarPor("Id")' style="padding:14px 18px;text-align:left;width:12%;cursor:pointer;user-select:none" title="Ordenar por ID">
+                        <div style="display:inline-flex;align-items:center;gap:6px">
+                            <span>ID</span>
+                            @if (SortColumn == "Id") { <span style="font-size:11px">@(SortAscending ? "▲" : "▼")</span> }
+                        </div>
+                    </th>
+                    <th @onclick='() => OrdenarPor("Cliente")' style="padding:14px 18px;text-align:left;width:22%;cursor:pointer;user-select:none" title="Ordenar por Cliente">
+                        <div style="display:inline-flex;align-items:center;gap:6px">
+                            <span>Cliente</span>
+                            @if (SortColumn == "Cliente") { <span style="font-size:11px">@(SortAscending ? "▲" : "▼")</span> }
+                        </div>
+                    </th>
+                    <th @onclick='() => OrdenarPor("Servicio")' style="padding:14px 18px;text-align:left;width:22%;cursor:pointer;user-select:none" title="Ordenar por Tipo de Servicio">
+                        <div style="display:inline-flex;align-items:center;gap:6px">
+                            <span>Tipo de Servicio</span>
+                            @if (SortColumn == "Servicio") { <span style="font-size:11px">@(SortAscending ? "▲" : "▼")</span> }
+                        </div>
+                    </th>
+                    <th @onclick='() => OrdenarPor("Fecha")' style="padding:14px 18px;text-align:left;width:18%;cursor:pointer;user-select:none" title="Ordenar por Fecha Solicitud">
+                        <div style="display:inline-flex;align-items:center;gap:6px">
+                            <span>Fecha Solicitud</span>
+                            @if (SortColumn == "Fecha") { <span style="font-size:11px">@(SortAscending ? "▲" : "▼")</span> }
+                        </div>
+                    </th>
+                    <th @onclick='() => OrdenarPor("Estado")' style="padding:14px 18px;text-align:left;width:15%;cursor:pointer;user-select:none" title="Ordenar por Estado">
+                        <div style="display:inline-flex;align-items:center;gap:6px">
+                            <span>Estado</span>
+                            @if (SortColumn == "Estado") { <span style="font-size:11px">@(SortAscending ? "▲" : "▼")</span> }
+                        </div>
+                    </th>
                     <th style="padding:14px 18px;text-align:right;width:11%">Acciones</th>
                 </tr>
             </thead>
@@ -92,17 +120,17 @@
                                 <span style="font-family:ui-monospace,'SFMono-Regular',Consolas,monospace;font-size:14px;font-weight:700;letter-spacing:.05em;color:#5B6173">@s.Id.ToString("D4")</span>
                             </td>
                             <td style="padding:18px;vertical-align:middle;font-weight:700;color:#14162B">
-                                @s.Cliente
+                                @s.Cliente?.Nombre
                             </td>
                             <td style="padding:18px;vertical-align:middle;color:#4A4E63">
-                                @s.TipoServicio
+                                @s.Servicio?.Nombre
                             </td>
                             <td style="padding:18px;vertical-align:middle;color:#6B7085">
-                                @AppStateService.FormatFecha(s.FechaSolicitud)
+                                @AppStateService.FormatFecha(s.FechaSolicitud.ToString("yyyy-MM-dd"))
                             </td>
                             <td style="padding:18px;vertical-align:middle">
-                                <span style="display:inline-block;padding:5px 12px;border-radius:999px;font-size:12.5px;font-weight:700;line-height:1.2;background:@(s.Estado == "Pendiente" ? "#F7E7C9" : s.Estado == "En proceso" ? "#DDE7FF" : s.Estado == "Finalizada" ? "#DDF7E8" : "#F9E6E6");color:@(s.Estado == "Pendiente" ? "#B57A00" : s.Estado == "En proceso" ? "#2B5BDB" : s.Estado == "Finalizada" ? "#198754" : "#C0392B")">
-                                    @s.Estado
+                                <span style="display:inline-block;padding:5px 12px;border-radius:999px;font-size:12.5px;font-weight:700;line-height:1.2;background:@(s.EstadoSolicitud?.Nombre == "Pendiente" ? "#F7E7C9" : s.EstadoSolicitud?.Nombre == "En proceso" ? "#DDE7FF" : s.EstadoSolicitud?.Nombre == "Finalizada" ? "#DDF7E8" : "#F9E6E6");color:@(s.EstadoSolicitud?.Nombre == "Pendiente" ? "#B57A00" : s.EstadoSolicitud?.Nombre == "En proceso" ? "#2B5BDB" : s.EstadoSolicitud?.Nombre == "Finalizada" ? "#198754" : "#C0392B")">
+                                    @s.EstadoSolicitud?.Nombre
                                 </span>
                             </td>
                             <td style="padding:18px;text-align:right;vertical-align:middle">
@@ -135,14 +163,14 @@
                 <button @onclick="CerrarDetalle" aria-label="Cerrar" style="width:32px;height:32px;border:1px solid #E3E5EE;border-radius:8px;background:#fff;display:flex;align-items:center;justify-content:center;color:#8B90A3;cursor:pointer"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M18 6 6 18M6 6l12 12"/></svg></button>
             </div>
             <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px" class="resp-grid-2">
-                <div style="background:#F7F8FC;border:1px solid #EFF0F6;border-radius:10px;padding:12px 14px"><div style="font-size:11.5px;color:#8B90A3;font-weight:800;text-transform:uppercase">Cliente</div><div style="font-size:14px;margin-top:4px;font-weight:700;color:#14162B">@SelectedSolicitud.Cliente</div></div>
+                <div style="background:#F7F8FC;border:1px solid #EFF0F6;border-radius:10px;padding:12px 14px"><div style="font-size:11.5px;color:#8B90A3;font-weight:800;text-transform:uppercase">Cliente</div><div style="font-size:14px;margin-top:4px;font-weight:700;color:#14162B">@SelectedSolicitud.Cliente?.Nombre</div></div>
                 <div style="background:#F7F8FC;border:1px solid #EFF0F6;border-radius:10px;padding:12px 14px"><div style="font-size:11.5px;color:#8B90A3;font-weight:800;text-transform:uppercase">Contacto</div><div style="font-size:14px;margin-top:4px;font-weight:700;color:#14162B">@SelectedSolicitud.Contacto</div></div>
-                <div style="background:#F7F8FC;border:1px solid #EFF0F6;border-radius:10px;padding:12px 14px"><div style="font-size:11.5px;color:#8B90A3;font-weight:800;text-transform:uppercase">Tipo de servicio</div><div style="font-size:14px;margin-top:4px;font-weight:700;color:#14162B">@SelectedSolicitud.TipoServicio</div></div>
+                <div style="background:#F7F8FC;border:1px solid #EFF0F6;border-radius:10px;padding:12px 14px"><div style="font-size:11.5px;color:#8B90A3;font-weight:800;text-transform:uppercase">Tipo de servicio</div><div style="font-size:14px;margin-top:4px;font-weight:700;color:#14162B">@SelectedSolicitud.Servicio?.Nombre</div></div>
                 <div style="background:#F7F8FC;border:1px solid #EFF0F6;border-radius:10px;padding:12px 14px"><div style="font-size:11.5px;color:#8B90A3;font-weight:800;text-transform:uppercase">Dirección</div><div style="font-size:14px;margin-top:4px;font-weight:700;color:#14162B">@SelectedSolicitud.Direccion</div></div>
-                <div style="background:#F7F8FC;border:1px solid #EFF0F6;border-radius:10px;padding:12px 14px"><div style="font-size:11.5px;color:#8B90A3;font-weight:800;text-transform:uppercase">Fecha de solicitud</div><div style="font-size:14px;margin-top:4px;font-weight:700;color:#14162B">@AppStateService.FormatFecha(SelectedSolicitud.FechaSolicitud)</div></div>
-                <div style="background:#F7F8FC;border:1px solid #EFF0F6;border-radius:10px;padding:12px 14px"><div style="font-size:11.5px;color:#8B90A3;font-weight:800;text-transform:uppercase">Fecha del levantamiento</div><div style="font-size:14px;margin-top:4px;font-weight:700;color:#14162B">@AppStateService.FormatFecha(SelectedSolicitud.Fecha)</div></div>
+                <div style="background:#F7F8FC;border:1px solid #EFF0F6;border-radius:10px;padding:12px 14px"><div style="font-size:11.5px;color:#8B90A3;font-weight:800;text-transform:uppercase">Fecha de solicitud</div><div style="font-size:14px;margin-top:4px;font-weight:700;color:#14162B">@AppStateService.FormatFecha(SelectedSolicitud.FechaSolicitud.ToString("yyyy-MM-dd"))</div></div>
+                <div style="background:#F7F8FC;border:1px solid #EFF0F6;border-radius:10px;padding:12px 14px"><div style="font-size:11.5px;color:#8B90A3;font-weight:800;text-transform:uppercase">Fecha del levantamiento</div><div style="font-size:14px;margin-top:4px;font-weight:700;color:#14162B">@AppStateService.FormatFecha(SelectedSolicitud.Fecha.ToString("yyyy-MM-dd"))</div></div>
                 <div style="background:#F7F8FC;border:1px solid #EFF0F6;border-radius:10px;padding:12px 14px"><div style="font-size:11.5px;color:#8B90A3;font-weight:800;text-transform:uppercase">Hora</div><div style="font-size:14px;margin-top:4px;font-weight:700;color:#14162B">@AppStateService.FormatHora12(SelectedSolicitud.Hora)</div></div>
-                <div style="background:#F7F8FC;border:1px solid #EFF0F6;border-radius:10px;padding:12px 14px"><div style="font-size:11.5px;color:#8B90A3;font-weight:800;text-transform:uppercase">Estado</div><div style="font-size:14px;margin-top:4px;font-weight:700;color:#14162B">@SelectedSolicitud.Estado</div></div>
+                <div style="background:#F7F8FC;border:1px solid #EFF0F6;border-radius:10px;padding:12px 14px"><div style="font-size:11.5px;color:#8B90A3;font-weight:800;text-transform:uppercase">Estado</div><div style="font-size:14px;margin-top:4px;font-weight:700;color:#14162B">@SelectedSolicitud.EstadoSolicitud?.Nombre</div></div>
             </div>
             <div style="margin-top:24px;display:flex;justify-content:flex-end;border-top:1px solid #EFF0F6;padding-top:17px"><button @onclick="CerrarDetalle" style="padding:10px 20px;border:1px solid #D5D8E6;background:#fff;border-radius:8px;font-weight:700;cursor:pointer;color:#14162B">Cerrar</button></div>
         </div>
@@ -158,7 +186,7 @@
                 <button @onclick="CloseModal" aria-label="Cerrar" style="width:32px;height:32px;border:1px solid #E3E5EE;border-radius:8px;background:#fff;display:flex;align-items:center;justify-content:center;color:#8B90A3;cursor:pointer"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M18 6 6 18M6 6l12 12"/></svg></button>
             </div>
             <div style="display:flex;flex-direction:column;gap:16px">
-                <div><label style="display:block;font-size:13px;font-weight:700;color:#14162B;margin-bottom:6px">Cliente *</label><select @bind="FormCliente" style="width:100%;padding:10px 14px;border:1px solid #D5D8E6;border-radius:8px;font-size:14px;background:#fff"><option value="">Seleccione un cliente registrado</option>@foreach (var cliente in AppState.Clientes) { <option value="@cliente.Nombre">@cliente.Nombre</option> }</select></div>
+                <div><label style="display:block;font-size:13px;font-weight:700;color:#14162B;margin-bottom:6px">Cliente *</label><select @bind="FormCliente" style="width:100%;padding:10px 14px;border:1px solid #D5D8E6;border-radius:8px;font-size:14px;background:#fff"><option value="">Seleccione un cliente registrado</option>@foreach (var cliente in clientes) { <option value="@cliente.Nombre">@cliente.Nombre</option> }</select></div>
                 <div><label style="display:block;font-size:13px;font-weight:700;color:#14162B;margin-bottom:6px">Tipo de Servicio *</label><select @bind="FormTipo" style="width:100%;padding:10px 14px;border:1px solid #D5D8E6;border-radius:8px;font-size:14px;background:#fff"><option value="">Seleccione el tipo de servicio</option>@foreach (var tipo in TiposServicio) { <option value="@tipo">@tipo</option> }</select></div>
                 <div><label style="display:block;font-size:13px;font-weight:700;color:#14162B;margin-bottom:6px">Dirección del Servicio *</label><input @bind="FormDireccion" placeholder="ej. Calle Principal #12, Santiago" style="width:100%;padding:10px 14px;border:1px solid #D5D8E6;border-radius:8px;font-size:14px" /></div>
                 <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px" class="resp-grid-2">
@@ -166,7 +194,10 @@
                     <div><label style="display:block;font-size:13px;font-weight:700;color:#14162B;margin-bottom:6px">Hora de Visita</label><input type="time" @bind="FormHora" style="width:100%;padding:10px 14px;border:1px solid #D5D8E6;border-radius:8px;font-size:14px" /></div>
                 </div>
             </div>
-            <div style="display:flex;justify-content:flex-end;gap:12px;margin-top:28px"><button @onclick="CloseModal" style="padding:10px 20px;border:1px solid #D5D8E6;background:#fff;border-radius:8px;font-weight:700;font-size:14px;cursor:pointer;color:#4A4E63">Cancelar</button><button @onclick="SaveModal" style="padding:10px 24px;border:0;background:#1D4ED8;color:#fff;border-radius:8px;font-weight:700;font-size:14px;cursor:pointer;font-family:'Manrope'">Guardar</button></div>
+            <div style="display:flex;justify-content:flex-end;gap:12px;margin-top:28px">
+                <button @onclick="CloseModal" style="padding:10px 20px;border:1px solid #D5D8E6;background:#fff;border-radius:8px;font-weight:700;font-size:14px;cursor:pointer;color:#4A4E63">Cancelar</button>
+                <button @onclick="SaveModal" style="padding:10px 24px;border:0;background:#1D4ED8;color:#fff;border-radius:8px;font-weight:700;font-size:14px;cursor:pointer;font-family:'Manrope'">Guardar</button>
+            </div>
         </div>
     </div>
 }
@@ -186,31 +217,88 @@
     private string FormDireccion = "";
     private DateTime? FormFecha;
     private TimeOnly? FormHora;
-    private List<string> TiposServicio { get; } = new() {
-        "Instalación Solar", "Instalación de Sistema UPS", "Mantenimiento Eléctrico",
-        "Instalación de Planta Eléctrica", "Cableado Estructurado"
-    };
+    private List<string> TiposServicio = new();
 
-    private string SearchTerm { get; set; } = "";
-    private string FilterEstado { get; set; } = "Todos";
+    private string SortColumn = "Id";
+    private bool SortAscending = false;
 
-    private List<ElectroGestion.Models.Solicitud> FilteredSolicitudes => AppState.Solicitudes
-        .Where(s =>
-        {
-            bool matchId = string.IsNullOrWhiteSpace(SearchId) || s.Id.ToString("D4").Contains(SearchId, StringComparison.OrdinalIgnoreCase);
-            bool matchCliente = string.IsNullOrWhiteSpace(SearchCliente) || s.Cliente.Contains(SearchCliente, StringComparison.OrdinalIgnoreCase);
-            bool matchTipo = string.IsNullOrWhiteSpace(SearchTipo) || s.TipoServicio == SearchTipo;
-            bool matchFecha = !SearchFecha.HasValue || s.FechaSolicitud.StartsWith(SearchFecha.Value.ToString("yyyy-MM-dd"));
-            bool matchEstado = SearchEstado == "Todos los estados" || s.Estado == SearchEstado;
-            return matchId && matchCliente && matchTipo && matchFecha && matchEstado;
-        })
-        .OrderByDescending(s => s.Id)
-        .ToList();
+    private List<ElectroGestion.Models.Solicitud> solicitudes = new();
+    private List<ElectroGestion.Models.Cliente> clientes = new();
+    private List<ElectroGestion.Models.Servicio> servicios = new();
+    private List<ElectroGestion.Models.Solicitud> FilteredSolicitudes = new();
 
-    private void Filtrar() { }
-
-    private void NuevaSolicitud()
+    protected override async Task OnInitializedAsync()
     {
+        await CargarDatos();
+    }
+
+    private void OrdenarPor(string columna)
+    {
+        if (SortColumn == columna)
+        {
+            SortAscending = !SortAscending;
+        }
+        else
+        {
+            SortColumn = columna;
+            SortAscending = true;
+        }
+        Filtrar();
+    }
+
+    private async Task CargarDatos()
+    {
+        solicitudes = await SolicitudService.GetList(s => true);
+        clientes = await ClienteService.GetList(c => true);
+        servicios = await ServicioService.GetList(s => true);
+        TiposServicio = servicios.Select(s => s.Nombre).Distinct().ToList();
+        Filtrar();
+    }
+
+    private void Filtrar()
+    {
+        var q = solicitudes.AsEnumerable();
+
+        if (!string.IsNullOrWhiteSpace(SearchId))
+        {
+            q = q.Where(x => x.Id.ToString("D4").Contains(SearchId, StringComparison.OrdinalIgnoreCase));
+        }
+
+        if (!string.IsNullOrWhiteSpace(SearchCliente))
+        {
+            q = q.Where(x => x.Cliente != null && x.Cliente.Nombre.Contains(SearchCliente, StringComparison.OrdinalIgnoreCase));
+        }
+
+        if (!string.IsNullOrWhiteSpace(SearchTipo))
+        {
+            q = q.Where(x => x.Servicio != null && x.Servicio.Nombre == SearchTipo);
+        }
+
+        if (SearchFecha.HasValue)
+        {
+            var dateStr = SearchFecha.Value.ToString("yyyy-MM-dd");
+            q = q.Where(x => x.FechaSolicitud.ToString("yyyy-MM-dd").StartsWith(dateStr));
+        }
+
+        if (SearchEstado != "Todos los estados")
+        {
+            q = q.Where(x => x.EstadoSolicitud != null && x.EstadoSolicitud.Nombre == SearchEstado);
+        }
+
+        FilteredSolicitudes = (SortColumn switch
+        {
+            "Id" => SortAscending ? q.OrderBy(x => x.Id) : q.OrderByDescending(x => x.Id),
+            "Cliente" => SortAscending ? q.OrderBy(x => x.Cliente != null ? x.Cliente.Nombre : "") : q.OrderByDescending(x => x.Cliente != null ? x.Cliente.Nombre : ""),
+            "Servicio" => SortAscending ? q.OrderBy(x => x.Servicio != null ? x.Servicio.Nombre : "") : q.OrderByDescending(x => x.Servicio != null ? x.Servicio.Nombre : ""),
+            "Fecha" => SortAscending ? q.OrderBy(x => x.FechaSolicitud) : q.OrderByDescending(x => x.FechaSolicitud),
+            "Estado" => SortAscending ? q.OrderBy(x => x.EstadoSolicitud != null ? x.EstadoSolicitud.Nombre : "") : q.OrderByDescending(x => x.EstadoSolicitud != null ? x.EstadoSolicitud.Nombre : ""),
+            _ => SortAscending ? q.OrderBy(x => x.Id) : q.OrderByDescending(x => x.Id)
+        }).ToList();
+    }
+
+    private async Task NuevaSolicitud()
+    {
+        await CargarDatos();
         ModalTitle = "Nueva Solicitud";
         ModalSub = "Complete los datos para registrar una nueva solicitud de servicio.";
         FormId = null;
@@ -220,23 +308,24 @@
         IsFormModalOpen = true;
     }
 
-    private void Editar(int id)
+    private async Task Editar(int id)
     {
-        var solicitud = AppState.Solicitudes.FirstOrDefault(s => s.Id == id);
+        await CargarDatos();
+        var solicitud = solicitudes.FirstOrDefault(s => s.Id == id);
         if (solicitud == null) return;
 
         ModalTitle = "Editar Solicitud";
         ModalSub = "Modifique los datos de la solicitud.";
         FormId = solicitud.Id;
-        FormCliente = solicitud.Cliente;
-        FormTipo = solicitud.TipoServicio;
+        FormCliente = solicitud.Cliente?.Nombre ?? "";
+        FormTipo = solicitud.Servicio?.Nombre ?? "";
         FormDireccion = solicitud.Direccion;
-        FormFecha = string.IsNullOrWhiteSpace(solicitud.Fecha) ? null : DateTime.Parse(solicitud.Fecha);
-        FormHora = string.IsNullOrWhiteSpace(solicitud.Hora) ? null : TimeOnly.Parse(solicitud.Hora);
+        FormFecha = solicitud.Fecha;
+        FormHora = TimeOnly.TryParse(solicitud.Hora, out var h) ? h : null;
         IsFormModalOpen = true;
     }
 
-    private void SaveModal()
+    private async Task SaveModal()
     {
         if (string.IsNullOrWhiteSpace(FormCliente) || string.IsNullOrWhiteSpace(FormTipo) || string.IsNullOrWhiteSpace(FormDireccion))
         {
@@ -244,38 +333,64 @@
             return;
         }
 
+        var clienteEntity = clientes.FirstOrDefault(c => c.Nombre == FormCliente);
+        var servicioEntity = servicios.FirstOrDefault(serv => serv.Nombre == FormTipo);
+
+        if (clienteEntity == null || servicioEntity == null)
+        {
+            ToastService.ShowWarning("Por favor seleccione un cliente y tipo de servicio válidos.", "Atención");
+            return;
+        }
+
         var editing = FormId.HasValue;
         if (editing)
         {
             var solicitudId = FormId.GetValueOrDefault();
-            var solicitud = AppState.Solicitudes.FirstOrDefault(s => s.Id == solicitudId);
+            var solicitud = solicitudes.FirstOrDefault(s => s.Id == solicitudId);
             if (solicitud != null)
             {
-                solicitud.Cliente = FormCliente;
-                solicitud.TipoServicio = FormTipo;
+                solicitud.ClienteId = clienteEntity.Id;
+                solicitud.Contacto = clienteEntity.Nombre;
+                solicitud.ServicioId = servicioEntity.Id;
                 solicitud.Direccion = FormDireccion;
-                solicitud.Fecha = FormFecha?.ToString("yyyy-MM-dd") ?? "";
+                if (FormFecha.HasValue) solicitud.Fecha = FormFecha.Value;
                 solicitud.Hora = FormHora?.ToString("HH:mm") ?? "";
+
+                var resultado = await SolicitudService.Guardar(solicitud);
+                if (resultado) ToastService.ShowSuccess("Solicitud actualizada correctamente.");
+                else ToastService.ShowError("Error al actualizar la solicitud.");
             }
         }
         else
         {
-            var newId = AppState.Solicitudes.Any() ? AppState.Solicitudes.Max(s => s.Id) + 1 : 1;
-            AppState.Solicitudes.Add(new ElectroGestion.Models.Solicitud
+            var s = new ElectroGestion.Models.Solicitud
             {
-                Id = newId,
-                Cliente = FormCliente,
-                TipoServicio = FormTipo,
+                ClienteId = clienteEntity.Id,
+                ServicioId = servicioEntity.Id,
+                Contacto = clienteEntity.Nombre,
                 Direccion = FormDireccion,
-                FechaSolicitud = DateTime.Today.ToString("yyyy-MM-dd"),
-                Fecha = FormFecha?.ToString("yyyy-MM-dd") ?? "",
+                FechaSolicitud = DateTime.Today,
+                Fecha = FormFecha ?? DateTime.Today,
                 Hora = FormHora?.ToString("HH:mm") ?? "",
-                Estado = "Pendiente"
-            });
+                EstadoSolicitudId = 1
+            };
+
+            var resultado = await SolicitudService.Guardar(s);
+            if (resultado)
+            {
+                clienteEntity.Servicios++;
+                clienteEntity.Ultimo = servicioEntity.Nombre;
+                await ClienteService.Guardar(clienteEntity);
+                ToastService.ShowSuccess("Solicitud registrada correctamente.");
+            }
+            else
+            {
+                ToastService.ShowError("Error al registrar la solicitud.");
+            }
         }
 
         IsFormModalOpen = false;
-        ToastService.ShowSuccess(editing ? "Solicitud actualizada correctamente." : "Solicitud registrada correctamente.");
+        await CargarDatos();
     }
 
     private void CloseModal() => IsFormModalOpen = false;
@@ -285,7 +400,7 @@
 
     private void VerDetalle(int id)
     {
-        SelectedSolicitud = AppState.Solicitudes.FirstOrDefault(s => s.Id == id);
+        SelectedSolicitud = solicitudes.FirstOrDefault(s => s.Id == id);
         IsDetalleModalOpen = SelectedSolicitud != null;
     }
 

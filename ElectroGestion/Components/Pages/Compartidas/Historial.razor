@@ -61,9 +61,9 @@
             <div style="display:grid;grid-template-columns:80px 1.2fr 1.4fr 1fr 1fr 80px;padding:16px 18px;border-bottom:1px solid #F4F5FB;align-items:center;font-size:14px"
                  class="resp-table-row">
                 <div style="font-family:ui-monospace,monospace;color:#6B7085">@h.Id.ToString("D4")</div>
-                <div style="font-weight:700">@h.Cliente</div>
-                <div>@h.TipoServicio</div>
-                <div style="color:#6B7085">@ElectroGestion.Services.AppStateService.FormatFecha(h.FechaFin ?? h.Fecha)</div>
+                <div style="font-weight:700">@h.Cliente?.Nombre</div>
+                <div>@h.Servicio?.Nombre</div>
+                <div style="color:#6B7085">@ElectroGestion.Services.AppStateService.FormatFecha((h.FechaFin ?? h.Fecha).ToString("yyyy-MM-dd"))</div>
                 <div>
                     <span style="display:inline-block;padding:5px 11px;border-radius:20px;font-size:12px;font-weight:800;background:#E4F6EA;color:#17803D">
                         Finalizada
@@ -103,9 +103,9 @@
                 </button>
             </div>
             <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px" class="resp-grid-2">
-                <div style="background:#F7F8FC;border:1px solid #EFF0F6;border-radius:10px;padding:12px 14px"><div style="font-size:11.5px;color:#8B90A3;font-weight:800;text-transform:uppercase">Cliente</div><div style="font-size:14px;margin-top:4px;font-weight:700;color:#14162B">@SelectedHistorial.Cliente</div></div>
-                <div style="background:#F7F8FC;border:1px solid #EFF0F6;border-radius:10px;padding:12px 14px"><div style="font-size:11.5px;color:#8B90A3;font-weight:800;text-transform:uppercase">Tipo de Servicio</div><div style="font-size:14px;margin-top:4px;font-weight:700;color:#14162B">@SelectedHistorial.TipoServicio</div></div>
-                <div style="background:#F7F8FC;border:1px solid #EFF0F6;border-radius:10px;padding:12px 14px"><div style="font-size:11.5px;color:#8B90A3;font-weight:800;text-transform:uppercase">Fecha Finalización</div><div style="font-size:14px;margin-top:4px;font-weight:700;color:#14162B">@ElectroGestion.Services.AppStateService.FormatFecha(SelectedHistorial.FechaFin ?? SelectedHistorial.Fecha)</div></div>
+                <div style="background:#F7F8FC;border:1px solid #EFF0F6;border-radius:10px;padding:12px 14px"><div style="font-size:11.5px;color:#8B90A3;font-weight:800;text-transform:uppercase">Cliente</div><div style="font-size:14px;margin-top:4px;font-weight:700;color:#14162B">@SelectedHistorial.Cliente?.Nombre</div></div>
+                <div style="background:#F7F8FC;border:1px solid #EFF0F6;border-radius:10px;padding:12px 14px"><div style="font-size:11.5px;color:#8B90A3;font-weight:800;text-transform:uppercase">Tipo de Servicio</div><div style="font-size:14px;margin-top:4px;font-weight:700;color:#14162B">@SelectedHistorial.Servicio?.Nombre</div></div>
+                <div style="background:#F7F8FC;border:1px solid #EFF0F6;border-radius:10px;padding:12px 14px"><div style="font-size:11.5px;color:#8B90A3;font-weight:800;text-transform:uppercase">Fecha Finalización</div><div style="font-size:14px;margin-top:4px;font-weight:700;color:#14162B">@ElectroGestion.Services.AppStateService.FormatFecha((SelectedHistorial.FechaFin ?? SelectedHistorial.Fecha).ToString("yyyy-MM-dd"))</div></div>
                 <div style="background:#F7F8FC;border:1px solid #EFF0F6;border-radius:10px;padding:12px 14px"><div style="font-size:11.5px;color:#8B90A3;font-weight:800;text-transform:uppercase">Técnico Asignado</div><div style="font-size:14px;margin-top:4px;font-weight:700;color:#14162B">@SelectedHistorial.TecnicoAsignado</div></div>
                 <div style="grid-column:1 / -1;background:#F7F8FC;border:1px solid #EFF0F6;border-radius:10px;padding:12px 14px"><div style="font-size:11.5px;color:#8B90A3;font-weight:800;text-transform:uppercase">Dirección</div><div style="font-size:14px;margin-top:4px;font-weight:700;color:#14162B">@SelectedHistorial.Direccion</div></div>
             </div>
@@ -148,7 +148,7 @@
     {
         get
         {
-            var res = AppState.Solicitudes.Where(x => x.Estado == "Finalizada");
+            var res = AppState.Solicitudes.Where(x => x.EstadoSolicitud?.Nombre == "Finalizada");
 
             if (!string.IsNullOrWhiteSpace(SearchId))
             {
@@ -156,22 +156,22 @@
             }
             if (!string.IsNullOrWhiteSpace(SearchCliente))
             {
-                res = res.Where(x => x.Cliente.Contains(SearchCliente, StringComparison.OrdinalIgnoreCase));
+                res = res.Where(x => x.Cliente != null && x.Cliente.Nombre.Contains(SearchCliente, StringComparison.OrdinalIgnoreCase));
             }
             if (!string.IsNullOrWhiteSpace(SearchTipo))
             {
-                res = res.Where(x => x.TipoServicio.Contains(SearchTipo, StringComparison.OrdinalIgnoreCase));
+                res = res.Where(x => x.Servicio != null && x.Servicio.Nombre.Contains(SearchTipo, StringComparison.OrdinalIgnoreCase));
             }
 
             if (FiltroFecha == "Últimos 7 días")
             {
                 var lim = DateTime.Today.AddDays(-7);
-                res = res.Where(x => DateTime.TryParse(x.FechaFin ?? x.Fecha, out var d) && d >= lim);
+                res = res.Where(x => (x.FechaFin ?? x.Fecha) >= lim);
             }
             else if (FiltroFecha == "Últimos 30 días")
             {
                 var lim = DateTime.Today.AddDays(-30);
-                res = res.Where(x => DateTime.TryParse(x.FechaFin ?? x.Fecha, out var d) && d >= lim);
+                res = res.Where(x => (x.FechaFin ?? x.Fecha) >= lim);
             }
 
             return res;

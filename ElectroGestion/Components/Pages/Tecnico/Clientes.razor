@@ -1,4 +1,5 @@
 @inject ElectroGestion.Services.AppStateService AppState
+@inject ElectroGestion.Services.ClienteService ClienteService
 @inject NavigationManager NavManager
 @inject ToastService ToastService
 
@@ -61,10 +62,30 @@
         <table style="width:100%;border-collapse:collapse;font-size:14px;min-width:760px">
             <thead>
                 <tr style="border-bottom:1px solid #EFF0F6;background:#FAFAFC;color:#6B7085;font-family:'Manrope';font-weight:800;font-size:12px;text-transform:uppercase;letter-spacing:.35px">
-                    <th style="padding:14px 18px;text-align:left;width:23%">Cliente</th>
-                    <th style="padding:14px 18px;text-align:left;width:18%">Teléfono</th>
-                    <th style="padding:14px 18px;text-align:left;width:34%">Dirección</th>
-                    <th style="padding:14px 18px;text-align:left;width:16%">Servicios</th>
+                    <th @onclick='() => OrdenarPor("Nombre")' style="padding:14px 18px;text-align:left;width:23%;cursor:pointer;user-select:none" title="Ordenar por Cliente">
+                        <div style="display:inline-flex;align-items:center;gap:6px">
+                            <span>Cliente</span>
+                            @if (SortColumn == "Nombre") { <span style="font-size:11px">@(SortAscending ? "▲" : "▼")</span> }
+                        </div>
+                    </th>
+                    <th @onclick='() => OrdenarPor("Telefono")' style="padding:14px 18px;text-align:left;width:18%;cursor:pointer;user-select:none" title="Ordenar por Teléfono">
+                        <div style="display:inline-flex;align-items:center;gap:6px">
+                            <span>Teléfono</span>
+                            @if (SortColumn == "Telefono") { <span style="font-size:11px">@(SortAscending ? "▲" : "▼")</span> }
+                        </div>
+                    </th>
+                    <th @onclick='() => OrdenarPor("Direccion")' style="padding:14px 18px;text-align:left;width:34%;cursor:pointer;user-select:none" title="Ordenar por Dirección">
+                        <div style="display:inline-flex;align-items:center;gap:6px">
+                            <span>Dirección</span>
+                            @if (SortColumn == "Direccion") { <span style="font-size:11px">@(SortAscending ? "▲" : "▼")</span> }
+                        </div>
+                    </th>
+                    <th @onclick='() => OrdenarPor("Servicios")' style="padding:14px 18px;text-align:left;width:16%;cursor:pointer;user-select:none" title="Ordenar por Servicios">
+                        <div style="display:inline-flex;align-items:center;gap:6px">
+                            <span>Servicios</span>
+                            @if (SortColumn == "Servicios") { <span style="font-size:11px">@(SortAscending ? "▲" : "▼")</span> }
+                        </div>
+                    </th>
                     <th style="padding:14px 18px;text-align:right;width:9%">Acciones</th>
                 </tr>
             </thead>
@@ -173,6 +194,22 @@
     private string SearchTelefono = "";
     private string SearchDireccion = "";
 
+    private string SortColumn = "Nombre";
+    private bool SortAscending = true;
+
+    private void OrdenarPor(string columna)
+    {
+        if (SortColumn == columna)
+        {
+            SortAscending = !SortAscending;
+        }
+        else
+        {
+            SortColumn = columna;
+            SortAscending = true;
+        }
+    }
+
     private void Filtrar()
     {
         StateHasChanged();
@@ -189,18 +226,42 @@
     private string FormTelefono2 = "";
     private string FormDireccion = "";
 
-    private List<ElectroGestion.Models.Cliente> FilteredClientes => AppState.Clientes
-        .Where(c => {
-            bool matchId = string.IsNullOrEmpty(SearchId) || c.Id.ToString().Contains(SearchId);
-            bool matchNombre = string.IsNullOrEmpty(SearchNombre) || c.Nombre.Contains(SearchNombre, StringComparison.OrdinalIgnoreCase);
-            bool matchRnc = string.IsNullOrEmpty(SearchRnc) || (!string.IsNullOrEmpty(c.Rnc) && c.Rnc.Contains(SearchRnc, StringComparison.OrdinalIgnoreCase));
-            bool matchCorreo = string.IsNullOrEmpty(SearchCorreo) || (!string.IsNullOrEmpty(c.Correo) && c.Correo.Contains(SearchCorreo, StringComparison.OrdinalIgnoreCase));
-            bool matchTelefono = string.IsNullOrEmpty(SearchTelefono) || (!string.IsNullOrEmpty(c.Telefono) && c.Telefono.Contains(SearchTelefono, StringComparison.OrdinalIgnoreCase)) || (!string.IsNullOrEmpty(c.Telefono2) && c.Telefono2.Contains(SearchTelefono, StringComparison.OrdinalIgnoreCase));
-            bool matchDireccion = string.IsNullOrEmpty(SearchDireccion) || c.Direccion.Contains(SearchDireccion, StringComparison.OrdinalIgnoreCase);
-            return matchId && matchNombre && matchRnc && matchCorreo && matchTelefono && matchDireccion;
-        })
-        .OrderBy(c => c.Nombre)
-        .ToList();
+    private List<ElectroGestion.Models.Cliente> clientes = new();
+
+    protected override async Task OnInitializedAsync()
+    {
+        await CargarClientes();
+    }
+
+    private async Task CargarClientes()
+    {
+        clientes = await ClienteService.GetList(c => true);
+    }
+
+    private List<ElectroGestion.Models.Cliente> FilteredClientes
+    {
+        get
+        {
+            var q = clientes.Where(c => {
+                bool matchId = string.IsNullOrEmpty(SearchId) || c.Id.ToString().Contains(SearchId);
+                bool matchNombre = string.IsNullOrEmpty(SearchNombre) || c.Nombre.Contains(SearchNombre, StringComparison.OrdinalIgnoreCase);
+                bool matchRnc = string.IsNullOrEmpty(SearchRnc) || (!string.IsNullOrEmpty(c.Rnc) && c.Rnc.Contains(SearchRnc, StringComparison.OrdinalIgnoreCase));
+                bool matchCorreo = string.IsNullOrEmpty(SearchCorreo) || (!string.IsNullOrEmpty(c.Correo) && c.Correo.Contains(SearchCorreo, StringComparison.OrdinalIgnoreCase));
+                bool matchTelefono = string.IsNullOrEmpty(SearchTelefono) || (!string.IsNullOrEmpty(c.Telefono) && c.Telefono.Contains(SearchTelefono, StringComparison.OrdinalIgnoreCase)) || (!string.IsNullOrEmpty(c.Telefono2) && c.Telefono2.Contains(SearchTelefono, StringComparison.OrdinalIgnoreCase));
+                bool matchDireccion = string.IsNullOrEmpty(SearchDireccion) || c.Direccion.Contains(SearchDireccion, StringComparison.OrdinalIgnoreCase);
+                return matchId && matchNombre && matchRnc && matchCorreo && matchTelefono && matchDireccion;
+            });
+
+            return (SortColumn switch
+            {
+                "Nombre" => SortAscending ? q.OrderBy(c => c.Nombre) : q.OrderByDescending(c => c.Nombre),
+                "Telefono" => SortAscending ? q.OrderBy(c => c.Telefono) : q.OrderByDescending(c => c.Telefono),
+                "Direccion" => SortAscending ? q.OrderBy(c => c.Direccion) : q.OrderByDescending(c => c.Direccion),
+                "Servicios" => SortAscending ? q.OrderBy(c => c.Servicios) : q.OrderByDescending(c => c.Servicios),
+                _ => SortAscending ? q.OrderBy(c => c.Nombre) : q.OrderByDescending(c => c.Nombre)
+            }).ToList();
+        }
+    }
 
     private void NuevoCliente()
     {
@@ -212,7 +273,7 @@
 
     private void Editar(int id)
     {
-        var cliente = AppState.Clientes.FirstOrDefault(c => c.Id == id);
+        var cliente = clientes.FirstOrDefault(c => c.Id == id);
         if (cliente == null) return;
 
         EditId = cliente.Id;
@@ -226,7 +287,7 @@
         IsModalOpen = true;
     }
 
-    private void GuardarCliente()
+    private async Task GuardarCliente()
     {
         if (string.IsNullOrWhiteSpace(FormNombre) || string.IsNullOrWhiteSpace(FormCorreo) || string.IsNullOrWhiteSpace(FormTelefono) || string.IsNullOrWhiteSpace(FormRnc) || string.IsNullOrWhiteSpace(FormDireccion))
         {
@@ -234,37 +295,50 @@
             return;
         }
 
-        if (EditId.HasValue)
+        var existingCliente = EditId.HasValue ? clientes.FirstOrDefault(x => x.Id == EditId.Value) : null;
+        var cliente = new ElectroGestion.Models.Cliente
         {
-            var cliente = AppState.Clientes.FirstOrDefault(c => c.Id == EditId.Value);
-            if (cliente != null)
-            {
-                cliente.Nombre = FormNombre;
-                cliente.Rnc = FormRnc;
-                cliente.Correo = FormCorreo;
-                cliente.Telefono = FormTelefono;
-                cliente.Telefono2 = FormTelefono2;
-                cliente.Direccion = FormDireccion;
-            }
-        }
-        else
+            Id = EditId ?? 0,
+            Nombre = FormNombre,
+            Rnc = FormRnc,
+            Correo = FormCorreo,
+            Direccion = FormDireccion,
+            Servicios = existingCliente?.Servicios ?? 0,
+            Ultimo = existingCliente?.Ultimo ?? ""
+        };
+
+        if (!string.IsNullOrWhiteSpace(FormTelefono))
         {
-            var newId = AppState.Clientes.Any() ? AppState.Clientes.Max(c => c.Id) + 1 : 1;
-            AppState.Clientes.Add(new ElectroGestion.Models.Cliente
+            cliente.Telefonos.Add(new ElectroGestion.Models.ClienteTelefono
             {
-                Id = newId,
-                Nombre = FormNombre,
-                Rnc = FormRnc,
-                Correo = FormCorreo,
-                Telefono = FormTelefono,
-                Telefono2 = FormTelefono2,
-                Direccion = FormDireccion,
-                Servicios = 0
+                ClienteId = cliente.Id,
+                Numero = FormTelefono,
+                Tipo = "Principal"
             });
         }
 
+        if (!string.IsNullOrWhiteSpace(FormTelefono2))
+        {
+            cliente.Telefonos.Add(new ElectroGestion.Models.ClienteTelefono
+            {
+                ClienteId = cliente.Id,
+                Numero = FormTelefono2,
+                Tipo = "Alternativo"
+            });
+        }
+
+        var resultado = await ClienteService.Guardar(cliente);
+        if (resultado)
+        {
+            ToastService.ShowSuccess(EditId.HasValue ? "Cliente actualizado exitosamente." : "Cliente registrado exitosamente.");
+            await CargarClientes();
+        }
+        else
+        {
+            ToastService.ShowError("Error al guardar el cliente.");
+        }
+
         CerrarFormulario();
-        ToastService.ShowSuccess(EditId.HasValue ? "Cliente actualizado exitosamente." : "Cliente registrado exitosamente.");
     }
 
     private void CerrarFormulario()
@@ -274,7 +348,7 @@
 
     private void VerDetalle(int id)
     {
-        SelectedCliente = AppState.Clientes.FirstOrDefault(c => c.Id == id);
+        SelectedCliente = clientes.FirstOrDefault(c => c.Id == id);
     }
 
     private void CerrarDetalle()

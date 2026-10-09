@@ -62,8 +62,8 @@
     @foreach (var o in FilteredOrdenes)
     {
         var s = AppState.Solicitudes.FirstOrDefault(x => x.Id == o.SolicitudId);
-        var cliente = string.IsNullOrEmpty(o.Cliente) ? (s?.Cliente ?? "Cliente") : o.Cliente;
-        var tipoServicio = string.IsNullOrEmpty(o.TipoServicio) ? (s?.TipoServicio ?? "Servicio Eléctrico") : o.TipoServicio;
+        var cliente = s?.Cliente?.Nombre ?? "Cliente";
+        var tipoServicio = s?.Servicio?.Nombre ?? "Servicio Eléctrico";
         var colors = ElectroGestion.Services.AppStateService.GetBadgeColors(o.Estado);
 
         <div style="background:#fff;border:1px solid #E3E5EE;border-radius:14px;padding:22px;display:flex;flex-direction:column">
@@ -121,18 +121,41 @@
 
             <div style="margin-top:auto;padding-top:20px;display:flex;gap:10px">
                 <button @onclick="() => EditarOrden(o.Id)"
-                    style="width:50%;padding:12px;border:1px solid #E3E5EE;background:#fff;color:#4A4E63;border-radius:9px;font-weight:700;font-size:14px;cursor:pointer;font-family:'Manrope';transition:all 0.2s;display:flex;align-items:center;justify-content:center;gap:8px">
+                    style="width:33%;padding:12px;border:1px solid #E3E5EE;background:#fff;color:#4A4E63;border-radius:9px;font-weight:700;font-size:14px;cursor:pointer;font-family:'Manrope';transition:all 0.2s;display:flex;align-items:center;justify-content:center;gap:8px">
                     <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 1 1 3 3L7 19l-4 1 1-4 12.5-12.5Z"/></svg>
                     Editar
                 </button>
+                <button @onclick="() => ConfirmarEliminar(o.Id)"
+                    style="width:33%;padding:12px;border:1px solid #F5C2C4;background:#fff;color:#C4141B;border-radius:9px;font-weight:700;font-size:14px;cursor:pointer;font-family:'Manrope';transition:all 0.2s;display:flex;align-items:center;justify-content:center;gap:8px">
+                    <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2M10 11v6M14 11v6"/></svg>
+                    Eliminar
+                </button>
                 <button @onclick="() => ToggleEstado(o.Id)"
-                    style="width:50%;padding:12px;border:1px solid #1D4ED8;background:#1D4ED8;color:#fff;border-radius:9px;font-weight:700;font-size:14px;cursor:pointer;font-family:'Manrope';transition:all 0.2s">
+                    style="width:34%;padding:12px;border:1px solid #1D4ED8;background:#1D4ED8;color:#fff;border-radius:9px;font-weight:700;font-size:14px;cursor:pointer;font-family:'Manrope';transition:all 0.2s">
                     Cambiar Estado
                 </button>
             </div>
         </div>
     }
 </div>
+
+@if (IsDeleteModalOpen)
+{
+    <div style="position:fixed;inset:0;background:rgba(14,16,40,0.5);display:flex;align-items:center;justify-content:center;z-index:9999;padding:20px">
+        <div style="background:#fff;border-radius:16px;width:100%;max-width:400px;padding:32px;box-shadow:0 20px 40px rgba(0,0,0,0.2);animation:tin 0.2s ease-out">
+            <div style="font-family:'Manrope';font-weight:800;font-size:22px;color:#14162B;margin-bottom:10px">Eliminar Orden</div>
+            <div style="color:#4A4E63;font-size:14px;margin-bottom:24px">¿Está seguro que desea eliminar esta orden de trabajo? Esta acción no se puede deshacer.</div>
+            <div style="display:flex;justify-content:flex-end;gap:12px">
+                <button @onclick="CerrarEliminar" style="padding:10px 20px;border:1px solid #D5D8E6;background:#fff;border-radius:8px;font-weight:700;font-size:14px;cursor:pointer;color:#4A4E63">
+                    Cancelar
+                </button>
+                <button @onclick="EjecutarEliminar" style="padding:10px 24px;border:0;background:#C0392B;color:#fff;border-radius:8px;font-weight:700;font-size:14px;cursor:pointer;font-family:'Manrope'">
+                    Eliminar
+                </button>
+            </div>
+        </div>
+    </div>
+}
 
 @if (!FilteredOrdenes.Any())
 {
@@ -208,6 +231,44 @@
     private string SearchEstado = "Todas";
 
     private bool IsModalOpen = false;
+    private bool IsDeleteModalOpen = false;
+    private int? DeleteId;
+
+    private void ConfirmarEliminar(int id)
+    {
+        DeleteId = id;
+        IsDeleteModalOpen = true;
+    }
+
+    private void EjecutarEliminar()
+    {
+        if (DeleteId.HasValue)
+        {
+            var o = AppState.Ordenes.FirstOrDefault(x => x.Id == DeleteId.Value);
+            if (o != null)
+            {
+                AppState.Ordenes.Remove(o);
+                ToastService.Notify(new ToastMessage(ToastType.Success, "Orden de trabajo eliminada exitosamente."));
+                
+                // Actualizar estado de solicitud si aplica
+                var s = AppState.Solicitudes.FirstOrDefault(x => x.Id == o.SolicitudId);
+                if (s != null)
+                {
+                    s.EstadoSolicitudId = 1; // Pendiente
+                    s.EstadoSolicitud = AppState.EstadosSolicitud.FirstOrDefault(e => e.Id == 1);
+                }
+                AppState.NotifyStateChanged();
+            }
+        }
+        IsDeleteModalOpen = false;
+        DeleteId = null;
+    }
+
+    private void CerrarEliminar()
+    {
+        IsDeleteModalOpen = false;
+        DeleteId = null;
+    }
 
     private int _formCotizacionId;
     private int FormCotizacionId
@@ -235,12 +296,12 @@
     private List<ElectroGestion.Models.OrdenTrabajo> FilteredOrdenes => AppState.Ordenes
         .Where(o => {
             var s = AppState.Solicitudes.FirstOrDefault(x => x.Id == o.SolicitudId);
-            var cliente = string.IsNullOrEmpty(o.Cliente) ? (s?.Cliente ?? "") : o.Cliente;
-            var tipo = string.IsNullOrEmpty(o.TipoServicio) ? (s?.TipoServicio ?? "") : o.TipoServicio;
+            var cliente = string.IsNullOrEmpty(o.Cliente) ? (s?.Cliente?.Nombre ?? "") : o.Cliente;
+            var tipo = string.IsNullOrEmpty(o.TipoServicio) ? (s?.Servicio?.Nombre ?? "") : o.TipoServicio;
             bool matchId = string.IsNullOrEmpty(SearchId) || o.Id.ToString().Contains(SearchId) || (!string.IsNullOrEmpty(o.Code) && o.Code.Contains(SearchId, StringComparison.OrdinalIgnoreCase));
             bool matchCliente = string.IsNullOrEmpty(SearchCliente) || cliente.Contains(SearchCliente, StringComparison.OrdinalIgnoreCase);
             bool matchTipo = string.IsNullOrEmpty(SearchTipo) || tipo.Contains(SearchTipo, StringComparison.OrdinalIgnoreCase);
-            bool matchFecha = !SearchFecha.HasValue || (s != null && s.Fecha == SearchFecha.Value.ToString("yyyy-MM-dd"));
+            bool matchFecha = !SearchFecha.HasValue || (s != null && s.Fecha.Date == SearchFecha.Value.Date);
             bool matchEstado = SearchEstado == "Todas" || o.Estado == SearchEstado;
             return matchId && matchCliente && matchTipo && matchFecha && matchEstado;
         })
@@ -272,7 +333,7 @@
             var s = AppState.Solicitudes.FirstOrDefault(x => x.Id == o.SolicitudId);
             if (s != null && o.Estado == "Finalizada")
             {
-                s.Estado = "Finalizada";
+                // Estado actualizado
             }
             
             ToastService.Notify(new ToastMessage(ToastType.Success, $"Estado de orden #{o.Code ?? o.Id.ToString()} actualizado a '{o.Estado}'."));

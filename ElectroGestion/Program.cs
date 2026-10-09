@@ -16,10 +16,24 @@ builder.Services.AddDbContextFactory<Contexto>(options =>
 
 builder.Services.AddScoped<ModelosService>();
 builder.Services.AddScoped<AppStateService>();
+builder.Services.AddScoped<ClienteService>();
+builder.Services.AddScoped<ServicioService>();
+builder.Services.AddScoped<SolicitudService>();
 
 builder.Services.AddBlazorBootstrap();
 
 var app = builder.Build();
+
+if (args.Contains("--test-crud"))
+{
+    using var scope = app.Services.CreateScope();
+    var cliService = scope.ServiceProvider.GetRequiredService<ClienteService>();
+    var srvService = scope.ServiceProvider.GetRequiredService<ServicioService>();
+    var solService = scope.ServiceProvider.GetRequiredService<SolicitudService>();
+    var exito = await CrudTester.RunAsync(cliService, srvService, solService);
+    Environment.Exit(exito ? 0 : 1);
+    return;
+}
 
 // Configure the HTTP request pipeline.
 if (!app.Environment.IsDevelopment())

@@ -1,6 +1,7 @@
 @page "/agenda"
 @implements IDisposable
 @inject ElectroGestion.Services.AppStateService AppState
+@inject ElectroGestion.Services.SolicitudService SolicitudService
 @inject NavigationManager NavManager
 
 <PageTitle>Agenda | ElectroGestion</PageTitle>
@@ -340,11 +341,12 @@
     private List<DiaMes> Mes = new();
     private List<Evento> DiariaEventos = new();
     private Evento? Detalle;
+    private List<ElectroGestion.Models.Solicitud> solicitudes = new();
 
-    protected override void OnInitialized()
+    protected override async Task OnInitializedAsync()
     {
         AppState.OnChange += OnStateChanged;
-        UpdateData();
+        await UpdateData();
         
         if (VistaActual == "Hoy")
         {
@@ -359,23 +361,25 @@
 
     private async void OnStateChanged()
     {
+        await UpdateData();
         await InvokeAsync(StateHasChanged);
     }
 
-    private void OnVistaActualChanged(ChangeEventArgs e)
+    private async Task OnVistaActualChanged(ChangeEventArgs e)
     {
         VistaActual = e.Value?.ToString() ?? "Semanal";
-        UpdateData();
+        await UpdateData();
     }
 
-    private void UpdateData()
+    private async Task UpdateData()
     {
+        solicitudes = await SolicitudService.GetList(s => true);
         var hoyD = DateTime.Today;
         var hoyStr = hoyD.ToString("yyyy-MM-dd");
 
         var MES = new[] { "enero", "febrero", "marzo", "abril", "mayo", "junio", "julio", "agosto", "septiembre", "octubre", "noviembre", "diciembre" };
 
-        var visibles = AppState.Solicitudes.Where(x => !string.IsNullOrEmpty(x.Fecha) && !string.IsNullOrEmpty(x.Hora)).ToList();
+        var visibles = solicitudes.Where(x => x.Fecha != DateTime.MinValue && !string.IsNullOrEmpty(x.Hora)).ToList();
 
         var lunes = hoyD.AddDays(-((int)hoyD.DayOfWeek == 0 ? 6 : (int)hoyD.DayOfWeek - 1));
         var finSem = lunes.AddDays(6);
@@ -400,13 +404,14 @@
             var f = d.ToString("yyyy-MM-dd");
             var esHoy = f == hoyStr;
 
-            var evs = visibles.Where(x => x.Fecha == f).OrderBy(x => x.Hora).Select(x => {
+            var evs = visibles.Where(x => x.Fecha.ToString("yyyy-MM-dd") == f).OrderBy(x => x.Hora).Select(x => {
                 var hm = x.Hora.Split(':');
                 var hh = int.Parse(hm[0]);
                 var mm = int.Parse(hm[1]);
-                var cancel = x.Estado == "Cancelada";
-                var fin = x.Estado == "Finalizada";
-                var colors = AppStateService.GetBadgeColors(x.Estado);
+                var estadoNombre = x.EstadoSolicitud?.Nombre ?? "";
+                var cancel = estadoNombre == "Cancelada";
+                var fin = estadoNombre == "Finalizada";
+                var colors = AppStateService.GetBadgeColors(estadoNombre);
                 return new Evento {
                     Id = x.Id,
                     Top = Math.Max(0, (int)((hh - 8) * 45 + (mm / 60.0) * 45 + 1)),
@@ -414,12 +419,12 @@
                     Bg = cancel ? "#FDE9EA" : (fin ? "#E4F6EA" : "#EAF3EC"),
                     Line = cancel ? "#E11B22" : (fin ? "#17803D" : "#4E9A63"),
                     Hora = AppStateService.FormatHora12(x.Hora),
-                    Cliente = x.Cliente,
-                    TipoServicio = x.TipoServicio,
+                    Cliente = x.Cliente?.Nombre ?? "",
+                    TipoServicio = x.Servicio?.Nombre ?? "",
                     Direccion = x.Direccion,
-                    Estado = x.Estado,
+                    Estado = estadoNombre,
                     Fg = colors.Fg,
-                    Fecha = AppStateService.FormatFechaLarga(x.Fecha),
+                    Fecha = AppStateService.FormatFechaLarga(x.Fecha.ToString("yyyy-MM-dd")),
                     Rango = AppStateService.FormatHora12(x.Hora) + " - " + AppStateService.FormatHora12(AppStateService.AddMinutes(x.Hora, 150))
                 };
             }).ToList();
@@ -445,24 +450,25 @@
             var esHoy = f == hoyStr;
             var otro = d.Month != hoyD.Month;
 
-            var evs = visibles.Where(x => x.Fecha == f).OrderBy(x => x.Hora).Select(x => {
-                var cancel = x.Estado == "Cancelada";
-                var fin = x.Estado == "Finalizada";
-                var colors = AppStateService.GetBadgeColors(x.Estado);
+            var evs = visibles.Where(x => x.Fecha.ToString("yyyy-MM-dd") == f).OrderBy(x => x.Hora).Select(x => {
+                var estadoNombre = x.EstadoSolicitud?.Nombre ?? "";
+                var cancel = estadoNombre == "Cancelada";
+                var fin = estadoNombre == "Finalizada";
+                var colors = AppStateService.GetBadgeColors(estadoNombre);
                 var horaFmt = AppStateService.FormatHora12(x.Hora);
                 return new Evento {
                     Id = x.Id,
                     Bg = cancel ? "#FDE9EA" : (fin ? "#E4F6EA" : "#EAF3EC"),
                     Line = cancel ? "#E11B22" : (fin ? "#17803D" : "#4E9A63"),
                     Hora = horaFmt,
-                    Cliente = x.Cliente,
-                    TipoServicio = x.TipoServicio,
+                    Cliente = x.Cliente?.Nombre ?? "",
+                    TipoServicio = x.Servicio?.Nombre ?? "",
                     Direccion = x.Direccion,
-                    Estado = x.Estado,
+                    Estado = estadoNombre,
                     Fg = colors.Fg,
-                    Fecha = AppStateService.FormatFechaLarga(x.Fecha),
+                    Fecha = AppStateService.FormatFechaLarga(x.Fecha.ToString("yyyy-MM-dd")),
                     Rango = horaFmt + " - " + AppStateService.FormatHora12(AppStateService.AddMinutes(x.Hora, 150)),
-                    Corto = (horaFmt.Length > 5 ? horaFmt.Substring(0, 5) : horaFmt) + " " + x.Cliente
+                    Corto = (horaFmt.Length > 5 ? horaFmt.Substring(0, 5) : horaFmt) + " " + (x.Cliente?.Nombre ?? "")
                 };
             }).ToList();
 
@@ -475,13 +481,14 @@
             });
         }
 
-        DiariaEventos = visibles.Where(x => x.Fecha == hoyStr).Select(x => {
+        DiariaEventos = visibles.Where(x => x.Fecha.ToString("yyyy-MM-dd") == hoyStr).Select(x => {
             var hm = x.Hora.Split(':');
             var hh = int.Parse(hm[0]);
             var mm = int.Parse(hm[1]);
-            var cancel = x.Estado == "Cancelada";
-            var fin = x.Estado == "Finalizada";
-            var colors = AppStateService.GetBadgeColors(x.Estado);
+            var estadoNombre = x.EstadoSolicitud?.Nombre ?? "";
+            var cancel = estadoNombre == "Cancelada";
+            var fin = estadoNombre == "Finalizada";
+            var colors = AppStateService.GetBadgeColors(estadoNombre);
             return new Evento {
                 Id = x.Id,
                 Top = Math.Max(0, (int)((hh - 8) * 64 + (mm / 60.0) * 64 + 2)),
@@ -489,12 +496,12 @@
                 Bg = cancel ? "#FDE9EA" : (fin ? "#E4F6EA" : "#EAF3EC"),
                 Line = cancel ? "#E11B22" : (fin ? "#17803D" : "#4E9A63"),
                 Hora = AppStateService.FormatHora12(x.Hora),
-                Cliente = x.Cliente,
-                TipoServicio = x.TipoServicio,
+                Cliente = x.Cliente?.Nombre ?? "",
+                TipoServicio = x.Servicio?.Nombre ?? "",
                 Direccion = x.Direccion,
-                Estado = x.Estado,
+                Estado = x.EstadoSolicitud?.Nombre ?? "",
                 Fg = colors.Fg,
-                Fecha = AppStateService.FormatFechaLarga(x.Fecha),
+                Fecha = AppStateService.FormatFecha(x.Fecha.ToString("yyyy-MM-dd")),
                 Rango = AppStateService.FormatHora12(x.Hora) + " - " + AppStateService.FormatHora12(AppStateService.AddMinutes(x.Hora, 150))
             };
         }).ToList();

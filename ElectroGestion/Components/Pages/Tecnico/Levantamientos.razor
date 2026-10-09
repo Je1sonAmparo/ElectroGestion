@@ -1,6 +1,9 @@
 @page "/levantamientos"
 @implements IDisposable
 @inject ElectroGestion.Services.AppStateService AppState
+@inject ElectroGestion.Services.SolicitudService SolicitudService
+@inject ElectroGestion.Services.ClienteService ClienteService
+@inject ElectroGestion.Services.ServicioService ServicioService
 @inject NavigationManager NavManager
 
 <PageTitle>Levantamientos | ElectroGestion</PageTitle>
@@ -69,10 +72,10 @@
                 @foreach (var l in FilteredLevantamientos)
                 {
                     var colors = AppStateService.GetBadgeColors(l.Estado);
-                    var s = AppState.Solicitudes.FirstOrDefault(x => x.Id == l.SolicitudId);
-                    var cliente = s?.Cliente ?? "Desconocido";
-                    var tipoServicio = s?.TipoServicio ?? "Desconocido";
-                    var fecha = string.IsNullOrEmpty(s?.Fecha) ? "Sin programar" : $"{AppStateService.FormatFecha(s.Fecha)} {AppStateService.FormatHora12(s.Hora)}";
+                    var s = solicitudes.FirstOrDefault(x => x.Id == l.SolicitudId);
+                    var clienteNombre = s?.Cliente?.Nombre ?? "Desconocido";
+                    var servicioNombre = s?.Servicio?.Nombre ?? "Desconocido";
+                    var fecha = s == null ? "Sin programar" : $"{AppStateService.FormatFecha(s.Fecha.ToString("yyyy-MM-dd"))} {AppStateService.FormatHora12(s.Hora)}";
 
                     <div style="background:#fff;border:1px solid #D9DCE9;border-radius:12px;padding:16px;display:flex;flex-direction:column;gap:2px">
                         <div style="display:flex;justify-content:flex-end">
@@ -81,9 +84,9 @@
                             </span>
                         </div>
                         <div style="font-size:12px;color:#8B90A3;font-weight:700">Cliente</div>
-                        <div style="font-family:'Manrope';font-weight:800;font-size:16.5px">@cliente</div>
+                        <div style="font-family:'Manrope';font-weight:800;font-size:16.5px">@clienteNombre</div>
                         <div style="font-size:12px;color:#8B90A3;font-weight:700;margin-top:8px">Tipo de servicio</div>
-                        <div style="font-size:14.5px">@tipoServicio</div>
+                        <div style="font-size:14.5px">@servicioNombre</div>
                         <div style="font-size:12px;color:#8B90A3;font-weight:700;margin-top:8px">Fecha programada</div>
                         <div style="font-size:14.5px">@fecha</div>
 
@@ -130,7 +133,7 @@ else
                 <label style="display:block;font-size:13px;font-weight:700;color:#4A4E63;margin-bottom:7px">Cliente *</label>
                 <select disabled="@DesdeSolicitud" @bind="FormCliente" style="width:100%;padding:12px 13px;border:1px solid #D5D8E6;border-radius:9px;font-size:14.5px;background:@(DesdeSolicitud ? "#F7F8FC" : "#fff")">
                     <option value="">Seleccionar cliente...</option>
-                    @foreach (var c in AppState.Clientes)
+                    @foreach (var c in clientes)
                     {
                         <option value="@c.Nombre">@c.Nombre</option>
                     }
@@ -225,23 +228,35 @@ else
         StateHasChanged();
     }
 
+    private List<ElectroGestion.Models.Solicitud> solicitudes = new();
+    private List<ElectroGestion.Models.Cliente> clientes = new();
+    private List<ElectroGestion.Models.Servicio> servicios = new();
+    private List<string> TiposServicio = new();
+
     private List<ElectroGestion.Models.Levantamiento> FilteredLevantamientos => AppState.Levantamientos
         .Where(l => {
-            var s = AppState.Solicitudes.FirstOrDefault(x => x.Id == l.SolicitudId);
+            var s = solicitudes.FirstOrDefault(x => x.Id == l.SolicitudId);
             bool matchId = string.IsNullOrEmpty(SearchId) || l.Id.ToString().Contains(SearchId);
-            bool matchCliente = string.IsNullOrEmpty(SearchCliente) || (s != null && s.Cliente.Contains(SearchCliente, StringComparison.OrdinalIgnoreCase));
-            bool matchTipo = string.IsNullOrEmpty(SearchTipo) || (s != null && s.TipoServicio == SearchTipo);
-            bool matchFecha = !SearchFecha.HasValue || (s != null && s.Fecha == SearchFecha.Value.ToString("yyyy-MM-dd"));
+            bool matchCliente = string.IsNullOrEmpty(SearchCliente) || (s != null && s.Cliente?.Nombre != null && s.Cliente.Nombre.Contains(SearchCliente, StringComparison.OrdinalIgnoreCase));
+            bool matchTipo = string.IsNullOrEmpty(SearchTipo) || (s != null && s.Servicio?.Nombre == SearchTipo);
+            bool matchFecha = !SearchFecha.HasValue || (s != null && s.Fecha.Date == SearchFecha.Value.Date);
             bool matchEstado = SearchEstado == "Todos" || l.Estado == SearchEstado;
             return matchId && matchCliente && matchTipo && matchFecha && matchEstado;
         })
         .OrderByDescending(x => x.Id).ToList();
 
-    private IEnumerable<string> TiposServicio => AppState.Servicios.Select(x => x.Nombre);
-
-    protected override void OnInitialized()
+    protected override async Task OnInitializedAsync()
     {
         AppState.OnChange += OnStateChanged;
+        await CargarDatos();
+    }
+
+    private async Task CargarDatos()
+    {
+        solicitudes = await SolicitudService.GetList(s => true);
+        clientes = await ClienteService.GetList(c => true);
+        servicios = await ServicioService.GetList(s => true);
+        TiposServicio = servicios.Select(x => x.Nombre).Distinct().ToList();
     }
 
     public void Dispose()
@@ -251,6 +266,7 @@ else
 
     private async void OnStateChanged()
     {
+        await CargarDatos();
         await InvokeAsync(StateHasChanged);
     }
 
@@ -264,15 +280,15 @@ else
         var lev = AppState.Levantamientos.FirstOrDefault(l => l.Id == id);
         if (lev != null)
         {
-            var s = AppState.Solicitudes.FirstOrDefault(x => x.Id == lev.SolicitudId);
+            var s = solicitudes.FirstOrDefault(x => x.Id == lev.SolicitudId);
             IsNuevoLev = true;
             CurrentLevId = id;
             if (s != null)
             {
                 DesdeSolicitud = true;
-                OrigenTexto = $"Levantamiento de: {s.Cliente} - {s.TipoServicio}";
-                FormCliente = s.Cliente;
-                FormTipo = s.TipoServicio;
+                OrigenTexto = $"Levantamiento de: {s.Cliente?.Nombre} - {s.Servicio?.Nombre}";
+                FormCliente = s.Cliente?.Nombre ?? "";
+                FormTipo = s.Servicio?.Nombre ?? "";
             }
             else
             {
