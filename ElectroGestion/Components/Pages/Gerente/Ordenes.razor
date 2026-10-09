@@ -15,20 +15,7 @@
     </button>
 </div>
 
-<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-bottom:20px" class="resp-grid-3">
-    <div style="background:#fff;border:1px solid #E3E5EE;border-radius:12px;padding:16px 20px">
-        <div style="font-size:12.5px;color:#6B7085;font-weight:700">Total Órdenes Emitidas</div>
-        <div style="font-family:'Manrope';font-weight:800;font-size:30px;color:#1D4ED8;margin-top:4px">@AppState.Ordenes.Count</div>
-    </div>
-    <div style="background:#fff;border:1px solid #E3E5EE;border-radius:12px;padding:16px 20px">
-        <div style="font-size:12.5px;color:#6B7085;font-weight:700">Órdenes en Ejecución</div>
-        <div style="font-family:'Manrope';font-weight:800;font-size:30px;color:#F59E0B;margin-top:4px">@AppState.Ordenes.Count(o => o.Estado == "En proceso")</div>
-    </div>
-    <div style="background:#fff;border:1px solid #E3E5EE;border-radius:12px;padding:16px 20px">
-        <div style="font-size:12.5px;color:#6B7085;font-weight:700">Órdenes Finalizadas</div>
-        <div style="font-family:'Manrope';font-weight:800;font-size:30px;color:#10B981;margin-top:4px">@AppState.Ordenes.Count(o => o.Estado == "Finalizada")</div>
-    </div>
-</div>
+
 
 <div style="background:#fff;border:1px solid #E3E5EE;border-radius:14px;overflow:hidden;margin-bottom:16px">
     <div style="display:flex;flex-direction:column;gap:18px;padding:18px 18px 12px;border-bottom:1px solid #EFF0F6">
@@ -161,9 +148,7 @@
             </div>
             
             <div style="padding:24px;overflow-y:auto;display:flex;flex-direction:column;gap:16px">
-                <div style="background:#EFF6FF;padding:14px;border-radius:8px;border:1px solid #BFDBFE;color:#1E3A8A;font-size:14px;margin-bottom:8px">
-                    Las órdenes de trabajo se crean a partir de una cotización aprobada.
-                </div>
+
                 
                 <div>
                     <label style="display:block;font-family:'Manrope';font-weight:700;font-size:14px;color:#4A4E63;margin-bottom:6px">Seleccionar Cotización Aprobada</label>
