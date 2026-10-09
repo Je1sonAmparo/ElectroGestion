@@ -168,13 +168,3 @@ dotnet watch
 ```
 
 La aplicación iniciará en `https://localhost:7198` (o el puerto configurado en `Properties/launchSettings.json`).
-
----
-
-## Verificación Automatizada del CRUD
-
-El proyecto incluye un módulo de pruebas directas contra la base de datos configurada para validar las operaciones de inserción, lectura, actualización y restricciones de borrado de Clientes, Servicios y Solicitudes:
-
-```bash
-dotnet run --environment Development -- --test-crud
-```
