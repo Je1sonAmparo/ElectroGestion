@@ -1,6 +1,22 @@
 # ElectroGestion
 
+[![Despliegue Principal](https://img.shields.io/badge/Demo%20en%20Vivo-electrogestion.runasp.net-0078D4?style=for-the-badge&logo=dotnet&logoColor=white)](https://electrogestion.runasp.net/)
+[![.NET](https://img.shields.io/badge/.NET-10.0-512BD4?style=for-the-badge&logo=dotnet&logoColor=white)](https://dotnet.microsoft.com/)
+[![Database](https://img.shields.io/badge/Database-SQL%20Server-CC292B?style=for-the-badge&logo=microsoftsqlserver&logoColor=white)](https://www.microsoft.com/sql-server)
+
+> 🚀 **Enlace Principal de Despliegue (Producción):** [https://electrogestion.runasp.net/](https://electrogestion.runasp.net/)
+
 Sistema de gestión operativa y comercial para empresas de ingeniería eléctrica, contratistas e instalaciones de energía. Permite administrar el ciclo completo de atención: registro de clientes, catálogo de servicios, gestión de solicitudes técnicas y asignación de trabajos en campo.
+
+---
+
+## 🌐 Despliegue en Producción
+
+El sistema se encuentra desplegado y plenamente operativo en la nube a través de MonsterASP.net:
+
+- **Enlace de Producción:** [https://electrogestion.runasp.net/](https://electrogestion.runasp.net/)
+- **Plataforma:** ASP.NET Core Blazor (.NET 10) Server Components
+- **Base de Datos:** Microsoft SQL Server
 
 ---
 
