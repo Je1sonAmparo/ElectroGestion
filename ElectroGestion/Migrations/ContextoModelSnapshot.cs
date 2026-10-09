@@ -406,6 +406,112 @@ namespace ElectroGestion.Migrations
                     b.HasIndex("ServicioId");
 
                     b.ToTable("Solicitudes");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 1,
+                            ClienteId = 1,
+                            Contacto = "Melody Santos",
+                            Direccion = "Calle Duarte #24, Santiago",
+                            EstadoSolicitudId = 1,
+                            Fecha = new DateTime(2026, 10, 12, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            FechaSolicitud = new DateTime(2026, 10, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            Hora = "09:00",
+                            ServicioId = 2,
+                            TecnicoAsignado = ""
+                        },
+                        new
+                        {
+                            Id = 2,
+                            ClienteId = 2,
+                            Contacto = "Constructora López",
+                            Direccion = "Av. Estrella Sadhalá #102, Santiago",
+                            EstadoSolicitudId = 2,
+                            Fecha = new DateTime(2026, 10, 10, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            FechaSolicitud = new DateTime(2026, 10, 2, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            Hora = "10:30",
+                            ServicioId = 1,
+                            TecnicoAsignado = ""
+                        },
+                        new
+                        {
+                            Id = 3,
+                            ClienteId = 3,
+                            Contacto = "Farmacia El Sol",
+                            Direccion = "Calle 16 #7, La Vega",
+                            EstadoSolicitudId = 1,
+                            Fecha = new DateTime(2026, 10, 11, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            FechaSolicitud = new DateTime(2026, 10, 3, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            Hora = "14:00",
+                            ServicioId = 3,
+                            TecnicoAsignado = ""
+                        },
+                        new
+                        {
+                            Id = 4,
+                            ClienteId = 4,
+                            Contacto = "Colmado Hernández",
+                            Direccion = "Calle Principal #58, Moca",
+                            EstadoSolicitudId = 3,
+                            Fecha = new DateTime(2026, 10, 5, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            FechaSolicitud = new DateTime(2026, 9, 29, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            Hora = "08:30",
+                            ServicioId = 4,
+                            TecnicoAsignado = ""
+                        },
+                        new
+                        {
+                            Id = 5,
+                            ClienteId = 5,
+                            Contacto = "Taller Mecánico RD",
+                            Direccion = "Carretera Luperón km 5, Santiago",
+                            EstadoSolicitudId = 2,
+                            Fecha = new DateTime(2026, 10, 9, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            FechaSolicitud = new DateTime(2026, 10, 4, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            Hora = "11:00",
+                            ServicioId = 5,
+                            TecnicoAsignado = ""
+                        },
+                        new
+                        {
+                            Id = 6,
+                            ClienteId = 1,
+                            Contacto = "Melody Santos",
+                            Direccion = "Calle Duarte #24, Santiago",
+                            EstadoSolicitudId = 3,
+                            Fecha = new DateTime(2026, 9, 28, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            FechaSolicitud = new DateTime(2026, 9, 20, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            Hora = "15:00",
+                            ServicioId = 3,
+                            TecnicoAsignado = ""
+                        },
+                        new
+                        {
+                            Id = 7,
+                            ClienteId = 2,
+                            Contacto = "Constructora López",
+                            Direccion = "Av. Estrella Sadhalá #102, Santiago",
+                            EstadoSolicitudId = 4,
+                            Fecha = new DateTime(2026, 10, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            FechaSolicitud = new DateTime(2026, 9, 25, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            Hora = "09:30",
+                            ServicioId = 4,
+                            TecnicoAsignado = ""
+                        },
+                        new
+                        {
+                            Id = 8,
+                            ClienteId = 3,
+                            Contacto = "Farmacia El Sol",
+                            Direccion = "Calle 16 #7, La Vega",
+                            EstadoSolicitudId = 1,
+                            Fecha = new DateTime(2026, 10, 14, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            FechaSolicitud = new DateTime(2026, 10, 6, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            Hora = "10:00",
+                            ServicioId = 2,
+                            TecnicoAsignado = ""
+                        });
                 });
 
             modelBuilder.Entity("ElectroGestion.Models.ClienteTelefono", b =>

@@ -92,6 +92,105 @@ public class Contexto : DbContext
             new Servicio { Id = 4, ServicioId = "SV-004", Nombre = "Cableado Estructurado", Categoria = "Redes y Cableado", PrecioBase = 28000, Estado = "Activo" },
             new Servicio { Id = 5, ServicioId = "SV-005", Nombre = "Instalación de Planta Eléctrica", Categoria = "Instalaciones", PrecioBase = 120000, Estado = "Activo" }
         );
+
+        modelBuilder.Entity<Solicitud>().HasData(
+            new Solicitud
+            {
+                Id = 1,
+                ClienteId = 1,
+                ServicioId = 2,
+                Contacto = "Melody Santos",
+                Direccion = "Calle Duarte #24, Santiago",
+                FechaSolicitud = new DateTime(2026, 10, 1),
+                Fecha = new DateTime(2026, 10, 12),
+                Hora = "09:00",
+                EstadoSolicitudId = 1
+            },
+            new Solicitud
+            {
+                Id = 2,
+                ClienteId = 2,
+                ServicioId = 1,
+                Contacto = "Constructora López",
+                Direccion = "Av. Estrella Sadhalá #102, Santiago",
+                FechaSolicitud = new DateTime(2026, 10, 2),
+                Fecha = new DateTime(2026, 10, 10),
+                Hora = "10:30",
+                EstadoSolicitudId = 2
+            },
+            new Solicitud
+            {
+                Id = 3,
+                ClienteId = 3,
+                ServicioId = 3,
+                Contacto = "Farmacia El Sol",
+                Direccion = "Calle 16 #7, La Vega",
+                FechaSolicitud = new DateTime(2026, 10, 3),
+                Fecha = new DateTime(2026, 10, 11),
+                Hora = "14:00",
+                EstadoSolicitudId = 1
+            },
+            new Solicitud
+            {
+                Id = 4,
+                ClienteId = 4,
+                ServicioId = 4,
+                Contacto = "Colmado Hernández",
+                Direccion = "Calle Principal #58, Moca",
+                FechaSolicitud = new DateTime(2026, 9, 29),
+                Fecha = new DateTime(2026, 10, 5),
+                Hora = "08:30",
+                EstadoSolicitudId = 3
+            },
+            new Solicitud
+            {
+                Id = 5,
+                ClienteId = 5,
+                ServicioId = 5,
+                Contacto = "Taller Mecánico RD",
+                Direccion = "Carretera Luperón km 5, Santiago",
+                FechaSolicitud = new DateTime(2026, 10, 4),
+                Fecha = new DateTime(2026, 10, 9),
+                Hora = "11:00",
+                EstadoSolicitudId = 2
+            },
+            new Solicitud
+            {
+                Id = 6,
+                ClienteId = 1,
+                ServicioId = 3,
+                Contacto = "Melody Santos",
+                Direccion = "Calle Duarte #24, Santiago",
+                FechaSolicitud = new DateTime(2026, 9, 20),
+                Fecha = new DateTime(2026, 9, 28),
+                Hora = "15:00",
+                EstadoSolicitudId = 3
+            },
+            new Solicitud
+            {
+                Id = 7,
+                ClienteId = 2,
+                ServicioId = 4,
+                Contacto = "Constructora López",
+                Direccion = "Av. Estrella Sadhalá #102, Santiago",
+                FechaSolicitud = new DateTime(2026, 9, 25),
+                Fecha = new DateTime(2026, 10, 1),
+                Hora = "09:30",
+                EstadoSolicitudId = 4
+            },
+            new Solicitud
+            {
+                Id = 8,
+                ClienteId = 3,
+                ServicioId = 2,
+                Contacto = "Farmacia El Sol",
+                Direccion = "Calle 16 #7, La Vega",
+                FechaSolicitud = new DateTime(2026, 10, 6),
+                Fecha = new DateTime(2026, 10, 14),
+                Hora = "10:00",
+                EstadoSolicitudId = 1
+            }
+        );
     }
 }
 

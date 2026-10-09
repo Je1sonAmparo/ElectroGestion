@@ -57,12 +57,42 @@
         <table style="width:100%;border-collapse:collapse;font-size:14px">
             <thead style="background:#F8F9FC;border-bottom:1px solid #E3E5EE">
                 <tr>
-                    <th style="padding:14px 18px;text-align:left;color:#4A4E63;font-weight:700">ID</th>
-                    <th style="padding:14px 18px;text-align:left;color:#4A4E63;font-weight:700">Código</th>
-                    <th style="padding:14px 18px;text-align:left;color:#4A4E63;font-weight:700">Nombre</th>
-                    <th style="padding:14px 18px;text-align:left;color:#4A4E63;font-weight:700">Categoría</th>
-                    <th style="padding:14px 18px;text-align:left;color:#4A4E63;font-weight:700">Precio Base</th>
-                    <th style="padding:14px 18px;text-align:left;color:#4A4E63;font-weight:700">Estado</th>
+                    <th @onclick='() => OrdenarPor("Id")' style="padding:14px 18px;text-align:left;color:#4A4E63;font-weight:700;cursor:pointer;user-select:none" title="Ordenar por ID">
+                        <div style="display:inline-flex;align-items:center;gap:6px">
+                            <span>ID</span>
+                            @if (SortColumn == "Id") { <span style="font-size:11px">@(SortAscending ? "▲" : "▼")</span> }
+                        </div>
+                    </th>
+                    <th @onclick='() => OrdenarPor("Codigo")' style="padding:14px 18px;text-align:left;color:#4A4E63;font-weight:700;cursor:pointer;user-select:none" title="Ordenar por Código">
+                        <div style="display:inline-flex;align-items:center;gap:6px">
+                            <span>Código</span>
+                            @if (SortColumn == "Codigo") { <span style="font-size:11px">@(SortAscending ? "▲" : "▼")</span> }
+                        </div>
+                    </th>
+                    <th @onclick='() => OrdenarPor("Nombre")' style="padding:14px 18px;text-align:left;color:#4A4E63;font-weight:700;cursor:pointer;user-select:none" title="Ordenar por Nombre">
+                        <div style="display:inline-flex;align-items:center;gap:6px">
+                            <span>Nombre</span>
+                            @if (SortColumn == "Nombre") { <span style="font-size:11px">@(SortAscending ? "▲" : "▼")</span> }
+                        </div>
+                    </th>
+                    <th @onclick='() => OrdenarPor("Categoria")' style="padding:14px 18px;text-align:left;color:#4A4E63;font-weight:700;cursor:pointer;user-select:none" title="Ordenar por Categoría">
+                        <div style="display:inline-flex;align-items:center;gap:6px">
+                            <span>Categoría</span>
+                            @if (SortColumn == "Categoria") { <span style="font-size:11px">@(SortAscending ? "▲" : "▼")</span> }
+                        </div>
+                    </th>
+                    <th @onclick='() => OrdenarPor("Precio")' style="padding:14px 18px;text-align:left;color:#4A4E63;font-weight:700;cursor:pointer;user-select:none" title="Ordenar por Precio Base">
+                        <div style="display:inline-flex;align-items:center;gap:6px">
+                            <span>Precio Base</span>
+                            @if (SortColumn == "Precio") { <span style="font-size:11px">@(SortAscending ? "▲" : "▼")</span> }
+                        </div>
+                    </th>
+                    <th @onclick='() => OrdenarPor("Estado")' style="padding:14px 18px;text-align:left;color:#4A4E63;font-weight:700;cursor:pointer;user-select:none" title="Ordenar por Estado">
+                        <div style="display:inline-flex;align-items:center;gap:6px">
+                            <span>Estado</span>
+                            @if (SortColumn == "Estado") { <span style="font-size:11px">@(SortAscending ? "▲" : "▼")</span> }
+                        </div>
+                    </th>
                     <th style="padding:14px 18px;text-align:center;color:#4A4E63;font-weight:700">Acciones</th>
                 </tr>
             </thead>
@@ -96,9 +126,6 @@
                                     </button>
                                     <button @onclick="() => AbrirModal(serv.Id)" title="Editar" aria-label="Editar" class="table-action-icon" style="width:30px;height:30px;border:1px solid #D5D8E6;background:#fff;border-radius:7px;cursor:pointer;color:#5F6479;display:flex;align-items:center;justify-content:center;padding:0">
                                         <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 1 1 3 3L7 19l-4 1 1-4 12.5-12.5Z"/></svg>
-                                    </button>
-                                    <button @onclick="() => ConfirmarEliminar(serv.Id)" title="Eliminar" aria-label="Eliminar" class="table-action-icon" style="width:30px;height:30px;border:1px solid #D5D8E6;background:#fff;border-radius:7px;cursor:pointer;color:#C0392B;display:flex;align-items:center;justify-content:center;padding:0">
-                                        <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 6h18M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2M10 11v6M14 11v6"/></svg>
                                     </button>
                                 </div>
                             </td>
@@ -151,6 +178,13 @@
             </div>
 
             <div style="padding:20px 24px;border-top:1px solid #E3E5EE;display:flex;justify-content:flex-end;gap:12px;background:#F8F9FC;border-radius:0 0 16px 16px">
+                @if (EditId.HasValue)
+                {
+                    <button @onclick="() => ConfirmarEliminar(EditId.Value)" style="padding:10px 18px;border:0;background:#DC2626;color:#fff;border-radius:8px;font-weight:700;font-size:14px;cursor:pointer;font-family:'Manrope';display:flex;align-items:center;gap:6px">
+                        <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 6h18M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2M10 11v6M14 11v6"/></svg>
+                        <span>Eliminar</span>
+                    </button>
+                }
                 <button @onclick="CerrarModal" style="padding:10px 18px;border:1px solid #D5D8E6;background:#fff;color:#4A4E63;border-radius:8px;font-weight:700;font-size:14px;cursor:pointer;font-family:'Manrope'">Cancelar</button>
                 <button @onclick="GuardarServicio" style="padding:10px 22px;border:0;background:#1D4ED8;color:#fff;border-radius:8px;font-weight:700;font-size:14px;cursor:pointer;font-family:'Manrope'">Guardar</button>
             </div>
@@ -212,6 +246,22 @@
     private string SearchCategoria = "";
     private string SearchEstado = "";
 
+    private string SortColumn = "Id";
+    private bool SortAscending = true;
+
+    private void OrdenarPor(string columna)
+    {
+        if (SortColumn == columna)
+        {
+            SortAscending = !SortAscending;
+        }
+        else
+        {
+            SortColumn = columna;
+            SortAscending = true;
+        }
+    }
+
     private void Filtrar()
     {
         StateHasChanged();
@@ -240,16 +290,30 @@
     private decimal FormPrecio = 0;
     private string FormEstado = "Activo";
 
-    private List<ElectroGestion.Models.Servicio> FilteredServicios => servicios
-        .Where(s => {
-            bool matchCod = string.IsNullOrEmpty(SearchCodigo) || s.ServicioId.Contains(SearchCodigo, StringComparison.OrdinalIgnoreCase);
-            bool matchNombre = string.IsNullOrEmpty(SearchNombre) || s.Nombre.Contains(SearchNombre, StringComparison.OrdinalIgnoreCase);
-            bool matchCat = string.IsNullOrEmpty(SearchCategoria) || (!string.IsNullOrEmpty(s.Categoria) && s.Categoria.Contains(SearchCategoria, StringComparison.OrdinalIgnoreCase));
-            bool matchEst = string.IsNullOrEmpty(SearchEstado) || (!string.IsNullOrEmpty(s.Estado) && s.Estado.Equals(SearchEstado, StringComparison.OrdinalIgnoreCase));
-            return matchCod && matchNombre && matchCat && matchEst;
-        })
-        .OrderByDescending(s => s.Id)
-        .ToList();
+    private List<ElectroGestion.Models.Servicio> FilteredServicios
+    {
+        get
+        {
+            var q = servicios.Where(s => {
+                bool matchCod = string.IsNullOrEmpty(SearchCodigo) || s.ServicioId.Contains(SearchCodigo, StringComparison.OrdinalIgnoreCase);
+                bool matchNombre = string.IsNullOrEmpty(SearchNombre) || s.Nombre.Contains(SearchNombre, StringComparison.OrdinalIgnoreCase);
+                bool matchCat = string.IsNullOrEmpty(SearchCategoria) || (!string.IsNullOrEmpty(s.Categoria) && s.Categoria.Contains(SearchCategoria, StringComparison.OrdinalIgnoreCase));
+                bool matchEst = string.IsNullOrEmpty(SearchEstado) || (!string.IsNullOrEmpty(s.Estado) && s.Estado.Equals(SearchEstado, StringComparison.OrdinalIgnoreCase));
+                return matchCod && matchNombre && matchCat && matchEst;
+            });
+
+            return (SortColumn switch
+            {
+                "Id" => SortAscending ? q.OrderBy(s => s.Id) : q.OrderByDescending(s => s.Id),
+                "Codigo" => SortAscending ? q.OrderBy(s => s.ServicioId) : q.OrderByDescending(s => s.ServicioId),
+                "Nombre" => SortAscending ? q.OrderBy(s => s.Nombre) : q.OrderByDescending(s => s.Nombre),
+                "Categoria" => SortAscending ? q.OrderBy(s => s.Categoria) : q.OrderByDescending(s => s.Categoria),
+                "Precio" => SortAscending ? q.OrderBy(s => s.PrecioBase) : q.OrderByDescending(s => s.PrecioBase),
+                "Estado" => SortAscending ? q.OrderBy(s => s.Estado) : q.OrderByDescending(s => s.Estado),
+                _ => SortAscending ? q.OrderBy(s => s.Id) : q.OrderByDescending(s => s.Id)
+            }).ToList();
+        }
+    }
 
     private void AbrirModal(int? id = null)
     {
@@ -301,6 +365,7 @@
             }
         }
         IsDeleteModalOpen = false;
+        IsModalOpen = false;
         DeleteId = null;
     }
 
