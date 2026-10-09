@@ -13,31 +13,31 @@
 
 <div style="background:#fff;border:1px solid #E3E5EE;border-radius:14px;overflow:hidden">
     <div style="padding:18px 18px 12px;border-bottom:1px solid #EFF0F6">
-        <div style="display:flex;align-items:center;gap:20px;flex-wrap:wrap">
+        <div style="display:flex;align-items:center;gap:20px;white-space:nowrap;overflow-x:auto" class="resp-search-block">
             <div style="display:flex;align-items:center;gap:10px">
                 <span style="font-family:'Manrope';font-weight:800;font-size:15px;color:#14162B">ID:</span>
                 <input @bind="SearchId" @bind:event="oninput" placeholder="ID"
-                    style="width:140px;padding:9px 12px;border:1px solid #D5D8E6;border-radius:6px;font-size:14px;color:#4A4E63" />
+                    style="width:120px;padding:9px 12px;border:1px solid #D5D8E6;border-radius:6px;font-size:14px;color:#4A4E63" />
             </div>
             <div style="display:flex;align-items:center;gap:10px">
                 <span style="font-family:'Manrope';font-weight:800;font-size:15px;color:#14162B">Cliente:</span>
-                <input @bind="SearchCliente" @bind:event="oninput" placeholder="Nombre del cliente"
-                    style="width:200px;padding:9px 12px;border:1px solid #D5D8E6;border-radius:6px;font-size:14px;color:#4A4E63" />
+                <input @bind="SearchCliente" @bind:event="oninput" placeholder="Nombre"
+                    style="width:170px;padding:9px 12px;border:1px solid #D5D8E6;border-radius:6px;font-size:14px;color:#4A4E63" />
             </div>
             <div style="display:flex;align-items:center;gap:10px">
                 <span style="font-family:'Manrope';font-weight:800;font-size:15px;color:#14162B">Tipo:</span>
-                <input @bind="SearchTipo" @bind:event="oninput" placeholder="Tipo de servicio"
-                    style="width:190px;padding:9px 12px;border:1px solid #D5D8E6;border-radius:6px;font-size:14px;color:#4A4E63" />
+                <input @bind="SearchTipo" @bind:event="oninput" placeholder="Tipo"
+                    style="width:150px;padding:9px 12px;border:1px solid #D5D8E6;border-radius:6px;font-size:14px;color:#4A4E63" />
             </div>
             <div style="display:flex;align-items:center;gap:10px">
-                <span style="font-family:'Manrope';font-weight:800;font-size:15px;color:#14162B">Fecha Rango:</span>
-                <select @bind="FiltroFecha" style="width:170px;padding:9px 12px;border:1px solid #D5D8E6;border-radius:6px;font-size:14px;background:#fff;color:#4A4E63">
+                <span style="font-family:'Manrope';font-weight:800;font-size:15px;color:#14162B">Fecha:</span>
+                <select @bind="FiltroFecha" style="width:160px;padding:9px 12px;border:1px solid #D5D8E6;border-radius:6px;font-size:14px;background:#fff;color:#4A4E63">
                     <option value="Todas las fechas">Todas las fechas</option>
                     <option value="Últimos 7 días">Últimos 7 días</option>
                     <option value="Últimos 30 días">Últimos 30 días</option>
                 </select>
             </div>
-            <div style="display:flex;justify-content:flex-end;margin-left:auto">
+            <div style="display:flex;justify-content:flex-end;flex:1;min-width:90px">
                 <button class="primary-btn" @onclick="Filtrar"
                     style="padding:9px 16px;background:#1D4ED8;color:#fff;border:0;border-radius:6px;font-weight:700;font-size:14px;cursor:pointer;font-family:'Manrope'">Buscar</button>
             </div>
@@ -70,7 +70,7 @@
                     </span>
                 </div>
                 <div style="display:flex;justify-content:flex-end">
-                    <button title="Ver detalle"
+                    <button title="Ver detalle" @onclick="() => AbrirDetalle(h)"
                             style="width:32px;height:32px;border:1px solid #D5D8E6;background:#fff;border-radius:8px;cursor:pointer;color:#4A4E63;display:flex;align-items:center;justify-content:center">
                         <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2">
                             <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
@@ -89,11 +89,55 @@
     }
 </div>
 
+@if (IsModalOpen && SelectedHistorial != null)
+{
+    <div style="position:fixed;inset:0;background:rgba(14,16,40,.5);display:flex;align-items:center;justify-content:center;z-index:9999;padding:20px" @onclick="CerrarDetalle">
+        <div style="background:#fff;border-radius:16px;width:100%;max-width:620px;padding:32px;box-shadow:0 20px 40px rgba(0,0,0,.2);animation:tin .2s ease-out" @onclick:stopPropagation>
+            <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:20px">
+                <div>
+                    <div style="font-family:'Manrope';font-weight:800;font-size:22px;color:#14162B">Detalle de Historial</div>
+                    <div style="font-size:14px;color:#6B7085;margin-top:3px">Historial @SelectedHistorial.Id.ToString("D4")</div>
+                </div>
+                <button @onclick="CerrarDetalle" aria-label="Cerrar" style="width:32px;height:32px;border:1px solid #E3E5EE;border-radius:8px;background:#fff;display:flex;align-items:center;justify-content:center;color:#8B90A3;cursor:pointer">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M18 6 6 18M6 6l12 12"/></svg>
+                </button>
+            </div>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px" class="resp-grid-2">
+                <div style="background:#F7F8FC;border:1px solid #EFF0F6;border-radius:10px;padding:12px 14px"><div style="font-size:11.5px;color:#8B90A3;font-weight:800;text-transform:uppercase">Cliente</div><div style="font-size:14px;margin-top:4px;font-weight:700;color:#14162B">@SelectedHistorial.Cliente</div></div>
+                <div style="background:#F7F8FC;border:1px solid #EFF0F6;border-radius:10px;padding:12px 14px"><div style="font-size:11.5px;color:#8B90A3;font-weight:800;text-transform:uppercase">Tipo de Servicio</div><div style="font-size:14px;margin-top:4px;font-weight:700;color:#14162B">@SelectedHistorial.TipoServicio</div></div>
+                <div style="background:#F7F8FC;border:1px solid #EFF0F6;border-radius:10px;padding:12px 14px"><div style="font-size:11.5px;color:#8B90A3;font-weight:800;text-transform:uppercase">Fecha Finalización</div><div style="font-size:14px;margin-top:4px;font-weight:700;color:#14162B">@ElectroGestion.Services.AppStateService.FormatFecha(SelectedHistorial.FechaFin ?? SelectedHistorial.Fecha)</div></div>
+                <div style="background:#F7F8FC;border:1px solid #EFF0F6;border-radius:10px;padding:12px 14px"><div style="font-size:11.5px;color:#8B90A3;font-weight:800;text-transform:uppercase">Técnico Asignado</div><div style="font-size:14px;margin-top:4px;font-weight:700;color:#14162B">@SelectedHistorial.TecnicoAsignado</div></div>
+                <div style="grid-column:1 / -1;background:#F7F8FC;border:1px solid #EFF0F6;border-radius:10px;padding:12px 14px"><div style="font-size:11.5px;color:#8B90A3;font-weight:800;text-transform:uppercase">Dirección</div><div style="font-size:14px;margin-top:4px;font-weight:700;color:#14162B">@SelectedHistorial.Direccion</div></div>
+            </div>
+            <div style="margin-top:24px;display:flex;justify-content:flex-end;border-top:1px solid #EFF0F6;padding-top:17px">
+                <button @onclick="CerrarDetalle" style="padding:10px 20px;border:1px solid #D5D8E6;background:#fff;border-radius:8px;font-weight:700;cursor:pointer;color:#14162B">Cerrar</button>
+            </div>
+        </div>
+    </div>
+}
+
 @code {
     private string SearchId = "";
     private string SearchCliente = "";
     private string SearchTipo = "";
     private string FiltroFecha = "Todas las fechas";
+    
+    private bool IsModalOpen = false;
+    private ElectroGestion.Models.Solicitud? SelectedHistorial;
+
+    private void AbrirDetalle(ElectroGestion.Models.Solicitud s)
+    {
+        SelectedHistorial = s;
+        IsModalOpen = true;
+        StateHasChanged();
+    }
+
+    private void CerrarDetalle()
+    {
+        IsModalOpen = false;
+        SelectedHistorial = null;
+        StateHasChanged();
+    }
 
     private void Filtrar()
     {
