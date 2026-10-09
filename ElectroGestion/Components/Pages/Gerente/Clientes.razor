@@ -16,8 +16,8 @@
 </div>
 
 <div style="background:#fff;border:1px solid #E3E5EE;border-radius:12px;overflow:hidden">
-    <div style="padding:18px 18px 12px;border-bottom:1px solid #EFF0F6">
-        <div style="display:flex;align-items:center;gap:20px;flex-wrap:wrap">
+    <div style="display:flex;flex-direction:column;gap:18px;padding:18px 18px 12px;border-bottom:1px solid #EFF0F6">
+        <div style="display:flex;align-items:center;gap:20px;flex-wrap:wrap" class="resp-search-block">
             <div style="display:flex;align-items:center;gap:10px">
                 <span style="font-family:'Manrope';font-weight:800;font-size:15px;color:#14162B">ID:</span>
                 <input @bind="SearchId" @bind:event="oninput" placeholder="ID de cliente"
@@ -34,9 +34,21 @@
                     style="width:190px;padding:9px 12px;border:1px solid #D5D8E6;border-radius:6px;font-size:14px;color:#4A4E63" />
             </div>
             <div style="display:flex;align-items:center;gap:10px">
+                <span style="font-family:'Manrope';font-weight:800;font-size:15px;color:#14162B">Correo:</span>
+                <input @bind="SearchCorreo" @bind:event="oninput" placeholder="Correo electrónico"
+                    style="width:200px;padding:9px 12px;border:1px solid #D5D8E6;border-radius:6px;font-size:14px;color:#4A4E63" />
+            </div>
+        </div>
+        <div style="display:flex;align-items:center;gap:20px;flex-wrap:wrap" class="resp-search-block">
+            <div style="display:flex;align-items:center;gap:10px">
+                <span style="font-family:'Manrope';font-weight:800;font-size:15px;color:#14162B">Teléfono:</span>
+                <input @bind="SearchTelefono" @bind:event="oninput" placeholder="Número de teléfono"
+                    style="width:190px;padding:9px 12px;border:1px solid #D5D8E6;border-radius:6px;font-size:14px;color:#4A4E63" />
+            </div>
+            <div style="display:flex;align-items:center;gap:10px">
                 <span style="font-family:'Manrope';font-weight:800;font-size:15px;color:#14162B">Dirección:</span>
                 <input @bind="SearchDireccion" @bind:event="oninput" placeholder="Dirección del cliente"
-                    style="width:250px;padding:9px 12px;border:1px solid #D5D8E6;border-radius:6px;font-size:14px;color:#4A4E63" />
+                    style="width:300px;padding:9px 12px;border:1px solid #D5D8E6;border-radius:6px;font-size:14px;color:#4A4E63" />
             </div>
             <div style="display:flex;justify-content:flex-end;margin-left:auto">
                 <button class="primary-btn" @onclick="Filtrar"
@@ -180,6 +192,8 @@
     private string SearchId = "";
     private string SearchNombre = "";
     private string SearchRnc = "";
+    private string SearchCorreo = "";
+    private string SearchTelefono = "";
     private string SearchDireccion = "";
 
     private void Filtrar()
@@ -213,8 +227,10 @@
             bool matchId = string.IsNullOrEmpty(SearchId) || c.Id.ToString().Contains(SearchId);
             bool matchNombre = string.IsNullOrEmpty(SearchNombre) || c.Nombre.Contains(SearchNombre, StringComparison.OrdinalIgnoreCase);
             bool matchRnc = string.IsNullOrEmpty(SearchRnc) || (!string.IsNullOrEmpty(c.Rnc) && c.Rnc.Contains(SearchRnc, StringComparison.OrdinalIgnoreCase));
+            bool matchCorreo = string.IsNullOrEmpty(SearchCorreo) || (!string.IsNullOrEmpty(c.Correo) && c.Correo.Contains(SearchCorreo, StringComparison.OrdinalIgnoreCase));
+            bool matchTelefono = string.IsNullOrEmpty(SearchTelefono) || (!string.IsNullOrEmpty(c.Telefono) && c.Telefono.Contains(SearchTelefono, StringComparison.OrdinalIgnoreCase)) || (!string.IsNullOrEmpty(c.Telefono2) && c.Telefono2.Contains(SearchTelefono, StringComparison.OrdinalIgnoreCase));
             bool matchDireccion = string.IsNullOrEmpty(SearchDireccion) || c.Direccion.Contains(SearchDireccion, StringComparison.OrdinalIgnoreCase);
-            return matchId && matchNombre && matchRnc && matchDireccion;
+            return matchId && matchNombre && matchRnc && matchCorreo && matchTelefono && matchDireccion;
         })
         .OrderBy(c => c.Nombre)
         .ToList();
