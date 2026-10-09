@@ -84,6 +84,15 @@ public class AppStateService
             new() { Id = 4, Nombre = "Cancelada" }
         };
 
+        Servicios = new List<Servicio>
+        {
+            new() { Id = 1, ServicioId = "SV-001", Nombre = "Instalación de Paneles Solares", Categoria = "Instalaciones", PrecioBase = 85000, Estado = "Activo" },
+            new() { Id = 2, ServicioId = "SV-002", Nombre = "Instalación de Sistema UPS", Categoria = "Instalaciones", PrecioBase = 45000, Estado = "Activo" },
+            new() { Id = 3, ServicioId = "SV-003", Nombre = "Mantenimiento Eléctrico", Categoria = "Mantenimiento", PrecioBase = 12500, Estado = "Activo" },
+            new() { Id = 4, ServicioId = "SV-004", Nombre = "Cableado Estructurado", Categoria = "Redes y Cableado", PrecioBase = 28000, Estado = "Activo" },
+            new() { Id = 5, ServicioId = "SV-005", Nombre = "Instalación de Planta Eléctrica", Categoria = "Instalaciones", PrecioBase = 120000, Estado = "Activo" }
+        };
+
         Solicitudes = new List<Solicitud>
         {
             new() { Id = 1, ClienteId = 1, Cliente = Clientes[0], Contacto = "809-000-0000", Direccion = "Calle Duarte #24, Santiago", ServicioId = 2, Servicio = Servicios[1], FechaSolicitud = DateTime.Today.AddDays(-6), Fecha = DateTime.Today, Hora = "09:00", EstadoSolicitudId = 2, EstadoSolicitud = EstadosSolicitud[1] },
@@ -122,14 +131,7 @@ public class AppStateService
             }
         };
 
-        Servicios = new List<Servicio>
-        {
-            new() { Id = 1, ServicioId = "SV-001", Nombre = "Instalación de Paneles Solares", Categoria = "Instalaciones", PrecioBase = 85000, Estado = "Activo" },
-            new() { Id = 2, ServicioId = "SV-002", Nombre = "Instalación de Sistema UPS", Categoria = "Instalaciones", PrecioBase = 45000, Estado = "Activo" },
-            new() { Id = 3, ServicioId = "SV-003", Nombre = "Mantenimiento Eléctrico", Categoria = "Mantenimiento", PrecioBase = 12500, Estado = "Activo" },
-            new() { Id = 4, ServicioId = "SV-004", Nombre = "Cableado Estructurado", Categoria = "Redes y Cableado", PrecioBase = 28000, Estado = "Activo" },
-            new() { Id = 5, ServicioId = "SV-005", Nombre = "Instalación de Planta Eléctrica", Categoria = "Instalaciones", PrecioBase = 120000, Estado = "Activo" }
-        };
+
         Cotizaciones = new List<Cotizacion>
         {
             new() { Id = 1, SolicitudId = "REQ-001", Cliente = "Acme Corp", Fecha = DateTime.Today.AddDays(-2), MontoTotal = 15000.00m, Estado = "Aprobada" },
