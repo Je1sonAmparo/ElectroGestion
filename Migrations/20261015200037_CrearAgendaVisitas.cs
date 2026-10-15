@@ -41,9 +41,10 @@ namespace ElectroGestion.Migrations
             migrationBuilder.Sql("""
                 INSERT INTO [Visitas] ([SolicitudId], [Fecha], [Hora], [Estado])
                 SELECT [Id], [Fecha], [Hora],
-                       CASE WHEN [EstadoSolicitudId] = 4 THEN N'Cancelada' ELSE N'Programada' END
-                FROM [Solicitudes]
-                WHERE NULLIF(LTRIM(RTRIM([Hora])), N'') IS NOT NULL;
+                       estado.[Nombre]
+                FROM [Solicitudes] solicitud
+                INNER JOIN [EstadosSolicitud] estado ON estado.[Id] = solicitud.[EstadoSolicitudId]
+                WHERE NULLIF(LTRIM(RTRIM(solicitud.[Hora])), N'') IS NOT NULL;
                 """);
         }
 

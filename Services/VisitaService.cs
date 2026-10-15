@@ -52,4 +52,17 @@ public class VisitaService(IDbContextFactory<Contexto> contextFactory)
             .Where(v => v.Id == id)
             .ExecuteDeleteAsync() > 0;
     }
+
+    public async Task<bool> CambiarEstadoAsync(int id, string estado)
+    {
+        await using var contexto = await contextFactory.CreateDbContextAsync();
+        var visita = await contexto.Visitas.FirstOrDefaultAsync(v => v.Id == id);
+        if (visita is null)
+        {
+            return false;
+        }
+
+        visita.Estado = estado;
+        return await contexto.SaveChangesAsync() > 0;
+    }
 }

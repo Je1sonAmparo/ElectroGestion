@@ -70,7 +70,7 @@ El sistema está desarrollado sobre la plataforma .NET utilizando una arquitectu
 
 ## Modelo de Base de Datos
 
-La base de datos se encuentra normalizada (3FN). La estructura contempla la separación de números de contacto mediante la entidad `ClientesTelefonos`, catálogos para estados de solicitud y detalles desagregados de servicios por solicitud.
+La base de datos se encuentra normalizada (3FN). La estructura contempla la separación de números de contacto mediante la entidad `ClientesTelefonos`, catálogos para estados de solicitud y detalles desagregados de servicios por solicitud. Las visitas de la agenda se almacenan en `Visitas` y se relacionan con su solicitud, conservando su fecha, hora y estado de forma independiente.
 
 ```mermaid
 erDiagram
@@ -80,6 +80,7 @@ erDiagram
     SERVICIOS ||--o{ DETALLES_SOLICITUD : "incluido en (1:N)"
     ESTADOS_SOLICITUD ||--o{ SOLICITUDES : "clasifica (1:N)"
     SOLICITUDES ||--o{ DETALLES_SOLICITUD : "contiene (1:N)"
+    SOLICITUDES ||--o{ VISITAS : "programa (1:N)"
 
     CLIENTES {
         int Id PK
@@ -124,6 +125,14 @@ erDiagram
         int EstadoSolicitudId FK
         string TecnicoAsignado
         datetime FechaFin
+    }
+
+    VISITAS {
+        int Id PK
+        int SolicitudId FK
+        datetime Fecha
+        string Hora
+        string Estado
     }
 
     DETALLES_SOLICITUD {

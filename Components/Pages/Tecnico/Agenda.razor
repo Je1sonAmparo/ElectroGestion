@@ -2,6 +2,9 @@
 @implements IDisposable
 @inject ElectroGestion.Services.AppStateService AppState
 @inject ElectroGestion.Services.SolicitudService SolicitudService
+@inject ElectroGestion.Services.VisitaService VisitaService
+@inject BlazorBootstrap.ToastService ToastService
+@inject ILogger<Agenda> Logger
 @inject NavigationManager NavManager
 
 <PageTitle>Agenda | ElectroGestion</PageTitle>
@@ -151,6 +154,7 @@
                 <div style="display:flex;flex-direction:column;gap:9px;margin-top:22px">
                     <button class="action-btn" style="padding:11px;border:1px solid #D5D8E6;background:#fff;border-radius:9px;font-size:13.5px;font-weight:700;cursor:pointer">Ver ubicación</button>
                     <button class="action-btn" @onclick="OpenEditarVisitaModal" style="padding:11px;border:1px solid #D5D8E6;background:#fff;border-radius:9px;font-size:13.5px;font-weight:700;cursor:pointer">Editar visita</button>
+                    <button @onclick="OpenEliminarModal" style="padding:11px;border:1px solid #F5C2C4;background:#fff;border-radius:9px;font-size:13.5px;font-weight:700;cursor:pointer;color:#C4141B">Eliminar visita</button>
                     @if (Detalle.Estado == "Cancelada")
                     {
                         <button class="reactivate-btn" @onclick="OpenReactivarModal" style="padding:11px;border:1px solid #4E9A63;background:#fff;border-radius:9px;font-size:13.5px;font-weight:700;cursor:pointer;color:#17803D">Reactivar visita</button>
@@ -179,20 +183,26 @@
             <div style="display:flex;flex-direction:column;gap:16px">
                 <div>
                     <label style="display:block;font-size:13px;font-weight:700;color:#14162B;margin-bottom:6px">Solicitud *</label>
-                    <select style="width:100%;padding:10px 14px;border:1px solid #D5D8E6;border-radius:8px;font-size:14px;color:#14162B;background:#fff">
-                        <option>Seleccionar solicitud pendiente...</option>
-                        <option>#101 - Instalación de Paneles Solares - Juan Pérez</option>
-                        <option>#104 - Mantenimiento Eléctrico - María Gómez</option>
+                    <select value="@FormSolicitudId" @onchange="OnSolicitudChanged" style="width:100%;padding:10px 14px;border:1px solid #D5D8E6;border-radius:8px;font-size:14px;color:#14162B;background:#fff">
+                        <option value="">Seleccionar solicitud...</option>
+                        @foreach (var solicitud in solicitudes.OrderBy(s => s.Id))
+                        {
+                            <option value="@solicitud.Id">@TextoSolicitud(solicitud)</option>
+                        }
                     </select>
+                </div>
+                <div>
+                    <label style="display:block;font-size:13px;font-weight:700;color:#14162B;margin-bottom:6px">Dirección</label>
+                    <input value="@DireccionSeleccionada" readonly disabled style="width:100%;padding:10px 14px;border:1px solid #D5D8E6;border-radius:8px;font-size:14px;color:#6B7085;background:#F7F8FC;opacity:1" />
                 </div>
                 <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
                     <div>
                         <label style="display:block;font-size:13px;font-weight:700;color:#14162B;margin-bottom:6px">Fecha *</label>
-                        <input type="date" style="width:100%;padding:10px 14px;border:1px solid #D5D8E6;border-radius:8px;font-size:14px;color:#14162B" />
+                        <input type="date" @bind="FormFecha" style="width:100%;padding:10px 14px;border:1px solid #D5D8E6;border-radius:8px;font-size:14px;color:#14162B" />
                     </div>
                     <div>
                         <label style="display:block;font-size:13px;font-weight:700;color:#14162B;margin-bottom:6px">Hora *</label>
-                        <input type="time" style="width:100%;padding:10px 14px;border:1px solid #D5D8E6;border-radius:8px;font-size:14px;color:#14162B" />
+                        <input type="time" @bind="FormHora" style="width:100%;padding:10px 14px;border:1px solid #D5D8E6;border-radius:8px;font-size:14px;color:#14162B" />
                     </div>
                 </div>
 
@@ -200,7 +210,7 @@
 
             <div style="display:flex;justify-content:flex-end;gap:12px;margin-top:24px">
                 <button @onclick="CloseModals" style="padding:10px 18px;border:1px solid #D5D8E6;background:#fff;border-radius:8px;font-weight:700;cursor:pointer;color:#14162B">Cancelar</button>
-                <button @onclick="CloseModals" style="padding:10px 18px;border:none;background:#1D4ED8;color:#fff;border-radius:8px;font-weight:700;cursor:pointer">Guardar visita</button>
+                <button @onclick="GuardarVisitaAsync" style="padding:10px 18px;border:none;background:#1D4ED8;color:#fff;border-radius:8px;font-weight:700;cursor:pointer">Guardar visita</button>
             </div>
         </div>
     </div>
@@ -215,31 +225,26 @@
 
             <div style="display:flex;flex-direction:column;gap:16px">
                 <div>
-                    <label style="display:block;font-size:13px;font-weight:700;color:#14162B;margin-bottom:6px">Cliente *</label>
-                    <select style="width:100%;padding:10px 14px;border:1px solid #D5D8E6;border-radius:8px;font-size:14px;color:#14162B;background:#fff">
-                        <option>@Detalle?.Cliente</option>
+                    <label style="display:block;font-size:13px;font-weight:700;color:#14162B;margin-bottom:6px">Solicitud *</label>
+                    <select value="@FormSolicitudId" @onchange="OnSolicitudChanged" style="width:100%;padding:10px 14px;border:1px solid #D5D8E6;border-radius:8px;font-size:14px;color:#14162B;background:#fff">
+                        @foreach (var solicitud in solicitudes.OrderBy(s => s.Id))
+                        {
+                            <option value="@solicitud.Id">@TextoSolicitud(solicitud)</option>
+                        }
                     </select>
                 </div>
-                <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
-                    <div>
-                        <label style="display:block;font-size:13px;font-weight:700;color:#14162B;margin-bottom:6px">Tipo de servicio *</label>
-                        <select style="width:100%;padding:10px 14px;border:1px solid #D5D8E6;border-radius:8px;font-size:14px;color:#14162B;background:#fff">
-                            <option>@Detalle?.TipoServicio</option>
-                        </select>
-                    </div>
-                    <div>
-                        <label style="display:block;font-size:13px;font-weight:700;color:#14162B;margin-bottom:6px">Dirección *</label>
-                        <input type="text" value="@Detalle?.Direccion" style="width:100%;padding:10px 14px;border:1px solid #D5D8E6;border-radius:8px;font-size:14px;color:#14162B" />
-                    </div>
+                <div>
+                    <label style="display:block;font-size:13px;font-weight:700;color:#14162B;margin-bottom:6px">Dirección</label>
+                    <input value="@DireccionSeleccionada" readonly disabled style="width:100%;padding:10px 14px;border:1px solid #D5D8E6;border-radius:8px;font-size:14px;color:#6B7085;background:#F7F8FC;opacity:1" />
                 </div>
                 <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
                     <div>
                         <label style="display:block;font-size:13px;font-weight:700;color:#14162B;margin-bottom:6px">Fecha *</label>
-                        <input type="date" value="2026-08-03" style="width:100%;padding:10px 14px;border:1px solid #D5D8E6;border-radius:8px;font-size:14px;color:#14162B" />
+                        <input type="date" @bind="FormFecha" style="width:100%;padding:10px 14px;border:1px solid #D5D8E6;border-radius:8px;font-size:14px;color:#14162B" />
                     </div>
                     <div>
                         <label style="display:block;font-size:13px;font-weight:700;color:#14162B;margin-bottom:6px">Hora *</label>
-                        <input type="time" value="09:00" style="width:100%;padding:10px 14px;border:1px solid #D5D8E6;border-radius:8px;font-size:14px;color:#14162B" />
+                        <input type="time" @bind="FormHora" style="width:100%;padding:10px 14px;border:1px solid #D5D8E6;border-radius:8px;font-size:14px;color:#14162B" />
                     </div>
                 </div>
 
@@ -247,7 +252,23 @@
 
             <div style="display:flex;justify-content:flex-end;gap:12px;margin-top:24px">
                 <button @onclick="CloseModals" style="padding:10px 18px;border:1px solid #D5D8E6;background:#fff;border-radius:8px;font-weight:700;cursor:pointer;color:#14162B">Cancelar</button>
-                <button @onclick="CloseModals" style="padding:10px 18px;border:none;background:#1D4ED8;color:#fff;border-radius:8px;font-weight:700;cursor:pointer">Guardar cambios</button>
+                <button @onclick="GuardarVisitaAsync" style="padding:10px 18px;border:none;background:#1D4ED8;color:#fff;border-radius:8px;font-weight:700;cursor:pointer">Guardar cambios</button>
+            </div>
+        </div>
+    </div>
+}
+
+@if (showEliminar)
+{
+    <div style="position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.4);display:flex;align-items:center;justify-content:center;z-index:9999">
+        <div style="background:#fff;border-radius:14px;width:100%;max-width:400px;padding:24px;box-shadow:0 10px 25px rgba(0,0,0,0.1)">
+            <h2 style="margin:0 0 12px;font-family:'Manrope';font-weight:800;font-size:20px;color:#14162B">Eliminar visita</h2>
+            <p style="margin:0 0 24px;color:#4A4E63;font-size:14.5px;line-height:1.4">
+                ¿Confirmas eliminar la visita de <strong>@Detalle?.Cliente</strong>? La solicitud permanecerá registrada.
+            </p>
+            <div style="display:flex;justify-content:flex-end;gap:12px">
+                <button @onclick="CloseModals" style="padding:10px 18px;border:1px solid #D5D8E6;background:#fff;border-radius:8px;font-weight:700;cursor:pointer;color:#14162B">Cancelar</button>
+                <button @onclick="ConfirmarEliminarAsync" style="padding:10px 18px;border:none;background:#C4141B;color:#fff;border-radius:8px;font-weight:700;cursor:pointer">Sí, eliminar</button>
             </div>
         </div>
     </div>
@@ -296,6 +317,11 @@
     private bool showEditarVisita = false;
     private bool showCancelar = false;
     private bool showReactivar = false;
+    private bool showEliminar = false;
+    private int? FormVisitaId;
+    private int? FormSolicitudId;
+    private DateTime FormFecha = DateTime.Today;
+    private TimeOnly? FormHora;
 
     private List<string> DiasSemana = new() { "Lun", "Mar", "Mié", "Jue", "Vie", "Sáb", "Dom" };
     private List<string> HorasSem = new() { "08 AM", "09 AM", "10 AM", "11 AM", "12 PM", "01 PM", "02 PM", "03 PM", "04 PM", "05 PM", "06 PM" };
@@ -303,6 +329,7 @@
     public class Evento
     {
         public int Id { get; set; }
+        public int SolicitudId { get; set; }
         public int Top { get; set; }
         public int H { get; set; }
         public string Bg { get; set; } = "";
@@ -342,6 +369,7 @@
     private List<Evento> DiariaEventos = new();
     private Evento? Detalle;
     private List<ElectroGestion.Models.Solicitud> solicitudes = new();
+    private List<ElectroGestion.Models.Visita> visitas = new();
 
     protected override async Task OnInitializedAsync()
     {
@@ -374,12 +402,15 @@
     private async Task UpdateData()
     {
         solicitudes = await SolicitudService.GetList(s => true);
+        visitas = await VisitaService.ObtenerTodasAsync();
         var hoyD = DateTime.Today;
         var hoyStr = hoyD.ToString("yyyy-MM-dd");
 
         var MES = new[] { "enero", "febrero", "marzo", "abril", "mayo", "junio", "julio", "agosto", "septiembre", "octubre", "noviembre", "diciembre" };
 
-        var visibles = solicitudes.Where(x => x.Fecha != DateTime.MinValue && !string.IsNullOrEmpty(x.Hora)).ToList();
+        var visibles = visitas
+            .Where(v => v.Fecha != DateTime.MinValue && TimeOnly.TryParse(v.Hora, out _))
+            .ToList();
 
         var lunes = hoyD.AddDays(-((int)hoyD.DayOfWeek == 0 ? 6 : (int)hoyD.DayOfWeek - 1));
         var finSem = lunes.AddDays(6);
@@ -404,30 +435,16 @@
             var f = d.ToString("yyyy-MM-dd");
             var esHoy = f == hoyStr;
 
-            var evs = visibles.Where(x => x.Fecha.ToString("yyyy-MM-dd") == f).OrderBy(x => x.Hora).Select(x => {
-                var hm = x.Hora.Split(':');
-                var hh = int.Parse(hm[0]);
-                var mm = int.Parse(hm[1]);
-                var estadoNombre = x.EstadoSolicitud?.Nombre ?? "";
-                var cancel = estadoNombre == "Cancelada";
-                var fin = estadoNombre == "Finalizada";
-                var colors = AppStateService.GetBadgeColors(estadoNombre);
-                return new Evento {
-                    Id = x.Id,
-                    Top = Math.Max(0, (int)((hh - 8) * 45 + (mm / 60.0) * 45 + 1)),
-                    H = 58,
-                    Bg = cancel ? "#FDE9EA" : (fin ? "#E4F6EA" : "#EAF3EC"),
-                    Line = cancel ? "#E11B22" : (fin ? "#17803D" : "#4E9A63"),
-                    Hora = AppStateService.FormatHora12(x.Hora),
-                    Cliente = x.Cliente?.Nombre ?? "",
-                    TipoServicio = x.Servicio?.Nombre ?? "",
-                    Direccion = x.Direccion,
-                    Estado = estadoNombre,
-                    Fg = colors.Fg,
-                    Fecha = AppStateService.FormatFechaLarga(x.Fecha.ToString("yyyy-MM-dd")),
-                    Rango = AppStateService.FormatHora12(x.Hora) + " - " + AppStateService.FormatHora12(AppStateService.AddMinutes(x.Hora, 150))
-                };
-            }).ToList();
+            var evs = visibles
+                .Where(v => v.Fecha.ToString("yyyy-MM-dd") == f)
+                .OrderBy(v => v.Hora)
+                .Select(v =>
+                {
+                    var hora = TimeOnly.Parse(v.Hora);
+                    var top = Math.Max(0, (int)((hora.Hour - 8) * 45 + (hora.Minute / 60.0) * 45 + 1));
+                    return CrearEvento(v, top, 58);
+                })
+                .ToList();
 
             Semana.Add(new DiaSemana {
                 Dia = DiasSemana[i],
@@ -450,27 +467,11 @@
             var esHoy = f == hoyStr;
             var otro = d.Month != hoyD.Month;
 
-            var evs = visibles.Where(x => x.Fecha.ToString("yyyy-MM-dd") == f).OrderBy(x => x.Hora).Select(x => {
-                var estadoNombre = x.EstadoSolicitud?.Nombre ?? "";
-                var cancel = estadoNombre == "Cancelada";
-                var fin = estadoNombre == "Finalizada";
-                var colors = AppStateService.GetBadgeColors(estadoNombre);
-                var horaFmt = AppStateService.FormatHora12(x.Hora);
-                return new Evento {
-                    Id = x.Id,
-                    Bg = cancel ? "#FDE9EA" : (fin ? "#E4F6EA" : "#EAF3EC"),
-                    Line = cancel ? "#E11B22" : (fin ? "#17803D" : "#4E9A63"),
-                    Hora = horaFmt,
-                    Cliente = x.Cliente?.Nombre ?? "",
-                    TipoServicio = x.Servicio?.Nombre ?? "",
-                    Direccion = x.Direccion,
-                    Estado = estadoNombre,
-                    Fg = colors.Fg,
-                    Fecha = AppStateService.FormatFechaLarga(x.Fecha.ToString("yyyy-MM-dd")),
-                    Rango = horaFmt + " - " + AppStateService.FormatHora12(AppStateService.AddMinutes(x.Hora, 150)),
-                    Corto = (horaFmt.Length > 5 ? horaFmt.Substring(0, 5) : horaFmt) + " " + (x.Cliente?.Nombre ?? "")
-                };
-            }).ToList();
+            var evs = visibles
+                .Where(v => v.Fecha.ToString("yyyy-MM-dd") == f)
+                .OrderBy(v => v.Hora)
+                .Select(v => CrearEvento(v))
+                .ToList();
 
             Mes.Add(new DiaMes {
                 Num = d.Day.ToString(),
@@ -481,46 +482,100 @@
             });
         }
 
-        DiariaEventos = visibles.Where(x => x.Fecha.ToString("yyyy-MM-dd") == hoyStr).Select(x => {
-            var hm = x.Hora.Split(':');
-            var hh = int.Parse(hm[0]);
-            var mm = int.Parse(hm[1]);
-            var estadoNombre = x.EstadoSolicitud?.Nombre ?? "";
-            var cancel = estadoNombre == "Cancelada";
-            var fin = estadoNombre == "Finalizada";
-            var colors = AppStateService.GetBadgeColors(estadoNombre);
-            return new Evento {
-                Id = x.Id,
-                Top = Math.Max(0, (int)((hh - 8) * 64 + (mm / 60.0) * 64 + 2)),
-                H = (int)(150 / 60.0 * 64 - 6),
-                Bg = cancel ? "#FDE9EA" : (fin ? "#E4F6EA" : "#EAF3EC"),
-                Line = cancel ? "#E11B22" : (fin ? "#17803D" : "#4E9A63"),
-                Hora = AppStateService.FormatHora12(x.Hora),
-                Cliente = x.Cliente?.Nombre ?? "",
-                TipoServicio = x.Servicio?.Nombre ?? "",
-                Direccion = x.Direccion,
-                Estado = x.EstadoSolicitud?.Nombre ?? "",
-                Fg = colors.Fg,
-                Fecha = AppStateService.FormatFecha(x.Fecha.ToString("yyyy-MM-dd")),
-                Rango = AppStateService.FormatHora12(x.Hora) + " - " + AppStateService.FormatHora12(AppStateService.AddMinutes(x.Hora, 150))
-            };
-        }).ToList();
+        DiariaEventos = visibles
+            .Where(v => v.Fecha.ToString("yyyy-MM-dd") == hoyStr)
+            .Select(v =>
+            {
+                var hora = TimeOnly.Parse(v.Hora);
+                var top = Math.Max(0, (int)((hora.Hour - 8) * 64 + (hora.Minute / 60.0) * 64 + 2));
+                return CrearEvento(v, top, (int)(150 / 60.0 * 64 - 6), larga: false);
+            })
+            .ToList();
     }
 
-    private void SelectEvent(Evento ev)
+    private Evento CrearEvento(ElectroGestion.Models.Visita visita, int top = 0, int alto = 58, bool larga = true)
     {
-        Detalle = ev;
+        var hora = TimeOnly.Parse(visita.Hora);
+        var estado = visita.Estado;
+        var cancelada = estado == "Cancelada";
+        var finalizada = estado == "Finalizada";
+        var colores = AppStateService.GetBadgeColors(estado);
+        var horaFormato = AppStateService.FormatHora12(visita.Hora);
+
+        return new Evento
+        {
+            Id = visita.Id,
+            SolicitudId = visita.SolicitudId,
+            Top = top,
+            H = alto,
+            Bg = cancelada ? "#FDE9EA" : (finalizada ? "#E4F6EA" : "#EAF3EC"),
+            Line = cancelada ? "#E11B22" : (finalizada ? "#17803D" : "#4E9A63"),
+            Hora = horaFormato,
+            Cliente = visita.Solicitud?.Cliente?.Nombre ?? "",
+            TipoServicio = visita.Solicitud?.Servicio?.Nombre ?? "",
+            Direccion = visita.Solicitud?.Direccion ?? "",
+            Estado = estado,
+            Fg = colores.Fg,
+            Fecha = larga
+                ? AppStateService.FormatFechaLarga(visita.Fecha.ToString("yyyy-MM-dd"))
+                : AppStateService.FormatFecha(visita.Fecha.ToString("yyyy-MM-dd")),
+            Rango = horaFormato + " - " + AppStateService.FormatHora12(AppStateService.AddMinutes(visita.Hora, 150)),
+            Corto = (horaFormato.Length > 5 ? horaFormato[..5] : horaFormato) + " " + (visita.Solicitud?.Cliente?.Nombre ?? "")
+        };
     }
 
-    private void ClearDetalle()
+    private string DireccionSeleccionada =>
+        solicitudes.FirstOrDefault(s => s.Id == FormSolicitudId)?.Direccion ?? "";
+
+    private static string TextoSolicitud(ElectroGestion.Models.Solicitud solicitud) =>
+        $"#{solicitud.Id:D4} - {solicitud.Cliente?.Nombre} - {solicitud.Servicio?.Nombre}";
+
+    private void OnSolicitudChanged(ChangeEventArgs args)
     {
-        Detalle = null;
+        FormSolicitudId = int.TryParse(args.Value?.ToString(), out var solicitudId)
+            ? solicitudId
+            : null;
     }
 
-    private void OpenNuevaVisitaModal() => showNuevaVisita = true;
-    private void OpenEditarVisitaModal() => showEditarVisita = true;
+    private void SelectEvent(Evento ev) => Detalle = ev;
+
+    private void ClearDetalle() => Detalle = null;
+
+    private async Task OpenNuevaVisitaModal()
+    {
+        await UpdateData();
+        FormVisitaId = null;
+        FormSolicitudId = null;
+        FormFecha = DateTime.Today;
+        FormHora = null;
+        showNuevaVisita = true;
+    }
+
+    private async Task OpenEditarVisitaModal()
+    {
+        if (Detalle is null)
+        {
+            return;
+        }
+
+        await UpdateData();
+        var visita = visitas.FirstOrDefault(v => v.Id == Detalle.Id);
+        if (visita is null)
+        {
+            ToastService.ShowError("No se encontró la visita que deseas editar.");
+            return;
+        }
+
+        FormVisitaId = visita.Id;
+        FormSolicitudId = visita.SolicitudId;
+        FormFecha = visita.Fecha;
+        FormHora = TimeOnly.TryParse(visita.Hora, out var hora) ? hora : null;
+        showEditarVisita = true;
+    }
+
     private void OpenCancelarModal() => showCancelar = true;
     private void OpenReactivarModal() => showReactivar = true;
+    private void OpenEliminarModal() => showEliminar = true;
 
     private void CloseModals()
     {
@@ -528,31 +583,120 @@
         showEditarVisita = false;
         showCancelar = false;
         showReactivar = false;
+        showEliminar = false;
+        FormVisitaId = null;
     }
 
-    private void ConfirmarCancelar()
+    private async Task GuardarVisitaAsync()
     {
-        if (Detalle != null)
+        var solicitud = solicitudes.FirstOrDefault(s => s.Id == FormSolicitudId);
+        if (solicitud is null || FormFecha == DateTime.MinValue || !FormHora.HasValue)
         {
-            // Solo para prototipo estático
-            Detalle.Estado = "Cancelada";
-            Detalle.Bg = "#FDE9EA";
-            Detalle.Fg = "#E11B22";
-            Detalle.Line = "#E11B22";
+            ToastService.ShowWarning("Seleccione una solicitud e indique una fecha y hora válidas.", "Atención");
+            return;
         }
-        CloseModals();
+
+        var existente = FormVisitaId.HasValue
+            ? visitas.FirstOrDefault(v => v.Id == FormVisitaId.Value)
+            : null;
+        var visita = new ElectroGestion.Models.Visita
+        {
+            Id = FormVisitaId ?? 0,
+            SolicitudId = solicitud.Id,
+            Fecha = FormFecha.Date,
+            Hora = FormHora.Value.ToString("HH:mm"),
+            Estado = existente is not null && existente.SolicitudId == solicitud.Id
+                ? existente.Estado
+                : solicitud.EstadoSolicitud?.Nombre ?? "Pendiente"
+        };
+
+        try
+        {
+            if (!await VisitaService.GuardarAsync(visita))
+            {
+                ToastService.ShowError("No se pudo guardar la visita.");
+                return;
+            }
+
+            await UpdateData();
+            var guardada = visitas.First(v => v.Id == visita.Id);
+            Detalle = CrearEvento(guardada);
+            ToastService.ShowSuccess(FormVisitaId.HasValue
+                ? "Visita actualizada correctamente."
+                : "Visita programada correctamente.");
+            CloseModals();
+        }
+        catch (Exception ex)
+        {
+            Logger.LogError(ex, "No se pudo guardar la visita de la solicitud {SolicitudId}.", solicitud.Id);
+            ToastService.ShowError("Ocurrió un error al guardar la visita.");
+        }
     }
 
-    private void ConfirmarReactivar()
+    private async Task ConfirmarCancelar()
     {
-        if (Detalle != null)
+        await CambiarEstadoVisitaAsync("Cancelada", "cancelar");
+    }
+
+    private async Task ConfirmarReactivar()
+    {
+        await CambiarEstadoVisitaAsync("En proceso", "reactivar");
+    }
+
+    private async Task CambiarEstadoVisitaAsync(string estado, string accion)
+    {
+        if (Detalle is null)
         {
-            // Solo para prototipo estático
-            Detalle.Estado = "En proceso";
-            Detalle.Bg = "#EAF3EC";
-            Detalle.Fg = "#4E9A63";
-            Detalle.Line = "#4E9A63";
+            return;
         }
-        CloseModals();
+
+        try
+        {
+            if (!await VisitaService.CambiarEstadoAsync(Detalle.Id, estado))
+            {
+                ToastService.ShowError("No se encontró la visita para actualizar su estado.");
+                return;
+            }
+
+            await UpdateData();
+            Detalle = CrearEvento(visitas.First(v => v.Id == Detalle.Id));
+            ToastService.ShowSuccess(accion == "cancelar"
+                ? "Visita cancelada correctamente."
+                : "Visita reactivada correctamente.");
+            CloseModals();
+        }
+        catch (Exception ex)
+        {
+            Logger.LogError(ex, "No se pudo {Accion} la visita {VisitaId}.", accion, Detalle.Id);
+            ToastService.ShowError("Ocurrió un error al actualizar la visita.");
+        }
+    }
+
+    private async Task ConfirmarEliminarAsync()
+    {
+        if (Detalle is null)
+        {
+            return;
+        }
+
+        var visitaId = Detalle.Id;
+        try
+        {
+            if (!await VisitaService.EliminarAsync(visitaId))
+            {
+                ToastService.ShowError("No se encontró la visita para eliminarla.");
+                return;
+            }
+
+            await UpdateData();
+            Detalle = null;
+            ToastService.ShowSuccess("Visita eliminada correctamente.");
+            CloseModals();
+        }
+        catch (Exception ex)
+        {
+            Logger.LogError(ex, "No se pudo eliminar la visita {VisitaId}.", visitaId);
+            ToastService.ShowError("Ocurrió un error al eliminar la visita.");
+        }
     }
 }
