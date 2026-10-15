@@ -67,6 +67,14 @@ public class Contexto : DbContext
                 .OnDelete(DeleteBehavior.Restrict);
         });
 
+        modelBuilder.Entity<Visita>(entity =>
+        {
+            entity.HasOne(v => v.Tecnico)
+                .WithMany()
+                .HasForeignKey(v => v.TecnicoId)
+                .OnDelete(DeleteBehavior.SetNull);
+        });
+
         modelBuilder.Entity<Usuario>(entity =>
         {
             entity.Property(u => u.UsuarioLogin).HasMaxLength(50).IsRequired();

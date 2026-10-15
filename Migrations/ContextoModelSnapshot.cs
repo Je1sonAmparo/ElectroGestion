@@ -599,9 +599,14 @@ namespace ElectroGestion.Migrations
                     b.Property<int>("SolicitudId")
                         .HasColumnType("int");
 
+                    b.Property<int?>("TecnicoId")
+                        .HasColumnType("int");
+
                     b.HasKey("Id");
 
                     b.HasIndex("SolicitudId");
+
+                    b.HasIndex("TecnicoId");
 
                     b.ToTable("Visitas");
                 });
@@ -671,7 +676,14 @@ namespace ElectroGestion.Migrations
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
+                    b.HasOne("ElectroGestion.Models.Usuario", "Tecnico")
+                        .WithMany()
+                        .HasForeignKey("TecnicoId")
+                        .OnDelete(DeleteBehavior.SetNull);
+
                     b.Navigation("Solicitud");
+
+                    b.Navigation("Tecnico");
                 });
 
             modelBuilder.Entity("ElectroGestion.Models.Cliente", b =>

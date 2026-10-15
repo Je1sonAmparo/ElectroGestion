@@ -16,15 +16,44 @@ public class VisitaService(IDbContextFactory<Contexto> contextFactory)
                 .ThenInclude(s => s.Servicio)
             .Include(v => v.Solicitud!)
                 .ThenInclude(s => s.EstadoSolicitud)
+            .Include(v => v.Tecnico)
             .AsNoTracking()
             .ToListAsync();
+    }
+
+    public async Task<List<Usuario>> ObtenerTecnicosAsync()
+    {
+        await using var contexto = await contextFactory.CreateDbContextAsync();
+        return await contexto.Usuarios
+            .Where(u => u.Rol == "Técnico")
+            .OrderBy(u => u.Nombre)
+            .AsNoTracking()
+            .ToListAsync();
+    }
+
+    public async Task<bool> SolicitudDisponibleAsync(int solicitudId, int? visitaId = null)
+    {
+        await using var contexto = await contextFactory.CreateDbContextAsync();
+        return !await contexto.Visitas.AnyAsync(v =>
+            v.SolicitudId == solicitudId && (!visitaId.HasValue || v.Id != visitaId.Value));
     }
 
     public async Task<bool> GuardarAsync(Visita visita)
     {
         await using var contexto = await contextFactory.CreateDbContextAsync();
+        if (visita.TecnicoId.HasValue &&
+            !await contexto.Usuarios.AnyAsync(u => u.Id == visita.TecnicoId && u.Rol == "Técnico"))
+        {
+            return false;
+        }
+
         if (visita.Id == 0)
         {
+            if (await contexto.Visitas.AnyAsync(v => v.SolicitudId == visita.SolicitudId))
+            {
+                return false;
+            }
+
             visita.Solicitud = null;
             contexto.Visitas.Add(visita);
         }
@@ -36,7 +65,15 @@ public class VisitaService(IDbContextFactory<Contexto> contextFactory)
                 return false;
             }
 
+            if (existente.SolicitudId != visita.SolicitudId &&
+                await contexto.Visitas.AnyAsync(v =>
+                    v.SolicitudId == visita.SolicitudId && v.Id != visita.Id))
+            {
+                return false;
+            }
+
             existente.SolicitudId = visita.SolicitudId;
+            existente.TecnicoId = visita.TecnicoId;
             existente.Fecha = visita.Fecha;
             existente.Hora = visita.Hora;
             existente.Estado = visita.Estado;

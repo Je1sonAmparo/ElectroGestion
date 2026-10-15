@@ -10,6 +10,9 @@ public class Visita
     public int SolicitudId { get; set; }
     public Solicitud? Solicitud { get; set; }
 
+    public int? TecnicoId { get; set; }
+    public Usuario? Tecnico { get; set; }
+
     public DateTime Fecha { get; set; }
 
     [Required, StringLength(10)]
