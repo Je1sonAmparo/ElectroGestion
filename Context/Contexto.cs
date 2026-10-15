@@ -8,6 +8,7 @@ public class Contexto : DbContext
     public Contexto(DbContextOptions<Contexto> options) : base(options) { }
 
     public DbSet<Solicitud> Solicitudes { get; set; }
+    public DbSet<Visita> Visitas { get; set; }
     public DbSet<Cliente> Clientes { get; set; }
     public DbSet<Usuario> Usuarios { get; set; }
     public DbSet<Servicio> Servicios { get; set; }
@@ -59,6 +60,11 @@ public class Contexto : DbContext
                 .WithOne(d => d.Solicitud)
                 .HasForeignKey(d => d.SolicitudId)
                 .OnDelete(DeleteBehavior.Cascade);
+
+            entity.HasMany<Visita>()
+                .WithOne(v => v.Solicitud)
+                .HasForeignKey(v => v.SolicitudId)
+                .OnDelete(DeleteBehavior.Restrict);
         });
 
         modelBuilder.Entity<Usuario>(entity =>

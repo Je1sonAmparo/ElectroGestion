@@ -575,6 +575,37 @@ namespace ElectroGestion.Migrations
                         });
                 });
 
+            modelBuilder.Entity("ElectroGestion.Models.Visita", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Estado")
+                        .IsRequired()
+                        .HasMaxLength(30)
+                        .HasColumnType("nvarchar(30)");
+
+                    b.Property<DateTime>("Fecha")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Hora")
+                        .IsRequired()
+                        .HasMaxLength(10)
+                        .HasColumnType("nvarchar(10)");
+
+                    b.Property<int>("SolicitudId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("SolicitudId");
+
+                    b.ToTable("Visitas");
+                });
+
             modelBuilder.Entity("ElectroGestion.Models.ClienteTelefono", b =>
                 {
                     b.HasOne("ElectroGestion.Models.Cliente", "Cliente")
@@ -630,6 +661,17 @@ namespace ElectroGestion.Migrations
                     b.Navigation("EstadoSolicitud");
 
                     b.Navigation("Servicio");
+                });
+
+            modelBuilder.Entity("ElectroGestion.Models.Visita", b =>
+                {
+                    b.HasOne("ElectroGestion.Models.Solicitud", "Solicitud")
+                        .WithMany()
+                        .HasForeignKey("SolicitudId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Solicitud");
                 });
 
             modelBuilder.Entity("ElectroGestion.Models.Cliente", b =>
