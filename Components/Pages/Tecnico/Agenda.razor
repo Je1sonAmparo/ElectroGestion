@@ -1,4 +1,5 @@
 @page "/agenda"
+@using System.Globalization
 @implements IDisposable
 @inject ElectroGestion.Services.AppStateService AppState
 @inject ElectroGestion.Services.SolicitudService SolicitudService
@@ -234,7 +235,40 @@
                 <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
                     <div>
                         <label style="display:block;font-size:13px;font-weight:700;color:#14162B;margin-bottom:6px">Fecha *</label>
-                        <input type="date" @bind="FormFecha" style="width:100%;padding:10px 14px;border:1px solid #D5D8E6;border-radius:8px;font-size:14px;color:#14162B" />
+                        <div style="position:relative">
+                            <button type="button" @onclick="ToggleDatePicker" style="width:100%;padding:10px 14px;border:1px solid #D5D8E6;border-radius:8px;font-size:14px;color:#14162B;background:#fff;text-align:left;cursor:pointer">
+                                @FormFecha.ToString("yyyy-MM-dd") <span style="float:right">▾</span>
+                            </button>
+                            @if (showDatePicker)
+                            {
+                                <div style="position:absolute;top:calc(100% + 4px);left:0;width:280px;padding:14px;background:#fff;border:1px solid #D5D8E6;border-radius:10px;box-shadow:0 8px 24px rgba(20,22,43,.16);z-index:10000">
+                                    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
+                                        <button type="button" @onclick="() => CambiarMesCalendario(-1)" aria-label="Mes anterior" style="border:0;background:#fff;font-size:18px;cursor:pointer">‹</button>
+                                        <strong>@MesCalendario.ToString("MMMM yyyy", CultureInfo.GetCultureInfo("es"))</strong>
+                                        <button type="button" @onclick="() => CambiarMesCalendario(1)" aria-label="Mes siguiente" style="border:0;background:#fff;font-size:18px;cursor:pointer">›</button>
+                                    </div>
+                                    <div style="display:grid;grid-template-columns:repeat(6,1fr);gap:4px;text-align:center;font-size:11px;font-weight:700;color:#6B7085;margin-bottom:5px">
+                                        @foreach (var dia in DiasSemana)
+                                        {
+                                            <span>@dia</span>
+                                        }
+                                    </div>
+                                    <div style="display:grid;grid-template-columns:repeat(6,1fr);gap:4px;text-align:center">
+                                        @foreach (var dia in DiasCalendario)
+                                        {
+                                            @if (dia.Month == MesCalendario.Month)
+                                            {
+                                                <button type="button" @onclick="() => SeleccionarFecha(dia)" style="height:32px;border:0;border-radius:50%;background:@(dia.Date == FormFecha.Date ? "#1D4ED8" : "transparent");color:@(dia.Date == FormFecha.Date ? "#fff" : "#14162B");cursor:pointer">@dia.Day</button>
+                                            }
+                                            else
+                                            {
+                                                <span style="height:32px"></span>
+                                            }
+                                        }
+                                    </div>
+                                </div>
+                            }
+                        </div>
                     </div>
                     <div>
                         <label style="display:block;font-size:13px;font-weight:700;color:#14162B;margin-bottom:6px">Hora *</label>
@@ -297,7 +331,40 @@
                 <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
                     <div>
                         <label style="display:block;font-size:13px;font-weight:700;color:#14162B;margin-bottom:6px">Fecha *</label>
-                        <input type="date" @bind="FormFecha" style="width:100%;padding:10px 14px;border:1px solid #D5D8E6;border-radius:8px;font-size:14px;color:#14162B" />
+                        <div style="position:relative">
+                            <button type="button" @onclick="ToggleDatePicker" style="width:100%;padding:10px 14px;border:1px solid #D5D8E6;border-radius:8px;font-size:14px;color:#14162B;background:#fff;text-align:left;cursor:pointer">
+                                @FormFecha.ToString("yyyy-MM-dd") <span style="float:right">▾</span>
+                            </button>
+                            @if (showDatePicker)
+                            {
+                                <div style="position:absolute;top:calc(100% + 4px);left:0;width:280px;padding:14px;background:#fff;border:1px solid #D5D8E6;border-radius:10px;box-shadow:0 8px 24px rgba(20,22,43,.16);z-index:10000">
+                                    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
+                                        <button type="button" @onclick="() => CambiarMesCalendario(-1)" aria-label="Mes anterior" style="border:0;background:#fff;font-size:18px;cursor:pointer">‹</button>
+                                        <strong>@MesCalendario.ToString("MMMM yyyy", CultureInfo.GetCultureInfo("es"))</strong>
+                                        <button type="button" @onclick="() => CambiarMesCalendario(1)" aria-label="Mes siguiente" style="border:0;background:#fff;font-size:18px;cursor:pointer">›</button>
+                                    </div>
+                                    <div style="display:grid;grid-template-columns:repeat(6,1fr);gap:4px;text-align:center;font-size:11px;font-weight:700;color:#6B7085;margin-bottom:5px">
+                                        @foreach (var dia in DiasSemana)
+                                        {
+                                            <span>@dia</span>
+                                        }
+                                    </div>
+                                    <div style="display:grid;grid-template-columns:repeat(6,1fr);gap:4px;text-align:center">
+                                        @foreach (var dia in DiasCalendario)
+                                        {
+                                            @if (dia.Month == MesCalendario.Month)
+                                            {
+                                                <button type="button" @onclick="() => SeleccionarFecha(dia)" style="height:32px;border:0;border-radius:50%;background:@(dia.Date == FormFecha.Date ? "#1D4ED8" : "transparent");color:@(dia.Date == FormFecha.Date ? "#fff" : "#14162B");cursor:pointer">@dia.Day</button>
+                                            }
+                                            else
+                                            {
+                                                <span style="height:32px"></span>
+                                            }
+                                        }
+                                    </div>
+                                </div>
+                            }
+                        </div>
                     </div>
                     <div>
                         <label style="display:block;font-size:13px;font-weight:700;color:#14162B;margin-bottom:6px">Hora *</label>
@@ -380,11 +447,13 @@
     private bool showCancelar = false;
     private bool showReactivar = false;
     private bool showEliminar = false;
+    private bool showDatePicker = false;
     private int? FormVisitaId;
     private int? FormSolicitudId;
     private int? FormTecnicoId;
     private int? TecnicoFiltroId;
     private DateTime FormFecha = DateTime.Today;
+    private DateTime MesCalendario = DateTime.Today;
     private TimeOnly? FormHora;
 
     private List<string> DiasSemana = new() { "Lun", "Mar", "Mié", "Jue", "Vie", "Sáb" };
@@ -447,6 +516,17 @@
         tecnicos.FirstOrDefault(t => t.Id == FormTecnicoId)?.Nombre ?? "Sin asignar";
 
     private bool EsDomingoSeleccionado => FormFecha.DayOfWeek == DayOfWeek.Sunday;
+
+    private IEnumerable<DateTime> DiasCalendario
+    {
+        get
+        {
+            var primerDia = new DateTime(MesCalendario.Year, MesCalendario.Month, 1);
+            var inicio = primerDia.AddDays(-((int)primerDia.DayOfWeek + 6) % 7);
+            return Enumerable.Range(0, 36)
+                .Select(i => inicio.AddDays((i / 6 * 7) + i % 6));
+        }
+    }
 
     protected override async Task OnInitializedAsync()
     {
@@ -639,7 +719,9 @@
         FormSolicitudId = null;
         FormTecnicoId = AppState.EsGerente ? null : AppState.Session?.Id;
         FormFecha = DateTime.Today;
+        MesCalendario = new DateTime(FormFecha.Year, FormFecha.Month, 1);
         FormHora = null;
+        showDatePicker = false;
         showNuevaVisita = true;
     }
 
@@ -662,8 +744,23 @@
         FormSolicitudId = visita.SolicitudId;
         FormTecnicoId = visita.TecnicoId;
         FormFecha = visita.Fecha;
+        MesCalendario = new DateTime(FormFecha.Year, FormFecha.Month, 1);
         FormHora = TimeOnly.TryParse(visita.Hora, out var hora) ? hora : null;
+        showDatePicker = false;
         showEditarVisita = true;
+    }
+
+    private void ToggleDatePicker() => showDatePicker = !showDatePicker;
+
+    private void CambiarMesCalendario(int diferencia)
+    {
+        MesCalendario = MesCalendario.AddMonths(diferencia);
+    }
+
+    private void SeleccionarFecha(DateTime fecha)
+    {
+        FormFecha = fecha.Date;
+        showDatePicker = false;
     }
 
     private void OpenCancelarModal() => showCancelar = true;
