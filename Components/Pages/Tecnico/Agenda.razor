@@ -103,22 +103,29 @@
         }
         else if (VistaActual == "Hoy")
         {
-            <div style="position:relative">
-                @foreach (var h in HorasSem)
-                {
-                    <div style="display:flex;gap:12px;height:64px;border-top:1px solid #F0F1F7">
-                        <div style="width:66px;flex:0 0 66px;font-size:12px;color:#8B90A3;font-weight:700;padding-top:4px">@h</div>
-                    </div>
-                }
-                @foreach (var ev in DiariaEventos)
-                {
-                    <div @onclick="() => SelectEvent(ev)" style="position:absolute;left:78px;right:6px;top:@(ev.Top)px;height:@(ev.H)px;background:@ev.Bg;border-left:4px solid @ev.Line;border-radius:9px;padding:11px 13px;cursor:pointer;overflow:hidden">
-                        <div style="font-weight:700;font-size:14px">@ev.Cliente</div>
-                        <div style="font-size:12.5px;color:#4A4E63;margin-top:3px">@ev.TipoServicio</div>
-                        <div style="font-size:12px;color:#6B7085;margin-top:2px">@ev.Rango</div>
-                    </div>
-                }
-            </div>
+            @if (DateTime.Today.DayOfWeek == DayOfWeek.Sunday)
+            {
+                <div style="color:#8B90A3;font-size:14px;text-align:center;padding:40px 10px">La agenda no está disponible los domingos.</div>
+            }
+            else
+            {
+                <div style="position:relative">
+                    @foreach (var h in HorasSem)
+                    {
+                        <div style="display:flex;gap:12px;height:64px;border-top:1px solid #F0F1F7">
+                            <div style="width:66px;flex:0 0 66px;font-size:12px;color:#8B90A3;font-weight:700;padding-top:4px">@h</div>
+                        </div>
+                    }
+                    @foreach (var ev in DiariaEventos)
+                    {
+                        <div @onclick="() => SelectEvent(ev)" style="position:absolute;left:78px;right:6px;top:@(ev.Top)px;height:@(ev.H)px;background:@ev.Bg;border-left:4px solid @ev.Line;border-radius:9px;padding:11px 13px;cursor:pointer;overflow:hidden">
+                            <div style="font-weight:700;font-size:14px">@ev.Cliente</div>
+                            <div style="font-size:12.5px;color:#4A4E63;margin-top:3px">@ev.TipoServicio</div>
+                            <div style="font-size:12px;color:#6B7085;margin-top:2px">@ev.Rango</div>
+                        </div>
+                    }
+                </div>
+            }
         }
     </div>
 
@@ -231,13 +238,7 @@
                     </div>
                     <div>
                         <label style="display:block;font-size:13px;font-weight:700;color:#14162B;margin-bottom:6px">Hora *</label>
-                        <select value="@(FormHora?.ToString("HH:mm"))" @onchange="OnHoraChanged" style="width:100%;padding:10px 14px;border:1px solid #D5D8E6;border-radius:8px;font-size:14px;color:#14162B;background:#fff">
-                            <option value="">Seleccionar hora...</option>
-                            @foreach (var hora in HorasDisponibles)
-                            {
-                                <option value="@hora">@AppStateService.FormatHora12(hora)</option>
-                            }
-                        </select>
+                        <input type="time" @bind="FormHora" min="08:00" max="18:00" style="width:100%;padding:10px 14px;border:1px solid #D5D8E6;border-radius:8px;font-size:14px;color:#14162B" />
                     </div>
                 </div>
                 @if (EsDomingoSeleccionado)
@@ -300,13 +301,7 @@
                     </div>
                     <div>
                         <label style="display:block;font-size:13px;font-weight:700;color:#14162B;margin-bottom:6px">Hora *</label>
-                        <select value="@(FormHora?.ToString("HH:mm"))" @onchange="OnHoraChanged" style="width:100%;padding:10px 14px;border:1px solid #D5D8E6;border-radius:8px;font-size:14px;color:#14162B;background:#fff">
-                            <option value="">Seleccionar hora...</option>
-                            @foreach (var hora in HorasDisponibles)
-                            {
-                                <option value="@hora">@AppStateService.FormatHora12(hora)</option>
-                            }
-                        </select>
+                        <input type="time" @bind="FormHora" min="08:00" max="18:00" style="width:100%;padding:10px 14px;border:1px solid #D5D8E6;border-radius:8px;font-size:14px;color:#14162B" />
                     </div>
                 </div>
                 @if (EsDomingoSeleccionado)
@@ -452,21 +447,6 @@
         tecnicos.FirstOrDefault(t => t.Id == FormTecnicoId)?.Nombre ?? "Sin asignar";
 
     private bool EsDomingoSeleccionado => FormFecha.DayOfWeek == DayOfWeek.Sunday;
-
-    private IEnumerable<string> HorasDisponibles
-    {
-        get
-        {
-            var horas = Enumerable.Range(0, 21)
-                .Select(i => new TimeOnly(8, 0).AddMinutes(i * 30));
-            if (FormHora is { } horaActual && !horas.Contains(horaActual))
-            {
-                horas = horas.Append(horaActual).OrderBy(h => h);
-            }
-
-            return horas.Select(h => h.ToString("HH:mm"));
-        }
-    }
 
     protected override async Task OnInitializedAsync()
     {
@@ -645,13 +625,6 @@
     {
         FormSolicitudId = int.TryParse(args.Value?.ToString(), out var solicitudId)
             ? solicitudId
-            : null;
-    }
-
-    private void OnHoraChanged(ChangeEventArgs args)
-    {
-        FormHora = TimeOnly.TryParse(args.Value?.ToString(), out var hora)
-            ? hora
             : null;
     }
 
