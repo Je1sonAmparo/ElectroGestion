@@ -36,7 +36,15 @@
                     }
                 </select>
             </div>
-            <div style="color:#6B7085;font-size:13.5px">@AgendaRango</div>
+            <div style="display:flex;align-items:center;gap:8px;color:#6B7085;font-size:13.5px">
+                <button @onclick="() => CambiarPeriodo(-1)"
+                    aria-label="@(VistaActual == "Hoy" ? "Día anterior" : VistaActual == "Semanal" ? "Semana anterior" : "Mes anterior")"
+                    style="width:32px;height:32px;display:flex;align-items:center;justify-content:center;border:1px solid #D5D8E6;background:#fff;border-radius:8px;color:#4A4E63;font-size:20px;line-height:1;cursor:pointer">‹</button>
+                <span style="min-width:180px;text-align:center">@AgendaRango</span>
+                <button @onclick="() => CambiarPeriodo(1)"
+                    aria-label="@(VistaActual == "Hoy" ? "Día siguiente" : VistaActual == "Semanal" ? "Semana siguiente" : "Mes siguiente")"
+                    style="width:32px;height:32px;display:flex;align-items:center;justify-content:center;border:1px solid #D5D8E6;background:#fff;border-radius:8px;color:#4A4E63;font-size:20px;line-height:1;cursor:pointer">›</button>
+            </div>
         </div>
 
         @if (VistaActual == "Semanal")
@@ -103,7 +111,7 @@
         }
         else if (VistaActual == "Hoy")
         {
-            @if (DateTime.Today.DayOfWeek == DayOfWeek.Sunday)
+            @if (FechaCalendario.DayOfWeek == DayOfWeek.Sunday)
             {
                 <div style="color:#8B90A3;font-size:14px;text-align:center;padding:40px 10px">La agenda no está disponible los domingos.</div>
             }
@@ -390,6 +398,7 @@
 @code {
     private string VistaActual = "Hoy";
     private string AgendaRango = "";
+    private DateTime FechaCalendario = DateTime.Today;
 
     private bool showNuevaVisita = false;
     private bool showEditarVisita = false;
@@ -518,6 +527,29 @@
         await UpdateData();
     }
 
+    private async Task CambiarPeriodo(int direccion)
+    {
+        FechaCalendario = VistaActual switch
+        {
+            "Semanal" => FechaCalendario.AddDays(7 * direccion),
+            "Mensual" => FechaCalendario.AddMonths(direccion),
+            _ => CambiarDiaHabil(FechaCalendario, direccion)
+        };
+
+        await UpdateData();
+    }
+
+    private static DateTime CambiarDiaHabil(DateTime fecha, int direccion)
+    {
+        var siguiente = fecha.AddDays(direccion);
+        while (siguiente.DayOfWeek == DayOfWeek.Sunday)
+        {
+            siguiente = siguiente.AddDays(direccion);
+        }
+
+        return siguiente;
+    }
+
     private async Task OnTecnicoFiltroChanged(ChangeEventArgs e)
     {
         TecnicoFiltroId = int.TryParse(e.Value?.ToString(), out var tecnicoId)
@@ -531,8 +563,8 @@
         solicitudes = await SolicitudService.GetList(s => true);
         visitas = await VisitaService.ObtenerTodasAsync();
         tecnicos = await VisitaService.ObtenerTecnicosAsync();
-        var hoyD = DateTime.Today;
-        var hoyStr = hoyD.ToString("yyyy-MM-dd");
+        var fechaActual = FechaCalendario.Date;
+        var fechaActualStr = fechaActual.ToString("yyyy-MM-dd");
 
         var MES = new[] { "enero", "febrero", "marzo", "abril", "mayo", "junio", "julio", "agosto", "septiembre", "octubre", "noviembre", "diciembre" };
 
@@ -542,7 +574,7 @@
             .Where(v => v.Fecha != DateTime.MinValue && TimeOnly.TryParse(v.Hora, out _))
             .ToList();
 
-        var lunes = hoyD.AddDays(-((int)hoyD.DayOfWeek == 0 ? 6 : (int)hoyD.DayOfWeek - 1));
+        var lunes = fechaActual.AddDays(-((int)fechaActual.DayOfWeek == 0 ? 6 : (int)fechaActual.DayOfWeek - 1));
         var finSem = lunes.AddDays(5);
 
         if (VistaActual == "Semanal")
@@ -551,11 +583,11 @@
         }
         else if (VistaActual == "Mensual")
         {
-            AgendaRango = char.ToUpper(MES[hoyD.Month - 1][0]) + MES[hoyD.Month - 1].Substring(1) + " " + hoyD.Year;
+            AgendaRango = char.ToUpper(MES[fechaActual.Month - 1][0]) + MES[fechaActual.Month - 1].Substring(1) + " " + fechaActual.Year;
         }
         else
         {
-            AgendaRango = AppStateService.FormatFechaLarga(hoyStr);
+            AgendaRango = AppStateService.FormatFechaLarga(fechaActualStr);
         }
 
         Semana.Clear();
@@ -563,7 +595,7 @@
         {
             var d = lunes.AddDays(i);
             var f = d.ToString("yyyy-MM-dd");
-            var esHoy = f == hoyStr;
+            var esHoy = f == fechaActualStr;
 
             var evs = visibles
                 .Where(v => v.Fecha.ToString("yyyy-MM-dd") == f)
@@ -586,7 +618,7 @@
             });
         }
 
-        var prim = new DateTime(hoyD.Year, hoyD.Month, 1);
+        var prim = new DateTime(fechaActual.Year, fechaActual.Month, 1);
         var ini = prim.AddDays(-((int)prim.DayOfWeek == 0 ? 6 : (int)prim.DayOfWeek - 1));
         
         Mes.Clear();
@@ -594,8 +626,8 @@
         {
             var d = ini.AddDays((i / 6 * 7) + i % 6);
             var f = d.ToString("yyyy-MM-dd");
-            var esHoy = f == hoyStr;
-            var otro = d.Month != hoyD.Month;
+            var esHoy = f == fechaActualStr;
+            var otro = d.Month != fechaActual.Month;
 
             var evs = visibles
                 .Where(v => v.Fecha.ToString("yyyy-MM-dd") == f)
@@ -612,10 +644,10 @@
             });
         }
 
-        DiariaEventos = hoyD.DayOfWeek == DayOfWeek.Sunday
+        DiariaEventos = fechaActual.DayOfWeek == DayOfWeek.Sunday
             ? new List<Evento>()
             : visibles
-                .Where(v => v.Fecha.ToString("yyyy-MM-dd") == hoyStr)
+                .Where(v => v.Fecha.ToString("yyyy-MM-dd") == fechaActualStr)
                 .Select(v =>
             {
                 var hora = TimeOnly.Parse(v.Hora);
