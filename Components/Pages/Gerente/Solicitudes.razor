@@ -172,9 +172,6 @@
                 <div style="background:#F7F8FC;border:1px solid #EFF0F6;border-radius:10px;padding:12px 14px"><div style="font-size:11.5px;color:#8B90A3;font-weight:800;text-transform:uppercase">Contacto</div><div style="font-size:14px;margin-top:4px;font-weight:700;color:#14162B">@SelectedSolicitud.Contacto</div></div>
                 <div style="background:#F7F8FC;border:1px solid #EFF0F6;border-radius:10px;padding:12px 14px"><div style="font-size:11.5px;color:#8B90A3;font-weight:800;text-transform:uppercase">Tipo de servicio</div><div style="font-size:14px;margin-top:4px;font-weight:700;color:#14162B">@SelectedSolicitud.Servicio?.Nombre</div></div>
                 <div style="background:#F7F8FC;border:1px solid #EFF0F6;border-radius:10px;padding:12px 14px"><div style="font-size:11.5px;color:#8B90A3;font-weight:800;text-transform:uppercase">Dirección</div><div style="font-size:14px;margin-top:4px;font-weight:700;color:#14162B">@SelectedSolicitud.Direccion</div></div>
-                <div style="background:#F7F8FC;border:1px solid #EFF0F6;border-radius:10px;padding:12px 14px"><div style="font-size:11.5px;color:#8B90A3;font-weight:800;text-transform:uppercase">Fecha de solicitud</div><div style="font-size:14px;margin-top:4px;font-weight:700;color:#14162B">@AppStateService.FormatFecha(SelectedSolicitud.FechaSolicitud.ToString("yyyy-MM-dd"))</div></div>
-                <div style="background:#F7F8FC;border:1px solid #EFF0F6;border-radius:10px;padding:12px 14px"><div style="font-size:11.5px;color:#8B90A3;font-weight:800;text-transform:uppercase">Fecha del levantamiento</div><div style="font-size:14px;margin-top:4px;font-weight:700;color:#14162B">@AppStateService.FormatFecha(SelectedSolicitud.Fecha.ToString("yyyy-MM-dd"))</div></div>
-                <div style="background:#F7F8FC;border:1px solid #EFF0F6;border-radius:10px;padding:12px 14px"><div style="font-size:11.5px;color:#8B90A3;font-weight:800;text-transform:uppercase">Hora</div><div style="font-size:14px;margin-top:4px;font-weight:700;color:#14162B">@AppStateService.FormatHora12(SelectedSolicitud.Hora)</div></div>
                 <div style="background:#F7F8FC;border:1px solid #EFF0F6;border-radius:10px;padding:12px 14px"><div style="font-size:11.5px;color:#8B90A3;font-weight:800;text-transform:uppercase">Estado</div><div style="font-size:14px;margin-top:4px;font-weight:700;color:#14162B">@SelectedSolicitud.EstadoSolicitud?.Nombre</div></div>
             </div>
             <div style="margin-top:24px;display:flex;justify-content:flex-end;border-top:1px solid #EFF0F6;padding-top:17px">
@@ -225,16 +222,6 @@
                     <input @bind="FormDireccion" placeholder="ej. Calle Principal #12, Santiago" style="width:100%;padding:10px 14px;border:1px solid #D5D8E6;border-radius:8px;font-size:14px" />
                 </div>
 
-                <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px">
-                    <div>
-                        <label style="display:block;font-size:13px;font-weight:700;color:#14162B;margin-bottom:6px">Fecha de Visita</label>
-                        <input type="date" @bind="FormFecha" style="width:100%;padding:10px 14px;border:1px solid #D5D8E6;border-radius:8px;font-size:14px" />
-                    </div>
-                    <div>
-                        <label style="display:block;font-size:13px;font-weight:700;color:#14162B;margin-bottom:6px">Hora de Visita</label>
-                        <input type="time" @bind="FormHora" style="width:100%;padding:10px 14px;border:1px solid #D5D8E6;border-radius:8px;font-size:14px" />
-                    </div>
-                </div>
             </div>
 
             <div style="display:flex;justify-content:flex-end;gap:12px;margin-top:28px">
@@ -297,8 +284,6 @@
     private string FormCliente = "";
     private string FormTipo = "";
     private string FormDireccion = "";
-    private DateTime? FormFecha;
-    private TimeOnly? FormHora;
     private List<string> TiposServicio = new() {
         "Instalación Solar", "Instalación de Sistema UPS", "Mantenimiento Eléctrico",
         "Instalación de Planta Eléctrica", "Cableado Estructurado"
@@ -386,8 +371,6 @@
         FormCliente = "";
         FormTipo = "";
         FormDireccion = "";
-        FormFecha = null;
-        FormHora = null;
         FormId = null;
     }
 
@@ -403,11 +386,6 @@
             FormCliente = s.Cliente?.Nombre ?? "";
             FormTipo = s.Servicio?.Nombre ?? "";
             FormDireccion = s.Direccion;
-            FormFecha = s.Fecha;
-            if (!string.IsNullOrEmpty(s.Hora) && TimeOnly.TryParse(s.Hora, out var parsedHora))
-                FormHora = parsedHora;
-            else
-                FormHora = null;
             FormId = s.Id;
         }
     }
@@ -487,9 +465,6 @@
                 s.Contacto = clienteEntity.Nombre;
                 s.ServicioId = servicioEntity.Id;
                 s.Direccion = FormDireccion;
-                if (FormFecha.HasValue) s.Fecha = FormFecha.Value;
-                s.Hora = FormHora?.ToString("HH:mm") ?? "";
-                
                 var resultado = await SolicitudService.Guardar(s);
                 if (resultado) ToastService.ShowSuccess("Solicitud actualizada correctamente.");
                 else ToastService.ShowError("Error al actualizar la solicitud.");
@@ -504,8 +479,6 @@
                 Contacto = clienteEntity.Nombre,
                 Direccion = FormDireccion,
                 FechaSolicitud = DateTime.Today,
-                Fecha = FormFecha ?? DateTime.Today,
-                Hora = FormHora?.ToString("HH:mm") ?? "",
                 EstadoSolicitudId = 1
             };
             

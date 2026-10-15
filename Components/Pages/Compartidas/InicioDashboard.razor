@@ -29,10 +29,10 @@
                 <div class="home-visit-content">
                     <div class="home-visit-details">
                         <div class="home-visit-time">@ElectroGestion.Services.AppStateService.FormatHora12(visit.Hora)</div>
-                        <div class="home-visit-client">@visit.Cliente?.Nombre</div>
-                        <div class="home-visit-meta">@visit.Servicio?.Nombre</div>
-                        <div class="home-visit-meta">@visit.Direccion</div>
-                        <button @onclick="() => VerMapa(visit.Direccion)" class="home-outline-button">Ver ubicación</button>
+                        <div class="home-visit-client">@visit.Solicitud?.Cliente?.Nombre</div>
+                        <div class="home-visit-meta">@visit.Solicitud?.Servicio?.Nombre</div>
+                        <div class="home-visit-meta">@visit.Solicitud?.Direccion</div>
+                        <button @onclick='() => VerMapa(visit.Solicitud?.Direccion ?? "")' class="home-outline-button">Ver ubicación</button>
                     </div>
                     <div class="home-map" role="img" aria-label="Mapa de ubicación aproximada">
                         <svg viewBox="0 0 320 172" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
@@ -116,13 +116,12 @@
 @code {
     private string UserName => AppState.Session?.Nombre ?? "Usuario";
 
-    private IEnumerable<ElectroGestion.Models.Solicitud> VisitsToday => AppState.Solicitudes
-        .Where(s => s.Fecha.ToString("yyyy-MM-dd") == DateTime.Today.ToString("yyyy-MM-dd") &&
-                    !string.IsNullOrWhiteSpace(s.Hora) &&
-                    s.EstadoSolicitud?.Nombre != "Cancelada" && s.EstadoSolicitud?.Nombre != "Finalizada")
-        .OrderBy(s => s.Hora);
+    private IEnumerable<ElectroGestion.Models.Visita> VisitsToday => AppState.Visitas
+        .Where(v => v.Fecha.Date == DateTime.Today &&
+                    v.Estado != "Cancelada" && v.Estado != "Finalizada")
+        .OrderBy(v => v.Hora);
 
-    private ElectroGestion.Models.Solicitud? NextVisit => VisitsToday.FirstOrDefault();
+    private ElectroGestion.Models.Visita? NextVisit => VisitsToday.FirstOrDefault();
 
     private IEnumerable<ElectroGestion.Models.Solicitud> RecentActivity => AppState.Solicitudes
         .OrderByDescending(s => s.FechaSolicitud)

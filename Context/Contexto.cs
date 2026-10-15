@@ -147,8 +147,6 @@ public class Contexto : DbContext
                 Contacto = "Melody Santos",
                 Direccion = "Calle Duarte #24, Santiago",
                 FechaSolicitud = new DateTime(2026, 10, 1),
-                Fecha = new DateTime(2026, 10, 12),
-                Hora = "09:00",
                 EstadoSolicitudId = 1
             },
             new Solicitud
@@ -159,8 +157,6 @@ public class Contexto : DbContext
                 Contacto = "Constructora López",
                 Direccion = "Av. Estrella Sadhalá #102, Santiago",
                 FechaSolicitud = new DateTime(2026, 10, 2),
-                Fecha = new DateTime(2026, 10, 10),
-                Hora = "10:30",
                 EstadoSolicitudId = 2
             },
             new Solicitud
@@ -171,8 +167,6 @@ public class Contexto : DbContext
                 Contacto = "Farmacia El Sol",
                 Direccion = "Calle 16 #7, La Vega",
                 FechaSolicitud = new DateTime(2026, 10, 3),
-                Fecha = new DateTime(2026, 10, 11),
-                Hora = "14:00",
                 EstadoSolicitudId = 1
             },
             new Solicitud
@@ -183,8 +177,6 @@ public class Contexto : DbContext
                 Contacto = "Colmado Hernández",
                 Direccion = "Calle Principal #58, Moca",
                 FechaSolicitud = new DateTime(2026, 9, 29),
-                Fecha = new DateTime(2026, 10, 5),
-                Hora = "08:30",
                 EstadoSolicitudId = 3
             },
             new Solicitud
@@ -195,8 +187,6 @@ public class Contexto : DbContext
                 Contacto = "Taller Mecánico RD",
                 Direccion = "Carretera Luperón km 5, Santiago",
                 FechaSolicitud = new DateTime(2026, 10, 4),
-                Fecha = new DateTime(2026, 10, 9),
-                Hora = "11:00",
                 EstadoSolicitudId = 2
             },
             new Solicitud
@@ -207,8 +197,6 @@ public class Contexto : DbContext
                 Contacto = "Melody Santos",
                 Direccion = "Calle Duarte #24, Santiago",
                 FechaSolicitud = new DateTime(2026, 9, 20),
-                Fecha = new DateTime(2026, 9, 28),
-                Hora = "15:00",
                 EstadoSolicitudId = 3
             },
             new Solicitud
@@ -219,8 +207,6 @@ public class Contexto : DbContext
                 Contacto = "Constructora López",
                 Direccion = "Av. Estrella Sadhalá #102, Santiago",
                 FechaSolicitud = new DateTime(2026, 9, 25),
-                Fecha = new DateTime(2026, 10, 1),
-                Hora = "09:30",
                 EstadoSolicitudId = 4
             },
             new Solicitud
@@ -231,8 +217,6 @@ public class Contexto : DbContext
                 Contacto = "Farmacia El Sol",
                 Direccion = "Calle 16 #7, La Vega",
                 FechaSolicitud = new DateTime(2026, 10, 6),
-                Fecha = new DateTime(2026, 10, 14),
-                Hora = "10:00",
                 EstadoSolicitudId = 1
             }
         );

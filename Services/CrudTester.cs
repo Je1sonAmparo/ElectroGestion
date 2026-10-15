@@ -114,8 +114,6 @@ public static class CrudTester
             Contacto = nuevoCliente.Nombre,
             Direccion = "Av. Circunvalación Norte #50, Santiago",
             FechaSolicitud = DateTime.Today,
-            Fecha = DateTime.Today.AddDays(3),
-            Hora = "10:30",
             EstadoSolicitudId = 1
         };
 
@@ -136,7 +134,6 @@ public static class CrudTester
         Console.WriteLine($"✅ Solicitud LEÍDA correctamente. Cliente relacionado: {solLeida.Cliente?.Nombre}, Servicio: {solLeida.Servicio?.Nombre}");
 
         solLeida.Direccion = "Nueva dirección de visita #99";
-        solLeida.Hora = "15:45";
         solLeida.EstadoSolicitudId = 2; // En proceso
 
         bool solModificada = await solicitudService.Guardar(solLeida);
@@ -148,7 +145,7 @@ public static class CrudTester
         Console.WriteLine("✅ Solicitud MODIFICADA correctamente.");
 
         var solVerif = await solicitudService.Buscar(nuevaSolicitud.Id);
-        if (solVerif?.Direccion != "Nueva dirección de visita #99" || solVerif?.Hora != "15:45" || solVerif?.EstadoSolicitudId != 2)
+        if (solVerif?.Direccion != "Nueva dirección de visita #99" || solVerif?.EstadoSolicitudId != 2)
         {
             Console.WriteLine("❌ ERROR: La modificación de la solicitud no persistió los cambios.");
             return false;

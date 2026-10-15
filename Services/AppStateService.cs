@@ -11,6 +11,7 @@ public class AppStateService
     public List<Usuario> Usuarios { get; set; } = new();
     public List<Cliente> Clientes { get; set; } = new();
     public List<Solicitud> Solicitudes { get; set; } = new();
+    public List<Visita> Visitas { get; set; } = new();
     public List<Levantamiento> Levantamientos { get; set; } = new();
     public List<OrdenTrabajo> Ordenes { get; set; } = new();
     public List<Servicio> Servicios { get; set; } = new();
@@ -103,14 +104,25 @@ public class AppStateService
 
         Solicitudes = new List<Solicitud>
         {
-            new() { Id = 1, ClienteId = 1, Cliente = Clientes[0], Contacto = "809-000-0000", Direccion = "Calle Duarte #24, Santiago", ServicioId = 2, Servicio = Servicios[1], FechaSolicitud = DateTime.Today.AddDays(-6), Fecha = DateTime.Today, Hora = "09:00", EstadoSolicitudId = 2, EstadoSolicitud = EstadosSolicitud[1] },
-            new() { Id = 2, ClienteId = 2, Cliente = Clientes[1], Contacto = "809-555-1212", Direccion = "Av. Estrella Sadhalá #102, Santiago", ServicioId = 1, Servicio = Servicios[0], FechaSolicitud = DateTime.Today.AddDays(-5), Fecha = DateTime.Today, Hora = "14:00", EstadoSolicitudId = 1, EstadoSolicitud = EstadosSolicitud[0] },
-            new() { Id = 3, ClienteId = 3, Cliente = Clientes[2], Contacto = "829-441-8890", Direccion = "Calle 16 #7, La Vega", ServicioId = 3, Servicio = Servicios[2], FechaSolicitud = DateTime.Today.AddDays(-4), Fecha = DateTime.Today.AddDays(1), Hora = "10:30", EstadoSolicitudId = 1, EstadoSolicitud = EstadosSolicitud[0] },
-            new() { Id = 4, ClienteId = 4, Cliente = Clientes[3], Contacto = "849-220-3311", Direccion = "Calle Principal #58, Moca", ServicioId = 4, Servicio = Servicios[3], FechaSolicitud = DateTime.Today.AddDays(-3), Fecha = DateTime.Today.AddDays(2), Hora = "08:00", EstadoSolicitudId = 1, EstadoSolicitud = EstadosSolicitud[0] },
-            new() { Id = 5, ClienteId = 5, Cliente = Clientes[4], Contacto = "809-778-4402", Direccion = "Carretera Luperón km 5, Santiago", ServicioId = 5, Servicio = Servicios[4], FechaSolicitud = DateTime.Today.AddDays(-2), Fecha = DateTime.Today, Hora = "", EstadoSolicitudId = 1, EstadoSolicitud = EstadosSolicitud[0] },
-            new() { Id = 6, ClienteId = 1, Cliente = Clientes[0], Contacto = "809-000-0000", Direccion = "Calle Duarte #24, Santiago", ServicioId = 3, Servicio = Servicios[2], FechaSolicitud = DateTime.Today.AddDays(-12), Fecha = DateTime.Today.AddDays(-9), Hora = "11:00", EstadoSolicitudId = 3, EstadoSolicitud = EstadosSolicitud[2], FechaFin = DateTime.Today.AddDays(-8) },
-            new() { Id = 7, ClienteId = 3, Cliente = Clientes[2], Contacto = "829-441-8890", Direccion = "Calle 16 #7, La Vega", ServicioId = 4, Servicio = Servicios[3], FechaSolicitud = DateTime.Today.AddDays(-20), Fecha = DateTime.Today.AddDays(-18), Hora = "09:00", EstadoSolicitudId = 3, EstadoSolicitud = EstadosSolicitud[2], FechaFin = DateTime.Today.AddDays(-17) },
-            new() { Id = 8, ClienteId = 4, Cliente = Clientes[3], Contacto = "849-220-3311", Direccion = "Calle Principal #58, Moca", ServicioId = 1, Servicio = Servicios[0], FechaSolicitud = DateTime.Today.AddDays(-30), Fecha = DateTime.Today.AddDays(-28), Hora = "15:00", EstadoSolicitudId = 4, EstadoSolicitud = EstadosSolicitud[3] }
+            new() { Id = 1, ClienteId = 1, Cliente = Clientes[0], Contacto = "809-000-0000", Direccion = "Calle Duarte #24, Santiago", ServicioId = 2, Servicio = Servicios[1], FechaSolicitud = DateTime.Today.AddDays(-6), EstadoSolicitudId = 2, EstadoSolicitud = EstadosSolicitud[1] },
+            new() { Id = 2, ClienteId = 2, Cliente = Clientes[1], Contacto = "809-555-1212", Direccion = "Av. Estrella Sadhalá #102, Santiago", ServicioId = 1, Servicio = Servicios[0], FechaSolicitud = DateTime.Today.AddDays(-5), EstadoSolicitudId = 1, EstadoSolicitud = EstadosSolicitud[0] },
+            new() { Id = 3, ClienteId = 3, Cliente = Clientes[2], Contacto = "829-441-8890", Direccion = "Calle 16 #7, La Vega", ServicioId = 3, Servicio = Servicios[2], FechaSolicitud = DateTime.Today.AddDays(-4), EstadoSolicitudId = 1, EstadoSolicitud = EstadosSolicitud[0] },
+            new() { Id = 4, ClienteId = 4, Cliente = Clientes[3], Contacto = "849-220-3311", Direccion = "Calle Principal #58, Moca", ServicioId = 4, Servicio = Servicios[3], FechaSolicitud = DateTime.Today.AddDays(-3), EstadoSolicitudId = 1, EstadoSolicitud = EstadosSolicitud[0] },
+            new() { Id = 5, ClienteId = 5, Cliente = Clientes[4], Contacto = "809-778-4402", Direccion = "Carretera Luperón km 5, Santiago", ServicioId = 5, Servicio = Servicios[4], FechaSolicitud = DateTime.Today.AddDays(-2), EstadoSolicitudId = 1, EstadoSolicitud = EstadosSolicitud[0] },
+            new() { Id = 6, ClienteId = 1, Cliente = Clientes[0], Contacto = "809-000-0000", Direccion = "Calle Duarte #24, Santiago", ServicioId = 3, Servicio = Servicios[2], FechaSolicitud = DateTime.Today.AddDays(-12), EstadoSolicitudId = 3, EstadoSolicitud = EstadosSolicitud[2], FechaFin = DateTime.Today.AddDays(-8) },
+            new() { Id = 7, ClienteId = 3, Cliente = Clientes[2], Contacto = "829-441-8890", Direccion = "Calle 16 #7, La Vega", ServicioId = 4, Servicio = Servicios[3], FechaSolicitud = DateTime.Today.AddDays(-20), EstadoSolicitudId = 3, EstadoSolicitud = EstadosSolicitud[2], FechaFin = DateTime.Today.AddDays(-17) },
+            new() { Id = 8, ClienteId = 4, Cliente = Clientes[3], Contacto = "849-220-3311", Direccion = "Calle Principal #58, Moca", ServicioId = 1, Servicio = Servicios[0], FechaSolicitud = DateTime.Today.AddDays(-30), EstadoSolicitudId = 4, EstadoSolicitud = EstadosSolicitud[3] }
+        };
+
+        Visitas = new List<Visita>
+        {
+            new() { Id = 1, SolicitudId = 1, Solicitud = Solicitudes[0], Fecha = DateTime.Today, Hora = "09:00", HoraFin = "11:30", Estado = "En proceso" },
+            new() { Id = 2, SolicitudId = 2, Solicitud = Solicitudes[1], Fecha = DateTime.Today, Hora = "14:00", HoraFin = "16:30", Estado = "Pendiente" },
+            new() { Id = 3, SolicitudId = 3, Solicitud = Solicitudes[2], Fecha = DateTime.Today.AddDays(1), Hora = "10:30", HoraFin = "13:00", Estado = "Pendiente" },
+            new() { Id = 4, SolicitudId = 4, Solicitud = Solicitudes[3], Fecha = DateTime.Today.AddDays(2), Hora = "08:00", HoraFin = "10:30", Estado = "Pendiente" },
+            new() { Id = 5, SolicitudId = 6, Solicitud = Solicitudes[5], Fecha = DateTime.Today.AddDays(-9), Hora = "11:00", HoraFin = "13:30", Estado = "Finalizada" },
+            new() { Id = 6, SolicitudId = 7, Solicitud = Solicitudes[6], Fecha = DateTime.Today.AddDays(-18), Hora = "09:00", HoraFin = "11:30", Estado = "Finalizada" },
+            new() { Id = 7, SolicitudId = 8, Solicitud = Solicitudes[7], Fecha = DateTime.Today.AddDays(-28), Hora = "15:00", HoraFin = "17:30", Estado = "Cancelada" }
         };
 
         Levantamientos = new List<Levantamiento>

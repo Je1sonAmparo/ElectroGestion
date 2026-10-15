@@ -301,7 +301,8 @@
             bool matchId = string.IsNullOrEmpty(SearchId) || o.Id.ToString().Contains(SearchId) || (!string.IsNullOrEmpty(o.Code) && o.Code.Contains(SearchId, StringComparison.OrdinalIgnoreCase));
             bool matchCliente = string.IsNullOrEmpty(SearchCliente) || cliente.Contains(SearchCliente, StringComparison.OrdinalIgnoreCase);
             bool matchTipo = string.IsNullOrEmpty(SearchTipo) || tipo.Contains(SearchTipo, StringComparison.OrdinalIgnoreCase);
-            bool matchFecha = !SearchFecha.HasValue || (s != null && s.Fecha.Date == SearchFecha.Value.Date);
+            var visita = AppState.Visitas.FirstOrDefault(v => v.SolicitudId == o.SolicitudId);
+            bool matchFecha = !SearchFecha.HasValue || (visita != null && visita.Fecha.Date == SearchFecha.Value.Date);
             bool matchEstado = SearchEstado == "Todas" || o.Estado == SearchEstado;
             return matchId && matchCliente && matchTipo && matchFecha && matchEstado;
         })
