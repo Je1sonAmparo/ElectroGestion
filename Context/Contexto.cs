@@ -8,6 +8,7 @@ public class Contexto : DbContext
     public Contexto(DbContextOptions<Contexto> options) : base(options) { }
 
     public DbSet<Solicitud> Solicitudes { get; set; }
+    public DbSet<Visita> Visitas { get; set; }
     public DbSet<Cliente> Clientes { get; set; }
     public DbSet<Usuario> Usuarios { get; set; }
     public DbSet<Servicio> Servicios { get; set; }
@@ -59,6 +60,19 @@ public class Contexto : DbContext
                 .WithOne(d => d.Solicitud)
                 .HasForeignKey(d => d.SolicitudId)
                 .OnDelete(DeleteBehavior.Cascade);
+
+            entity.HasMany<Visita>()
+                .WithOne(v => v.Solicitud)
+                .HasForeignKey(v => v.SolicitudId)
+                .OnDelete(DeleteBehavior.Restrict);
+        });
+
+        modelBuilder.Entity<Visita>(entity =>
+        {
+            entity.HasOne(v => v.Tecnico)
+                .WithMany()
+                .HasForeignKey(v => v.TecnicoId)
+                .OnDelete(DeleteBehavior.SetNull);
         });
 
         modelBuilder.Entity<Usuario>(entity =>
@@ -75,8 +89,8 @@ public class Contexto : DbContext
             new Usuario
             {
                 Id = 1,
-                UsuarioLogin = "gerente",
-                PasswordHash = "AQAAAAIAAYagAAAAEJvgEPmcnhCOwOXMhDWnexFdwrQh5Mp/b03A6SZkGM8aoTtqxVaYaiMdDG4D1BgbqQ==",
+                UsuarioLogin = "ana",
+                PasswordHash = "AQAAAAIAAYagAAAAEHjAvVupymZcL4Z7wSkz9ro//N3Hyz31400GKF9GEPnxQFaOPv8TGpO2FJZ8XqCSwg==",
                 Nombre = "Ana Hernández",
                 Cargo = "Gerente",
                 Rol = "Gerente"
@@ -84,8 +98,8 @@ public class Contexto : DbContext
             new Usuario
             {
                 Id = 2,
-                UsuarioLogin = "tecnico",
-                PasswordHash = "AQAAAAIAAYagAAAAEPeGfF62+i6tlvwb/sGQEx4ZyM4cP0sxOuSW3LIBCB8siO0FC0OAM/bXUzKQK/ujqw==",
+                UsuarioLogin = "luis",
+                PasswordHash = "AQAAAAIAAYagAAAAEAXFkAX9eqMt9778g9tjjfmZCQWcmM5qlxzOI9VP6eXkDBo7XL52AGtJ9CTZWHUm7g==",
                 Nombre = "Luis Peña",
                 Cargo = "Técnico",
                 Rol = "Técnico"

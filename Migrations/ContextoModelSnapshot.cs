@@ -560,19 +560,60 @@ namespace ElectroGestion.Migrations
                             Id = 1,
                             Cargo = "Gerente",
                             Nombre = "Ana Hernández",
-                            PasswordHash = "AQAAAAIAAYagAAAAEJvgEPmcnhCOwOXMhDWnexFdwrQh5Mp/b03A6SZkGM8aoTtqxVaYaiMdDG4D1BgbqQ==",
+                            PasswordHash = "AQAAAAIAAYagAAAAEHjAvVupymZcL4Z7wSkz9ro//N3Hyz31400GKF9GEPnxQFaOPv8TGpO2FJZ8XqCSwg==",
                             Rol = "Gerente",
-                            UsuarioLogin = "gerente"
+                            UsuarioLogin = "ana"
                         },
                         new
                         {
                             Id = 2,
                             Cargo = "Técnico",
                             Nombre = "Luis Peña",
-                            PasswordHash = "AQAAAAIAAYagAAAAEPeGfF62+i6tlvwb/sGQEx4ZyM4cP0sxOuSW3LIBCB8siO0FC0OAM/bXUzKQK/ujqw==",
+                            PasswordHash = "AQAAAAIAAYagAAAAEAXFkAX9eqMt9778g9tjjfmZCQWcmM5qlxzOI9VP6eXkDBo7XL52AGtJ9CTZWHUm7g==",
                             Rol = "Técnico",
-                            UsuarioLogin = "tecnico"
+                            UsuarioLogin = "luis"
                         });
+                });
+
+            modelBuilder.Entity("ElectroGestion.Models.Visita", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Estado")
+                        .IsRequired()
+                        .HasMaxLength(30)
+                        .HasColumnType("nvarchar(30)");
+
+                    b.Property<DateTime>("Fecha")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Hora")
+                        .IsRequired()
+                        .HasMaxLength(10)
+                        .HasColumnType("nvarchar(10)");
+
+                    b.Property<string>("HoraFin")
+                        .IsRequired()
+                        .HasMaxLength(10)
+                        .HasColumnType("nvarchar(10)");
+
+                    b.Property<int>("SolicitudId")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("TecnicoId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("SolicitudId");
+
+                    b.HasIndex("TecnicoId");
+
+                    b.ToTable("Visitas");
                 });
 
             modelBuilder.Entity("ElectroGestion.Models.ClienteTelefono", b =>
@@ -630,6 +671,24 @@ namespace ElectroGestion.Migrations
                     b.Navigation("EstadoSolicitud");
 
                     b.Navigation("Servicio");
+                });
+
+            modelBuilder.Entity("ElectroGestion.Models.Visita", b =>
+                {
+                    b.HasOne("ElectroGestion.Models.Solicitud", "Solicitud")
+                        .WithMany()
+                        .HasForeignKey("SolicitudId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("ElectroGestion.Models.Usuario", "Tecnico")
+                        .WithMany()
+                        .HasForeignKey("TecnicoId")
+                        .OnDelete(DeleteBehavior.SetNull);
+
+                    b.Navigation("Solicitud");
+
+                    b.Navigation("Tecnico");
                 });
 
             modelBuilder.Entity("ElectroGestion.Models.Cliente", b =>
