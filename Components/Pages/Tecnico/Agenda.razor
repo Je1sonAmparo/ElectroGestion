@@ -21,26 +21,28 @@
 
 <div style="display:grid;grid-template-columns:1.55fr 1fr;gap:16px;align-items:start">
     <div style="background:#fff;border:1px solid #E3E5EE;border-radius:14px;padding:20px">
-        <div style="display:flex;align-items:center;justify-content:space-between;gap:14px;margin-bottom:16px">
-            <select value="@VistaActual" @onchange="OnVistaActualChanged" style="padding:9px 14px;border:1px solid #D5D8E6;border-radius:9px;font-weight:700;font-size:13.5px;background:#fff;color:#14162B;cursor:pointer">
-                <option value="Hoy">Hoy</option>
-                <option value="Semanal">Semanal</option>
-                <option value="Mensual">Mensual</option>
-            </select>
-            <select value="@TecnicoFiltroId" @onchange="OnTecnicoFiltroChanged" aria-label="Filtrar agenda por técnico" style="padding:9px 14px;border:1px solid #D5D8E6;border-radius:9px;font-weight:700;font-size:13.5px;background:#fff;color:#14162B;cursor:pointer">
-                <option value="">Todos los técnicos</option>
-                @foreach (var tecnico in tecnicos)
-                {
-                    <option value="@tecnico.Id">@tecnico.Nombre</option>
-                }
-            </select>
+        <div style="display:flex;align-items:center;justify-content:space-between;gap:14px;flex-wrap:wrap;margin-bottom:16px">
+            <div style="display:flex;align-items:center;gap:8px">
+                <select value="@VistaActual" @onchange="OnVistaActualChanged" style="padding:9px 14px;border:1px solid #D5D8E6;border-radius:9px;font-weight:700;font-size:13.5px;background:#fff;color:#14162B;cursor:pointer">
+                    <option value="Hoy">Hoy</option>
+                    <option value="Semanal">Semanal</option>
+                    <option value="Mensual">Mensual</option>
+                </select>
+                <select value="@TecnicoFiltroId" @onchange="OnTecnicoFiltroChanged" aria-label="Filtrar agenda por técnico" style="padding:9px 14px;border:1px solid #D5D8E6;border-radius:9px;font-weight:700;font-size:13.5px;background:#fff;color:#14162B;cursor:pointer">
+                    <option value="">Todos los técnicos</option>
+                    @foreach (var tecnico in tecnicos)
+                    {
+                        <option value="@tecnico.Id">@tecnico.Nombre</option>
+                    }
+                </select>
+            </div>
             <div style="color:#6B7085;font-size:13.5px">@AgendaRango</div>
         </div>
 
         @if (VistaActual == "Semanal")
         {
             <div>
-                <div style="display:grid;grid-template-columns:56px repeat(7,1fr);border-bottom:1px solid #E3E5EE">
+                <div style="display:grid;grid-template-columns:56px repeat(6,1fr);border-bottom:1px solid #E3E5EE">
                     <div></div>
                     @foreach (var d in Semana)
                     {
@@ -50,7 +52,7 @@
                         </div>
                     }
                 </div>
-                <div style="display:grid;grid-template-columns:56px repeat(7,1fr);position:relative">
+                <div style="display:grid;grid-template-columns:56px repeat(6,1fr);position:relative">
                     <div>
                         @foreach (var h in HorasSem)
                         {
@@ -79,13 +81,13 @@
         else if (VistaActual == "Mensual")
         {
             <div>
-                <div style="display:grid;grid-template-columns:repeat(7,1fr);gap:6px;margin-bottom:6px">
+                <div style="display:grid;grid-template-columns:repeat(6,1fr);gap:6px;margin-bottom:6px">
                     @foreach (var ds in DiasSemana)
                     {
                         <div style="text-align:center;font-size:11px;font-weight:800;color:#8B90A3;text-transform:uppercase;letter-spacing:.06em;padding:4px 0">@ds</div>
                     }
                 </div>
-                <div style="display:grid;grid-template-columns:repeat(7,1fr);gap:6px">
+                <div style="display:grid;grid-template-columns:repeat(6,1fr);gap:6px">
                     @foreach (var d in Mes)
                     {
                         <div style="background:@d.Bg;border:1px solid @d.Border;border-radius:9px;min-height:92px;min-width:0;padding:7px 8px;display:flex;flex-direction:column;gap:4px">
@@ -229,15 +231,25 @@
                     </div>
                     <div>
                         <label style="display:block;font-size:13px;font-weight:700;color:#14162B;margin-bottom:6px">Hora *</label>
-                        <input type="time" @bind="FormHora" style="width:100%;padding:10px 14px;border:1px solid #D5D8E6;border-radius:8px;font-size:14px;color:#14162B" />
+                        <select value="@(FormHora?.ToString("HH:mm"))" @onchange="OnHoraChanged" style="width:100%;padding:10px 14px;border:1px solid #D5D8E6;border-radius:8px;font-size:14px;color:#14162B;background:#fff">
+                            <option value="">Seleccionar hora...</option>
+                            @foreach (var hora in HorasDisponibles)
+                            {
+                                <option value="@hora">@AppStateService.FormatHora12(hora)</option>
+                            }
+                        </select>
                     </div>
                 </div>
+                @if (EsDomingoSeleccionado)
+                {
+                    <div style="color:#C4141B;font-size:13px;font-weight:700">No se pueden programar visitas los domingos.</div>
+                }
 
             </div>
 
             <div style="display:flex;justify-content:flex-end;gap:12px;margin-top:24px">
                 <button @onclick="CloseModals" style="padding:10px 18px;border:1px solid #D5D8E6;background:#fff;border-radius:8px;font-weight:700;cursor:pointer;color:#14162B">Cancelar</button>
-                <button @onclick="GuardarVisitaAsync" style="padding:10px 18px;border:none;background:#1D4ED8;color:#fff;border-radius:8px;font-weight:700;cursor:pointer">Guardar visita</button>
+                <button @onclick="GuardarVisitaAsync" disabled="@EsDomingoSeleccionado" style="padding:10px 18px;border:none;background:@(EsDomingoSeleccionado ? "#9CA3AF" : "#1D4ED8");color:#fff;border-radius:8px;font-weight:700;cursor:@(EsDomingoSeleccionado ? "not-allowed" : "pointer")">Guardar visita</button>
             </div>
         </div>
     </div>
@@ -288,16 +300,26 @@
                     </div>
                     <div>
                         <label style="display:block;font-size:13px;font-weight:700;color:#14162B;margin-bottom:6px">Hora *</label>
-                        <input type="time" @bind="FormHora" style="width:100%;padding:10px 14px;border:1px solid #D5D8E6;border-radius:8px;font-size:14px;color:#14162B" />
+                        <select value="@(FormHora?.ToString("HH:mm"))" @onchange="OnHoraChanged" style="width:100%;padding:10px 14px;border:1px solid #D5D8E6;border-radius:8px;font-size:14px;color:#14162B;background:#fff">
+                            <option value="">Seleccionar hora...</option>
+                            @foreach (var hora in HorasDisponibles)
+                            {
+                                <option value="@hora">@AppStateService.FormatHora12(hora)</option>
+                            }
+                        </select>
                     </div>
                 </div>
+                @if (EsDomingoSeleccionado)
+                {
+                    <div style="color:#C4141B;font-size:13px;font-weight:700">No se pueden programar visitas los domingos.</div>
+                }
 
             </div>
 
             <div style="display:flex;justify-content:flex-end;gap:12px;margin-top:24px">
-                <button @onclick="OpenEliminarModal" style="margin-right:auto;padding:10px 18px;border:1px solid #F5C2C4;background:#fff;border-radius:8px;font-weight:700;cursor:pointer;color:#C4141B">Eliminar visita</button>
+                <button @onclick="OpenEliminarModal" style="padding:10px 18px;border:1px solid #F5C2C4;background:#fff;border-radius:8px;font-weight:700;cursor:pointer;color:#C4141B">Eliminar visita</button>
                 <button @onclick="CloseModals" style="padding:10px 18px;border:1px solid #D5D8E6;background:#fff;border-radius:8px;font-weight:700;cursor:pointer;color:#14162B">Cancelar</button>
-                <button @onclick="GuardarVisitaAsync" style="padding:10px 18px;border:none;background:#1D4ED8;color:#fff;border-radius:8px;font-weight:700;cursor:pointer">Guardar cambios</button>
+                <button @onclick="GuardarVisitaAsync" disabled="@EsDomingoSeleccionado" style="padding:10px 18px;border:none;background:@(EsDomingoSeleccionado ? "#9CA3AF" : "#1D4ED8");color:#fff;border-radius:8px;font-weight:700;cursor:@(EsDomingoSeleccionado ? "not-allowed" : "pointer")">Guardar cambios</button>
             </div>
         </div>
     </div>
@@ -370,7 +392,7 @@
     private DateTime FormFecha = DateTime.Today;
     private TimeOnly? FormHora;
 
-    private List<string> DiasSemana = new() { "Lun", "Mar", "Mié", "Jue", "Vie", "Sáb", "Dom" };
+    private List<string> DiasSemana = new() { "Lun", "Mar", "Mié", "Jue", "Vie", "Sáb" };
     private List<string> HorasSem = new() { "08 AM", "09 AM", "10 AM", "11 AM", "12 PM", "01 PM", "02 PM", "03 PM", "04 PM", "05 PM", "06 PM" };
 
     public class Evento
@@ -429,6 +451,23 @@
     private string TecnicoFormularioNombre =>
         tecnicos.FirstOrDefault(t => t.Id == FormTecnicoId)?.Nombre ?? "Sin asignar";
 
+    private bool EsDomingoSeleccionado => FormFecha.DayOfWeek == DayOfWeek.Sunday;
+
+    private IEnumerable<string> HorasDisponibles
+    {
+        get
+        {
+            var horas = Enumerable.Range(0, 21)
+                .Select(i => new TimeOnly(8, 0).AddMinutes(i * 30));
+            if (FormHora is { } horaActual && !horas.Contains(horaActual))
+            {
+                horas = horas.Append(horaActual).OrderBy(h => h);
+            }
+
+            return horas.Select(h => h.ToString("HH:mm"));
+        }
+    }
+
     protected override async Task OnInitializedAsync()
     {
         AppState.OnChange += OnStateChanged;
@@ -477,11 +516,12 @@
 
         var visibles = visitas
             .Where(v => !TecnicoFiltroId.HasValue || v.TecnicoId == TecnicoFiltroId.Value)
+            .Where(v => v.Fecha.DayOfWeek != DayOfWeek.Sunday)
             .Where(v => v.Fecha != DateTime.MinValue && TimeOnly.TryParse(v.Hora, out _))
             .ToList();
 
         var lunes = hoyD.AddDays(-((int)hoyD.DayOfWeek == 0 ? 6 : (int)hoyD.DayOfWeek - 1));
-        var finSem = lunes.AddDays(6);
+        var finSem = lunes.AddDays(5);
 
         if (VistaActual == "Semanal")
         {
@@ -497,7 +537,7 @@
         }
 
         Semana.Clear();
-        for (int i = 0; i < 7; i++)
+        for (int i = 0; i < 6; i++)
         {
             var d = lunes.AddDays(i);
             var f = d.ToString("yyyy-MM-dd");
@@ -528,9 +568,9 @@
         var ini = prim.AddDays(-((int)prim.DayOfWeek == 0 ? 6 : (int)prim.DayOfWeek - 1));
         
         Mes.Clear();
-        for (int i = 0; i < 42; i++)
+        for (int i = 0; i < 36; i++)
         {
-            var d = ini.AddDays(i);
+            var d = ini.AddDays((i / 6 * 7) + i % 6);
             var f = d.ToString("yyyy-MM-dd");
             var esHoy = f == hoyStr;
             var otro = d.Month != hoyD.Month;
@@ -550,9 +590,11 @@
             });
         }
 
-        DiariaEventos = visibles
-            .Where(v => v.Fecha.ToString("yyyy-MM-dd") == hoyStr)
-            .Select(v =>
+        DiariaEventos = hoyD.DayOfWeek == DayOfWeek.Sunday
+            ? new List<Evento>()
+            : visibles
+                .Where(v => v.Fecha.ToString("yyyy-MM-dd") == hoyStr)
+                .Select(v =>
             {
                 var hora = TimeOnly.Parse(v.Hora);
                 var top = Math.Max(0, (int)((hora.Hour - 8) * 64 + (hora.Minute / 60.0) * 64 + 2));
@@ -603,6 +645,13 @@
     {
         FormSolicitudId = int.TryParse(args.Value?.ToString(), out var solicitudId)
             ? solicitudId
+            : null;
+    }
+
+    private void OnHoraChanged(ChangeEventArgs args)
+    {
+        FormHora = TimeOnly.TryParse(args.Value?.ToString(), out var hora)
+            ? hora
             : null;
     }
 
@@ -667,6 +716,12 @@
             return;
         }
 
+        if (EsDomingoSeleccionado)
+        {
+            ToastService.ShowWarning("No se pueden programar visitas los domingos.", "Atención");
+            return;
+        }
+
         var existente = FormVisitaId.HasValue
             ? visitas.FirstOrDefault(v => v.Id == FormVisitaId.Value)
             : null;
@@ -674,6 +729,13 @@
             !await VisitaService.SolicitudDisponibleAsync(solicitud.Id, FormVisitaId))
         {
             ToastService.ShowWarning("La solicitud seleccionada ya tiene una visita asignada.", "Atención");
+            return;
+        }
+
+        if (!await VisitaService.HorarioDisponibleAsync(
+                FormFecha, FormHora.Value.ToString("HH:mm"), FormVisitaId))
+        {
+            ToastService.ShowWarning("Ya existe una visita programada en esa fecha y hora.", "Atención");
             return;
         }
 

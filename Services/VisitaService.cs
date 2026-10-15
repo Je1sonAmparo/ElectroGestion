@@ -38,11 +38,50 @@ public class VisitaService(IDbContextFactory<Contexto> contextFactory)
             v.SolicitudId == solicitudId && (!visitaId.HasValue || v.Id != visitaId.Value));
     }
 
+    public async Task<bool> HorarioDisponibleAsync(DateTime fecha, string hora, int? visitaId = null)
+    {
+        if (!TimeOnly.TryParse(hora, out var horaSeleccionada) ||
+            horaSeleccionada < new TimeOnly(8, 0) ||
+            horaSeleccionada > new TimeOnly(18, 0) ||
+            fecha.DayOfWeek == DayOfWeek.Sunday)
+        {
+            return false;
+        }
+
+        await using var contexto = await contextFactory.CreateDbContextAsync();
+        var horariosExistentes = await contexto.Visitas
+            .Where(v => v.Fecha.Date == fecha.Date &&
+                (!visitaId.HasValue || v.Id != visitaId.Value))
+            .Select(v => v.Hora)
+            .ToListAsync();
+
+        return !horariosExistentes.Any(h =>
+            TimeOnly.TryParse(h, out var horaExistente) && horaExistente == horaSeleccionada);
+    }
+
     public async Task<bool> GuardarAsync(Visita visita)
     {
         await using var contexto = await contextFactory.CreateDbContextAsync();
+        if (visita.Fecha.DayOfWeek == DayOfWeek.Sunday ||
+            !TimeOnly.TryParse(visita.Hora, out var hora) ||
+            hora < new TimeOnly(8, 0) ||
+            hora > new TimeOnly(18, 0))
+        {
+            return false;
+        }
+
         if (visita.TecnicoId.HasValue &&
             !await contexto.Usuarios.AnyAsync(u => u.Id == visita.TecnicoId && u.Rol == "Técnico"))
+        {
+            return false;
+        }
+
+        var horariosExistentes = await contexto.Visitas
+            .Where(v => v.Fecha.Date == visita.Fecha.Date && v.Id != visita.Id)
+            .Select(v => v.Hora)
+            .ToListAsync();
+        if (horariosExistentes.Any(h =>
+                TimeOnly.TryParse(h, out var horaExistente) && horaExistente == hora))
         {
             return false;
         }
