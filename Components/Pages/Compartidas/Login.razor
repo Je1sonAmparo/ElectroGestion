@@ -44,8 +44,33 @@
       </div>
       <div style="margin-bottom:18px">
         <label for="contrasena" style="display:block;margin-bottom:7px;font-size:14px;font-weight:700;color:#334155">Contraseña</label>
-        <InputText id="contrasena" @bind-Value="credenciales.Password" type="password" autocomplete="current-password"
-          class="login-input" placeholder="Escribe tu contraseña" />
+        <div class="password-input-container">
+          <InputText id="contrasena" @bind-Value="credenciales.Password"
+            type="@(mostrarContrasena ? "text" : "password")" autocomplete="current-password"
+            class="login-input" placeholder="Escribe tu contraseña" />
+          <button type="button" class="password-visibility-btn"
+            @onclick="TogglePasswordVisibility"
+            aria-label="@(mostrarContrasena ? "Ocultar contraseña" : "Mostrar contraseña")"
+            aria-pressed="@mostrarContrasena"
+            title="@(mostrarContrasena ? "Ocultar contraseña" : "Mostrar contraseña")">
+            @if (mostrarContrasena)
+            {
+              <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <path d="M3 3l18 18" />
+                <path d="M10.6 10.6a2 2 0 0 0 2.8 2.8" />
+                <path d="M9.9 5.2A10.8 10.8 0 0 1 12 5c5 0 8.3 4.5 9 7-.3 1.1-1 2.1-1.8 3" />
+                <path d="M6.2 6.2C4 7.5 2.5 9.7 2 12c.7 2.5 4 7 10 7 1 0 2-.2 2.9-.5" />
+              </svg>
+            }
+            else
+            {
+              <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12z" />
+                <circle cx="12" cy="12" r="3" />
+              </svg>
+            }
+          </button>
+        </div>
         <ValidationMessage For="@(() => credenciales.Password)" />
       </div>
       @if (!string.IsNullOrWhiteSpace(error))
@@ -76,12 +101,48 @@
     font: inherit;
     box-sizing: border-box;
   }
+
+  .password-input-container {
+    position: relative;
+  }
+
+  .password-input-container .login-input {
+    padding-right: 48px;
+  }
+
+  .password-visibility-btn {
+    position: absolute;
+    top: 50%;
+    right: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 4px;
+    border: 0;
+    background: transparent;
+    color: #6B7085;
+    cursor: pointer;
+    transform: translateY(-50%);
+  }
+
+  .password-visibility-btn:hover {
+    color: #1D4ED8;
+  }
+
+  .password-visibility-btn:focus-visible {
+    border-radius: 4px;
+    outline: 2px solid #1D4ED8;
+    outline-offset: 2px;
+  }
 </style>
 
 @code {
     private Credenciales credenciales = new();
     private string? error;
     private bool cargando;
+    private bool mostrarContrasena;
+
+    private void TogglePasswordVisibility() => mostrarContrasena = !mostrarContrasena;
 
     private async Task IniciarSesionAsync()
     {
