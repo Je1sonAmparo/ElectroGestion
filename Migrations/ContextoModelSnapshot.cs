@@ -562,7 +562,7 @@ namespace ElectroGestion.Migrations
                             Nombre = "Ana Hernández",
                             PasswordHash = "AQAAAAIAAYagAAAAEJvgEPmcnhCOwOXMhDWnexFdwrQh5Mp/b03A6SZkGM8aoTtqxVaYaiMdDG4D1BgbqQ==",
                             Rol = "Gerente",
-                            UsuarioLogin = "gerente"
+                            UsuarioLogin = "Ana Hernández"
                         },
                         new
                         {
@@ -571,7 +571,7 @@ namespace ElectroGestion.Migrations
                             Nombre = "Luis Peña",
                             PasswordHash = "AQAAAAIAAYagAAAAEPeGfF62+i6tlvwb/sGQEx4ZyM4cP0sxOuSW3LIBCB8siO0FC0OAM/bXUzKQK/ujqw==",
                             Rol = "Técnico",
-                            UsuarioLogin = "tecnico"
+                            UsuarioLogin = "Luis Peña"
                         });
                 });
 

@@ -160,8 +160,12 @@
                             <div style="margin-top:3px">@Detalle.Fecha</div>
                         </div>
                         <div>
-                            <div style="font-size:12px;color:#8B90A3;font-weight:800;text-transform:uppercase;letter-spacing:.06em">Hora</div>
-                            <div style="margin-top:3px">@Detalle.Hora</div>
+                            <div style="font-size:12px;color:#8B90A3;font-weight:800;text-transform:uppercase;letter-spacing:.06em">Hora de inicio</div>
+                            <div style="margin-top:3px">@Detalle.HoraInicio</div>
+                        </div>
+                        <div>
+                            <div style="font-size:12px;color:#8B90A3;font-weight:800;text-transform:uppercase;letter-spacing:.06em">Hora de fin</div>
+                            <div style="margin-top:3px">@Detalle.HoraFin</div>
                         </div>
                     </div>
                     <div>
@@ -427,6 +431,8 @@
         public string Hora { get; set; } = "";
         public string Cliente { get; set; } = "";
         public string TipoServicio { get; set; } = "";
+        public string HoraInicio { get; set; } = "";
+        public string HoraFin { get; set; } = "";
         public string Tecnico { get; set; } = "Sin asignar";
         public string Direccion { get; set; } = "";
         public string Estado { get; set; } = "";
@@ -587,7 +593,7 @@
         }
         else
         {
-            AgendaRango = AppStateService.FormatFechaLarga(fechaActualStr);
+            AgendaRango = $"{ObtenerNombreDia(fechaActual.DayOfWeek)}, {AppStateService.FormatFechaLarga(fechaActualStr)}";
         }
 
         Semana.Clear();
@@ -657,6 +663,18 @@
             .ToList();
     }
 
+    private static string ObtenerNombreDia(DayOfWeek dia) => dia switch
+    {
+        DayOfWeek.Monday => "Lunes",
+        DayOfWeek.Tuesday => "Martes",
+        DayOfWeek.Wednesday => "Miércoles",
+        DayOfWeek.Thursday => "Jueves",
+        DayOfWeek.Friday => "Viernes",
+        DayOfWeek.Saturday => "Sábado",
+        DayOfWeek.Sunday => "Domingo",
+        _ => throw new ArgumentOutOfRangeException(nameof(dia))
+    };
+
     private Evento CrearEvento(ElectroGestion.Models.Visita visita, int top = 0, int alto = 58, bool larga = true)
     {
         var hora = TimeOnly.Parse(visita.Hora);
@@ -677,6 +695,8 @@
             Hora = horaFormato,
             Cliente = visita.Solicitud?.Cliente?.Nombre ?? "",
             TipoServicio = visita.Solicitud?.Servicio?.Nombre ?? "",
+            HoraInicio = AppStateService.FormatHora12(visita.Hora),
+            HoraFin = AppStateService.FormatHora12(visita.HoraFin),
             Tecnico = visita.Tecnico?.Nombre ?? "Sin asignar",
             Direccion = visita.Solicitud?.Direccion ?? "",
             Estado = estado,

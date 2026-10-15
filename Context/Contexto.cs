@@ -89,7 +89,7 @@ public class Contexto : DbContext
             new Usuario
             {
                 Id = 1,
-                UsuarioLogin = "gerente",
+                UsuarioLogin = "Ana Hernández",
                 PasswordHash = "AQAAAAIAAYagAAAAEJvgEPmcnhCOwOXMhDWnexFdwrQh5Mp/b03A6SZkGM8aoTtqxVaYaiMdDG4D1BgbqQ==",
                 Nombre = "Ana Hernández",
                 Cargo = "Gerente",
@@ -98,7 +98,7 @@ public class Contexto : DbContext
             new Usuario
             {
                 Id = 2,
-                UsuarioLogin = "tecnico",
+                UsuarioLogin = "Luis Peña",
                 PasswordHash = "AQAAAAIAAYagAAAAEPeGfF62+i6tlvwb/sGQEx4ZyM4cP0sxOuSW3LIBCB8siO0FC0OAM/bXUzKQK/ujqw==",
                 Nombre = "Luis Peña",
                 Cargo = "Técnico",
