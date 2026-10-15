@@ -126,7 +126,17 @@
                 </div>
                 <div>
                     <label style="display:block;font-family:'Manrope';font-weight:700;font-size:14px;color:#4A4E63;margin-bottom:6px">Cliente</label>
-                    <input @bind="FormCliente" style="width:100%;padding:10px 14px;border:1px solid #D5D8E6;border-radius:8px;font-size:14px;color:#14162B" placeholder="Nombre del cliente" />
+                    <select @bind="FormCliente" disabled="@EditId.HasValue" style="width:100%;padding:10px 14px;border:1px solid #D5D8E6;border-radius:8px;font-size:14px;background:@(EditId.HasValue ? "#F7F8FC" : "#fff");color:@(EditId.HasValue ? "#6B7085" : "#14162B");cursor:@(EditId.HasValue ? "not-allowed" : "pointer");opacity:1">
+                        <option value="">Seleccione un cliente registrado</option>
+                        @if (EditId.HasValue && !AppState.Clientes.Any(c => string.Equals(c.Nombre, FormCliente, StringComparison.OrdinalIgnoreCase)))
+                        {
+                            <option value="@FormCliente">@FormCliente</option>
+                        }
+                        @foreach (var cliente in AppState.Clientes.OrderBy(c => c.Nombre))
+                        {
+                            <option value="@cliente.Nombre">@cliente.Nombre</option>
+                        }
+                    </select>
                 </div>
                 <div>
                     <label style="display:block;font-family:'Manrope';font-weight:700;font-size:14px;color:#4A4E63;margin-bottom:6px">Monto Total</label>
@@ -251,11 +261,16 @@
             return;
         }
 
+        if (!EditId.HasValue && !AppState.Clientes.Any(c => string.Equals(c.Nombre, FormCliente, StringComparison.OrdinalIgnoreCase)))
+        {
+            ToastService.Notify(new ToastMessage(ToastType.Warning, "Seleccione un cliente registrado."));
+            return;
+        }
+
         if (EditId.HasValue)
         {
             var item = AppState.Cotizaciones.First(x => x.Id == EditId.Value);
             item.SolicitudId = FormSolicitudId;
-            item.Cliente = FormCliente;
             item.MontoTotal = FormMonto;
             item.Estado = FormEstado;
             ToastService.Notify(new ToastMessage(ToastType.Success, "Cotización actualizada con éxito."));
