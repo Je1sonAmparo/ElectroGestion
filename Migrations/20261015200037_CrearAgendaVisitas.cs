@@ -40,7 +40,7 @@ namespace ElectroGestion.Migrations
 
             migrationBuilder.Sql("""
                 INSERT INTO [Visitas] ([SolicitudId], [Fecha], [Hora], [Estado])
-                SELECT [Id], [Fecha], [Hora],
+                SELECT solicitud.[Id], solicitud.[Fecha], solicitud.[Hora],
                        estado.[Nombre]
                 FROM [Solicitudes] solicitud
                 INNER JOIN [EstadosSolicitud] estado ON estado.[Id] = solicitud.[EstadoSolicitudId]
