@@ -189,9 +189,9 @@ La migración crea estos usuarios para iniciar sesión. Las contraseñas se alma
 
 | Rol | Usuario | Contraseña |
 | :--- | :--- | :--- |
-| Gerente (Ana Hernández) | `Ana Hernández` | `gerente` |
-| Técnico (Luis Peña) | `Luis Peña` | `tecnico` |
-| Técnico (Carlos Méndez) | `Carlos Méndez` | `carlos123` |
+| Gerente (Ana Hernández) | `ana` | `ana` |
+| Técnico (Luis Peña) | `luis` | `luis` |
+| Técnico (Carlos Méndez) | `carlos` | `carlos` |
 
 Estas credenciales son únicamente para demostración; deben cambiarse antes de usar el sistema en producción.
 

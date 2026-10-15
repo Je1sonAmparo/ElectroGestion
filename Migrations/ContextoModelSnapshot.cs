@@ -560,18 +560,18 @@ namespace ElectroGestion.Migrations
                             Id = 1,
                             Cargo = "Gerente",
                             Nombre = "Ana Hernández",
-                            PasswordHash = "AQAAAAIAAYagAAAAEJvgEPmcnhCOwOXMhDWnexFdwrQh5Mp/b03A6SZkGM8aoTtqxVaYaiMdDG4D1BgbqQ==",
+                            PasswordHash = "AQAAAAIAAYagAAAAEHjAvVupymZcL4Z7wSkz9ro//N3Hyz31400GKF9GEPnxQFaOPv8TGpO2FJZ8XqCSwg==",
                             Rol = "Gerente",
-                            UsuarioLogin = "Ana Hernández"
+                            UsuarioLogin = "ana"
                         },
                         new
                         {
                             Id = 2,
                             Cargo = "Técnico",
                             Nombre = "Luis Peña",
-                            PasswordHash = "AQAAAAIAAYagAAAAEPeGfF62+i6tlvwb/sGQEx4ZyM4cP0sxOuSW3LIBCB8siO0FC0OAM/bXUzKQK/ujqw==",
+                            PasswordHash = "AQAAAAIAAYagAAAAEAXFkAX9eqMt9778g9tjjfmZCQWcmM5qlxzOI9VP6eXkDBo7XL52AGtJ9CTZWHUm7g==",
                             Rol = "Técnico",
-                            UsuarioLogin = "Luis Peña"
+                            UsuarioLogin = "luis"
                         });
                 });
 
