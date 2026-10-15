@@ -49,7 +49,14 @@ public class AppStateService
 
     public void Login(Usuario user)
     {
-        Session = user;
+        Session = new Usuario
+        {
+            Id = user.Id,
+            UsuarioLogin = user.UsuarioLogin,
+            Nombre = user.Nombre,
+            Cargo = user.Cargo,
+            Rol = user.Rol
+        };
         NotifyStateChanged();
     }
 
@@ -63,8 +70,8 @@ public class AppStateService
     {
         Usuarios = new List<Usuario>
         {
-            new() { Id = 1, UsuarioLogin = "gerente", Password = "gerente", Nombre = "Ana Hernández", Cargo = "Gerente", Rol = "Gerente" },
-            new() { Id = 2, UsuarioLogin = "tecnico", Password = "tecnico", Nombre = "Luis Peña", Cargo = "Técnico", Rol = "Técnico" }
+            new() { Id = 1, UsuarioLogin = "gerente", Nombre = "Ana Hernández", Cargo = "Gerente", Rol = "Gerente" },
+            new() { Id = 2, UsuarioLogin = "tecnico", Nombre = "Luis Peña", Cargo = "Técnico", Rol = "Técnico" }
         };
 
         Clientes = new List<Cliente>

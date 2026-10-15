@@ -174,6 +174,17 @@ Ejecutar el comando de Entity Framework para crear la base de datos y sembrar lo
 dotnet ef database update
 ```
 
+### Credenciales de demostración
+
+La migración crea estos usuarios para iniciar sesión. Las contraseñas se almacenan como hashes:
+
+| Rol | Usuario | Contraseña |
+| :--- | :--- | :--- |
+| Gerente | `gerente` | `gerente` |
+| Técnico | `tecnico` | `tecnico` |
+
+Estas credenciales son únicamente para demostración; deben cambiarse antes de usar el sistema en producción.
+
 ### 5. Iniciar la Aplicación
 ```bash
 dotnet run
