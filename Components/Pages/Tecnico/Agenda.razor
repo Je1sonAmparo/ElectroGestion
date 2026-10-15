@@ -27,6 +27,13 @@
                 <option value="Semanal">Semanal</option>
                 <option value="Mensual">Mensual</option>
             </select>
+            <select value="@TecnicoFiltroId" @onchange="OnTecnicoFiltroChanged" aria-label="Filtrar agenda por técnico" style="padding:9px 14px;border:1px solid #D5D8E6;border-radius:9px;font-weight:700;font-size:13.5px;background:#fff;color:#14162B;cursor:pointer">
+                <option value="">Todos los técnicos</option>
+                @foreach (var tecnico in tecnicos)
+                {
+                    <option value="@tecnico.Id">@tecnico.Nombre</option>
+                }
+            </select>
             <div style="color:#6B7085;font-size:13.5px">@AgendaRango</div>
         </div>
 
@@ -145,6 +152,10 @@
                         <div style="margin-top:3px">@Detalle.Direccion</div>
                     </div>
                     <div>
+                        <div style="font-size:12px;color:#8B90A3;font-weight:800;text-transform:uppercase;letter-spacing:.06em">Técnico asignado</div>
+                        <div style="margin-top:3px">@Detalle.Tecnico</div>
+                    </div>
+                    <div>
                         <div style="font-size:12px;color:#8B90A3;font-weight:800;text-transform:uppercase;letter-spacing:.06em">Estado</div>
                         <div style="margin-top:5px">
                             <span style="display:inline-block;padding:5px 11px;border-radius:20px;font-size:12px;font-weight:800;background:@Detalle.Bg;color:@Detalle.Fg">@Detalle.Estado</span>
@@ -154,7 +165,6 @@
                 <div style="display:flex;flex-direction:column;gap:9px;margin-top:22px">
                     <button class="action-btn" style="padding:11px;border:1px solid #D5D8E6;background:#fff;border-radius:9px;font-size:13.5px;font-weight:700;cursor:pointer">Ver ubicación</button>
                     <button class="action-btn" @onclick="OpenEditarVisitaModal" style="padding:11px;border:1px solid #D5D8E6;background:#fff;border-radius:9px;font-size:13.5px;font-weight:700;cursor:pointer">Editar visita</button>
-                    <button @onclick="OpenEliminarModal" style="padding:11px;border:1px solid #F5C2C4;background:#fff;border-radius:9px;font-size:13.5px;font-weight:700;cursor:pointer;color:#C4141B">Eliminar visita</button>
                     @if (Detalle.Estado == "Cancelada")
                     {
                         <button class="reactivate-btn" @onclick="OpenReactivarModal" style="padding:11px;border:1px solid #4E9A63;background:#fff;border-radius:9px;font-size:13.5px;font-weight:700;cursor:pointer;color:#17803D">Reactivar visita</button>
@@ -185,11 +195,28 @@
                     <label style="display:block;font-size:13px;font-weight:700;color:#14162B;margin-bottom:6px">Solicitud *</label>
                     <select value="@FormSolicitudId" @onchange="OnSolicitudChanged" style="width:100%;padding:10px 14px;border:1px solid #D5D8E6;border-radius:8px;font-size:14px;color:#14162B;background:#fff">
                         <option value="">Seleccionar solicitud...</option>
-                        @foreach (var solicitud in solicitudes.OrderBy(s => s.Id))
+                        @foreach (var solicitud in SolicitudesDisponibles.OrderBy(s => s.Id))
                         {
                             <option value="@solicitud.Id">@TextoSolicitud(solicitud)</option>
                         }
                     </select>
+                </div>
+                <div>
+                    <label style="display:block;font-size:13px;font-weight:700;color:#14162B;margin-bottom:6px">Técnico asignado</label>
+                    @if (AppState.EsGerente)
+                    {
+                        <select @bind="FormTecnicoId" style="width:100%;padding:10px 14px;border:1px solid #D5D8E6;border-radius:8px;font-size:14px;color:#14162B;background:#fff">
+                            <option value="">Sin asignar</option>
+                            @foreach (var tecnico in tecnicos)
+                            {
+                                <option value="@tecnico.Id">@tecnico.Nombre</option>
+                            }
+                        </select>
+                    }
+                    else
+                    {
+                        <input value="@TecnicoActualNombre" readonly disabled style="width:100%;padding:10px 14px;border:1px solid #D5D8E6;border-radius:8px;font-size:14px;color:#6B7085;background:#F7F8FC;opacity:1" />
+                    }
                 </div>
                 <div>
                     <label style="display:block;font-size:13px;font-weight:700;color:#14162B;margin-bottom:6px">Dirección</label>
@@ -227,11 +254,28 @@
                 <div>
                     <label style="display:block;font-size:13px;font-weight:700;color:#14162B;margin-bottom:6px">Solicitud *</label>
                     <select value="@FormSolicitudId" @onchange="OnSolicitudChanged" style="width:100%;padding:10px 14px;border:1px solid #D5D8E6;border-radius:8px;font-size:14px;color:#14162B;background:#fff">
-                        @foreach (var solicitud in solicitudes.OrderBy(s => s.Id))
+                        @foreach (var solicitud in SolicitudesDisponibles.OrderBy(s => s.Id))
                         {
                             <option value="@solicitud.Id">@TextoSolicitud(solicitud)</option>
                         }
                     </select>
+                </div>
+                <div>
+                    <label style="display:block;font-size:13px;font-weight:700;color:#14162B;margin-bottom:6px">Técnico asignado</label>
+                    @if (AppState.EsGerente)
+                    {
+                        <select @bind="FormTecnicoId" style="width:100%;padding:10px 14px;border:1px solid #D5D8E6;border-radius:8px;font-size:14px;color:#14162B;background:#fff">
+                            <option value="">Sin asignar</option>
+                            @foreach (var tecnico in tecnicos)
+                            {
+                                <option value="@tecnico.Id">@tecnico.Nombre</option>
+                            }
+                        </select>
+                    }
+                    else
+                    {
+                        <input value="@TecnicoFormularioNombre" readonly disabled style="width:100%;padding:10px 14px;border:1px solid #D5D8E6;border-radius:8px;font-size:14px;color:#6B7085;background:#F7F8FC;opacity:1" />
+                    }
                 </div>
                 <div>
                     <label style="display:block;font-size:13px;font-weight:700;color:#14162B;margin-bottom:6px">Dirección</label>
@@ -251,6 +295,7 @@
             </div>
 
             <div style="display:flex;justify-content:flex-end;gap:12px;margin-top:24px">
+                <button @onclick="OpenEliminarModal" style="margin-right:auto;padding:10px 18px;border:1px solid #F5C2C4;background:#fff;border-radius:8px;font-weight:700;cursor:pointer;color:#C4141B">Eliminar visita</button>
                 <button @onclick="CloseModals" style="padding:10px 18px;border:1px solid #D5D8E6;background:#fff;border-radius:8px;font-weight:700;cursor:pointer;color:#14162B">Cancelar</button>
                 <button @onclick="GuardarVisitaAsync" style="padding:10px 18px;border:none;background:#1D4ED8;color:#fff;border-radius:8px;font-weight:700;cursor:pointer">Guardar cambios</button>
             </div>
@@ -320,6 +365,8 @@
     private bool showEliminar = false;
     private int? FormVisitaId;
     private int? FormSolicitudId;
+    private int? FormTecnicoId;
+    private int? TecnicoFiltroId;
     private DateTime FormFecha = DateTime.Today;
     private TimeOnly? FormHora;
 
@@ -337,6 +384,7 @@
         public string Hora { get; set; } = "";
         public string Cliente { get; set; } = "";
         public string TipoServicio { get; set; } = "";
+        public string Tecnico { get; set; } = "Sin asignar";
         public string Direccion { get; set; } = "";
         public string Estado { get; set; } = "";
         public string Fg { get; set; } = "";
@@ -370,6 +418,16 @@
     private Evento? Detalle;
     private List<ElectroGestion.Models.Solicitud> solicitudes = new();
     private List<ElectroGestion.Models.Visita> visitas = new();
+    private List<ElectroGestion.Models.Usuario> tecnicos = new();
+
+    private IEnumerable<ElectroGestion.Models.Solicitud> SolicitudesDisponibles =>
+        solicitudes.Where(s => s.Id == FormSolicitudId ||
+            !visitas.Any(v => v.SolicitudId == s.Id));
+
+    private string TecnicoActualNombre => AppState.Session?.Nombre ?? "Sin asignar";
+
+    private string TecnicoFormularioNombre =>
+        tecnicos.FirstOrDefault(t => t.Id == FormTecnicoId)?.Nombre ?? "Sin asignar";
 
     protected override async Task OnInitializedAsync()
     {
@@ -399,16 +457,26 @@
         await UpdateData();
     }
 
+    private async Task OnTecnicoFiltroChanged(ChangeEventArgs e)
+    {
+        TecnicoFiltroId = int.TryParse(e.Value?.ToString(), out var tecnicoId)
+            ? tecnicoId
+            : null;
+        await UpdateData();
+    }
+
     private async Task UpdateData()
     {
         solicitudes = await SolicitudService.GetList(s => true);
         visitas = await VisitaService.ObtenerTodasAsync();
+        tecnicos = await VisitaService.ObtenerTecnicosAsync();
         var hoyD = DateTime.Today;
         var hoyStr = hoyD.ToString("yyyy-MM-dd");
 
         var MES = new[] { "enero", "febrero", "marzo", "abril", "mayo", "junio", "julio", "agosto", "septiembre", "octubre", "noviembre", "diciembre" };
 
         var visibles = visitas
+            .Where(v => !TecnicoFiltroId.HasValue || v.TecnicoId == TecnicoFiltroId.Value)
             .Where(v => v.Fecha != DateTime.MinValue && TimeOnly.TryParse(v.Hora, out _))
             .ToList();
 
@@ -513,6 +581,7 @@
             Hora = horaFormato,
             Cliente = visita.Solicitud?.Cliente?.Nombre ?? "",
             TipoServicio = visita.Solicitud?.Servicio?.Nombre ?? "",
+            Tecnico = visita.Tecnico?.Nombre ?? "Sin asignar",
             Direccion = visita.Solicitud?.Direccion ?? "",
             Estado = estado,
             Fg = colores.Fg,
@@ -546,6 +615,7 @@
         await UpdateData();
         FormVisitaId = null;
         FormSolicitudId = null;
+        FormTecnicoId = AppState.EsGerente ? null : AppState.Session?.Id;
         FormFecha = DateTime.Today;
         FormHora = null;
         showNuevaVisita = true;
@@ -568,6 +638,7 @@
 
         FormVisitaId = visita.Id;
         FormSolicitudId = visita.SolicitudId;
+        FormTecnicoId = visita.TecnicoId;
         FormFecha = visita.Fecha;
         FormHora = TimeOnly.TryParse(visita.Hora, out var hora) ? hora : null;
         showEditarVisita = true;
@@ -599,10 +670,20 @@
         var existente = FormVisitaId.HasValue
             ? visitas.FirstOrDefault(v => v.Id == FormVisitaId.Value)
             : null;
+        if ((existente is null || existente.SolicitudId != solicitud.Id) &&
+            !await VisitaService.SolicitudDisponibleAsync(solicitud.Id, FormVisitaId))
+        {
+            ToastService.ShowWarning("La solicitud seleccionada ya tiene una visita asignada.", "Atención");
+            return;
+        }
+
         var visita = new ElectroGestion.Models.Visita
         {
             Id = FormVisitaId ?? 0,
             SolicitudId = solicitud.Id,
+            TecnicoId = AppState.EsGerente
+                ? FormTecnicoId
+                : existente is null ? AppState.Session?.Id : existente.TecnicoId,
             Fecha = FormFecha.Date,
             Hora = FormHora.Value.ToString("HH:mm"),
             Estado = existente is not null && existente.SolicitudId == solicitud.Id
@@ -614,7 +695,7 @@
         {
             if (!await VisitaService.GuardarAsync(visita))
             {
-                ToastService.ShowError("No se pudo guardar la visita.");
+                ToastService.ShowWarning("La solicitud ya tiene una visita o el técnico seleccionado no es válido.", "Atención");
                 return;
             }
 
