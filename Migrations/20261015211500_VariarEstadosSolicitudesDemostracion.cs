@@ -73,8 +73,8 @@ namespace ElectroGestion.Migrations
                     AND muestra.[TecnicoAsignado] = solicitud.[TecnicoAsignado]
                 WHERE solicitud.[FechaSolicitud] = '20261014';
 
-                IF @@ROWCOUNT <> 15
-                    THROW 51004, N'No se pudieron actualizar los estados de las 15 visitas de demostración.', 1;
+                IF @@ROWCOUNT <> 16
+                    THROW 51004, N'No se pudieron actualizar los estados de las 16 visitas de demostración.', 1;
                 """);
         }
 
