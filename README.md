@@ -190,7 +190,8 @@ La migración crea estos usuarios para iniciar sesión. Las contraseñas se alma
 | Rol | Usuario | Contraseña |
 | :--- | :--- | :--- |
 | Gerente | `gerente` | `gerente` |
-| Técnico | `tecnico` | `tecnico` |
+| Técnico (Luis Peña) | `tecnico` | `tecnico` |
+| Técnico (Carlos Méndez) | `carlos` | `carlos123` |
 
 Estas credenciales son únicamente para demostración; deben cambiarse antes de usar el sistema en producción.
 
