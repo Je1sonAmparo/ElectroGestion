@@ -9,6 +9,7 @@ public class Contexto : DbContext
 
     public DbSet<Solicitud> Solicitudes { get; set; }
     public DbSet<Cliente> Clientes { get; set; }
+    public DbSet<Usuario> Usuarios { get; set; }
     public DbSet<Servicio> Servicios { get; set; }
     public DbSet<EstadoSolicitud> EstadosSolicitud { get; set; }
     public DbSet<DetalleSolicitud> DetallesSolicitud { get; set; }
@@ -59,6 +60,36 @@ public class Contexto : DbContext
                 .HasForeignKey(d => d.SolicitudId)
                 .OnDelete(DeleteBehavior.Cascade);
         });
+
+        modelBuilder.Entity<Usuario>(entity =>
+        {
+            entity.Property(u => u.UsuarioLogin).HasMaxLength(50).IsRequired();
+            entity.Property(u => u.PasswordHash).HasMaxLength(500).IsRequired();
+            entity.Property(u => u.Nombre).HasMaxLength(150).IsRequired();
+            entity.Property(u => u.Cargo).HasMaxLength(80).IsRequired();
+            entity.Property(u => u.Rol).HasMaxLength(30).IsRequired();
+            entity.HasIndex(u => u.UsuarioLogin).IsUnique();
+        });
+
+        modelBuilder.Entity<Usuario>().HasData(
+            new Usuario
+            {
+                Id = 1,
+                UsuarioLogin = "gerente",
+                PasswordHash = "AQAAAAIAAYagAAAAEJvgEPmcnhCOwOXMhDWnexFdwrQh5Mp/b03A6SZkGM8aoTtqxVaYaiMdDG4D1BgbqQ==",
+                Nombre = "Ana Hernández",
+                Cargo = "Gerente",
+                Rol = "Gerente"
+            },
+            new Usuario
+            {
+                Id = 2,
+                UsuarioLogin = "tecnico",
+                PasswordHash = "AQAAAAIAAYagAAAAEPeGfF62+i6tlvwb/sGQEx4ZyM4cP0sxOuSW3LIBCB8siO0FC0OAM/bXUzKQK/ujqw==",
+                Nombre = "Luis Peña",
+                Cargo = "Técnico",
+                Rol = "Técnico"
+            });
 
         modelBuilder.Entity<EstadoSolicitud>().HasData(
             new EstadoSolicitud { Id = 1, Nombre = "Pendiente" },
@@ -193,4 +224,3 @@ public class Contexto : DbContext
         );
     }
 }
-

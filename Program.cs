@@ -1,7 +1,9 @@
 using Microsoft.EntityFrameworkCore;
 using ElectroGestion.Components;
 using ElectroGestion.Context;
+using ElectroGestion.Models;
 using ElectroGestion.Services;
+using Microsoft.AspNetCore.Identity;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -16,6 +18,8 @@ builder.Services.AddDbContextFactory<Contexto>(options =>
 
 builder.Services.AddScoped<ModelosService>();
 builder.Services.AddScoped<AppStateService>();
+builder.Services.AddScoped<AutenticacionService>();
+builder.Services.AddScoped<IPasswordHasher<Usuario>, PasswordHasher<Usuario>>();
 builder.Services.AddScoped<ClienteService>();
 builder.Services.AddScoped<ServicioService>();
 builder.Services.AddScoped<SolicitudService>();
@@ -52,4 +56,3 @@ app.MapRazorComponents<App>()
     .AddInteractiveServerRenderMode();
 
 app.Run();
-

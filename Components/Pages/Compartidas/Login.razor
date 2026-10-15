@@ -1,9 +1,12 @@
 @page "/login"
 @rendermode InteractiveServer
 @using BlazorBootstrap
+@using System.ComponentModel.DataAnnotations
 @inject ElectroGestion.Services.AppStateService AppState
+@inject ElectroGestion.Services.AutenticacionService Autenticacion
 @inject NavigationManager NavManager
 @inject ToastService ToastService
+@inject ILogger<Login> Logger
 
 <div style="min-height:100vh;display:flex;align-items:center;justify-content:center;background:#F4F5FB;padding:20px;background-image:radial-gradient(circle at top right, rgba(29,78,216,0.05), transparent 40%), radial-gradient(circle at bottom left, rgba(245,158,11,0.05), transparent 40%)">
   <div style="width:100%;max-width:440px;background:#fff;border-radius:24px;box-shadow:0 24px 48px rgba(20,22,43,0.04), 0 2px 8px rgba(20,22,43,0.02);padding:48px 44px">
@@ -31,14 +34,29 @@
       Iniciar sesión
     </div>
 
-    <div style="display:flex;gap:16px;margin-top:20px">
-      <button type="button" class="login-btn" @onclick="LoginTecnico" style="flex:1;padding:15px;background:#1D4ED8;color:#fff;border:0;border-radius:10px;font-size:16px;font-weight:700;cursor:pointer;font-family:'Manrope';box-shadow:0 4px 14px rgba(29,78,216,0.25);transition:all 0.2s">
-        Técnico
+    <EditForm Model="@credenciales" OnValidSubmit="IniciarSesionAsync">
+      <DataAnnotationsValidator />
+      <div style="margin-bottom:18px">
+        <label for="usuario" style="display:block;margin-bottom:7px;font-size:14px;font-weight:700;color:#334155">Usuario</label>
+        <InputText id="usuario" @bind-Value="credenciales.Usuario" autocomplete="username"
+          class="login-input" placeholder="Escribe tu usuario" />
+        <ValidationMessage For="@(() => credenciales.Usuario)" />
+      </div>
+      <div style="margin-bottom:18px">
+        <label for="contrasena" style="display:block;margin-bottom:7px;font-size:14px;font-weight:700;color:#334155">Contraseña</label>
+        <InputText id="contrasena" @bind-Value="credenciales.Password" type="password" autocomplete="current-password"
+          class="login-input" placeholder="Escribe tu contraseña" />
+        <ValidationMessage For="@(() => credenciales.Password)" />
+      </div>
+      @if (!string.IsNullOrWhiteSpace(error))
+      {
+        <div role="alert" style="margin-bottom:16px;color:#B91C1C;font-size:14px">@error</div>
+      }
+      <button type="submit" disabled="@cargando" class="login-btn"
+        style="width:100%;padding:15px;background:#1D4ED8;color:#fff;border:0;border-radius:10px;font-size:16px;font-weight:700;cursor:pointer;font-family:'Manrope';box-shadow:0 4px 14px rgba(29,78,216,0.25);transition:all 0.2s;opacity:@(cargando ? "0.7" : "1")">
+        @(cargando ? "Ingresando..." : "Iniciar sesión")
       </button>
-      <button type="button" class="login-btn" @onclick="LoginGerente" style="flex:1;padding:15px;background:#1D4ED8;color:#fff;border:0;border-radius:10px;font-size:16px;font-weight:700;cursor:pointer;font-family:'Manrope';box-shadow:0 4px 14px rgba(29,78,216,0.25);transition:all 0.2s">
-        Gerente
-      </button>
-    </div>
+    </EditForm>
   </div>
 </div>
 
@@ -48,22 +66,58 @@
     transform: translateY(-1px);
     box-shadow: 0 6px 16px rgba(29,78,216,0.3) !important;
   }
+
+  .login-input {
+    display: block;
+    width: 100%;
+    padding: 12px 14px;
+    border: 1px solid #D7DCE5;
+    border-radius: 10px;
+    font: inherit;
+    box-sizing: border-box;
+  }
 </style>
 
 @code {
-    private void LoginTecnico()
+    private Credenciales credenciales = new();
+    private string? error;
+    private bool cargando;
+
+    private async Task IniciarSesionAsync()
     {
-        var u = AppState.Usuarios.First(x => x.Rol == "Técnico");
-        AppState.Login(u);
-        ToastService.Notify(new ToastMessage(ToastType.Primary, $"Bienvenido, {u.Nombre.Split(' ')[0]}."));
-        NavManager.NavigateTo("/");
+        cargando = true;
+        error = null;
+
+        try
+        {
+            var usuario = await Autenticacion.AutenticarAsync(credenciales.Usuario.Trim(), credenciales.Password);
+            if (usuario is null)
+            {
+                error = "El usuario o la contraseña son incorrectos.";
+                return;
+            }
+
+            AppState.Login(usuario);
+            ToastService.Notify(new ToastMessage(ToastType.Primary, $"Bienvenido, {usuario.Nombre.Split(' ')[0]}."));
+            NavManager.NavigateTo("/");
+        }
+        catch (Exception ex)
+        {
+            Logger.LogError(ex, "No fue posible autenticar al usuario {UsuarioLogin}.", credenciales.Usuario);
+            error = "No se pudo conectar con el servicio de autenticación. Inténtalo de nuevo.";
+        }
+        finally
+        {
+            cargando = false;
+        }
     }
 
-    private void LoginGerente()
+    private sealed class Credenciales
     {
-        var u = AppState.Usuarios.First(x => x.Rol == "Gerente");
-        AppState.Login(u);
-        ToastService.Notify(new ToastMessage(ToastType.Primary, $"Bienvenido, {u.Nombre.Split(' ')[0]}."));
-        NavManager.NavigateTo("/");
+        [Required(ErrorMessage = "Escribe tu usuario.")]
+        public string Usuario { get; set; } = "";
+
+        [Required(ErrorMessage = "Escribe tu contraseña.")]
+        public string Password { get; set; } = "";
     }
 }

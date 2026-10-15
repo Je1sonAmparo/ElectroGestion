@@ -187,28 +187,6 @@ else
         await InvokeAsync(StateHasChanged);
     }
 
-    private void LoginTecnico()
-    {
-        var u = AppState.Usuarios.FirstOrDefault(x => x.Rol == "Técnico");
-        if (u != null)
-        {
-            AppState.Login(u);
-            ToastService.Notify(new ToastMessage(ToastType.Primary, $"Bienvenido, {u.Nombre.Split(' ')[0]}."));
-            NavManager.NavigateTo("/solicitudes");
-        }
-    }
-
-    private void LoginGerente()
-    {
-        var u = AppState.Usuarios.FirstOrDefault(x => x.Rol == "Gerente");
-        if (u != null)
-        {
-            AppState.Login(u);
-            ToastService.Notify(new ToastMessage(ToastType.Primary, $"Bienvenido, {u.Nombre.Split(' ')[0]}."));
-            NavManager.NavigateTo("/solicitudes");
-        }
-    }
-
     private bool IsActiveRoute(string href)
     {
         var rel = NavManager.ToBaseRelativePath(NavManager.Uri);
