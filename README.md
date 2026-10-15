@@ -18,6 +18,18 @@ El sistema se encuentra desplegado y plenamente operativo en la nube a través d
 - **Plataforma:** ASP.NET Core Blazor (.NET 10) Server Components
 - **Base de Datos:** Microsoft SQL Server
 
+### Credenciales de demostración
+
+La migración crea estos usuarios para iniciar sesión. Las contraseñas se almacenan como hashes:
+
+| Rol | Usuario | Contraseña |
+| :--- | :--- | :--- |
+| Gerente (Ana Hernández) | `ana` | `ana` |
+| Técnico (Luis Peña) | `luis` | `luis` |
+| Técnico (Carlos Méndez) | `carlos` | `carlos` |
+
+Estas credenciales son únicamente para demostración; deben cambiarse antes de usar el sistema en producción.
+
 ---
 
 ## Sustentado por
@@ -182,18 +194,6 @@ Ejecutar el comando de Entity Framework para crear la base de datos y sembrar lo
 ```bash
 dotnet ef database update
 ```
-
-### Credenciales de demostración
-
-La migración crea estos usuarios para iniciar sesión. Las contraseñas se almacenan como hashes:
-
-| Rol | Usuario | Contraseña |
-| :--- | :--- | :--- |
-| Gerente (Ana Hernández) | `ana` | `ana` |
-| Técnico (Luis Peña) | `luis` | `luis` |
-| Técnico (Carlos Méndez) | `carlos` | `carlos` |
-
-Estas credenciales son únicamente para demostración; deben cambiarse antes de usar el sistema en producción.
 
 ### 5. Iniciar la Aplicación
 ```bash
