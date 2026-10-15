@@ -38,11 +38,13 @@ public class VisitaService(IDbContextFactory<Contexto> contextFactory)
             v.SolicitudId == solicitudId && (!visitaId.HasValue || v.Id != visitaId.Value));
     }
 
-    public async Task<bool> HorarioDisponibleAsync(DateTime fecha, string hora, int? visitaId = null)
+    public async Task<bool> HorarioDisponibleAsync(
+        DateTime fecha,
+        string horaInicio,
+        string horaFin,
+        int? visitaId = null)
     {
-        if (!TimeOnly.TryParse(hora, out var horaSeleccionada) ||
-            horaSeleccionada < new TimeOnly(8, 0) ||
-            horaSeleccionada > new TimeOnly(18, 0) ||
+        if (!TryGetIntervaloValido(horaInicio, horaFin, out var inicio, out var fin) ||
             fecha.DayOfWeek == DayOfWeek.Sunday)
         {
             return false;
@@ -52,20 +54,18 @@ public class VisitaService(IDbContextFactory<Contexto> contextFactory)
         var horariosExistentes = await contexto.Visitas
             .Where(v => v.Fecha.Date == fecha.Date &&
                 (!visitaId.HasValue || v.Id != visitaId.Value))
-            .Select(v => v.Hora)
             .ToListAsync();
 
-        return !horariosExistentes.Any(h =>
-            TimeOnly.TryParse(h, out var horaExistente) && horaExistente == horaSeleccionada);
+        return !horariosExistentes.Any(v =>
+            TryGetIntervaloValido(v.Hora, v.HoraFin, out var inicioExistente, out var finExistente) &&
+            inicio < finExistente && fin > inicioExistente);
     }
 
     public async Task<bool> GuardarAsync(Visita visita)
     {
         await using var contexto = await contextFactory.CreateDbContextAsync();
         if (visita.Fecha.DayOfWeek == DayOfWeek.Sunday ||
-            !TimeOnly.TryParse(visita.Hora, out var hora) ||
-            hora < new TimeOnly(8, 0) ||
-            hora > new TimeOnly(18, 0))
+            !TryGetIntervaloValido(visita.Hora, visita.HoraFin, out var inicio, out var fin))
         {
             return false;
         }
@@ -78,10 +78,10 @@ public class VisitaService(IDbContextFactory<Contexto> contextFactory)
 
         var horariosExistentes = await contexto.Visitas
             .Where(v => v.Fecha.Date == visita.Fecha.Date && v.Id != visita.Id)
-            .Select(v => v.Hora)
             .ToListAsync();
-        if (horariosExistentes.Any(h =>
-                TimeOnly.TryParse(h, out var horaExistente) && horaExistente == hora))
+        if (horariosExistentes.Any(v =>
+                TryGetIntervaloValido(v.Hora, v.HoraFin, out var inicioExistente, out var finExistente) &&
+                inicio < finExistente && fin > inicioExistente))
         {
             return false;
         }
@@ -115,10 +115,26 @@ public class VisitaService(IDbContextFactory<Contexto> contextFactory)
             existente.TecnicoId = visita.TecnicoId;
             existente.Fecha = visita.Fecha;
             existente.Hora = visita.Hora;
+            existente.HoraFin = visita.HoraFin;
             existente.Estado = visita.Estado;
         }
 
         return await contexto.SaveChangesAsync() > 0;
+    }
+
+    private static bool TryGetIntervaloValido(
+        string horaInicio,
+        string horaFin,
+        out TimeOnly inicio,
+        out TimeOnly fin)
+    {
+        inicio = default;
+        fin = default;
+        return TimeOnly.TryParse(horaInicio, out inicio) &&
+            TimeOnly.TryParse(horaFin, out fin) &&
+            inicio >= new TimeOnly(8, 0) &&
+            fin <= new TimeOnly(18, 0) &&
+            fin > inicio;
     }
 
     public async Task<bool> EliminarAsync(int id)

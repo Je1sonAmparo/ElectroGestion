@@ -18,6 +18,9 @@ public class Visita
     [Required, StringLength(10)]
     public string Hora { get; set; } = "";
 
+    [Required, StringLength(10)]
+    public string HoraFin { get; set; } = "";
+
     [Required, StringLength(30)]
     public string Estado { get; set; } = "Programada";
 }

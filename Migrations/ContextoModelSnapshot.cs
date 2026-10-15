@@ -596,6 +596,11 @@ namespace ElectroGestion.Migrations
                         .HasMaxLength(10)
                         .HasColumnType("nvarchar(10)");
 
+                    b.Property<string>("HoraFin")
+                        .IsRequired()
+                        .HasMaxLength(10)
+                        .HasColumnType("nvarchar(10)");
+
                     b.Property<int>("SolicitudId")
                         .HasColumnType("int");
 
