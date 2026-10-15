@@ -71,7 +71,8 @@ public class AppStateService
         Usuarios = new List<Usuario>
         {
             new() { Id = 1, UsuarioLogin = "gerente", Nombre = "Ana Hernández", Cargo = "Gerente", Rol = "Gerente" },
-            new() { Id = 2, UsuarioLogin = "tecnico", Nombre = "Luis Peña", Cargo = "Técnico", Rol = "Técnico" }
+            new() { Id = 2, UsuarioLogin = "tecnico", Nombre = "Luis Peña", Cargo = "Técnico", Rol = "Técnico" },
+            new() { Id = 3, UsuarioLogin = "carlos", Nombre = "Carlos Méndez", Cargo = "Técnico", Rol = "Técnico" }
         };
 
         Clientes = new List<Cliente>
