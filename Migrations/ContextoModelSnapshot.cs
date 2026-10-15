@@ -375,19 +375,11 @@ namespace ElectroGestion.Migrations
                     b.Property<int>("EstadoSolicitudId")
                         .HasColumnType("int");
 
-                    b.Property<DateTime>("Fecha")
-                        .HasColumnType("datetime2");
-
                     b.Property<DateTime?>("FechaFin")
                         .HasColumnType("datetime2");
 
                     b.Property<DateTime>("FechaSolicitud")
                         .HasColumnType("datetime2");
-
-                    b.Property<string>("Hora")
-                        .IsRequired()
-                        .HasMaxLength(10)
-                        .HasColumnType("nvarchar(10)");
 
                     b.Property<int>("ServicioId")
                         .HasColumnType("int");
@@ -415,9 +407,7 @@ namespace ElectroGestion.Migrations
                             Contacto = "Melody Santos",
                             Direccion = "Calle Duarte #24, Santiago",
                             EstadoSolicitudId = 1,
-                            Fecha = new DateTime(2026, 10, 12, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             FechaSolicitud = new DateTime(2026, 10, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            Hora = "09:00",
                             ServicioId = 2,
                             TecnicoAsignado = ""
                         },
@@ -428,9 +418,7 @@ namespace ElectroGestion.Migrations
                             Contacto = "Constructora López",
                             Direccion = "Av. Estrella Sadhalá #102, Santiago",
                             EstadoSolicitudId = 2,
-                            Fecha = new DateTime(2026, 10, 10, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             FechaSolicitud = new DateTime(2026, 10, 2, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            Hora = "10:30",
                             ServicioId = 1,
                             TecnicoAsignado = ""
                         },
@@ -441,9 +429,7 @@ namespace ElectroGestion.Migrations
                             Contacto = "Farmacia El Sol",
                             Direccion = "Calle 16 #7, La Vega",
                             EstadoSolicitudId = 1,
-                            Fecha = new DateTime(2026, 10, 11, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             FechaSolicitud = new DateTime(2026, 10, 3, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            Hora = "14:00",
                             ServicioId = 3,
                             TecnicoAsignado = ""
                         },
@@ -454,9 +440,7 @@ namespace ElectroGestion.Migrations
                             Contacto = "Colmado Hernández",
                             Direccion = "Calle Principal #58, Moca",
                             EstadoSolicitudId = 3,
-                            Fecha = new DateTime(2026, 10, 5, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             FechaSolicitud = new DateTime(2026, 9, 29, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            Hora = "08:30",
                             ServicioId = 4,
                             TecnicoAsignado = ""
                         },
@@ -467,9 +451,7 @@ namespace ElectroGestion.Migrations
                             Contacto = "Taller Mecánico RD",
                             Direccion = "Carretera Luperón km 5, Santiago",
                             EstadoSolicitudId = 2,
-                            Fecha = new DateTime(2026, 10, 9, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             FechaSolicitud = new DateTime(2026, 10, 4, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            Hora = "11:00",
                             ServicioId = 5,
                             TecnicoAsignado = ""
                         },
@@ -480,9 +462,7 @@ namespace ElectroGestion.Migrations
                             Contacto = "Melody Santos",
                             Direccion = "Calle Duarte #24, Santiago",
                             EstadoSolicitudId = 3,
-                            Fecha = new DateTime(2026, 9, 28, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             FechaSolicitud = new DateTime(2026, 9, 20, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            Hora = "15:00",
                             ServicioId = 3,
                             TecnicoAsignado = ""
                         },
@@ -493,9 +473,7 @@ namespace ElectroGestion.Migrations
                             Contacto = "Constructora López",
                             Direccion = "Av. Estrella Sadhalá #102, Santiago",
                             EstadoSolicitudId = 4,
-                            Fecha = new DateTime(2026, 10, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             FechaSolicitud = new DateTime(2026, 9, 25, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            Hora = "09:30",
                             ServicioId = 4,
                             TecnicoAsignado = ""
                         },
@@ -506,9 +484,7 @@ namespace ElectroGestion.Migrations
                             Contacto = "Farmacia El Sol",
                             Direccion = "Calle 16 #7, La Vega",
                             EstadoSolicitudId = 1,
-                            Fecha = new DateTime(2026, 10, 14, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             FechaSolicitud = new DateTime(2026, 10, 6, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            Hora = "10:00",
                             ServicioId = 2,
                             TecnicoAsignado = ""
                         });

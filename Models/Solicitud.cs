@@ -20,10 +20,6 @@ public class Solicitud
     public string Direccion { get; set; } = "";
 
     public DateTime FechaSolicitud { get; set; }
-    public DateTime Fecha { get; set; }
-
-    [StringLength(10)]
-    public string Hora { get; set; } = "";
 
     public int EstadoSolicitudId { get; set; }
     public EstadoSolicitud? EstadoSolicitud { get; set; }

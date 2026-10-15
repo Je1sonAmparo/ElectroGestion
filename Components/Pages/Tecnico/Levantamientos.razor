@@ -4,6 +4,7 @@
 @inject ElectroGestion.Services.SolicitudService SolicitudService
 @inject ElectroGestion.Services.ClienteService ClienteService
 @inject ElectroGestion.Services.ServicioService ServicioService
+@inject ElectroGestion.Services.VisitaService VisitaService
 @inject NavigationManager NavManager
 
 <PageTitle>Levantamientos | ElectroGestion</PageTitle>
@@ -73,7 +74,8 @@
                     var s = solicitudes.FirstOrDefault(x => x.Id == l.SolicitudId);
                     var clienteNombre = s?.Cliente?.Nombre ?? "Desconocido";
                     var servicioNombre = s?.Servicio?.Nombre ?? "Desconocido";
-                    var fecha = s == null ? "Sin programar" : $"{AppStateService.FormatFecha(s.Fecha.ToString("yyyy-MM-dd"))} {AppStateService.FormatHora12(s.Hora)}";
+                    var visita = visitas.FirstOrDefault(v => v.SolicitudId == l.SolicitudId);
+                    var fecha = visita == null ? "Sin programar" : $"{AppStateService.FormatFecha(visita.Fecha.ToString("yyyy-MM-dd"))} {AppStateService.FormatHora12(visita.Hora)}";
 
                     <div style="background:#fff;border:1px solid #D9DCE9;border-radius:12px;padding:16px;display:flex;flex-direction:column;gap:2px">
                         <div style="display:flex;justify-content:flex-end">
@@ -105,7 +107,7 @@
             @if (!FilteredLevantamientos.Any())
             {
                 <div style="padding:34px;text-align:center;color:#8B90A3;font-size:14px">
-                    No hay levantamientos en este estado. Solo se muestran solicitudes con fecha y hora definidas.
+                    No hay levantamientos en este estado.
                 </div>
             }
         </div>
@@ -227,6 +229,7 @@ else
     }
 
     private List<ElectroGestion.Models.Solicitud> solicitudes = new();
+    private List<ElectroGestion.Models.Visita> visitas = new();
     private List<ElectroGestion.Models.Cliente> clientes = new();
     private List<ElectroGestion.Models.Servicio> servicios = new();
     private List<string> TiposServicio = new();
@@ -237,7 +240,8 @@ else
             bool matchId = string.IsNullOrEmpty(SearchId) || l.Id.ToString().Contains(SearchId);
             bool matchCliente = string.IsNullOrEmpty(SearchCliente) || (s != null && s.Cliente?.Nombre != null && s.Cliente.Nombre.Contains(SearchCliente, StringComparison.OrdinalIgnoreCase));
             bool matchTipo = string.IsNullOrEmpty(SearchTipo) || (s != null && s.Servicio?.Nombre == SearchTipo);
-            bool matchFecha = !SearchFecha.HasValue || (s != null && s.Fecha.Date == SearchFecha.Value.Date);
+            var visita = visitas.FirstOrDefault(v => v.SolicitudId == l.SolicitudId);
+            bool matchFecha = !SearchFecha.HasValue || (visita != null && visita.Fecha.Date == SearchFecha.Value.Date);
             bool matchEstado = SearchEstado == "Todos" || l.Estado == SearchEstado;
             return matchId && matchCliente && matchTipo && matchFecha && matchEstado;
         })
@@ -252,6 +256,7 @@ else
     private async Task CargarDatos()
     {
         solicitudes = await SolicitudService.GetList(s => true);
+        visitas = await VisitaService.ObtenerTodasAsync();
         clientes = await ClienteService.GetList(c => true);
         servicios = await ServicioService.GetList(s => true);
         TiposServicio = servicios.Select(x => x.Nombre).Distinct().ToList();

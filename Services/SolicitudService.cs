@@ -54,8 +54,6 @@ public class SolicitudService(IDbContextFactory<Contexto> contextFactory) : Apli
             existente.ServicioId = solicitud.ServicioId;
             existente.Contacto = solicitud.Contacto;
             existente.Direccion = solicitud.Direccion;
-            existente.Fecha = solicitud.Fecha;
-            existente.Hora = solicitud.Hora;
             existente.EstadoSolicitudId = solicitud.EstadoSolicitudId;
 
             return await contexto.SaveChangesAsync() > 0;
