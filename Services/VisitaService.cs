@@ -142,7 +142,7 @@ public class VisitaService(IDbContextFactory<Contexto> contextFactory)
         await using var contexto = await contextFactory.CreateDbContextAsync();
         return await contexto.Visitas
             .Where(v => v.Id == id)
-            .ExecuteDeleteAsync() > 0;
+            .ExecuteUpdateAsync(setters => setters.SetProperty(v => v.IsDeleted, true)) > 0;
     }
 
     public async Task<bool> CambiarEstadoAsync(int id, string estado)

@@ -54,8 +54,13 @@ public class Contexto : DbContext
                 .OnDelete(DeleteBehavior.Restrict);
         });
 
+        modelBuilder.Entity<DetalleSolicitud>()
+            .HasQueryFilter(d => d.Solicitud != null && !d.Solicitud.IsDeleted);
+
         modelBuilder.Entity<Solicitud>(entity =>
         {
+            entity.HasQueryFilter(s => !s.IsDeleted);
+
             entity.HasMany(s => s.Detalles)
                 .WithOne(d => d.Solicitud)
                 .HasForeignKey(d => d.SolicitudId)
@@ -69,6 +74,8 @@ public class Contexto : DbContext
 
         modelBuilder.Entity<Visita>(entity =>
         {
+            entity.HasQueryFilter(v => !v.IsDeleted);
+
             entity.HasOne(v => v.Tecnico)
                 .WithMany()
                 .HasForeignKey(v => v.TecnicoId)
