@@ -91,8 +91,21 @@ public class SolicitudService(IDbContextFactory<Contexto> contextFactory) : Apli
     public async Task<bool> Eliminar(int id)
     {
         await using var contexto = await contextFactory.CreateDbContextAsync();
-        return await contexto.Solicitudes
-            .Where(s => s.Id == id)
-            .ExecuteDeleteAsync() > 0;
+        var solicitud = await contexto.Solicitudes.FirstOrDefaultAsync(s => s.Id == id);
+        if (solicitud is null)
+        {
+            return false;
+        }
+
+        solicitud.IsDeleted = true;
+        var visitas = await contexto.Visitas
+            .Where(v => v.SolicitudId == id)
+            .ToListAsync();
+        foreach (var visita in visitas)
+        {
+            visita.IsDeleted = true;
+        }
+
+        return await contexto.SaveChangesAsync() > 0;
     }
 }

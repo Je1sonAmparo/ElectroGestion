@@ -7,6 +7,8 @@ public class Solicitud
     [Key]
     public int Id { get; set; }
 
+    public bool IsDeleted { get; set; }
+
     public int ClienteId { get; set; }
     public Cliente? Cliente { get; set; }
 

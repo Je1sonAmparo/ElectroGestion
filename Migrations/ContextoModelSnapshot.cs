@@ -381,6 +381,9 @@ namespace ElectroGestion.Migrations
                     b.Property<DateTime>("FechaSolicitud")
                         .HasColumnType("datetime2");
 
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
+
                     b.Property<int>("ServicioId")
                         .HasColumnType("int");
 
@@ -408,6 +411,7 @@ namespace ElectroGestion.Migrations
                             Direccion = "Calle Duarte #24, Santiago",
                             EstadoSolicitudId = 1,
                             FechaSolicitud = new DateTime(2026, 10, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            IsDeleted = false,
                             ServicioId = 2,
                             TecnicoAsignado = ""
                         },
@@ -419,6 +423,7 @@ namespace ElectroGestion.Migrations
                             Direccion = "Av. Estrella Sadhalá #102, Santiago",
                             EstadoSolicitudId = 2,
                             FechaSolicitud = new DateTime(2026, 10, 2, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            IsDeleted = false,
                             ServicioId = 1,
                             TecnicoAsignado = ""
                         },
@@ -430,6 +435,7 @@ namespace ElectroGestion.Migrations
                             Direccion = "Calle 16 #7, La Vega",
                             EstadoSolicitudId = 1,
                             FechaSolicitud = new DateTime(2026, 10, 3, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            IsDeleted = false,
                             ServicioId = 3,
                             TecnicoAsignado = ""
                         },
@@ -441,6 +447,7 @@ namespace ElectroGestion.Migrations
                             Direccion = "Calle Principal #58, Moca",
                             EstadoSolicitudId = 3,
                             FechaSolicitud = new DateTime(2026, 9, 29, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            IsDeleted = false,
                             ServicioId = 4,
                             TecnicoAsignado = ""
                         },
@@ -452,6 +459,7 @@ namespace ElectroGestion.Migrations
                             Direccion = "Carretera Luperón km 5, Santiago",
                             EstadoSolicitudId = 2,
                             FechaSolicitud = new DateTime(2026, 10, 4, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            IsDeleted = false,
                             ServicioId = 5,
                             TecnicoAsignado = ""
                         },
@@ -463,6 +471,7 @@ namespace ElectroGestion.Migrations
                             Direccion = "Calle Duarte #24, Santiago",
                             EstadoSolicitudId = 3,
                             FechaSolicitud = new DateTime(2026, 9, 20, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            IsDeleted = false,
                             ServicioId = 3,
                             TecnicoAsignado = ""
                         },
@@ -474,6 +483,7 @@ namespace ElectroGestion.Migrations
                             Direccion = "Av. Estrella Sadhalá #102, Santiago",
                             EstadoSolicitudId = 4,
                             FechaSolicitud = new DateTime(2026, 9, 25, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            IsDeleted = false,
                             ServicioId = 4,
                             TecnicoAsignado = ""
                         },
@@ -485,6 +495,7 @@ namespace ElectroGestion.Migrations
                             Direccion = "Calle 16 #7, La Vega",
                             EstadoSolicitudId = 1,
                             FechaSolicitud = new DateTime(2026, 10, 6, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            IsDeleted = false,
                             ServicioId = 2,
                             TecnicoAsignado = ""
                         });
@@ -576,6 +587,9 @@ namespace ElectroGestion.Migrations
                         .IsRequired()
                         .HasMaxLength(10)
                         .HasColumnType("nvarchar(10)");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
 
                     b.Property<int>("SolicitudId")
                         .HasColumnType("int");
