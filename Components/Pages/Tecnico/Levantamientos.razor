@@ -133,19 +133,18 @@ else
             <button @onclick="CancelarEdicionAsync" style="padding:9px 14px;border:1px solid #A79EEE;background:#fff;color:#1D4ED8;border-radius:8px;font-size:13px;font-weight:700;cursor:pointer">
                 Volver a levantamientos
             </button>
+            @if (SoloLectura)
+            {
+                <button @onclick="SolicitarEdicionEnviada" style="padding:9px 14px;border:0;background:#1D4ED8;color:#fff;border-radius:8px;font-size:13px;font-weight:700;cursor:pointer">
+                    Editar información
+                </button>
+            }
         </div>
 
         @if (CurrentSolicitud.Levantamiento?.BorradorGuardado == true)
         {
             <div style="margin-bottom:18px;font-size:12px;font-weight:800;color:#B26A00;background:#FFF3E0;border-radius:6px;padding:8px 11px;display:inline-block">
                 Borrador guardado
-            </div>
-        }
-
-        @if (SoloLectura)
-        {
-            <div role="status" style="margin-bottom:18px;padding:12px 15px;background:#EEF2FF;border:1px solid #C7D2FE;color:#3730A3;border-radius:9px">
-                La información ya fue enviada a Administración y se muestra en modo de consulta.
             </div>
         }
 
@@ -222,8 +221,15 @@ else
             </button>
             @if (!SoloLectura)
             {
-                <button @onclick="GuardarBorradorAsync" disabled="@IsSaving" style="padding:12px 20px;border:1px solid #1D4ED8;background:#fff;color:#1D4ED8;border-radius:9px;font-weight:700;font-size:14px;cursor:pointer">Guardar</button>
-                <button @onclick="SolicitarEnvio" disabled="@IsSaving" style="padding:12px 22px;border:0;background:#1D4ED8;color:#fff;border-radius:9px;font-weight:700;font-size:14px;cursor:pointer;font-family:'Manrope'">Enviar a Administración</button>
+                @if (EditandoEnviado)
+                {
+                    <button @onclick="GuardarCambiosEnviadosAsync" disabled="@IsSaving" style="padding:12px 20px;border:0;background:#1D4ED8;color:#fff;border-radius:9px;font-weight:700;font-size:14px;cursor:pointer">Guardar cambios</button>
+                }
+                else
+                {
+                    <button @onclick="GuardarBorradorAsync" disabled="@IsSaving" style="padding:12px 20px;border:1px solid #1D4ED8;background:#fff;color:#1D4ED8;border-radius:9px;font-weight:700;font-size:14px;cursor:pointer">Guardar</button>
+                    <button @onclick="SolicitarEnvio" disabled="@IsSaving" style="padding:12px 22px;border:0;background:#1D4ED8;color:#fff;border-radius:9px;font-weight:700;font-size:14px;cursor:pointer;font-family:'Manrope'">Enviar a Administración</button>
+                }
             }
         </div>
     </div>
@@ -233,14 +239,44 @@ else
 {
     <div role="presentation" style="@ModalBackdropStyle">
         <section role="dialog" aria-modal="true" aria-labelledby="cancel-title" style="@ModalStyle">
-            <h2 id="cancel-title" style="font-family:'Manrope';font-size:19px;margin:0 0 12px">¿Desea guardar los cambios?</h2>
+            <h2 id="cancel-title" style="font-family:'Manrope';font-size:19px;margin:0 0 12px">@(EditandoEnviado ? "¿Descartar los cambios?" : "¿Desea guardar los cambios?")</h2>
             <p style="font-size:14px;color:#5E6378;line-height:1.55;margin:0">
-                Hay información ingresada que todavía no se ha guardado. Si sale ahora, esos cambios se perderán. Puede guardarlos como borrador para continuar después.
+                @if (EditandoEnviado)
+                {
+                    <span>Los cambios que todavía no ha guardado se perderán. ¿Desea volver a la información enviada?</span>
+                }
+                else
+                {
+                    <span>Hay información ingresada que todavía no se ha guardado. Si sale ahora, esos cambios se perderán. Puede guardarlos como borrador para continuar después.</span>
+                }
             </p>
             <div style="display:flex;justify-content:flex-end;gap:10px;flex-wrap:wrap;margin-top:22px">
                 <button @onclick="CerrarConfirmacionCancelar" style="@SecondaryButtonStyle">Cancelar</button>
-                <button @onclick="SalirSinGuardarAsync" style="@SecondaryButtonStyle">Salir sin guardar</button>
-                <button @onclick="GuardarBorradorYSalirAsync" style="@PrimaryButtonStyle">Guardar como borrador y salir</button>
+                @if (EditandoEnviado)
+                {
+                    <button @onclick="DescartarCambiosEnviados" style="@PrimaryButtonStyle">Descartar cambios</button>
+                }
+                else
+                {
+                    <button @onclick="SalirSinGuardarAsync" style="@SecondaryButtonStyle">Salir sin guardar</button>
+                    <button @onclick="GuardarBorradorYSalirAsync" style="@PrimaryButtonStyle">Guardar como borrador y salir</button>
+                }
+            </div>
+        </section>
+    </div>
+}
+
+@if (MostrarConfirmacionEdicion)
+{
+    <div role="presentation" style="@ModalBackdropStyle">
+        <section role="dialog" aria-modal="true" aria-labelledby="edit-title" style="@ModalStyle">
+            <h2 id="edit-title" style="font-family:'Manrope';font-size:19px;margin:0 0 12px">Editar información enviada</h2>
+            <p style="font-size:14px;color:#5E6378;line-height:1.55;margin:0">
+                ¿Desea habilitar la edición de este levantamiento? Los cambios se guardarán en la información enviada a Administración.
+            </p>
+            <div style="display:flex;justify-content:flex-end;gap:10px;margin-top:22px">
+                <button @onclick="CerrarConfirmacionEdicion" disabled="@IsSaving" style="@SecondaryButtonStyle">Cancelar</button>
+                <button @onclick="ConfirmarEdicionEnviada" disabled="@IsSaving" style="@PrimaryButtonStyle">Continuar</button>
             </div>
         </section>
     </div>
@@ -252,7 +288,7 @@ else
         <section role="dialog" aria-modal="true" aria-labelledby="send-title" style="@ModalStyle">
             <h2 id="send-title" style="font-family:'Manrope';font-size:19px;margin:0 0 12px">Enviar levantamiento a Administración</h2>
             <p style="font-size:14px;color:#5E6378;line-height:1.55;margin:0">
-                ¿Está seguro de que desea enviar la información a Administración? Después del envío, el levantamiento quedará en modo de consulta.
+                ¿Está seguro de que desea enviar la información a Administración?
             </p>
             <div style="display:flex;justify-content:flex-end;gap:10px;margin-top:22px">
                 <button @onclick="CerrarConfirmacionEnvio" disabled="@IsSaving" style="@SecondaryButtonStyle">Cancelar</button>
@@ -296,7 +332,9 @@ else
     private bool IsLoading;
     private bool IsSaving;
     private bool SoloLectura;
+    private bool EditandoEnviado;
     private bool MostrarConfirmacionCancelar;
+    private bool MostrarConfirmacionEdicion;
     private bool MostrarConfirmacionEnvio;
     private bool DesplazarListadoAlInicio;
 
@@ -424,6 +462,7 @@ else
 
         CurrentSolicitud = solicitud;
         SoloLectura = solicitud.EstadoSolicitud?.Nombre == "En Espera Administración";
+        EditandoEnviado = false;
         await CargarFormularioAsync(solicitud.Levantamiento);
     }
 
@@ -507,6 +546,66 @@ else
         {
             IsSaving = false;
         }
+    }
+
+    private async Task GuardarCambiosEnviadosAsync()
+    {
+        if (CurrentSolicitud is null || !EditandoEnviado)
+        {
+            return;
+        }
+
+        if (!TieneDatosRequeridos())
+        {
+            FormMessage = "Complete todos los campos técnicos obligatorios y agregue al menos una fotografía antes de guardar.";
+            ToastService.ShowWarning(FormMessage, "Atención");
+            return;
+        }
+
+        var solicitudId = CurrentSolicitud.Id;
+        IsSaving = true;
+        FormMessage = null;
+        try
+        {
+            if (!await LevantamientoService.ActualizarEnviadoAsync(solicitudId, CrearLevantamiento()))
+            {
+                FormMessage = "No se pudieron guardar los cambios. Verifique que el levantamiento siga en espera de Administración.";
+                ToastService.ShowWarning(FormMessage, "Atención");
+                return;
+            }
+
+            AppState.NotifyStateChanged();
+            await CargarDatosAsync();
+            CurrentSolicitud = solicitudes.FirstOrDefault(s => s.Id == solicitudId);
+            await CargarFormularioAsync(CurrentSolicitud?.Levantamiento);
+            EditandoEnviado = false;
+            SoloLectura = true;
+            ToastService.ShowSuccess("Los cambios se guardaron correctamente.", "Éxito");
+        }
+        catch (Exception ex)
+        {
+            Logger.LogError(ex, "No se pudieron guardar los cambios del levantamiento enviado de la solicitud {SolicitudId}.", solicitudId);
+            FormMessage = "Ocurrió un error al guardar los cambios. Intente nuevamente.";
+            ToastService.ShowError(FormMessage, "Error");
+        }
+        finally
+        {
+            IsSaving = false;
+        }
+    }
+
+    private void SolicitarEdicionEnviada() => MostrarConfirmacionEdicion = true;
+
+    private void CerrarConfirmacionEdicion() => MostrarConfirmacionEdicion = false;
+
+    private void ConfirmarEdicionEnviada()
+    {
+        MostrarConfirmacionEdicion = false;
+        SoloLectura = false;
+        EditandoEnviado = true;
+        FormMessage = null;
+        InitialSnapshot = CrearSnapshot();
+        ToastService.ShowToast(ToastType.Info, "Edición habilitada", "Puede modificar la información del levantamiento.");
     }
 
     private void SolicitarEnvio()
@@ -594,10 +693,24 @@ else
     private async Task CancelarEdicionAsync()
     {
         FormMessage = null;
+        if (EditandoEnviado)
+        {
+            if (HayCambiosSinGuardar)
+            {
+                MostrarConfirmacionCancelar = true;
+                return;
+            }
+
+            EditandoEnviado = false;
+            SoloLectura = true;
+            return;
+        }
+
         if (SoloLectura || !HayCambiosSinGuardar)
         {
             CurrentSolicitud = null;
             SoloLectura = false;
+            EditandoEnviado = false;
             DesplazarListadoAlInicio = true;
             return;
         }
@@ -609,6 +722,15 @@ else
     {
         MostrarConfirmacionCancelar = false;
         ToastService.ShowToast(ToastType.Info, "Levantamiento", "Continúa editando el formulario.");
+    }
+
+    private async Task DescartarCambiosEnviados()
+    {
+        MostrarConfirmacionCancelar = false;
+        EditandoEnviado = false;
+        SoloLectura = true;
+        await CargarFormularioAsync(CurrentSolicitud?.Levantamiento);
+        ToastService.ShowWarning("Los cambios se descartaron.", "Edición cancelada");
     }
 
     private Task SalirSinGuardarAsync()

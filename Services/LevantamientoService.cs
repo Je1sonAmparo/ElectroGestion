@@ -118,6 +118,25 @@ public class LevantamientoService(IDbContextFactory<Contexto> contextFactory)
         return true;
     }
 
+    public async Task<bool> ActualizarEnviadoAsync(int solicitudId, Levantamiento datos)
+    {
+        await using var contexto = await contextFactory.CreateDbContextAsync();
+        var solicitud = await contexto.Solicitudes
+            .Include(s => s.Levantamiento)
+            .FirstOrDefaultAsync(s => s.Id == solicitudId);
+        if (solicitud?.Levantamiento is null ||
+            solicitud.EstadoSolicitudId != EstadoEnEsperaAdministracionId ||
+            !TieneDatosRequeridos(datos))
+        {
+            return false;
+        }
+
+        CopiarDatos(datos, solicitud.Levantamiento);
+        solicitud.Levantamiento.BorradorGuardado = false;
+        await contexto.SaveChangesAsync();
+        return true;
+    }
+
     private static bool TieneDatosRequeridos(Levantamiento levantamiento) =>
         !string.IsNullOrWhiteSpace(levantamiento.DisponibilidadEspacios) &&
         !string.IsNullOrWhiteSpace(levantamiento.CargasElectricas) &&
