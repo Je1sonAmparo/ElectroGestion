@@ -7,13 +7,11 @@
 @inject ElectroGestion.Services.VisitaService VisitaService
 @inject BlazorBootstrap.ToastService ToastService
 @inject ILogger<Levantamientos> Logger
-@inject IJSRuntime JS
-
 <PageTitle>Levantamientos | ElectroGestion</PageTitle>
 
 <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:20px;margin-bottom:24px">
     <div>
-        <div class="page-title" style="font-family:'Manrope';font-weight:800;font-size:31px;letter-spacing:-.6px">Levantamientos</div>
+        <div @ref="TituloListado" class="page-title" tabindex="-1" style="font-family:'Manrope';font-weight:800;font-size:31px;letter-spacing:-.6px;outline:none">Levantamientos</div>
         <div style="color:#6B7085;font-size:14.5px;margin-top:5px">Gestiona los levantamientos técnicos.</div>
     </div>
 </div>
@@ -280,6 +278,7 @@ else
     private List<string> TiposServicio = new();
     private List<string> Fotos = new();
     private ElectroGestion.Models.Solicitud? CurrentSolicitud;
+    private ElementReference TituloListado;
     private string SearchId = "";
     private string SearchCliente = "";
     private string SearchTipo = "";
@@ -329,7 +328,7 @@ else
         }
 
         DesplazarListadoAlInicio = false;
-        await JS.InvokeVoidAsync("window.scrollTo", 0, 0);
+        await TituloListado.FocusAsync();
     }
 
     private async Task CargarDatosAsync()
