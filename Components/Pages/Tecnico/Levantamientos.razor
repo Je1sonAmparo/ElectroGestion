@@ -34,13 +34,13 @@ else if (CurrentSolicitud is null)
     <div style="background:#fff;border:1px solid #E3E5EE;border-radius:14px;padding:18px">
         <div style="display:flex;flex-direction:column;gap:18px;padding-bottom:12px;border-bottom:1px solid #EFF0F6">
             <div style="display:flex;align-items:center;gap:20px;flex-wrap:wrap">
-                <label style="display:flex;align-items:center;gap:10px;font-weight:800">ID:
+                <label style="display:flex;align-items:center;gap:10px;font-weight:700">ID:
                     <input @bind="SearchId" @bind:event="oninput" placeholder="ID" style="width:100px;padding:9px 12px;border:1px solid #D5D8E6;border-radius:6px;font-size:14px" />
                 </label>
-                <label style="display:flex;align-items:center;gap:10px;font-weight:800">Cliente:
+                <label style="display:flex;align-items:center;gap:10px;font-weight:700">Cliente:
                     <input @bind="SearchCliente" @bind:event="oninput" placeholder="Nombre del cliente" style="width:200px;padding:9px 12px;border:1px solid #D5D8E6;border-radius:6px;font-size:14px" />
                 </label>
-                <label style="display:flex;align-items:center;gap:10px;font-weight:800">Tipo de servicio:
+                <label style="display:flex;align-items:center;gap:10px;font-weight:700">Tipo de servicio:
                     <select @bind="SearchTipo" style="width:210px;padding:9px 12px;border:1px solid #D5D8E6;border-radius:6px;font-size:14px;background:#fff">
                         <option value="">Todos</option>
                         @foreach (var tipo in TiposServicio)
@@ -51,10 +51,10 @@ else if (CurrentSolicitud is null)
                 </label>
             </div>
             <div style="display:flex;align-items:center;gap:20px;flex-wrap:wrap">
-                <label style="display:flex;align-items:center;gap:10px;font-weight:800">Fecha programada:
+                <label style="display:flex;align-items:center;gap:10px;font-weight:700">Fecha programada:
                     <input type="date" @bind="SearchFecha" @bind:format="yyyy-MM-dd" style="width:170px;padding:9px 12px;border:1px solid #D5D8E6;border-radius:6px;font-size:14px;background:#fff" />
                 </label>
-                <label style="display:flex;align-items:center;gap:10px;font-weight:800">Estado:
+                <label style="display:flex;align-items:center;gap:10px;font-weight:700">Estado:
                     <select @bind="SearchEstado" style="width:210px;padding:9px 12px;border:1px solid #D5D8E6;border-radius:6px;font-size:14px;background:#fff">
                         <option value="Todos">Todos</option>
                         @foreach (var estado in EstadosLevantamiento)
