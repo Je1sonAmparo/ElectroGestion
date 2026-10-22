@@ -34,13 +34,13 @@ else if (CurrentSolicitud is null)
     <div style="background:#fff;border:1px solid #E3E5EE;border-radius:14px;padding:18px">
         <div style="display:flex;flex-direction:column;gap:18px;padding-bottom:12px;border-bottom:1px solid #EFF0F6">
             <div style="display:flex;align-items:center;gap:20px;flex-wrap:wrap">
-                <label style="display:flex;align-items:center;gap:10px;font-weight:500">ID:
+                <label style="display:flex;align-items:center;gap:10px;font-weight:800">ID:
                     <input @bind="SearchId" @bind:event="oninput" placeholder="ID" style="width:100px;padding:9px 12px;border:1px solid #D5D8E6;border-radius:6px;font-size:14px" />
                 </label>
-                <label style="display:flex;align-items:center;gap:10px;font-weight:500">Cliente:
+                <label style="display:flex;align-items:center;gap:10px;font-weight:800">Cliente:
                     <input @bind="SearchCliente" @bind:event="oninput" placeholder="Nombre del cliente" style="width:200px;padding:9px 12px;border:1px solid #D5D8E6;border-radius:6px;font-size:14px" />
                 </label>
-                <label style="display:flex;align-items:center;gap:10px;font-weight:500">Tipo de servicio:
+                <label style="display:flex;align-items:center;gap:10px;font-weight:800">Tipo de servicio:
                     <select @bind="SearchTipo" style="width:210px;padding:9px 12px;border:1px solid #D5D8E6;border-radius:6px;font-size:14px;background:#fff">
                         <option value="">Todos</option>
                         @foreach (var tipo in TiposServicio)
@@ -51,10 +51,10 @@ else if (CurrentSolicitud is null)
                 </label>
             </div>
             <div style="display:flex;align-items:center;gap:20px;flex-wrap:wrap">
-                <label style="display:flex;align-items:center;gap:10px;font-weight:500">Fecha programada:
+                <label style="display:flex;align-items:center;gap:10px;font-weight:800">Fecha programada:
                     <input type="date" @bind="SearchFecha" @bind:format="yyyy-MM-dd" style="width:170px;padding:9px 12px;border:1px solid #D5D8E6;border-radius:6px;font-size:14px;background:#fff" />
                 </label>
-                <label style="display:flex;align-items:center;gap:10px;font-weight:500">Estado:
+                <label style="display:flex;align-items:center;gap:10px;font-weight:800">Estado:
                     <select @bind="SearchEstado" style="width:210px;padding:9px 12px;border:1px solid #D5D8E6;border-radius:6px;font-size:14px;background:#fff">
                         <option value="Todos">Todos</option>
                         @foreach (var estado in EstadosLevantamiento)
@@ -125,12 +125,16 @@ else if (CurrentSolicitud is null)
 else
 {
     <div style="background:#fff;border:1px solid #E3E5EE;border-radius:14px;padding:26px">
-        <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:16px;flex-wrap:wrap;margin-bottom:22px;padding-bottom:16px;border-bottom:1px solid #EFF0F6">
-            <div>
-                <h2 style="font-family:'Manrope';font-size:20px;margin:0 0 7px">Levantamiento de @CurrentSolicitud.Cliente?.Nombre</h2>
-                <div style="font-size:14px;color:#6B7085">@CurrentSolicitud.Servicio?.Nombre · @FechaActual</div>
+        <div style="display:flex;align-items:center;gap:14px;flex-wrap:wrap;background:#EDEBFF;border:1px solid #C9C3F5;border-radius:12px;padding:14px 16px;margin-bottom:22px">
+            <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="#1D4ED8" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" style="flex:0 0 20px" aria-hidden="true">
+                <path d="M12 20.5a8.5 8.5 0 1 0 0-17 8.5 8.5 0 0 0 0 17 M12 8.2v.2 M12 11.5v4.6"></path>
+            </svg>
+            <div style="font-size:13.5px;color:#2A2382;font-weight:700;flex:1;min-width:220px">
+                Levantamiento de: @CurrentSolicitud.Cliente?.Nombre - @CurrentSolicitud.Servicio?.Nombre
             </div>
-            <span style="display:inline-block;padding:6px 12px;border-radius:20px;font-size:12px;font-weight:800;background:@EstadoActualColors.Bg;color:@EstadoActualColors.Fg">@EstadoActual</span>
+            <button @onclick="CancelarEdicionAsync" style="padding:9px 14px;border:1px solid #A79EEE;background:#fff;color:#1D4ED8;border-radius:8px;font-size:13px;font-weight:700;cursor:pointer">
+                Volver a levantamientos
+            </button>
         </div>
 
         @if (CurrentSolicitud.Levantamiento?.BorradorGuardado == true)
@@ -295,20 +299,9 @@ else
     private bool SoloLectura;
     private bool MostrarConfirmacionCancelar;
     private bool MostrarConfirmacionEnvio;
+    private bool DesplazarListadoAlInicio;
 
-    private string EstadoActual => CurrentSolicitud?.EstadoSolicitud?.Nombre ?? "Pendiente";
-    private (string Bg, string Fg) EstadoActualColors => ElectroGestion.Services.AppStateService.GetBadgeColors(EstadoActual);
     private bool HayCambiosSinGuardar => InitialSnapshot.Length > 0 && InitialSnapshot != CrearSnapshot();
-    private string FechaActual
-    {
-        get
-        {
-            var visita = CurrentSolicitud is null ? null : ObtenerVisita(CurrentSolicitud.Id);
-            return visita is null
-                ? "Sin fecha programada"
-                : $"{ElectroGestion.Services.AppStateService.FormatFecha(visita.Fecha.ToString("yyyy-MM-dd"))} · {ElectroGestion.Services.AppStateService.FormatHora12(visita.Hora)} - {ElectroGestion.Services.AppStateService.FormatHora12(visita.HoraFin)}";
-        }
-    }
 
     private IEnumerable<ElectroGestion.Models.Solicitud> FilteredSolicitudes => solicitudes.Where(s =>
     {
@@ -326,6 +319,17 @@ else
     {
         AppState.OnChange += OnAppStateChanged;
         await CargarDatosAsync();
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (!DesplazarListadoAlInicio || CurrentSolicitud is not null)
+        {
+            return;
+        }
+
+        DesplazarListadoAlInicio = false;
+        await JS.InvokeVoidAsync("window.scrollTo", 0, 0);
     }
 
     private async Task CargarDatosAsync()
@@ -453,7 +457,7 @@ else
         {
             CurrentSolicitud = null;
             await CargarDatosAsync();
-            await VolverAlInicioDelListadoAsync();
+            DesplazarListadoAlInicio = true;
         }
     }
 
@@ -465,7 +469,7 @@ else
         {
             CurrentSolicitud = null;
             await CargarDatosAsync();
-            await VolverAlInicioDelListadoAsync();
+            DesplazarListadoAlInicio = true;
         }
     }
 
@@ -542,7 +546,7 @@ else
             AppState.NotifyStateChanged();
             CurrentSolicitud = null;
             await CargarDatosAsync();
-            await VolverAlInicioDelListadoAsync();
+            DesplazarListadoAlInicio = true;
             ToastService.ShowSuccess("El levantamiento se envió a Administración.", "Éxito");
         }
         catch (Exception ex)
@@ -595,7 +599,7 @@ else
         {
             CurrentSolicitud = null;
             SoloLectura = false;
-            await VolverAlInicioDelListadoAsync();
+            DesplazarListadoAlInicio = true;
             return;
         }
 
@@ -608,14 +612,15 @@ else
         ToastService.ShowToast(ToastType.Info, "Levantamiento", "Continúa editando el formulario.");
     }
 
-    private async Task SalirSinGuardarAsync()
+    private Task SalirSinGuardarAsync()
     {
         MostrarConfirmacionCancelar = false;
         CurrentSolicitud = null;
         SoloLectura = false;
-        await VolverAlInicioDelListadoAsync();
+        DesplazarListadoAlInicio = true;
         ToastService.ShowToast(ToastType.Info, "Levantamiento", "Volvió a la lista principal.");
         ToastService.ShowWarning("Salió sin guardar los cambios.", "Cambios descartados");
+        return Task.CompletedTask;
     }
 
     private void CerrarConfirmacionEnvio() => MostrarConfirmacionEnvio = false;
@@ -667,18 +672,14 @@ else
 
     private void EliminarFoto(string foto) => Fotos.Remove(foto);
 
-    private async Task LimpiarFiltros()
+    private void LimpiarFiltros()
     {
         SearchId = "";
         SearchCliente = "";
         SearchTipo = "";
         SearchFecha = null;
         SearchEstado = "Todos";
-        await VolverAlInicioDelListadoAsync();
     }
-
-    private async Task VolverAlInicioDelListadoAsync() =>
-        await JS.InvokeVoidAsync("window.scrollTo", new { top = 0, behavior = "smooth" });
 
     private void OnAppStateChanged() => _ = InvokeAsync(CargarDatosAsync);
 
