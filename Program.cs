@@ -35,7 +35,8 @@ if (args.Contains("--test-crud"))
     var cliService = scope.ServiceProvider.GetRequiredService<ClienteService>();
     var srvService = scope.ServiceProvider.GetRequiredService<ServicioService>();
     var solService = scope.ServiceProvider.GetRequiredService<SolicitudService>();
-    var exito = await CrudTester.RunAsync(cliService, srvService, solService);
+    var visService = scope.ServiceProvider.GetRequiredService<VisitaService>();
+    var exito = await CrudTester.RunAsync(cliService, srvService, solService, visService);
     Environment.Exit(exito ? 0 : 1);
     return;
 }

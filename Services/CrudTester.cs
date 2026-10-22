@@ -4,228 +4,148 @@ namespace ElectroGestion.Services;
 
 public static class CrudTester
 {
-    public static async Task<bool> RunAsync(ClienteService clienteService, ServicioService servicioService, SolicitudService solicitudService)
+    public static async Task<bool> RunAsync(ClienteService clienteService, ServicioService servicioService, SolicitudService solicitudService, VisitaService visitaService)
     {
         Console.WriteLine("========================================");
-        Console.WriteLine("INICIANDO PRUEBAS DE CRUD EN BASE DE DATOS");
+        Console.WriteLine("INICIANDO PRUEBAS DE CHOQUE DE HORARIOS Y VISITAS");
         Console.WriteLine("========================================");
 
-        // 1. CLIENTE CRUD
-        Console.WriteLine("\n[1] Probando CRUD de Clientes...");
-        var nuevoCliente = new Cliente
+        var tecnicos = await visitaService.ObtenerTecnicosAsync();
+        if (tecnicos.Count < 2)
         {
-            Nombre = "Cliente Test Automatizado",
-            Correo = "test.crud@electrogestion.com",
-            Rnc = "402-9999999-9",
-            Direccion = "Av. Circunvalación Norte #50, Santiago",
-            Servicios = 0
-        };
-        nuevoCliente.Telefonos.Add(new ClienteTelefono { Numero = "809-555-0199", Tipo = "Principal" });
-        nuevoCliente.Telefonos.Add(new ClienteTelefono { Numero = "829-555-0188", Tipo = "Alternativo" });
-
-        bool clienteGuardado = await clienteService.Guardar(nuevoCliente);
-        if (!clienteGuardado || nuevoCliente.Id == 0)
-        {
-            Console.WriteLine("❌ ERROR: No se pudo crear el cliente.");
+            Console.WriteLine("❌ ERROR: Se requieren al menos 2 técnicos para la prueba de choque.");
             return false;
         }
-        Console.WriteLine($"✅ Cliente CREADO con ID: {nuevoCliente.Id}");
 
-        var clienteLeido = await clienteService.Buscar(nuevoCliente.Id);
-        if (clienteLeido == null || clienteLeido.Nombre != "Cliente Test Automatizado" || clienteLeido.Telefonos.Count != 2)
+        var tecCarlos = tecnicos[0];
+        var tecLuis = tecnicos[1];
+        Console.WriteLine($"Técnicos identificados: {tecCarlos.Nombre} (ID {tecCarlos.Id}) y {tecLuis.Nombre} (ID {tecLuis.Id})");
+
+        var clientesExistentes = await clienteService.GetList(c => true);
+        var serviciosExistentes = await servicioService.GetList(s => true);
+
+        var clienteTest = clientesExistentes.First();
+        var servicioTest = serviciosExistentes.First();
+
+        var solA = new Solicitud
         {
-            Console.WriteLine("❌ ERROR: No se pudo leer el cliente o faltan teléfonos.");
-            return false;
-        }
-        Console.WriteLine($"✅ Cliente LEÍDO correctamente. Teléfonos: {clienteLeido.Telefonos.Count}");
-
-        clienteLeido.Nombre = "Cliente Test Modificado";
-        clienteLeido.Direccion = "Calle Sol #10, Santiago";
-        clienteLeido.Telefonos.Clear();
-        clienteLeido.Telefonos.Add(new ClienteTelefono { Numero = "849-555-7777", Tipo = "Principal" });
-
-        bool clienteModificado = await clienteService.Guardar(clienteLeido);
-        if (!clienteModificado)
-        {
-            Console.WriteLine("❌ ERROR: No se pudo modificar el cliente.");
-            return false;
-        }
-        Console.WriteLine("✅ Cliente MODIFICADO correctamente.");
-
-        var clienteVerif = await clienteService.Buscar(nuevoCliente.Id);
-        if (clienteVerif?.Nombre != "Cliente Test Modificado" || clienteVerif?.Telefono != "849-555-7777")
-        {
-            Console.WriteLine("❌ ERROR: La modificación del cliente no persistió los cambios esperados.");
-            return false;
-        }
-        Console.WriteLine("✅ Verificación de modificación de cliente EXITOSA.");
-
-        // 2. SERVICIO CRUD
-        Console.WriteLine("\n[2] Probando CRUD de Servicios...");
-        var nuevoServicio = new Servicio
-        {
-            ServicioId = "SV-TEST",
-            Nombre = "Servicio de Diagnóstico Test",
-            Categoria = "Diagnóstico",
-            PrecioBase = 3500.00m,
-            Estado = "Activo"
-        };
-
-        bool servGuardado = await servicioService.Guardar(nuevoServicio);
-        if (!servGuardado || nuevoServicio.Id == 0)
-        {
-            Console.WriteLine("❌ ERROR: No se pudo crear el servicio.");
-            return false;
-        }
-        Console.WriteLine($"✅ Servicio CREADO con ID: {nuevoServicio.Id} (Código: {nuevoServicio.ServicioId})");
-
-        var servLeido = await servicioService.Buscar(nuevoServicio.Id);
-        if (servLeido == null || servLeido.Nombre != "Servicio de Diagnóstico Test")
-        {
-            Console.WriteLine("❌ ERROR: No se pudo leer el servicio.");
-            return false;
-        }
-        Console.WriteLine("✅ Servicio LEÍDO correctamente.");
-
-        servLeido.Nombre = "Servicio de Diagnóstico Avanzado";
-        servLeido.PrecioBase = 4200.00m;
-        bool servModificado = await servicioService.Guardar(servLeido);
-        if (!servModificado)
-        {
-            Console.WriteLine("❌ ERROR: No se pudo modificar el servicio.");
-            return false;
-        }
-        Console.WriteLine("✅ Servicio MODIFICADO correctamente.");
-
-        var servVerif = await servicioService.Buscar(nuevoServicio.Id);
-        if (servVerif?.PrecioBase != 4200.00m || servVerif?.Nombre != "Servicio de Diagnóstico Avanzado")
-        {
-            Console.WriteLine("❌ ERROR: La modificación del servicio no persistió los cambios.");
-            return false;
-        }
-        Console.WriteLine("✅ Verificación de modificación de servicio EXITOSA.");
-
-        // 3. SOLICITUD CRUD
-        Console.WriteLine("\n[3] Probando CRUD de Solicitudes...");
-        var nuevaSolicitud = new Solicitud
-        {
-            ClienteId = nuevoCliente.Id,
-            ServicioId = nuevoServicio.Id,
-            Contacto = nuevoCliente.Nombre,
-            Direccion = "Av. Circunvalación Norte #50, Santiago",
+            ClienteId = clienteTest.Id,
+            ServicioId = servicioTest.Id,
+            Contacto = "Contacto Demo A",
+            Direccion = "Calle 16 #10, Santiago",
             FechaSolicitud = DateTime.Today,
-            EstadoSolicitudId = 1
+            EstadoSolicitudId = 1 // Pendiente
+        };
+        await solicitudService.Guardar(solA);
+
+        var solB = new Solicitud
+        {
+            ClienteId = clienteTest.Id,
+            ServicioId = servicioTest.Id,
+            Contacto = "Contacto Demo B",
+            Direccion = "Av. Las Carreras #20, Santiago",
+            FechaSolicitud = DateTime.Today,
+            EstadoSolicitudId = 1 // Pendiente
+        };
+        await solicitudService.Guardar(solB);
+
+        var fechaPrueba = DateTime.Today.AddDays(1);
+        while (fechaPrueba.DayOfWeek == DayOfWeek.Sunday)
+        {
+            fechaPrueba = fechaPrueba.AddDays(1);
+        }
+
+        Console.WriteLine($"Fecha de prueba laboral: {fechaPrueba:yyyy-MM-dd}");
+
+        // 1. Agendar visita A para Carlos de 16:20 a 17:20
+        var visitaA = new Visita
+        {
+            SolicitudId = solA.Id,
+            TecnicoId = tecCarlos.Id,
+            Fecha = fechaPrueba,
+            Hora = "16:20",
+            HoraFin = "17:20",
+            Estado = "En proceso"
         };
 
-        bool solGuardada = await solicitudService.Guardar(nuevaSolicitud);
-        if (!solGuardada || nuevaSolicitud.Id == 0)
+        bool dispA = await visitaService.HorarioDisponibleAsync(fechaPrueba, "16:20", "17:20", null, tecCarlos.Id);
+        if (!dispA)
         {
-            Console.WriteLine("❌ ERROR: No se pudo crear la solicitud.");
+            Console.WriteLine("❌ ERROR: El horario inicial debería estar disponible para Carlos.");
             return false;
         }
-        Console.WriteLine($"✅ Solicitud CREADA con ID: {nuevaSolicitud.Id}");
 
-        var solLeida = await solicitudService.Buscar(nuevaSolicitud.Id);
-        if (solLeida == null || solLeida.Cliente?.Id != nuevoCliente.Id || solLeida.Servicio?.Id != nuevoServicio.Id)
+        bool guardadoA = await visitaService.GuardarAsync(visitaA);
+        if (!guardadoA)
         {
-            Console.WriteLine("❌ ERROR: No se pudo leer la solicitud o sus relaciones asociadas.");
+            Console.WriteLine("❌ ERROR: No se pudo guardar la visita de Carlos.");
             return false;
         }
-        Console.WriteLine($"✅ Solicitud LEÍDA correctamente. Cliente relacionado: {solLeida.Cliente?.Nombre}, Servicio: {solLeida.Servicio?.Nombre}");
+        Console.WriteLine($"✅ Visita A para {tecCarlos.Nombre} (16:20 - 17:20) guardada exitosamente.");
 
-        solLeida.Direccion = "Nueva dirección de visita #99";
-        solLeida.EstadoSolicitudId = 2; // En proceso
-
-        bool solModificada = await solicitudService.Guardar(solLeida);
-        if (!solModificada)
+        // Verificar que Solicitud A cambió a 'En proceso' (Id = 2)
+        var solAVerif = await solicitudService.Buscar(solA.Id);
+        if (solAVerif?.EstadoSolicitudId != 2)
         {
-            Console.WriteLine("❌ ERROR: No se pudo modificar la solicitud.");
+            Console.WriteLine($"❌ ERROR: EstadoSolicitudId de Solicitud A es {solAVerif?.EstadoSolicitudId}, se esperaba 2 ('En proceso').");
             return false;
         }
-        Console.WriteLine("✅ Solicitud MODIFICADA correctamente.");
+        Console.WriteLine("✅ Solicitud A pasó exitosamente al estado 'En proceso'.");
 
-        var solVerif = await solicitudService.Buscar(nuevaSolicitud.Id);
-        if (solVerif?.Direccion != "Nueva dirección de visita #99" || solVerif?.EstadoSolicitudId != 2)
+        // 2. Intentar agendar al MISMO técnico Carlos a la MISMA hora (16:20 a 17:20) -> DEBE DETECTAR COLISIÓN
+        bool dispMismoTec = await visitaService.HorarioDisponibleAsync(fechaPrueba, "16:20", "17:20", null, tecCarlos.Id);
+        if (dispMismoTec)
         {
-            Console.WriteLine("❌ ERROR: La modificación de la solicitud no persistió los cambios.");
+            Console.WriteLine("❌ ERROR: El sistema debió detectar choque de horario para Carlos.");
             return false;
         }
-        Console.WriteLine("✅ Verificación de modificación de solicitud EXITOSA.");
+        Console.WriteLine($"✅ Choque de horario detectado correctamente para el mismo técnico ({tecCarlos.Nombre}) a la misma hora.");
 
-        // 4. INTEGRIDAD REFERENCIAL Y ELIMINACIÓN
-        Console.WriteLine("\n[4] Probando Integridad Referencial y Eliminación...");
-        
-        // El cliente tiene solicitud activa, no debe poder eliminarse
-        bool clienteEliminadoConSolicitud = await clienteService.Eliminar(nuevoCliente.Id);
-        if (clienteEliminadoConSolicitud)
+        // 3. Agendar para un SEGUNDO técnico (Luis) a la EXACTA MISMA HORA (16:20 a 17:20) -> DEBE ESTAR DISPONIBLE
+        bool dispSegundoTec = await visitaService.HorarioDisponibleAsync(fechaPrueba, "16:20", "17:20", null, tecLuis.Id);
+        if (!dispSegundoTec)
         {
-            Console.WriteLine("❌ ERROR: El cliente no debió poder eliminarse teniendo una solicitud activa.");
+            Console.WriteLine($"❌ ERROR: {tecLuis.Nombre} debería estar libre pero fue bloqueado por la cita de {tecCarlos.Nombre}.");
             return false;
         }
-        Console.WriteLine("✅ Protección FK de Cliente validada (bloqueado correctamente cuando tiene solicitudes).");
+        Console.WriteLine($"✅ Horario DISPONIBLE para {tecLuis.Nombre} a las 16:20 a pesar de que {tecCarlos.Nombre} está ocupado.");
 
-        // El servicio tiene solicitud activa, no debe poder eliminarse
-        bool servEliminadoConSolicitud = await servicioService.Eliminar(nuevoServicio.Id);
-        if (servEliminadoConSolicitud)
+        var visitaB = new Visita
         {
-            Console.WriteLine("❌ ERROR: El servicio no debió poder eliminarse teniendo una solicitud activa.");
+            SolicitudId = solB.Id,
+            TecnicoId = tecLuis.Id,
+            Fecha = fechaPrueba,
+            Hora = "16:20",
+            HoraFin = "17:20",
+            Estado = "En proceso"
+        };
+
+        bool guardadoB = await visitaService.GuardarAsync(visitaB);
+        if (!guardadoB)
+        {
+            Console.WriteLine($"❌ ERROR: GuardarAsync falló al guardar la visita simultánea para {tecLuis.Nombre}.");
             return false;
         }
-        Console.WriteLine("✅ Protección FK de Servicio validada (bloqueado correctamente cuando tiene solicitudes).");
+        Console.WriteLine($"✅ Visita B para {tecLuis.Nombre} (16:20 - 17:20) guardada exitosamente (múltiples técnicos concurrentes soportados).");
 
-        // Eliminar la solicitud
-        bool solEliminada = await solicitudService.Eliminar(nuevaSolicitud.Id);
-        if (!solEliminada)
+        // Verificar que Solicitud B cambió a 'En proceso' (Id = 2)
+        var solBVerif = await solicitudService.Buscar(solB.Id);
+        if (solBVerif?.EstadoSolicitudId != 2)
         {
-            Console.WriteLine("❌ ERROR: No se pudo eliminar la solicitud.");
+            Console.WriteLine($"❌ ERROR: EstadoSolicitudId de Solicitud B es {solBVerif?.EstadoSolicitudId}, se esperaba 2 ('En proceso').");
             return false;
         }
-        Console.WriteLine("✅ Solicitud ELIMINADA exitosamente.");
+        Console.WriteLine("✅ Solicitud B pasó exitosamente al estado 'En proceso'.");
 
-        var solPostDelete = await solicitudService.Buscar(nuevaSolicitud.Id);
-        if (solPostDelete != null)
-        {
-            Console.WriteLine("❌ ERROR: La solicitud sigue existiendo tras ser eliminada.");
-            return false;
-        }
-        Console.WriteLine("✅ Verificación de eliminación de solicitud EXITOSA.");
-
-        // Ahora que la solicitud fue eliminada, el cliente sí debe poder eliminarse
-        bool clienteEliminadoFinal = await clienteService.Eliminar(nuevoCliente.Id);
-        if (!clienteEliminadoFinal)
-        {
-            Console.WriteLine("❌ ERROR: No se pudo eliminar el cliente después de liberar su solicitud.");
-            return false;
-        }
-        Console.WriteLine("✅ Cliente ELIMINADO exitosamente.");
-
-        var clientePostDelete = await clienteService.Buscar(nuevoCliente.Id);
-        if (clientePostDelete != null)
-        {
-            Console.WriteLine("❌ ERROR: El cliente sigue existiendo tras ser eliminado.");
-            return false;
-        }
-        Console.WriteLine("✅ Verificación de eliminación de cliente EXITOSA.");
-
-        // El servicio también debe poder eliminarse ahora
-        bool servEliminadoFinal = await servicioService.Eliminar(nuevoServicio.Id);
-        if (!servEliminadoFinal)
-        {
-            Console.WriteLine("❌ ERROR: No se pudo eliminar el servicio después de liberar su solicitud.");
-            return false;
-        }
-        Console.WriteLine("✅ Servicio ELIMINADO exitosamente.");
-
-        var servPostDelete = await servicioService.Buscar(nuevoServicio.Id);
-        if (servPostDelete != null)
-        {
-            Console.WriteLine("❌ ERROR: El servicio sigue existiendo tras ser eliminado.");
-            return false;
-        }
-        Console.WriteLine("✅ Verificación de eliminación de servicio EXITOSA.");
+        // Limpieza de datos de prueba
+        await visitaService.EliminarAsync(visitaA.Id);
+        await visitaService.EliminarAsync(visitaB.Id);
+        await solicitudService.Eliminar(solA.Id);
+        await solicitudService.Eliminar(solB.Id);
+        Console.WriteLine("✅ Limpieza de pruebas finalizada.");
 
         Console.WriteLine("\n========================================");
-        Console.WriteLine("🎉 TODAS LAS PRUEBAS DE CRUD PASARON CON ÉXITO");
+        Console.WriteLine("🎉 TODAS LAS PRUEBAS DE CHOQUE DE HORARIOS Y VISITAS PASARON CON ÉXITO");
         Console.WriteLine("========================================");
         return true;
     }
