@@ -184,7 +184,7 @@ else
         </div>
 
         <div style="margin-top:22px">
-            <div style="font-size:13px;font-weight:700;color:#4A4E63;margin-bottom:10px">Fotografías *</div>
+            <div style="font-size:13px;font-weight:700;color:#4A4E63;margin-bottom:10px">Fotografías (opcional)</div>
             <div style="display:flex;gap:12px;flex-wrap:wrap;align-items:center">
                 @if (!SoloLectura)
                 {
@@ -557,7 +557,7 @@ else
 
         if (!TieneDatosRequeridos())
         {
-            FormMessage = "Complete todos los campos técnicos obligatorios y agregue al menos una fotografía antes de guardar.";
+            FormMessage = "Complete todos los campos técnicos obligatorios antes de guardar.";
             ToastService.ShowWarning(FormMessage, "Atención");
             return;
         }
@@ -613,7 +613,7 @@ else
         FormMessage = null;
         if (!TieneDatosRequeridos())
         {
-            FormMessage = "Complete todos los campos técnicos obligatorios y agregue al menos una fotografía antes de enviar.";
+            FormMessage = "Complete todos los campos técnicos obligatorios antes de enviar.";
             ToastService.ShowWarning(FormMessage, "Atención");
             return;
         }
@@ -664,8 +664,7 @@ else
         !string.IsNullOrWhiteSpace(FormCargas) &&
         !string.IsNullOrWhiteSpace(FormTension) &&
         !string.IsNullOrWhiteSpace(FormTuberias) &&
-        !string.IsNullOrWhiteSpace(FormCableado) &&
-        Fotos.Count > 0;
+        !string.IsNullOrWhiteSpace(FormCableado);
 
     private ElectroGestion.Models.Levantamiento CrearLevantamiento() => new()
     {

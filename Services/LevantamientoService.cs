@@ -1,4 +1,3 @@
-using System.Text.Json;
 using ElectroGestion.Context;
 using ElectroGestion.Models;
 using Microsoft.EntityFrameworkCore;
@@ -142,8 +141,7 @@ public class LevantamientoService(IDbContextFactory<Contexto> contextFactory)
         !string.IsNullOrWhiteSpace(levantamiento.CargasElectricas) &&
         !string.IsNullOrWhiteSpace(levantamiento.EstabilidadTension) &&
         !string.IsNullOrWhiteSpace(levantamiento.RecorridoTuberias) &&
-        !string.IsNullOrWhiteSpace(levantamiento.RecorridoCableado) &&
-        JsonSerializer.Deserialize<List<string>>(levantamiento.FotografiasJson)?.Count > 0;
+        !string.IsNullOrWhiteSpace(levantamiento.RecorridoCableado);
 
     private static void CopiarDatos(Levantamiento origen, Levantamiento destino)
     {
