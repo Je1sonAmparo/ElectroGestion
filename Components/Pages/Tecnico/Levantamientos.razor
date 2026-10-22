@@ -5,14 +5,16 @@
 @inject ElectroGestion.Services.AppStateService AppState
 @inject ElectroGestion.Services.LevantamientoService LevantamientoService
 @inject ElectroGestion.Services.VisitaService VisitaService
+@inject BlazorBootstrap.ToastService ToastService
 @inject ILogger<Levantamientos> Logger
+@inject IJSRuntime JS
 
 <PageTitle>Levantamientos | ElectroGestion</PageTitle>
 
 <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:20px;margin-bottom:24px">
     <div>
         <div class="page-title" style="font-family:'Manrope';font-weight:800;font-size:31px;letter-spacing:-.6px">Levantamientos</div>
-        <div style="color:#6B7085;font-size:14.5px;margin-top:5px">Gestiona los levantamientos técnicos programados en la agenda.</div>
+        <div style="color:#6B7085;font-size:14.5px;margin-top:5px">Gestiona los levantamientos técnicos.</div>
     </div>
 </div>
 
@@ -32,13 +34,13 @@ else if (CurrentSolicitud is null)
     <div style="background:#fff;border:1px solid #E3E5EE;border-radius:14px;padding:18px">
         <div style="display:flex;flex-direction:column;gap:18px;padding-bottom:12px;border-bottom:1px solid #EFF0F6">
             <div style="display:flex;align-items:center;gap:20px;flex-wrap:wrap">
-                <label style="display:flex;align-items:center;gap:10px;font-weight:800">ID:
+                <label style="display:flex;align-items:center;gap:10px;font-weight:500">ID:
                     <input @bind="SearchId" @bind:event="oninput" placeholder="ID" style="width:100px;padding:9px 12px;border:1px solid #D5D8E6;border-radius:6px;font-size:14px" />
                 </label>
-                <label style="display:flex;align-items:center;gap:10px;font-weight:800">Cliente:
+                <label style="display:flex;align-items:center;gap:10px;font-weight:500">Cliente:
                     <input @bind="SearchCliente" @bind:event="oninput" placeholder="Nombre del cliente" style="width:200px;padding:9px 12px;border:1px solid #D5D8E6;border-radius:6px;font-size:14px" />
                 </label>
-                <label style="display:flex;align-items:center;gap:10px;font-weight:800">Tipo de servicio:
+                <label style="display:flex;align-items:center;gap:10px;font-weight:500">Tipo de servicio:
                     <select @bind="SearchTipo" style="width:210px;padding:9px 12px;border:1px solid #D5D8E6;border-radius:6px;font-size:14px;background:#fff">
                         <option value="">Todos</option>
                         @foreach (var tipo in TiposServicio)
@@ -49,10 +51,10 @@ else if (CurrentSolicitud is null)
                 </label>
             </div>
             <div style="display:flex;align-items:center;gap:20px;flex-wrap:wrap">
-                <label style="display:flex;align-items:center;gap:10px;font-weight:800">Fecha programada:
+                <label style="display:flex;align-items:center;gap:10px;font-weight:500">Fecha programada:
                     <input type="date" @bind="SearchFecha" @bind:format="yyyy-MM-dd" style="width:170px;padding:9px 12px;border:1px solid #D5D8E6;border-radius:6px;font-size:14px;background:#fff" />
                 </label>
-                <label style="display:flex;align-items:center;gap:10px;font-weight:800">Estado:
+                <label style="display:flex;align-items:center;gap:10px;font-weight:500">Estado:
                     <select @bind="SearchEstado" style="width:210px;padding:9px 12px;border:1px solid #D5D8E6;border-radius:6px;font-size:14px;background:#fff">
                         <option value="Todos">Todos</option>
                         @foreach (var estado in EstadosLevantamiento)
@@ -61,7 +63,7 @@ else if (CurrentSolicitud is null)
                         }
                     </select>
                 </label>
-                <button @onclick="LimpiarFiltros" style="margin-left:auto;padding:9px 16px;background:#1D4ED8;color:#fff;border:0;border-radius:6px;font-weight:700;font-size:14px;cursor:pointer">Limpiar filtros</button>
+                <button @onclick="LimpiarFiltros" style="margin-left:auto;padding:9px 16px;background:#1D4ED8;color:#fff;border:0;border-radius:6px;font-weight:700;font-size:14px;cursor:pointer">Buscar</button>
             </div>
         </div>
 
@@ -213,7 +215,7 @@ else
         }
 
         <div style="display:flex;justify-content:flex-end;gap:11px;flex-wrap:wrap;margin-top:26px;padding-top:20px;border-top:1px solid #EFF0F6">
-            <button @onclick="CancelarEdicion" style="padding:12px 20px;border:1px solid #D5D8E6;background:#fff;border-radius:9px;font-weight:700;font-size:14px;cursor:pointer">
+            <button @onclick="CancelarEdicionAsync" style="padding:12px 20px;border:1px solid #D5D8E6;background:#fff;border-radius:9px;font-weight:700;font-size:14px;cursor:pointer">
                 @(SoloLectura ? "Volver" : "Cancelar")
             </button>
             @if (!SoloLectura)
@@ -234,8 +236,8 @@ else
                 Hay información ingresada que todavía no se ha guardado. Si sale ahora, esos cambios se perderán. Puede guardarlos como borrador para continuar después.
             </p>
             <div style="display:flex;justify-content:flex-end;gap:10px;flex-wrap:wrap;margin-top:22px">
-                <button @onclick="CerrarConfirmacionCancelar" style="@SecondaryButtonStyle">Seguir editando</button>
-                <button @onclick="SalirSinGuardar" style="@SecondaryButtonStyle">Salir sin guardar</button>
+                <button @onclick="CerrarConfirmacionCancelar" style="@SecondaryButtonStyle">Cancelar</button>
+                <button @onclick="SalirSinGuardarAsync" style="@SecondaryButtonStyle">Salir sin guardar</button>
                 <button @onclick="GuardarBorradorYSalirAsync" style="@PrimaryButtonStyle">Guardar como borrador y salir</button>
             </div>
         </section>
@@ -355,6 +357,7 @@ else
         {
             Logger.LogError(ex, "No se pudieron cargar las solicitudes programadas para levantamientos.");
             ErrorMessage = "Ocurrió un error al cargar los levantamientos. Intente actualizar la pantalla.";
+            ToastService.ShowError(ErrorMessage, "Error");
         }
         finally
         {
@@ -394,17 +397,20 @@ else
                 if (!await LevantamientoService.IniciarAsync(solicitud.Id))
                 {
                     ErrorMessage = "No se pudo iniciar el levantamiento. Verifique que la solicitud tenga una visita activa en la agenda.";
+                    ToastService.ShowWarning(ErrorMessage, "Atención");
                     return;
                 }
 
                 AppState.NotifyStateChanged();
                 await CargarDatosAsync();
                 solicitud = solicitudes.First(s => s.Id == solicitud.Id);
+                ToastService.ShowSuccess("El levantamiento está en proceso.", "Éxito");
             }
             catch (Exception ex)
             {
                 Logger.LogError(ex, "No se pudo iniciar el levantamiento de la solicitud {SolicitudId}.", solicitud.Id);
                 ErrorMessage = "Ocurrió un error al iniciar el levantamiento. Intente nuevamente.";
+                ToastService.ShowError(ErrorMessage, "Error");
                 return;
             }
             finally
@@ -447,6 +453,7 @@ else
         {
             CurrentSolicitud = null;
             await CargarDatosAsync();
+            await VolverAlInicioDelListadoAsync();
         }
     }
 
@@ -458,6 +465,7 @@ else
         {
             CurrentSolicitud = null;
             await CargarDatosAsync();
+            await VolverAlInicioDelListadoAsync();
         }
     }
 
@@ -476,18 +484,21 @@ else
             if (!await LevantamientoService.GuardarBorradorAsync(solicitudId, CrearLevantamiento()))
             {
                 FormMessage = "No se pudo guardar el borrador. Verifique que el levantamiento continúe en proceso.";
+                ToastService.ShowWarning(FormMessage, "Atención");
                 return;
             }
 
             AppState.NotifyStateChanged();
             await CargarDatosAsync();
-            CurrentSolicitud = solicitudes.FirstOrDefault(s => s.Id == CurrentSolicitud?.Id);
+            CurrentSolicitud = solicitudes.FirstOrDefault(s => s.Id == solicitudId);
             InitialSnapshot = CrearSnapshot();
+            ToastService.ShowSuccess("El levantamiento se guardó como borrador.", "Éxito");
         }
         catch (Exception ex)
         {
             Logger.LogError(ex, "No se pudo guardar el borrador de la solicitud {SolicitudId}.", solicitudId);
             FormMessage = "Ocurrió un error al guardar el borrador. Intente nuevamente.";
+            ToastService.ShowError(FormMessage, "Error");
         }
         finally
         {
@@ -501,6 +512,7 @@ else
         if (!TieneDatosRequeridos())
         {
             FormMessage = "Complete todos los campos técnicos obligatorios y agregue al menos una fotografía antes de enviar.";
+            ToastService.ShowWarning(FormMessage, "Atención");
             return;
         }
 
@@ -522,6 +534,7 @@ else
             if (!await LevantamientoService.EnviarAAdministracionAsync(solicitudId, CrearLevantamiento()))
             {
                 FormMessage = "No se pudo enviar el levantamiento. Verifique los datos obligatorios y el estado actual de la solicitud.";
+                ToastService.ShowWarning(FormMessage, "Atención");
                 return;
             }
 
@@ -529,11 +542,14 @@ else
             AppState.NotifyStateChanged();
             CurrentSolicitud = null;
             await CargarDatosAsync();
+            await VolverAlInicioDelListadoAsync();
+            ToastService.ShowSuccess("El levantamiento se envió a Administración.", "Éxito");
         }
         catch (Exception ex)
         {
             Logger.LogError(ex, "No se pudo enviar el levantamiento de la solicitud {SolicitudId} a Administración.", solicitudId);
             FormMessage = "Ocurrió un error al enviar el levantamiento. Intente nuevamente.";
+            ToastService.ShowError(FormMessage, "Error");
         }
         finally
         {
@@ -572,26 +588,34 @@ else
         Fotos
     });
 
-    private void CancelarEdicion()
+    private async Task CancelarEdicionAsync()
     {
         FormMessage = null;
         if (SoloLectura || !HayCambiosSinGuardar)
         {
             CurrentSolicitud = null;
             SoloLectura = false;
+            await VolverAlInicioDelListadoAsync();
             return;
         }
 
         MostrarConfirmacionCancelar = true;
     }
 
-    private void CerrarConfirmacionCancelar() => MostrarConfirmacionCancelar = false;
+    private void CerrarConfirmacionCancelar()
+    {
+        MostrarConfirmacionCancelar = false;
+        ToastService.ShowToast(ToastType.Info, "Levantamiento", "Continúa editando el formulario.");
+    }
 
-    private void SalirSinGuardar()
+    private async Task SalirSinGuardarAsync()
     {
         MostrarConfirmacionCancelar = false;
         CurrentSolicitud = null;
         SoloLectura = false;
+        await VolverAlInicioDelListadoAsync();
+        ToastService.ShowToast(ToastType.Info, "Levantamiento", "Volvió a la lista principal.");
+        ToastService.ShowWarning("Salió sin guardar los cambios.", "Cambios descartados");
     }
 
     private void CerrarConfirmacionEnvio() => MostrarConfirmacionEnvio = false;
@@ -643,14 +667,18 @@ else
 
     private void EliminarFoto(string foto) => Fotos.Remove(foto);
 
-    private void LimpiarFiltros()
+    private async Task LimpiarFiltros()
     {
         SearchId = "";
         SearchCliente = "";
         SearchTipo = "";
         SearchFecha = null;
         SearchEstado = "Todos";
+        await VolverAlInicioDelListadoAsync();
     }
+
+    private async Task VolverAlInicioDelListadoAsync() =>
+        await JS.InvokeVoidAsync("window.scrollTo", new { top = 0, behavior = "smooth" });
 
     private void OnAppStateChanged() => _ = InvokeAsync(CargarDatosAsync);
 
