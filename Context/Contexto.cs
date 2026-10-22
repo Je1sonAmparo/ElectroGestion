@@ -9,6 +9,7 @@ public class Contexto : DbContext
 
     public DbSet<Solicitud> Solicitudes { get; set; }
     public DbSet<Visita> Visitas { get; set; }
+    public DbSet<Levantamiento> Levantamientos { get; set; }
     public DbSet<Cliente> Clientes { get; set; }
     public DbSet<Usuario> Usuarios { get; set; }
     public DbSet<Servicio> Servicios { get; set; }
@@ -52,6 +53,17 @@ public class Contexto : DbContext
                 .WithOne(s => s.EstadoSolicitud)
                 .HasForeignKey(s => s.EstadoSolicitudId)
                 .OnDelete(DeleteBehavior.Restrict);
+        });
+
+        modelBuilder.Entity<Levantamiento>(entity =>
+        {
+            entity.HasQueryFilter(l => l.Solicitud != null && !l.Solicitud.IsDeleted);
+            entity.HasIndex(l => l.SolicitudId).IsUnique();
+            entity.Property(l => l.FotografiasJson).HasColumnType("nvarchar(max)");
+            entity.HasOne(l => l.Solicitud)
+                .WithOne(s => s.Levantamiento)
+                .HasForeignKey<Levantamiento>(l => l.SolicitudId)
+                .OnDelete(DeleteBehavior.Cascade);
         });
 
         modelBuilder.Entity<DetalleSolicitud>()
@@ -116,7 +128,8 @@ public class Contexto : DbContext
             new EstadoSolicitud { Id = 1, Nombre = "Pendiente" },
             new EstadoSolicitud { Id = 2, Nombre = "En proceso" },
             new EstadoSolicitud { Id = 3, Nombre = "Finalizada" },
-            new EstadoSolicitud { Id = 4, Nombre = "Cancelada" }
+            new EstadoSolicitud { Id = 4, Nombre = "Cancelada" },
+            new EstadoSolicitud { Id = 5, Nombre = "En Espera Administración" }
         );
 
         modelBuilder.Entity<Cliente>().HasData(

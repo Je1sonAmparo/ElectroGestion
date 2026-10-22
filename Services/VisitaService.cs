@@ -93,6 +93,14 @@ public class VisitaService(IDbContextFactory<Contexto> contextFactory)
                 return false;
             }
 
+            var solicitud = await contexto.Solicitudes.FirstOrDefaultAsync(s => s.Id == visita.SolicitudId);
+            if (solicitud is null)
+            {
+                return false;
+            }
+
+            solicitud.EstadoSolicitudId = 1;
+            visita.Estado = "Pendiente";
             visita.Solicitud = null;
             contexto.Visitas.Add(visita);
         }

@@ -55,6 +55,7 @@
                     <option value="Todos los estados">Todos los estados</option>
                     <option value="Pendiente">Pendiente</option>
                     <option value="En proceso">En proceso</option>
+                    <option value="En Espera Administración">En Espera Administración</option>
                     <option value="Finalizada">Finalizada</option>
                     <option value="Cancelada">Cancelada</option>
                 </select>
@@ -132,7 +133,7 @@
                                 @AppStateService.FormatFecha(s.FechaSolicitud.ToString("yyyy-MM-dd"))
                             </td>
                             <td style="padding:18px;vertical-align:middle">
-                                <span style="display:inline-block;padding:5px 12px;border-radius:999px;font-size:12.5px;font-weight:700;line-height:1.2;background:@(s.EstadoSolicitud?.Nombre == "Pendiente" ? "#F7E7C9" : s.EstadoSolicitud?.Nombre == "En proceso" ? "#DDE7FF" : s.EstadoSolicitud?.Nombre == "Finalizada" ? "#DDF7E8" : "#F9E6E6");color:@(s.EstadoSolicitud?.Nombre == "Pendiente" ? "#B57A00" : s.EstadoSolicitud?.Nombre == "En proceso" ? "#2B5BDB" : s.EstadoSolicitud?.Nombre == "Finalizada" ? "#198754" : "#C0392B")">
+                                <span style="display:inline-block;padding:5px 12px;border-radius:999px;font-size:12.5px;font-weight:700;line-height:1.2;background:@(s.EstadoSolicitud?.Nombre == "Pendiente" ? "#F7E7C9" : s.EstadoSolicitud?.Nombre == "En proceso" ? "#DDE7FF" : s.EstadoSolicitud?.Nombre == "En Espera Administración" ? "#E0E7FF" : s.EstadoSolicitud?.Nombre == "Finalizada" ? "#DDF7E8" : "#F9E6E6");color:@(s.EstadoSolicitud?.Nombre == "Pendiente" ? "#B57A00" : s.EstadoSolicitud?.Nombre == "En proceso" ? "#2B5BDB" : s.EstadoSolicitud?.Nombre == "En Espera Administración" ? "#3730A3" : s.EstadoSolicitud?.Nombre == "Finalizada" ? "#198754" : "#C0392B")">
                                     @s.EstadoSolicitud?.Nombre
                                 </span>
                             </td>
