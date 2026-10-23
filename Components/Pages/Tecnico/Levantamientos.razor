@@ -184,7 +184,7 @@ else
         </div>
 
         <div style="margin-top:22px">
-            <div style="font-size:13px;font-weight:700;color:#4A4E63;margin-bottom:10px">Fotografías (opcional)</div>
+            <div style="font-size:13px;font-weight:700;color:#4A4E63;margin-bottom:10px">Fotografías</div>
             <div style="display:flex;gap:12px;flex-wrap:wrap;align-items:center">
                 @if (!SoloLectura)
                 {
@@ -206,7 +206,7 @@ else
             </div>
             @if (!SoloLectura)
             {
-                <div style="margin-top:7px;color:#8B90A3;font-size:12px">Seleccione imágenes de hasta 2 MB cada una. Puede agregar hasta 5 fotografías.</div>
+                <div style="margin-top:7px;color:#8B90A3;font-size:12px">Puede agregar las fotografías que necesite. Cada imagen debe pesar hasta 5 MB.</div>
             }
         </div>
 
@@ -299,8 +299,7 @@ else
 }
 
 @code {
-    private const int MaxPhotoSize = 2 * 1024 * 1024;
-    private const int MaxPhotos = 5;
+    private const int MaxPhotoSize = 5 * 1024 * 1024;
     private static readonly string[] EstadosLevantamiento = ["Pendiente", "En proceso", "En Espera Administración"];
     private const string InputStyle = "width:100%;padding:12px 13px;border:1px solid #D5D8E6;border-radius:9px;font-size:14.5px";
     private const string ReadOnlyInputStyle = "width:100%;padding:12px 13px;border:1px solid #D5D8E6;border-radius:9px;font-size:14.5px;background:#F7F8FC";
@@ -753,13 +752,7 @@ else
         }
 
         FormMessage = null;
-        if (Fotos.Count + args.FileCount > MaxPhotos)
-        {
-            FormMessage = $"Puede adjuntar hasta {MaxPhotos} fotografías.";
-            return;
-        }
-
-        var seleccionadas = args.GetMultipleFiles(MaxPhotos);
+        var seleccionadas = args.GetMultipleFiles(args.FileCount);
         foreach (var foto in seleccionadas)
         {
             if (!foto.ContentType.StartsWith("image/", StringComparison.OrdinalIgnoreCase))
@@ -770,7 +763,7 @@ else
 
             if (foto.Size > MaxPhotoSize)
             {
-                FormMessage = $"La imagen {foto.Name} supera el máximo de 2 MB.";
+                FormMessage = $"La imagen {foto.Name} supera el máximo de 5 MB.";
                 return;
             }
 
