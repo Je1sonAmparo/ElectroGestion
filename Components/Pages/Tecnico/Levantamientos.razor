@@ -172,7 +172,7 @@ else
                 <input value="@CurrentSolicitud.Servicio?.Nombre" readonly style="@ReadOnlyInputStyle" />
             </div>
             <div>
-                <label for="tecnico-asignado" style="display:block;font-size:13px;font-weight:700;color:#4A4E63;margin-bottom:7px">Técnico asignado en Agenda</label>
+                <label for="tecnico-asignado" style="display:block;font-size:13px;font-weight:700;color:#4A4E63;margin-bottom:7px">Técnico asignado</label>
                 @if (AppState.EsGerente)
                 {
                     <select id="tecnico-asignado" value="@(visitaActual?.TecnicoId?.ToString() ?? "")" @onchange="CambiarTecnicoAsignadoAsync" disabled="@(IsSaving || visitaActual is null)" style="@InputStyle">
@@ -291,7 +291,7 @@ else
 @if (MostrarConfirmacionCancelar)
 {
     <div role="presentation" style="@ModalBackdropStyle">
-        <section role="dialog" aria-modal="true" aria-labelledby="cancel-title" style="@ModalStyle">
+        <section role="dialog" aria-modal="true" aria-labelledby="cancel-title" style="@($"{ModalStyle};width:min(100%,620px)")">
             <h2 id="cancel-title" style="font-family:'Manrope';font-size:19px;margin:0 0 12px">@(EditandoEnviado ? "¿Descartar los cambios?" : "¿Desea guardar los cambios?")</h2>
             <p style="font-size:14px;color:#5E6378;line-height:1.55;margin:0">
                 @if (EditandoEnviado)
