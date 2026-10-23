@@ -10,6 +10,7 @@ public class VisitaService(IDbContextFactory<Contexto> contextFactory)
     {
         await using var contexto = await contextFactory.CreateDbContextAsync();
         return await contexto.Visitas
+            .Where(v => !v.IsDeleted)
             .Include(v => v.Solicitud!)
                 .ThenInclude(s => s.Cliente)
             .Include(v => v.Solicitud!)
@@ -35,6 +36,7 @@ public class VisitaService(IDbContextFactory<Contexto> contextFactory)
     {
         await using var contexto = await contextFactory.CreateDbContextAsync();
         return !await contexto.Visitas.AnyAsync(v =>
+            !v.IsDeleted &&
             v.SolicitudId == solicitudId && (!visitaId.HasValue || v.Id != visitaId.Value));
     }
 
@@ -42,7 +44,8 @@ public class VisitaService(IDbContextFactory<Contexto> contextFactory)
         DateTime fecha,
         string horaInicio,
         string horaFin,
-        int? visitaId = null)
+        int? visitaId = null,
+        int? tecnicoId = null)
     {
         if (!TryGetIntervaloValido(horaInicio, horaFin, out var inicio, out var fin) ||
             fecha.DayOfWeek == DayOfWeek.Sunday)
@@ -51,10 +54,22 @@ public class VisitaService(IDbContextFactory<Contexto> contextFactory)
         }
 
         await using var contexto = await contextFactory.CreateDbContextAsync();
-        var horariosExistentes = await contexto.Visitas
-            .Where(v => v.Fecha.Date == fecha.Date &&
-                (!visitaId.HasValue || v.Id != visitaId.Value))
-            .ToListAsync();
+        var query = contexto.Visitas
+            .Where(v => !v.IsDeleted &&
+                        v.Estado != "Cancelada" &&
+                        v.Fecha.Date == fecha.Date &&
+                        (!visitaId.HasValue || v.Id != visitaId.Value));
+
+        if (tecnicoId.HasValue)
+        {
+            query = query.Where(v => v.TecnicoId == tecnicoId.Value);
+        }
+        else
+        {
+            query = query.Where(v => v.TecnicoId == null);
+        }
+
+        var horariosExistentes = await query.ToListAsync();
 
         return !horariosExistentes.Any(v =>
             TryGetIntervaloValido(v.Hora, v.HoraFin, out var inicioExistente, out var finExistente) &&
@@ -76,9 +91,22 @@ public class VisitaService(IDbContextFactory<Contexto> contextFactory)
             return false;
         }
 
-        var horariosExistentes = await contexto.Visitas
-            .Where(v => v.Fecha.Date == visita.Fecha.Date && v.Id != visita.Id)
-            .ToListAsync();
+        var query = contexto.Visitas
+            .Where(v => !v.IsDeleted &&
+                        v.Estado != "Cancelada" &&
+                        v.Fecha.Date == visita.Fecha.Date &&
+                        v.Id != visita.Id);
+
+        if (visita.TecnicoId.HasValue)
+        {
+            query = query.Where(v => v.TecnicoId == visita.TecnicoId.Value);
+        }
+        else
+        {
+            query = query.Where(v => v.TecnicoId == null);
+        }
+
+        var horariosExistentes = await query.ToListAsync();
         if (horariosExistentes.Any(v =>
                 TryGetIntervaloValido(v.Hora, v.HoraFin, out var inicioExistente, out var finExistente) &&
                 inicio < finExistente && fin > inicioExistente))
@@ -88,19 +116,25 @@ public class VisitaService(IDbContextFactory<Contexto> contextFactory)
 
         if (visita.Id == 0)
         {
-            if (await contexto.Visitas.AnyAsync(v => v.SolicitudId == visita.SolicitudId))
+            if (await contexto.Visitas.AnyAsync(v => !v.IsDeleted && v.SolicitudId == visita.SolicitudId))
             {
                 return false;
             }
 
             var solicitud = await contexto.Solicitudes.FirstOrDefaultAsync(s => s.Id == visita.SolicitudId);
-            if (solicitud is null)
+            if (solicitud != null)
             {
-                return false;
+                if (solicitud.EstadoSolicitudId == 1) // Pendiente -> En proceso
+                {
+                    solicitud.EstadoSolicitudId = 2;
+                }
             }
 
-            solicitud.EstadoSolicitudId = 1;
-            visita.Estado = "Pendiente";
+            if (string.IsNullOrEmpty(visita.Estado) || visita.Estado == "Pendiente")
+            {
+                visita.Estado = "En proceso";
+            }
+
             visita.Solicitud = null;
             contexto.Visitas.Add(visita);
         }
@@ -114,7 +148,7 @@ public class VisitaService(IDbContextFactory<Contexto> contextFactory)
 
             if (existente.SolicitudId != visita.SolicitudId &&
                 await contexto.Visitas.AnyAsync(v =>
-                    v.SolicitudId == visita.SolicitudId && v.Id != visita.Id))
+                    !v.IsDeleted && v.SolicitudId == visita.SolicitudId && v.Id != visita.Id))
             {
                 return false;
             }
@@ -138,9 +172,18 @@ public class VisitaService(IDbContextFactory<Contexto> contextFactory)
     {
         inicio = default;
         fin = default;
-        return TimeOnly.TryParse(horaInicio, out inicio) &&
-            TimeOnly.TryParse(horaFin, out fin) &&
-            inicio >= new TimeOnly(8, 0) &&
+
+        if (!TimeOnly.TryParse(horaInicio, out inicio))
+        {
+            return false;
+        }
+
+        if (string.IsNullOrWhiteSpace(horaFin) || !TimeOnly.TryParse(horaFin, out fin))
+        {
+            fin = inicio.AddHours(1);
+        }
+
+        return inicio >= new TimeOnly(8, 0) &&
             fin <= new TimeOnly(18, 0) &&
             fin > inicio;
     }
@@ -148,9 +191,25 @@ public class VisitaService(IDbContextFactory<Contexto> contextFactory)
     public async Task<bool> EliminarAsync(int id)
     {
         await using var contexto = await contextFactory.CreateDbContextAsync();
-        return await contexto.Visitas
-            .Where(v => v.Id == id)
-            .ExecuteUpdateAsync(setters => setters.SetProperty(v => v.IsDeleted, true)) > 0;
+        var visita = await contexto.Visitas.FirstOrDefaultAsync(v => v.Id == id);
+        if (visita is null)
+        {
+            return false;
+        }
+
+        visita.IsDeleted = true;
+
+        var otraVisitaActiva = await contexto.Visitas.AnyAsync(v => v.SolicitudId == visita.SolicitudId && v.Id != id && !v.IsDeleted);
+        if (!otraVisitaActiva)
+        {
+            var solicitud = await contexto.Solicitudes.FirstOrDefaultAsync(s => s.Id == visita.SolicitudId);
+            if (solicitud != null && solicitud.EstadoSolicitudId == 2)
+            {
+                solicitud.EstadoSolicitudId = 1;
+            }
+        }
+
+        return await contexto.SaveChangesAsync() > 0;
     }
 
     public async Task<bool> CambiarEstadoAsync(int id, string estado)
@@ -177,6 +236,27 @@ public class VisitaService(IDbContextFactory<Contexto> contextFactory)
         }
 
         visita.Estado = estado;
+        var solicitud = await contexto.Solicitudes.FirstOrDefaultAsync(s => s.Id == visita.SolicitudId);
+        if (solicitud != null)
+        {
+            if (estado == "En proceso" && solicitud.EstadoSolicitudId != 2)
+            {
+                solicitud.EstadoSolicitudId = 2;
+            }
+            else if (estado == "Finalizada" && solicitud.EstadoSolicitudId != 3)
+            {
+                solicitud.EstadoSolicitudId = 3;
+            }
+            else if (estado == "Cancelada" && solicitud.EstadoSolicitudId == 2)
+            {
+                var tieneOtraActiva = await contexto.Visitas.AnyAsync(v => v.SolicitudId == visita.SolicitudId && v.Id != id && !v.IsDeleted && v.Estado != "Cancelada");
+                if (!tieneOtraActiva)
+                {
+                    solicitud.EstadoSolicitudId = 1;
+                }
+            }
+        }
+
         return await contexto.SaveChangesAsync() > 0;
     }
 }

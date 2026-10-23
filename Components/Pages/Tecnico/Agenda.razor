@@ -76,9 +76,14 @@
                             }
                             @foreach (var ev in d.Eventos)
                             {
-                                <div @onclick="() => SelectEvent(ev)" style="position:absolute;left:3px;right:3px;top:@(ev.Top)px;height:@(ev.H)px;background:@ev.Bg;border-left:3px solid @ev.Line;border-radius:6px;padding:4px 5px;cursor:pointer;overflow:hidden;min-width:0">
-                                    <div style="font-size:10px;font-weight:800;color:#4A4E63;line-height:1.2">@ev.Hora</div>
-                                    <div style="font-size:10.5px;font-weight:700;line-height:1.22;margin-top:1px;overflow-wrap:anywhere">@ev.Cliente</div>
+                                var isSel = Detalle?.Id == ev.Id;
+                                <div @onclick="() => SelectEvent(ev)"
+                                     class="agenda-card"
+                                     style="position:absolute;left:calc(@(ev.LeftPct.ToString("F1", System.Globalization.CultureInfo.InvariantCulture))% + 2px);width:calc(@(ev.WidthPct.ToString("F1", System.Globalization.CultureInfo.InvariantCulture))% - 4px);top:@(ev.Top)px;height:@(ev.H)px;background:@ev.Bg;border:@(isSel ? $"2px solid {ev.Line}" : $"1px solid {ev.Border}");border-left:3px solid @ev.Line;border-radius:6px;padding:3px 5px;cursor:pointer;overflow:hidden;min-width:0;box-sizing:border-box;box-shadow:@(isSel ? $"0 0 0 2px {ev.Line}2E, 0 4px 12px rgba(0,0,0,0.1)" : "0 1px 2px rgba(0,0,0,0.05)");z-index:@(isSel ? 20 : 2);transition:all 0.15s ease"
+                                     title="@ev.Rango - @ev.Cliente (@ev.Tecnico)">
+                                    <div style="font-size:10px;font-weight:800;color:@ev.BadgeFg;line-height:1.2;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">@ev.Hora</div>
+                                    <div style="font-size:10.5px;font-weight:700;color:#111827;line-height:1.2;margin-top:1px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis" title="@ev.Cliente">@ev.Cliente</div>
+                                    <div style="font-size:9.5px;font-weight:600;color:#4B5563;line-height:1.15;margin-top:1px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis" title="@ev.Tecnico">@ev.Tecnico</div>
                                 </div>
                             }
                         </div>
@@ -102,7 +107,9 @@
                             <div style="font-size:12.5px;font-weight:800;color:@d.NumColor">@d.Num</div>
                             @foreach (var ev in d.Eventos)
                             {
-                                <div @onclick="() => SelectEvent(ev)" style="background:@ev.Bg;border-left:3px solid @ev.Line;border-radius:5px;padding:3px 5px;cursor:pointer;font-size:10.5px;font-weight:700;white-space:nowrap;min-width:0;overflow:hidden;text-overflow:ellipsis">@ev.Corto</div>
+                                <div @onclick="() => SelectEvent(ev)"
+                                     style="background:@ev.Bg;border:1px solid @ev.Border;border-left:3px solid @ev.Line;border-radius:5px;padding:3px 6px;cursor:pointer;font-size:10.5px;font-weight:700;color:#111827;white-space:nowrap;min-width:0;overflow:hidden;text-overflow:ellipsis;transition:all 0.15s ease"
+                                     title="@ev.Rango - @ev.Cliente (@ev.Tecnico)">@ev.Corto</div>
                             }
                         </div>
                     }
@@ -117,21 +124,55 @@
             }
             else
             {
-                <div style="position:relative">
+                <div style="position:relative;min-height:704px">
                     @foreach (var h in HorasSem)
                     {
-                        <div style="display:flex;gap:12px;height:64px;border-top:1px solid #F0F1F7">
-                            <div style="width:66px;flex:0 0 66px;font-size:12px;color:#8B90A3;font-weight:700;padding-top:4px">@h</div>
+                        <div style="display:flex;align-items:flex-start;height:64px;border-top:1px solid #F0F1F7">
+                            <div style="width:64px;flex:0 0 64px;font-size:12px;color:#8B90A3;font-weight:700;padding-top:4px">@h</div>
+                            <div style="flex:1;height:100%;border-bottom:1px dashed #F8F9FD"></div>
                         </div>
                     }
-                    @foreach (var ev in DiariaEventos)
-                    {
-                        <div @onclick="() => SelectEvent(ev)" style="position:absolute;left:78px;right:6px;top:@(ev.Top)px;height:@(ev.H)px;background:@ev.Bg;border-left:4px solid @ev.Line;border-radius:9px;padding:11px 13px;cursor:pointer;overflow:hidden">
-                            <div style="font-weight:700;font-size:14px">@ev.Cliente</div>
-                            <div style="font-size:12.5px;color:#4A4E63;margin-top:3px">@ev.TipoServicio</div>
-                            <div style="font-size:12px;color:#6B7085;margin-top:2px">@ev.Rango</div>
-                        </div>
-                    }
+                    <div style="position:absolute;top:0;bottom:0;left:68px;right:6px;pointer-events:none">
+                        @foreach (var ev in DiariaEventos)
+                        {
+                            var isSelected = Detalle?.Id == ev.Id;
+                            <div @onclick="() => SelectEvent(ev)"
+                                 class="agenda-card"
+                                 style="pointer-events:auto;position:absolute;left:calc(@(ev.LeftPct.ToString("F1", System.Globalization.CultureInfo.InvariantCulture))% + 3px);width:calc(@(ev.WidthPct.ToString("F1", System.Globalization.CultureInfo.InvariantCulture))% - 6px);top:@(ev.Top)px;height:@(ev.H)px;background:@ev.Bg;border:@(isSelected ? $"2px solid {ev.Line}" : $"1px solid {ev.Border}");border-left:4px solid @ev.Line;border-radius:10px;padding:@(ev.H < 62 ? "6px 10px" : "9px 12px");cursor:pointer;overflow:hidden;box-sizing:border-box;box-shadow:@(isSelected ? $"0 0 0 3px {ev.Line}2E, 0 6px 16px rgba(0,0,0,0.1)" : "0 1px 3px rgba(0,0,0,0.06)");z-index:@(isSelected ? 20 : 2);transition:all 0.18s cubic-bezier(0.4,0,0.2,1)"
+                                 title="@ev.Rango - @ev.Cliente (@ev.Tecnico)">
+                                @if (ev.H >= 62)
+                                {
+                                    <div style="display:flex;align-items:center;justify-content:space-between;gap:6px">
+                                        <div style="font-weight:750;font-size:13.5px;color:#111827;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0;flex:1" title="@ev.Cliente">@ev.Cliente</div>
+                                        <span style="font-size:11px;font-weight:700;background:@ev.BadgeBg;color:@ev.BadgeFg;padding:2px 8px;border-radius:12px;white-space:nowrap;flex-shrink:0;box-shadow:0 1px 2px rgba(0,0,0,0.04)">@ev.Tecnico</span>
+                                    </div>
+                                    <div style="font-size:12px;color:#4B5563;margin-top:4px;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis" title="@ev.TipoServicio">@ev.TipoServicio</div>
+                                    <div style="font-size:11.5px;color:#6B7280;margin-top:auto;padding-top:3px;font-weight:600;display:flex;align-items:center;gap:4px">
+                                        <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="opacity:0.7">
+                                            <circle cx="12" cy="12" r="10"></circle>
+                                            <polyline points="12 6 12 12 16 14"></polyline>
+                                        </svg>
+                                        <span>@ev.Rango</span>
+                                    </div>
+                                }
+                                else
+                                {
+                                    <div style="display:flex;align-items:center;justify-content:space-between;gap:6px">
+                                        <div style="font-weight:750;font-size:12.5px;color:#111827;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0;flex:1" title="@ev.Cliente">@ev.Cliente</div>
+                                        <span style="font-size:10px;font-weight:700;background:@ev.BadgeBg;color:@ev.BadgeFg;padding:1px 6px;border-radius:10px;white-space:nowrap;flex-shrink:0">@ev.Tecnico</span>
+                                    </div>
+                                    <div style="font-size:11px;color:#6B7280;margin-top:2px;font-weight:600;display:flex;align-items:center;gap:4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">
+                                        <span>@ev.Rango</span>
+                                        @if (!string.IsNullOrEmpty(ev.TipoServicio))
+                                        {
+                                            <span style="opacity:0.6">•</span>
+                                            <span>@ev.TipoServicio</span>
+                                        }
+                                    </div>
+                                }
+                            </div>
+                        }
+                    </div>
                 </div>
             }
         }
@@ -428,6 +469,9 @@
         public int H { get; set; }
         public string Bg { get; set; } = "";
         public string Line { get; set; } = "";
+        public string Border { get; set; } = "#E3E5EE";
+        public string BadgeBg { get; set; } = "#EDEBFF";
+        public string BadgeFg { get; set; } = "#1D4ED8";
         public string Hora { get; set; } = "";
         public string Cliente { get; set; } = "";
         public string TipoServicio { get; set; } = "";
@@ -440,6 +484,11 @@
         public string Fecha { get; set; } = "";
         public string Rango { get; set; } = "";
         public string Corto { get; set; } = "";
+        public double LeftPct { get; set; } = 0;
+        public double WidthPct { get; set; } = 100;
+        public int ColIndex { get; set; } = 0;
+        public TimeOnly StartTime { get; set; }
+        public TimeOnly EndTime { get; set; }
     }
 
     public class DiaSemana
@@ -609,10 +658,15 @@
                 .Select(v =>
                 {
                     var hora = TimeOnly.Parse(v.Hora);
+                    var horaFin = TimeOnly.TryParse(v.HoraFin, out var hFin) ? hFin : hora.AddHours(1);
+                    var duracionMin = Math.Max(30, (int)(horaFin - hora).TotalMinutes);
                     var top = Math.Max(0, (int)((hora.Hour - 8) * 45 + (hora.Minute / 60.0) * 45 + 1));
-                    return CrearEvento(v, top, 58);
+                    var alto = Math.Max(28, (int)(duracionMin / 60.0 * 45 - 2));
+                    return CrearEvento(v, top, alto);
                 })
                 .ToList();
+
+            CalcularDistribucionEventos(evs);
 
             Semana.Add(new DiaSemana {
                 Dia = DiasSemana[i],
@@ -657,10 +711,77 @@
                 .Select(v =>
             {
                 var hora = TimeOnly.Parse(v.Hora);
+                var horaFin = TimeOnly.TryParse(v.HoraFin, out var hFin) ? hFin : hora.AddHours(1);
+                var duracionMin = Math.Max(30, (int)(horaFin - hora).TotalMinutes);
                 var top = Math.Max(0, (int)((hora.Hour - 8) * 64 + (hora.Minute / 60.0) * 64 + 2));
-                return CrearEvento(v, top, (int)(150 / 60.0 * 64 - 6), larga: false);
+                var alto = Math.Max(38, (int)(duracionMin / 60.0 * 64 - 4));
+                return CrearEvento(v, top, alto, larga: false);
             })
             .ToList();
+
+        CalcularDistribucionEventos(DiariaEventos);
+    }
+
+    private static void CalcularDistribucionEventos(List<Evento> eventos)
+    {
+        if (eventos.Count == 0) return;
+
+        var ordenados = eventos.OrderBy(e => e.StartTime).ThenByDescending(e => e.EndTime).ToList();
+        var clusters = new List<List<Evento>>();
+        List<Evento>? clusterActual = null;
+        TimeOnly clusterMaxEnd = TimeOnly.MinValue;
+
+        foreach (var ev in ordenados)
+        {
+            if (clusterActual == null || ev.StartTime >= clusterMaxEnd)
+            {
+                clusterActual = new List<Evento> { ev };
+                clusters.Add(clusterActual);
+                clusterMaxEnd = ev.EndTime;
+            }
+            else
+            {
+                clusterActual.Add(ev);
+                if (ev.EndTime > clusterMaxEnd)
+                {
+                    clusterMaxEnd = ev.EndTime;
+                }
+            }
+        }
+
+        foreach (var cluster in clusters)
+        {
+            var colEndTimes = new List<TimeOnly>();
+            foreach (var ev in cluster)
+            {
+                int assignedCol = -1;
+                for (int c = 0; c < colEndTimes.Count; c++)
+                {
+                    if (colEndTimes[c] <= ev.StartTime)
+                    {
+                        assignedCol = c;
+                        colEndTimes[c] = ev.EndTime;
+                        break;
+                    }
+                }
+
+                if (assignedCol == -1)
+                {
+                    assignedCol = colEndTimes.Count;
+                    colEndTimes.Add(ev.EndTime);
+                }
+
+                ev.ColIndex = assignedCol;
+            }
+
+            int totalCols = Math.Max(1, colEndTimes.Count);
+            double widthPct = 100.0 / totalCols;
+            foreach (var ev in cluster)
+            {
+                ev.WidthPct = widthPct;
+                ev.LeftPct = ev.ColIndex * widthPct;
+            }
+        }
     }
 
     private static string ObtenerNombreDia(DayOfWeek dia) => dia switch
@@ -675,14 +796,56 @@
         _ => throw new ArgumentOutOfRangeException(nameof(dia))
     };
 
+    private record ColorScheme(string Bg, string Line, string Border, string BadgeBg, string BadgeFg);
+
+    private static readonly ColorScheme[] TechnicianPalettes = new[]
+    {
+        new ColorScheme("#EFF6FF", "#2563EB", "#BFDBFE", "#DBEAFE", "#1D4ED8"), // Blueberry
+        new ColorScheme("#ECFDF5", "#059669", "#A7F3D0", "#D1FAE5", "#047857"), // Basil
+        new ColorScheme("#F5F3FF", "#7C3AED", "#DDD6FE", "#EDE9FE", "#6D28D9"), // Grape
+        new ColorScheme("#FFFBEB", "#D97706", "#FDE68A", "#FEF3C7", "#B45309"), // Tangerine
+        new ColorScheme("#FFF1F2", "#E11D48", "#FECDD3", "#FFE4E6", "#BE123C"), // Flamingo
+        new ColorScheme("#ECFEFF", "#0891B2", "#A5F3FC", "#CFFAFE", "#0E7490"), // Peacock
+        new ColorScheme("#EEF2FF", "#4F46E5", "#C7D2FE", "#E0E7FF", "#3730A3")  // Indigo
+    };
+
+    private static ColorScheme GetEventColorScheme(string estado, int? tecnicoId, string? tecnicoNombre)
+    {
+        if (estado == "Cancelada")
+        {
+            return new ColorScheme("#FEF2F2", "#EF4444", "#FCA5A5", "#FEE2E2", "#991B1B");
+        }
+        if (estado == "Finalizada")
+        {
+            return new ColorScheme("#F0FDF4", "#16A34A", "#86EFAC", "#DCFCE7", "#166534");
+        }
+
+        var nombre = (tecnicoNombre ?? "").ToLowerInvariant();
+        if (nombre.Contains("carlos") || tecnicoId == 2)
+        {
+            return TechnicianPalettes[0];
+        }
+        if (nombre.Contains("luis") || tecnicoId == 3)
+        {
+            return TechnicianPalettes[1];
+        }
+        if (tecnicoId.HasValue)
+        {
+            var idx = Math.Abs(tecnicoId.Value) % TechnicianPalettes.Length;
+            return TechnicianPalettes[idx];
+        }
+
+        return TechnicianPalettes[3];
+    }
+
     private Evento CrearEvento(ElectroGestion.Models.Visita visita, int top = 0, int alto = 58, bool larga = true)
     {
-        var hora = TimeOnly.Parse(visita.Hora);
+        var hIni = TimeOnly.TryParse(visita.Hora, out var hi) ? hi : new TimeOnly(8, 0);
+        var hFin = TimeOnly.TryParse(visita.HoraFin, out var hf) ? hf : hIni.AddHours(1);
         var estado = visita.Estado;
-        var cancelada = estado == "Cancelada";
-        var finalizada = estado == "Finalizada";
-        var colores = AppStateService.GetBadgeColors(estado);
         var horaFormato = AppStateService.FormatHora12(visita.Hora);
+        var tecNombre = visita.Tecnico?.Nombre ?? "Sin asignar";
+        var scheme = GetEventColorScheme(estado, visita.TecnicoId, tecNombre);
 
         return new Evento
         {
@@ -690,22 +853,27 @@
             SolicitudId = visita.SolicitudId,
             Top = top,
             H = alto,
-            Bg = cancelada ? "#FDE9EA" : (finalizada ? "#E4F6EA" : "#EAF3EC"),
-            Line = cancelada ? "#E11B22" : (finalizada ? "#17803D" : "#4E9A63"),
+            Bg = scheme.Bg,
+            Line = scheme.Line,
+            Border = scheme.Border,
+            BadgeBg = scheme.BadgeBg,
+            BadgeFg = scheme.BadgeFg,
             Hora = horaFormato,
             Cliente = visita.Solicitud?.Cliente?.Nombre ?? "",
             TipoServicio = visita.Solicitud?.Servicio?.Nombre ?? "",
             HoraInicio = AppStateService.FormatHora12(visita.Hora),
             HoraFin = AppStateService.FormatHora12(visita.HoraFin),
-            Tecnico = visita.Tecnico?.Nombre ?? "Sin asignar",
+            Tecnico = tecNombre,
             Direccion = visita.Solicitud?.Direccion ?? "",
             Estado = estado,
-            Fg = colores.Fg,
+            Fg = scheme.BadgeFg,
             Fecha = larga
                 ? AppStateService.FormatFechaLarga(visita.Fecha.ToString("yyyy-MM-dd"))
                 : AppStateService.FormatFecha(visita.Fecha.ToString("yyyy-MM-dd")),
             Rango = horaFormato + " - " + AppStateService.FormatHora12(visita.HoraFin),
-            Corto = (horaFormato.Length > 5 ? horaFormato[..5] : horaFormato) + " " + (visita.Solicitud?.Cliente?.Nombre ?? "")
+            Corto = (horaFormato.Length > 5 ? horaFormato[..5] : horaFormato) + " " + (visita.Solicitud?.Cliente?.Nombre ?? "") + (visita.Tecnico != null ? $" ({visita.Tecnico.Nombre})" : ""),
+            StartTime = hIni,
+            EndTime = hFin
         };
     }
 
@@ -802,13 +970,22 @@
             return;
         }
 
+        var tecnicoId = AppState.EsGerente
+            ? FormTecnicoId
+            : (existente is null ? AppState.Session?.Id : existente.TecnicoId);
+
         if (!await VisitaService.HorarioDisponibleAsync(
                 FormFecha,
                 FormHora.Value.ToString("HH:mm"),
                 FormHoraFin.Value.ToString("HH:mm"),
-                FormVisitaId))
+                FormVisitaId,
+                tecnicoId))
         {
-            ToastService.ShowWarning("Ya existe una visita programada en esa fecha y hora.", "Atención");
+            var nombreTec = tecnicos.FirstOrDefault(t => t.Id == tecnicoId)?.Nombre;
+            var mensaje = !string.IsNullOrEmpty(nombreTec)
+                ? $"El técnico {nombreTec} ya tiene una visita programada en esa fecha y horario."
+                : "Ya existe una visita programada para este técnico en esa fecha y horario.";
+            ToastService.ShowWarning(mensaje, "Conflicto de horario");
             return;
         }
 
@@ -816,15 +993,13 @@
         {
             Id = FormVisitaId ?? 0,
             SolicitudId = solicitud.Id,
-            TecnicoId = AppState.EsGerente
-                ? FormTecnicoId
-                : existente is null ? AppState.Session?.Id : existente.TecnicoId,
+            TecnicoId = tecnicoId,
             Fecha = FormFecha.Date,
             Hora = FormHora.Value.ToString("HH:mm"),
             HoraFin = FormHoraFin.Value.ToString("HH:mm"),
             Estado = existente is not null && existente.SolicitudId == solicitud.Id
                 ? existente.Estado
-                : solicitud.EstadoSolicitud?.Nombre ?? "Pendiente"
+                : "En proceso"
         };
 
         try
