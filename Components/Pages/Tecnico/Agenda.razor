@@ -79,7 +79,7 @@
                                 var isSel = Detalle?.Id == ev.Id;
                                 <div @onclick="() => SelectEvent(ev)"
                                      class="agenda-card"
-                                     style="position:absolute;left:calc(@(ev.LeftPct.ToString("F1", System.Globalization.CultureInfo.InvariantCulture))% + 2px);width:calc(@(ev.WidthPct.ToString("F1", System.Globalization.CultureInfo.InvariantCulture))% - 4px);top:@(ev.Top)px;height:@(ev.H)px;background:@ev.Bg;border:@(isSel ? $"2px solid {ev.Line}" : $"1px solid {ev.Border}");border-left:3px solid @ev.Line;border-radius:6px;padding:3px 5px;cursor:pointer;overflow:hidden;min-width:0;box-sizing:border-box;box-shadow:@(isSel ? $"0 0 0 2px {ev.Line}2E, 0 4px 12px rgba(0,0,0,0.1)" : "0 1px 2px rgba(0,0,0,0.05)");z-index:@(isSel ? 20 : 2);transition:all 0.15s ease"
+                                     style="position:absolute;left:calc(@(ev.LeftPct.ToString("F1", System.Globalization.CultureInfo.InvariantCulture))% + 2px);width:calc(@(ev.WidthPct.ToString("F1", System.Globalization.CultureInfo.InvariantCulture))% - 4px);top:@(ev.Top)px;height:@(ev.H)px;background:@ev.Bg;border:1px solid @ev.Border;border-left:3px solid @ev.Line;border-radius:6px;padding:3px 5px;cursor:pointer;overflow:hidden;min-width:0;box-sizing:border-box;box-shadow:0 1px 2px rgba(0,0,0,0.05);z-index:@(isSel ? 20 : 2)"
                                      title="@ev.Rango - @ev.Cliente (@ev.Tecnico)">
                                     <div style="font-size:10px;font-weight:800;color:@ev.BadgeFg;line-height:1.2;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">@ev.Hora</div>
                                     <div style="font-size:10.5px;font-weight:700;color:#111827;line-height:1.2;margin-top:1px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis" title="@ev.Cliente">@ev.Cliente</div>
@@ -108,7 +108,7 @@
                             @foreach (var ev in d.Eventos)
                             {
                                 <div @onclick="() => SelectEvent(ev)"
-                                     style="background:@ev.Bg;border:1px solid @ev.Border;border-left:3px solid @ev.Line;border-radius:5px;padding:3px 6px;cursor:pointer;font-size:10.5px;font-weight:700;color:#111827;white-space:nowrap;min-width:0;overflow:hidden;text-overflow:ellipsis;transition:all 0.15s ease"
+                                     style="background:@ev.Bg;border:1px solid @ev.Border;border-left:3px solid @ev.Line;border-radius:5px;padding:3px 6px;cursor:pointer;font-size:10.5px;font-weight:700;color:#111827;white-space:nowrap;min-width:0;overflow:hidden;text-overflow:ellipsis"
                                      title="@ev.Rango - @ev.Cliente (@ev.Tecnico)">@ev.Corto</div>
                             }
                         </div>
@@ -138,7 +138,7 @@
                             var isSelected = Detalle?.Id == ev.Id;
                             <div @onclick="() => SelectEvent(ev)"
                                  class="agenda-card"
-                                 style="pointer-events:auto;position:absolute;left:calc(@(ev.LeftPct.ToString("F1", System.Globalization.CultureInfo.InvariantCulture))% + 3px);width:calc(@(ev.WidthPct.ToString("F1", System.Globalization.CultureInfo.InvariantCulture))% - 6px);top:@(ev.Top)px;height:@(ev.H)px;background:@ev.Bg;border:@(isSelected ? $"2px solid {ev.Line}" : $"1px solid {ev.Border}");border-left:4px solid @ev.Line;border-radius:10px;padding:@(ev.H < 62 ? "6px 10px" : "9px 12px");cursor:pointer;overflow:hidden;box-sizing:border-box;box-shadow:@(isSelected ? $"0 0 0 3px {ev.Line}2E, 0 6px 16px rgba(0,0,0,0.1)" : "0 1px 3px rgba(0,0,0,0.06)");z-index:@(isSelected ? 20 : 2);transition:all 0.18s cubic-bezier(0.4,0,0.2,1)"
+                                 style="pointer-events:auto;position:absolute;left:calc(@(ev.LeftPct.ToString("F1", System.Globalization.CultureInfo.InvariantCulture))% + 3px);width:calc(@(ev.WidthPct.ToString("F1", System.Globalization.CultureInfo.InvariantCulture))% - 6px);top:@(ev.Top)px;height:@(ev.H)px;background:@ev.Bg;border:1px solid @ev.Border;border-left:4px solid @ev.Line;border-radius:10px;padding:@(ev.H < 62 ? "6px 10px" : "9px 12px");cursor:pointer;overflow:hidden;box-sizing:border-box;box-shadow:0 1px 3px rgba(0,0,0,0.06);z-index:@(isSelected ? 20 : 2)"
                                  title="@ev.Rango - @ev.Cliente (@ev.Tecnico)">
                                 @if (ev.H >= 62)
                                 {
