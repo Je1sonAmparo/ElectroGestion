@@ -86,7 +86,7 @@ public class Contexto : DbContext
 
         modelBuilder.Entity<Visita>(entity =>
         {
-            entity.HasQueryFilter(v => !v.IsDeleted);
+            entity.HasQueryFilter(v => !v.IsDeleted && v.Solicitud != null && !v.Solicitud.IsDeleted);
 
             entity.HasOne(v => v.Tecnico)
                 .WithMany()

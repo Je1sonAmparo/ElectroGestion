@@ -28,6 +28,9 @@
                     <option value="Semanal">Semanal</option>
                     <option value="Mensual">Mensual</option>
                 </select>
+                <input type="search" value="@SolicitudIdFiltro" @oninput="OnSolicitudIdFiltroChanged"
+                       aria-label="Filtrar agenda por ID de solicitud" placeholder="ID de solicitud"
+                       style="width:145px;padding:9px 12px;border:1px solid #D5D8E6;border-radius:9px;font-size:13.5px" />
                 <select value="@TecnicoFiltroId" @onchange="OnTecnicoFiltroChanged" aria-label="Filtrar agenda por técnico" style="padding:9px 14px;border:1px solid #D5D8E6;border-radius:9px;font-weight:700;font-size:13.5px;background:#fff;color:#14162B;cursor:pointer">
                     <option value="">Todos los técnicos</option>
                     @foreach (var tecnico in tecnicos)
@@ -454,6 +457,7 @@
     private int? FormSolicitudId;
     private int? FormTecnicoId;
     private int? TecnicoFiltroId;
+    private string SolicitudIdFiltro = "";
     private DateTime FormFecha = DateTime.Today;
     private TimeOnly? FormHora;
     private TimeOnly? FormHoraFin;
@@ -613,22 +617,66 @@
         await UpdateData();
     }
 
+    private Task OnSolicitudIdFiltroChanged(ChangeEventArgs e)
+    {
+        SolicitudIdFiltro = e.Value?.ToString() ?? "";
+        ConstruirAgenda();
+        return Task.CompletedTask;
+    }
+
     private async Task UpdateData()
     {
         solicitudes = await SolicitudService.GetList(s => true);
         visitas = await VisitaService.ObtenerTodasAsync();
         tecnicos = await VisitaService.ObtenerTecnicosAsync();
-        var fechaActual = FechaCalendario.Date;
-        var fechaActualStr = fechaActual.ToString("yyyy-MM-dd");
+        ConstruirAgenda();
+    }
 
+    private void ConstruirAgenda()
+    {
         var MES = new[] { "enero", "febrero", "marzo", "abril", "mayo", "junio", "julio", "agosto", "septiembre", "octubre", "noviembre", "diciembre" };
 
         var visibles = visitas
             .Where(v => !TecnicoFiltroId.HasValue || v.TecnicoId == TecnicoFiltroId.Value)
+            .Where(v => string.IsNullOrWhiteSpace(SolicitudIdFiltro) ||
+                (int.TryParse(SolicitudIdFiltro.Trim(), out var solicitudId) && v.SolicitudId == solicitudId))
             .Where(v => v.Fecha.DayOfWeek != DayOfWeek.Sunday)
             .Where(v => v.Fecha != DateTime.MinValue && TimeOnly.TryParse(v.Hora, out _))
             .ToList();
 
+        if (string.IsNullOrWhiteSpace(SolicitudIdFiltro))
+        {
+            if (Detalle is not null && !visibles.Any(v => v.Id == Detalle.Id))
+            {
+                Detalle = null;
+            }
+        }
+        else if (int.TryParse(SolicitudIdFiltro.Trim(), out var solicitudId))
+        {
+            var visitaEncontrada = visibles
+                .Where(v => v.SolicitudId == solicitudId)
+                .OrderBy(v => v.Estado == "Cancelada")
+                .ThenBy(v => v.Fecha)
+                .ThenBy(v => v.Hora)
+                .FirstOrDefault();
+
+            if (visitaEncontrada is not null)
+            {
+                FechaCalendario = visitaEncontrada.Fecha.Date;
+                Detalle = CrearEvento(visitaEncontrada);
+            }
+            else
+            {
+                Detalle = null;
+            }
+        }
+        else
+        {
+            Detalle = null;
+        }
+
+        var fechaActual = FechaCalendario.Date;
+        var fechaActualStr = fechaActual.ToString("yyyy-MM-dd");
         var lunes = fechaActual.AddDays(-((int)fechaActual.DayOfWeek == 0 ? 6 : (int)fechaActual.DayOfWeek - 1));
         var finSem = lunes.AddDays(5);
 
