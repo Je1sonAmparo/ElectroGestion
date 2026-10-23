@@ -133,7 +133,7 @@ else
             <button @onclick="CancelarEdicionAsync" style="padding:9px 14px;border:1px solid #A79EEE;background:#fff;color:#1D4ED8;border-radius:8px;font-size:13px;font-weight:700;cursor:pointer">
                 Volver a levantamientos
             </button>
-            @if (SoloLectura)
+            @if (CurrentSolicitud.EstadoSolicitud?.Nombre == "En Espera Administración")
             {
                 <button @onclick="SolicitarEdicionEnviada" style="padding:9px 14px;border:0;background:#1D4ED8;color:#fff;border-radius:8px;font-size:13px;font-weight:700;cursor:pointer">
                     Editar información
@@ -320,7 +320,7 @@ else
 
 @code {
     private const int MaxPhotoSize = 5 * 1024 * 1024;
-    private static readonly string[] EstadosLevantamiento = ["Pendiente", "En proceso", "En Espera Administración"];
+    private static readonly string[] EstadosLevantamiento = ["Pendiente", "En proceso", "En Espera Administración", "Cancelada"];
     private const string InputStyle = "width:100%;padding:12px 13px;border:1px solid #D5D8E6;border-radius:9px;font-size:14.5px";
     private const string ReadOnlyInputStyle = "width:100%;padding:12px 13px;border:1px solid #D5D8E6;border-radius:9px;font-size:14.5px;background:#F7F8FC";
     private const string ModalBackdropStyle = "position:fixed;inset:0;z-index:1055;background:rgba(20,22,43,.48);display:flex;align-items:center;justify-content:center;padding:18px";
@@ -428,7 +428,8 @@ else
     }
 
     private ElectroGestion.Models.Visita? ObtenerVisita(int solicitudId) =>
-        visitas.FirstOrDefault(v => v.SolicitudId == solicitudId && v.Estado != "Cancelada");
+        visitas.FirstOrDefault(v => v.SolicitudId == solicitudId && v.Estado != "Cancelada") ??
+        visitas.FirstOrDefault(v => v.SolicitudId == solicitudId);
 
     private static string TextoAccion(
         ElectroGestion.Models.Solicitud solicitud,
@@ -481,7 +482,7 @@ else
         }
 
         CurrentSolicitud = solicitud;
-        SoloLectura = solicitud.EstadoSolicitud?.Nombre == "En Espera Administración";
+        SoloLectura = solicitud.EstadoSolicitud?.Nombre is "En Espera Administración" or "Cancelada";
         EditandoEnviado = false;
         await CargarFormularioAsync(solicitud.Levantamiento);
     }

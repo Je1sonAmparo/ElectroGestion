@@ -8,15 +8,15 @@ public class LevantamientoService(IDbContextFactory<Contexto> contextFactory)
 {
     private const int EstadoPendienteId = 1;
     private const int EstadoEnProcesoId = 2;
+    private const int EstadoFinalizadaId = 3;
     private const int EstadoEnEsperaAdministracionId = 5;
 
     public async Task<List<Solicitud>> ObtenerSolicitudesProgramadasAsync()
     {
         await using var contexto = await contextFactory.CreateDbContextAsync();
         return await contexto.Solicitudes
-            .Where(s => s.EstadoSolicitudId != 3 &&
-                s.EstadoSolicitudId != 4 &&
-                contexto.Visitas.Any(v => v.SolicitudId == s.Id && v.Estado != "Cancelada"))
+            .Where(s => s.EstadoSolicitudId != EstadoFinalizadaId &&
+                contexto.Visitas.Any(v => v.SolicitudId == s.Id))
             .Include(s => s.Cliente)
             .Include(s => s.Servicio)
             .Include(s => s.EstadoSolicitud)
