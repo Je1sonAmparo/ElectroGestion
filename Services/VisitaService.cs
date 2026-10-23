@@ -40,6 +40,44 @@ public class VisitaService(IDbContextFactory<Contexto> contextFactory)
             v.SolicitudId == solicitudId && (!visitaId.HasValue || v.Id != visitaId.Value));
     }
 
+    public async Task<bool> ActualizarTecnicoAsignadoAsync(int visitaId, int? tecnicoId)
+    {
+        await using var contexto = await contextFactory.CreateDbContextAsync();
+        var visita = await contexto.Visitas.FirstOrDefaultAsync(v => v.Id == visitaId);
+        if (visita is null)
+        {
+            return false;
+        }
+
+        if (tecnicoId.HasValue &&
+            !await contexto.Usuarios.AnyAsync(u => u.Id == tecnicoId && u.Rol == "Técnico"))
+        {
+            return false;
+        }
+
+        if (visita.Estado != "Cancelada")
+        {
+            var visitasMismoTecnico = await contexto.Visitas
+                .Where(v => v.Id != visitaId &&
+                    !v.IsDeleted &&
+                    v.Estado != "Cancelada" &&
+                    v.Fecha.Date == visita.Fecha.Date &&
+                    v.TecnicoId == tecnicoId)
+                .ToListAsync();
+
+            if (!TryGetIntervaloValido(visita.Hora, visita.HoraFin, out var inicio, out var fin) ||
+                visitasMismoTecnico.Any(v =>
+                    TryGetIntervaloValido(v.Hora, v.HoraFin, out var inicioExistente, out var finExistente) &&
+                    inicio < finExistente && fin > inicioExistente))
+            {
+                return false;
+            }
+        }
+
+        visita.TecnicoId = tecnicoId;
+        return await contexto.SaveChangesAsync() > 0;
+    }
+
     public async Task<bool> HorarioDisponibleAsync(
         DateTime fecha,
         string horaInicio,

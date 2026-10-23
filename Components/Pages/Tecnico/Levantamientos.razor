@@ -61,7 +61,17 @@ else if (CurrentSolicitud is null)
                         }
                     </select>
                 </label>
-                <button @onclick="LimpiarFiltros" style="margin-left:auto;padding:9px 16px;background:#1D4ED8;color:#fff;border:0;border-radius:6px;font-weight:700;font-size:14px;cursor:pointer">Buscar</button>
+                <label style="display:flex;align-items:center;gap:10px;font-weight:700">Técnico:
+                    <select @bind="SearchTecnicoId" style="width:210px;padding:9px 12px;border:1px solid #D5D8E6;border-radius:6px;font-size:14px;background:#fff">
+                        <option value="">Todos</option>
+                        <option value="@TecnicoSinAsignar">Sin asignar</option>
+                        @foreach (var tecnico in Tecnicos)
+                        {
+                            <option value="@tecnico.Id">@tecnico.Nombre</option>
+                        }
+                    </select>
+                </label>
+                <button @onclick="AplicarFiltros" style="margin-left:auto;padding:9px 16px;background:#1D4ED8;color:#fff;border:0;border-radius:6px;font-weight:700;font-size:14px;cursor:pointer">Buscar</button>
             </div>
         </div>
 
@@ -88,9 +98,12 @@ else if (CurrentSolicitud is null)
                         <div style="font-size:14.5px">@solicitud.Servicio?.Nombre</div>
                         <div style="font-size:12px;color:#8B90A3;font-weight:700;margin-top:8px">Fecha programada</div>
                         <div style="font-size:14.5px">@fecha</div>
+                        <div style="font-size:12.5px;color:#6B7085;margin-top:6px">
+                            Técnico asignado: <strong>@(visita?.Tecnico?.Nombre ?? "Sin asignar")</strong>
+                        </div>
 
-                        @if (levantamiento?.BorradorGuardado == true)
-                        {
+                            @if (levantamiento?.BorradorGuardado == true)
+                            {
                             <div style="margin-top:9px;font-size:11.5px;font-weight:800;color:#B26A00;background:#FFF3E0;border-radius:6px;padding:5px 8px;display:inline-block;align-self:flex-start">
                                 Borrador guardado
                             </div>
@@ -122,6 +135,7 @@ else if (CurrentSolicitud is null)
 }
 else
 {
+    var visitaActual = ObtenerVisita(CurrentSolicitud.Id);
     <div style="background:#fff;border:1px solid #E3E5EE;border-radius:14px;padding:26px">
         <div style="display:flex;align-items:center;gap:14px;flex-wrap:wrap;background:#EDEBFF;border:1px solid #C9C3F5;border-radius:12px;padding:14px 16px;margin-bottom:22px">
             <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="#1D4ED8" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" style="flex:0 0 20px" aria-hidden="true">
@@ -156,6 +170,23 @@ else
             <div style="grid-column:span 2">
                 <label style="display:block;font-size:13px;font-weight:700;color:#4A4E63;margin-bottom:7px">Tipo de servicio</label>
                 <input value="@CurrentSolicitud.Servicio?.Nombre" readonly style="@ReadOnlyInputStyle" />
+            </div>
+            <div>
+                <label for="tecnico-asignado" style="display:block;font-size:13px;font-weight:700;color:#4A4E63;margin-bottom:7px">Técnico asignado en Agenda</label>
+                @if (AppState.EsGerente)
+                {
+                    <select id="tecnico-asignado" value="@(visitaActual?.TecnicoId?.ToString() ?? "")" @onchange="CambiarTecnicoAsignadoAsync" disabled="@(IsSaving || visitaActual is null)" style="@InputStyle">
+                        <option value="">Sin asignar</option>
+                        @foreach (var tecnico in Tecnicos)
+                        {
+                            <option value="@tecnico.Id">@tecnico.Nombre</option>
+                        }
+                    </select>
+                }
+                else
+                {
+                    <input id="tecnico-asignado" value="@(visitaActual?.Tecnico?.Nombre ?? "Sin asignar")" readonly style="@ReadOnlyInputStyle" />
+                }
             </div>
             <div>
                 <label for="espacios" style="display:block;font-size:13px;font-weight:700;color:#4A4E63;margin-bottom:7px">Disponibilidad de los espacios físicos *</label>
@@ -216,10 +247,12 @@ else
                 @foreach (var foto in Fotos)
                 {
                     <div style="position:relative;width:132px;height:96px;border:1px solid #D9DCE9;border-radius:11px;overflow:hidden;background:#F7F8FC">
-                        <img src="@foto" alt="Fotografía del levantamiento" style="width:100%;height:100%;object-fit:cover" />
+                        <button type="button" @onclick="() => AmpliarFoto(foto)" aria-label="Ampliar fotografía" style="display:block;width:100%;height:100%;padding:0;border:0;background:transparent;cursor:zoom-in">
+                            <img src="@foto" alt="Fotografía del levantamiento" style="width:100%;height:100%;object-fit:cover" />
+                        </button>
                         @if (!SoloLectura)
                         {
-                            <button @onclick="() => EliminarFoto(foto)" aria-label="Quitar fotografía" style="position:absolute;top:5px;right:5px;width:24px;height:24px;border-radius:50%;border:1px solid #D9DCE9;background:#fff;cursor:pointer;color:#C4141B;font-size:12px;line-height:1">✕</button>
+                            <button @onclick="() => EliminarFoto(foto)" aria-label="Quitar fotografía" style="position:absolute;top:5px;right:5px;z-index:1;width:24px;height:24px;border-radius:50%;border:1px solid #D9DCE9;background:#fff;cursor:pointer;color:#C4141B;font-size:12px;line-height:1">✕</button>
                         }
                     </div>
                 }
@@ -318,8 +351,19 @@ else
     </div>
 }
 
+@if (FotoAmpliada is not null)
+{
+    <div role="presentation" @onclick="CerrarFotoAmpliada" style="position:fixed;inset:0;z-index:1100;background:rgba(20,22,43,.82);display:flex;align-items:center;justify-content:center;padding:24px">
+        <section role="dialog" aria-modal="true" aria-label="Fotografía ampliada" @onclick:stopPropagation="true" style="position:relative;max-width:95vw;max-height:92vh">
+            <button type="button" @onclick="CerrarFotoAmpliada" aria-label="Cerrar fotografía ampliada" style="position:absolute;top:-14px;right:-14px;z-index:1;width:36px;height:36px;border:1px solid #D5D8E6;border-radius:50%;background:#fff;color:#25283B;font-size:20px;cursor:pointer">×</button>
+            <img src="@FotoAmpliada" alt="Fotografía ampliada del levantamiento" style="display:block;max-width:95vw;max-height:88vh;object-fit:contain;border-radius:10px;box-shadow:0 20px 60px rgba(0,0,0,.35)" />
+        </section>
+    </div>
+}
+
 @code {
     private const int MaxPhotoSize = 5 * 1024 * 1024;
+    private const string TecnicoSinAsignar = "sin-asignar";
     private static readonly string[] EstadosLevantamiento = ["Pendiente", "En proceso", "En Espera Administración", "Cancelada"];
     private const string InputStyle = "width:100%;padding:12px 13px;border:1px solid #D5D8E6;border-radius:9px;font-size:14.5px";
     private const string ReadOnlyInputStyle = "width:100%;padding:12px 13px;border:1px solid #D5D8E6;border-radius:9px;font-size:14.5px;background:#F7F8FC";
@@ -332,7 +376,9 @@ else
     private List<ElectroGestion.Models.Solicitud> solicitudes = new();
     private List<ElectroGestion.Models.Visita> visitas = new();
     private List<string> TiposServicio = new();
+    private List<ElectroGestion.Models.Usuario> Tecnicos = new();
     private List<string> Fotos = new();
+    private string? FotoAmpliada;
     private ElectroGestion.Models.Solicitud? CurrentSolicitud;
     private ElementReference TituloListado;
     private string SearchId = "";
@@ -340,6 +386,13 @@ else
     private string SearchTipo = "";
     private DateTime? SearchFecha;
     private string SearchEstado = "Todos";
+    private string SearchTecnicoId = "";
+    private string FiltroId = "";
+    private string FiltroCliente = "";
+    private string FiltroTipo = "";
+    private DateTime? FiltroFecha;
+    private string FiltroEstado = "Todos";
+    private string FiltroTecnicoId = "";
     private string FormEspacios = "";
     private string FormCargas = "";
     private string FormTension = "";
@@ -366,16 +419,26 @@ else
         var visita = ObtenerVisita(s.Id);
         var estado = s.EstadoSolicitud?.Nombre ?? "Pendiente";
         return
-            (string.IsNullOrWhiteSpace(SearchId) || s.Id.ToString().Contains(SearchId.Trim(), StringComparison.OrdinalIgnoreCase)) &&
-            (string.IsNullOrWhiteSpace(SearchCliente) || (s.Cliente?.Nombre ?? "").Contains(SearchCliente.Trim(), StringComparison.OrdinalIgnoreCase)) &&
-            (string.IsNullOrWhiteSpace(SearchTipo) || (s.Servicio?.Nombre ?? "").Equals(SearchTipo, StringComparison.OrdinalIgnoreCase)) &&
-            (!SearchFecha.HasValue || visita?.Fecha.Date == SearchFecha.Value.Date) &&
-            (SearchEstado == "Todos" || estado == SearchEstado);
+            (string.IsNullOrWhiteSpace(FiltroId) || s.Id.ToString().Contains(FiltroId.Trim(), StringComparison.OrdinalIgnoreCase)) &&
+            (string.IsNullOrWhiteSpace(FiltroCliente) || (s.Cliente?.Nombre ?? "").Contains(FiltroCliente.Trim(), StringComparison.OrdinalIgnoreCase)) &&
+            (string.IsNullOrWhiteSpace(FiltroTipo) || (s.Servicio?.Nombre ?? "").Equals(FiltroTipo, StringComparison.OrdinalIgnoreCase)) &&
+            (!FiltroFecha.HasValue || visita?.Fecha.Date == FiltroFecha.Value.Date) &&
+            (string.IsNullOrWhiteSpace(FiltroTecnicoId) ||
+                (FiltroTecnicoId == TecnicoSinAsignar
+                    ? visita?.TecnicoId is null
+                    : int.TryParse(FiltroTecnicoId, out var tecnicoId) && visita?.TecnicoId == tecnicoId)) &&
+            (FiltroEstado == "Todos" || estado == FiltroEstado);
     });
 
     protected override async Task OnInitializedAsync()
     {
         AppState.OnChange += OnAppStateChanged;
+        if (AppState.EsGerente)
+        {
+            SearchEstado = "En Espera Administración";
+        }
+
+        AplicarFiltros();
         await CargarDatosAsync();
     }
 
@@ -398,6 +461,7 @@ else
         {
             solicitudes = await LevantamientoService.ObtenerSolicitudesProgramadasAsync();
             visitas = await VisitaService.ObtenerTodasAsync();
+            Tecnicos = await VisitaService.ObtenerTecnicosAsync();
             TiposServicio = solicitudes
                 .Select(s => s.Servicio?.Nombre)
                 .Where(nombre => !string.IsNullOrWhiteSpace(nombre))
@@ -430,6 +494,56 @@ else
     private ElectroGestion.Models.Visita? ObtenerVisita(int solicitudId) =>
         visitas.FirstOrDefault(v => v.SolicitudId == solicitudId && v.Estado != "Cancelada") ??
         visitas.FirstOrDefault(v => v.SolicitudId == solicitudId);
+
+    private async Task CambiarTecnicoAsignadoAsync(ChangeEventArgs args)
+    {
+        if (!AppState.EsGerente || CurrentSolicitud is null)
+        {
+            return;
+        }
+
+        var visita = ObtenerVisita(CurrentSolicitud.Id);
+        if (visita is null)
+        {
+            ToastService.ShowWarning("La solicitud no tiene una visita asociada en la Agenda.", "Atención");
+            return;
+        }
+
+        int? tecnicoId = null;
+        var valor = args.Value?.ToString();
+        if (!string.IsNullOrWhiteSpace(valor))
+        {
+            if (!int.TryParse(valor, out var id))
+            {
+                ToastService.ShowWarning("El técnico seleccionado no es válido.", "Atención");
+                return;
+            }
+
+            tecnicoId = id;
+        }
+
+        IsSaving = true;
+        try
+        {
+            if (!await VisitaService.ActualizarTecnicoAsignadoAsync(visita.Id, tecnicoId))
+            {
+                ToastService.ShowWarning("No se pudo asignar el técnico. Verifique que no tenga otra visita en ese horario.", "Atención");
+                return;
+            }
+
+            AppState.NotifyStateChanged();
+            await CargarDatosAsync();
+        }
+        catch (Exception ex)
+        {
+            Logger.LogError(ex, "No se pudo actualizar el técnico de la visita {VisitaId}.", visita.Id);
+            ToastService.ShowError("Ocurrió un error al actualizar el técnico asignado.", "Error");
+        }
+        finally
+        {
+            IsSaving = false;
+        }
+    }
 
     private static string TextoAccion(
         ElectroGestion.Models.Solicitud solicitud,
@@ -809,14 +923,17 @@ else
     }
 
     private void EliminarFoto(string foto) => Fotos.Remove(foto);
+    private void AmpliarFoto(string foto) => FotoAmpliada = foto;
+    private void CerrarFotoAmpliada() => FotoAmpliada = null;
 
-    private void LimpiarFiltros()
+    private void AplicarFiltros()
     {
-        SearchId = "";
-        SearchCliente = "";
-        SearchTipo = "";
-        SearchFecha = null;
-        SearchEstado = "Todos";
+        FiltroId = SearchId;
+        FiltroCliente = SearchCliente;
+        FiltroTipo = SearchTipo;
+        FiltroFecha = SearchFecha;
+        FiltroEstado = SearchEstado;
+        FiltroTecnicoId = SearchTecnicoId;
     }
 
     private void OnAppStateChanged() => _ = InvokeAsync(CargarDatosAsync);

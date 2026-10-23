@@ -97,8 +97,8 @@ public class SolicitudService(IDbContextFactory<Contexto> contextFactory) : Apli
             return false;
         }
 
-        solicitud.IsDeleted = true;
         var visitas = await contexto.Visitas
+            .IgnoreQueryFilters()
             .Where(v => v.SolicitudId == id)
             .ToListAsync();
         foreach (var visita in visitas)
@@ -106,6 +106,7 @@ public class SolicitudService(IDbContextFactory<Contexto> contextFactory) : Apli
             visita.IsDeleted = true;
         }
 
+        solicitud.IsDeleted = true;
         return await contexto.SaveChangesAsync() > 0;
     }
 }

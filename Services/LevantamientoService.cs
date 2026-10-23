@@ -15,8 +15,9 @@ public class LevantamientoService(IDbContextFactory<Contexto> contextFactory)
     {
         await using var contexto = await contextFactory.CreateDbContextAsync();
         return await contexto.Solicitudes
-            .Where(s => s.EstadoSolicitudId != EstadoFinalizadaId &&
-                contexto.Visitas.Any(v => v.SolicitudId == s.Id))
+            .Where(s => !s.IsDeleted &&
+                s.EstadoSolicitudId != EstadoFinalizadaId &&
+                contexto.Visitas.Any(v => !v.IsDeleted && v.SolicitudId == s.Id))
             .Include(s => s.Cliente)
             .Include(s => s.Servicio)
             .Include(s => s.EstadoSolicitud)
