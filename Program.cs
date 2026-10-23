@@ -24,6 +24,7 @@ builder.Services.AddScoped<ClienteService>();
 builder.Services.AddScoped<ServicioService>();
 builder.Services.AddScoped<SolicitudService>();
 builder.Services.AddScoped<VisitaService>();
+builder.Services.AddScoped<LevantamientoService>();
 
 builder.Services.AddBlazorBootstrap();
 

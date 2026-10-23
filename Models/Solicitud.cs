@@ -32,4 +32,5 @@ public class Solicitud
     public string TecnicoAsignado { get; set; } = "";
 
     public ICollection<DetalleSolicitud> Detalles { get; set; } = new List<DetalleSolicitud>();
+    public Levantamiento? Levantamiento { get; set; }
 }

@@ -1,4 +1,5 @@
 @inject ElectroGestion.Services.AppStateService AppState
+@inject ElectroGestion.Services.LevantamientoService LevantamientoService
 @inject NavigationManager NavManager
 @inject IJSRuntime JS
 
@@ -128,11 +129,18 @@
         .ThenByDescending(s => s.Id)
         .Take(3);
 
+    private int LevantamientosPendientes { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        LevantamientosPendientes = await LevantamientoService.ContarPendientesAsync();
+    }
+
     private IEnumerable<HomeMetric> Metrics => new[]
     {
         new HomeMetric("Solicitudes pendientes", AppState.Solicitudes.Count(s => s.EstadoSolicitud?.Nombre == "Pendiente"), "Ver solicitudes", "/solicitudes"),
         new HomeMetric("Visitas programadas", VisitsToday.Count(), "Ver agenda", "/agenda"),
-        new HomeMetric("Levantamientos pendientes", AppState.Levantamientos.Count(l => l.Estado == "Pendiente"), "Ver levantamientos", "/levantamientos"),
+        new HomeMetric("Levantamientos pendientes", LevantamientosPendientes, "Ver levantamientos", "/levantamientos"),
         new HomeMetric("Órdenes de trabajo nuevas", AppState.Ordenes.Count(o => o.Estado == "En proceso"), "Ver órdenes", "/ordenes")
     };
 

@@ -265,7 +265,68 @@ namespace ElectroGestion.Migrations
                         {
                             Id = 4,
                             Nombre = "Cancelada"
+                        },
+                        new
+                        {
+                            Id = 5,
+                            Nombre = "En Espera Administración"
                         });
+                });
+
+            modelBuilder.Entity("ElectroGestion.Models.Levantamiento", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<bool>("BorradorGuardado")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("CargasElectricas")
+                        .IsRequired()
+                        .HasMaxLength(2000)
+                        .HasColumnType("nvarchar(2000)");
+
+                    b.Property<string>("DisponibilidadEspacios")
+                        .IsRequired()
+                        .HasMaxLength(2000)
+                        .HasColumnType("nvarchar(2000)");
+
+                    b.Property<string>("EstabilidadTension")
+                        .IsRequired()
+                        .HasMaxLength(2000)
+                        .HasColumnType("nvarchar(2000)");
+
+                    b.Property<string>("FotografiasJson")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Observaciones")
+                        .IsRequired()
+                        .HasMaxLength(4000)
+                        .HasColumnType("nvarchar(4000)");
+
+                    b.Property<string>("RecorridoCableado")
+                        .IsRequired()
+                        .HasMaxLength(2000)
+                        .HasColumnType("nvarchar(2000)");
+
+                    b.Property<string>("RecorridoTuberias")
+                        .IsRequired()
+                        .HasMaxLength(2000)
+                        .HasColumnType("nvarchar(2000)");
+
+                    b.Property<int>("SolicitudId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("SolicitudId")
+                        .IsUnique();
+
+                    b.ToTable("Levantamientos");
                 });
 
             modelBuilder.Entity("ElectroGestion.Models.Servicio", b =>
@@ -636,6 +697,17 @@ namespace ElectroGestion.Migrations
                     b.Navigation("Solicitud");
                 });
 
+            modelBuilder.Entity("ElectroGestion.Models.Levantamiento", b =>
+                {
+                    b.HasOne("ElectroGestion.Models.Solicitud", "Solicitud")
+                        .WithOne("Levantamiento")
+                        .HasForeignKey("ElectroGestion.Models.Levantamiento", "SolicitudId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Solicitud");
+                });
+
             modelBuilder.Entity("ElectroGestion.Models.Solicitud", b =>
                 {
                     b.HasOne("ElectroGestion.Models.Cliente", "Cliente")
@@ -703,6 +775,8 @@ namespace ElectroGestion.Migrations
             modelBuilder.Entity("ElectroGestion.Models.Solicitud", b =>
                 {
                     b.Navigation("Detalles");
+
+                    b.Navigation("Levantamiento");
                 });
 #pragma warning restore 612, 618
         }
