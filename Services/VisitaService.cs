@@ -93,6 +93,14 @@ public class VisitaService(IDbContextFactory<Contexto> contextFactory)
                 return false;
             }
 
+            var solicitud = await contexto.Solicitudes.FirstOrDefaultAsync(s => s.Id == visita.SolicitudId);
+            if (solicitud is null)
+            {
+                return false;
+            }
+
+            solicitud.EstadoSolicitudId = 1;
+            visita.Estado = "Pendiente";
             visita.Solicitud = null;
             contexto.Visitas.Add(visita);
         }
@@ -148,10 +156,24 @@ public class VisitaService(IDbContextFactory<Contexto> contextFactory)
     public async Task<bool> CambiarEstadoAsync(int id, string estado)
     {
         await using var contexto = await contextFactory.CreateDbContextAsync();
-        var visita = await contexto.Visitas.FirstOrDefaultAsync(v => v.Id == id);
+        var visita = await contexto.Visitas
+            .Include(v => v.Solicitud)
+            .FirstOrDefaultAsync(v => v.Id == id);
         if (visita is null)
         {
             return false;
+        }
+
+        if (visita.Solicitud is not null)
+        {
+            if (estado == "Cancelada")
+            {
+                visita.Solicitud.EstadoSolicitudId = 4;
+            }
+            else if (estado == "En proceso" && visita.Estado == "Cancelada")
+            {
+                visita.Solicitud.EstadoSolicitudId = 2;
+            }
         }
 
         visita.Estado = estado;
