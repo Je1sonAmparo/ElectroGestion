@@ -160,22 +160,42 @@ else
             <div>
                 <label for="espacios" style="display:block;font-size:13px;font-weight:700;color:#4A4E63;margin-bottom:7px">Disponibilidad de los espacios físicos *</label>
                 <input id="espacios" @bind="FormEspacios" maxlength="2000" disabled="@SoloLectura" placeholder="Ej. Sala técnica disponible" style="@InputStyle" />
+                @if (MostrarErrorRequerido(FormEspacios))
+                {
+                    <div role="alert" style="@ValidationMessageStyle">Este campo es obligatorio.</div>
+                }
             </div>
             <div>
                 <label for="cargas" style="display:block;font-size:13px;font-weight:700;color:#4A4E63;margin-bottom:7px">Cargas eléctricas *</label>
                 <input id="cargas" @bind="FormCargas" maxlength="2000" disabled="@SoloLectura" placeholder="Ej. 12 kW" style="@InputStyle" />
+                @if (MostrarErrorRequerido(FormCargas))
+                {
+                    <div role="alert" style="@ValidationMessageStyle">Este campo es obligatorio.</div>
+                }
             </div>
             <div>
                 <label for="tension" style="display:block;font-size:13px;font-weight:700;color:#4A4E63;margin-bottom:7px">Estabilidad de la tensión *</label>
                 <input id="tension" @bind="FormTension" maxlength="2000" disabled="@SoloLectura" placeholder="Ej. 118-122 V estable" style="@InputStyle" />
+                @if (MostrarErrorRequerido(FormTension))
+                {
+                    <div role="alert" style="@ValidationMessageStyle">Este campo es obligatorio.</div>
+                }
             </div>
             <div>
                 <label for="tuberias" style="display:block;font-size:13px;font-weight:700;color:#4A4E63;margin-bottom:7px">Recorrido físico de las tuberías *</label>
                 <input id="tuberias" @bind="FormTuberias" maxlength="2000" disabled="@SoloLectura" placeholder="Ej. 18 m EMT 3/4" style="@InputStyle" />
+                @if (MostrarErrorRequerido(FormTuberias))
+                {
+                    <div role="alert" style="@ValidationMessageStyle">Este campo es obligatorio.</div>
+                }
             </div>
             <div>
                 <label for="cableado" style="display:block;font-size:13px;font-weight:700;color:#4A4E63;margin-bottom:7px">Recorrido físico del cableado *</label>
                 <input id="cableado" @bind="FormCableado" maxlength="2000" disabled="@SoloLectura" placeholder="Ej. 24 m THHN #10" style="@InputStyle" />
+                @if (MostrarErrorRequerido(FormCableado))
+                {
+                    <div role="alert" style="@ValidationMessageStyle">Este campo es obligatorio.</div>
+                }
             </div>
             <div style="grid-row:span 2">
                 <label for="observaciones" style="display:block;font-size:13px;font-weight:700;color:#4A4E63;margin-bottom:7px">Observaciones</label>
@@ -307,6 +327,7 @@ else
     private const string ModalStyle = "width:min(100%,520px);background:#fff;border-radius:14px;padding:24px;box-shadow:0 20px 60px rgba(20,22,43,.25)";
     private const string SecondaryButtonStyle = "padding:10px 15px;border:1px solid #D5D8E6;background:#fff;border-radius:8px;font-weight:700;cursor:pointer";
     private const string PrimaryButtonStyle = "padding:10px 15px;border:0;background:#1D4ED8;color:#fff;border-radius:8px;font-weight:700;cursor:pointer";
+    private const string ValidationMessageStyle = "margin-top:5px;color:#A61B22;font-size:12px";
 
     private List<ElectroGestion.Models.Solicitud> solicitudes = new();
     private List<ElectroGestion.Models.Visita> visitas = new();
@@ -330,6 +351,7 @@ else
     private string? FormMessage;
     private bool IsLoading;
     private bool IsSaving;
+    private bool ValidacionIntentada;
     private bool SoloLectura;
     private bool EditandoEnviado;
     private bool MostrarConfirmacionCancelar;
@@ -444,7 +466,6 @@ else
                 AppState.NotifyStateChanged();
                 await CargarDatosAsync();
                 solicitud = solicitudes.First(s => s.Id == solicitud.Id);
-                ToastService.ShowSuccess("El levantamiento está en proceso.", "Éxito");
             }
             catch (Exception ex)
             {
@@ -480,6 +501,7 @@ else
         FormObservaciones = levantamiento?.Observaciones ?? "";
         Fotos = JsonSerializer.Deserialize<List<string>>(levantamiento?.FotografiasJson ?? "[]") ?? new List<string>();
         InitialSnapshot = CrearSnapshot();
+        ValidacionIntentada = false;
     }
 
     private async Task GuardarBorradorAsync()
@@ -554,10 +576,8 @@ else
             return;
         }
 
-        if (!TieneDatosRequeridos())
+        if (!ValidarCamposRequeridos())
         {
-            FormMessage = "Complete todos los campos técnicos obligatorios antes de guardar.";
-            ToastService.ShowWarning(FormMessage, "Atención");
             return;
         }
 
@@ -610,10 +630,8 @@ else
     private void SolicitarEnvio()
     {
         FormMessage = null;
-        if (!TieneDatosRequeridos())
+        if (!ValidarCamposRequeridos())
         {
-            FormMessage = "Complete todos los campos técnicos obligatorios antes de enviar.";
-            ToastService.ShowWarning(FormMessage, "Atención");
             return;
         }
 
@@ -658,12 +676,18 @@ else
         }
     }
 
-    private bool TieneDatosRequeridos() =>
-        !string.IsNullOrWhiteSpace(FormEspacios) &&
-        !string.IsNullOrWhiteSpace(FormCargas) &&
-        !string.IsNullOrWhiteSpace(FormTension) &&
-        !string.IsNullOrWhiteSpace(FormTuberias) &&
-        !string.IsNullOrWhiteSpace(FormCableado);
+    private bool ValidarCamposRequeridos()
+    {
+        ValidacionIntentada = true;
+        return !MostrarErrorRequerido(FormEspacios) &&
+            !MostrarErrorRequerido(FormCargas) &&
+            !MostrarErrorRequerido(FormTension) &&
+            !MostrarErrorRequerido(FormTuberias) &&
+            !MostrarErrorRequerido(FormCableado);
+    }
+
+    private bool MostrarErrorRequerido(string? valor) =>
+        ValidacionIntentada && string.IsNullOrWhiteSpace(valor);
 
     private ElectroGestion.Models.Levantamiento CrearLevantamiento() => new()
     {
