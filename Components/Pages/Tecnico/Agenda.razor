@@ -384,7 +384,14 @@
             </div>
 
             <div style="display:flex;justify-content:flex-end;gap:12px;margin-top:24px">
-                <button @onclick="OpenEliminarModal" style="padding:10px 18px;border:1px solid #F5C2C4;background:#fff;border-radius:8px;font-weight:700;cursor:pointer;color:#C4141B">Eliminar visita</button>
+                @if (Detalle?.Estado is "En proceso" or "En Espera Administración")
+                {
+                    <button disabled title="Las visitas en proceso o en espera de administración están protegidas" style="padding:10px 18px;border:1px solid #D5D8E6;background:#F7F8FC;border-radius:8px;font-weight:700;color:#8B90A3;cursor:not-allowed">Visita protegida</button>
+                }
+                else
+                {
+                    <button @onclick="OpenEliminarModal" style="padding:10px 18px;border:1px solid #F5C2C4;background:#fff;border-radius:8px;font-weight:700;cursor:pointer;color:#C4141B">Eliminar visita</button>
+                }
                 <button @onclick="CloseModals" style="padding:10px 18px;border:1px solid #D5D8E6;background:#fff;border-radius:8px;font-weight:700;cursor:pointer;color:#14162B">Cancelar</button>
                 <button @onclick="GuardarVisitaAsync" disabled="@EsDomingoSeleccionado" style="padding:10px 18px;border:none;background:@(EsDomingoSeleccionado ? "#9CA3AF" : "#1D4ED8");color:#fff;border-radius:8px;font-weight:700;cursor:@(EsDomingoSeleccionado ? "not-allowed" : "pointer")">Guardar cambios</button>
             </div>
@@ -1124,7 +1131,7 @@
         {
             if (!await VisitaService.EliminarAsync(visitaId))
             {
-                ToastService.ShowError("No se encontró la visita para eliminarla.");
+                ToastService.ShowWarning("No se puede eliminar una visita En proceso o En Espera Administración.", "Atención");
                 return;
             }
 
