@@ -22,6 +22,40 @@ public class VisitaService(IDbContextFactory<Contexto> contextFactory)
             .ToListAsync();
     }
 
+    public async Task<List<Visita>> ObtenerEliminadasAsync()
+    {
+        await using var contexto = await contextFactory.CreateDbContextAsync();
+        return await contexto.Visitas
+            .IgnoreQueryFilters()
+            .Where(v => v.IsDeleted && v.Solicitud != null && !v.Solicitud.IsDeleted)
+            .Include(v => v.Solicitud!)
+                .ThenInclude(s => s.Cliente)
+            .Include(v => v.Solicitud!)
+                .ThenInclude(s => s.Servicio)
+            .Include(v => v.Solicitud!)
+                .ThenInclude(s => s.EstadoSolicitud)
+            .Include(v => v.Tecnico)
+            .AsNoTracking()
+            .OrderByDescending(v => v.Id)
+            .ToListAsync();
+    }
+
+    public async Task<bool> RecuperarAsync(int id)
+    {
+        await using var contexto = await contextFactory.CreateDbContextAsync();
+        var visita = await contexto.Visitas
+            .IgnoreQueryFilters()
+            .Include(v => v.Solicitud)
+            .FirstOrDefaultAsync(v => v.Id == id && v.IsDeleted);
+        if (visita?.Solicitud is null || visita.Solicitud.IsDeleted || visita.EliminadaPorSolicitud)
+        {
+            return false;
+        }
+
+        visita.IsDeleted = false;
+        return await contexto.SaveChangesAsync() > 0;
+    }
+
     public async Task<List<Usuario>> ObtenerTecnicosAsync()
     {
         await using var contexto = await contextFactory.CreateDbContextAsync();
@@ -229,23 +263,18 @@ public class VisitaService(IDbContextFactory<Contexto> contextFactory)
     public async Task<bool> EliminarAsync(int id)
     {
         await using var contexto = await contextFactory.CreateDbContextAsync();
-        var visita = await contexto.Visitas.FirstOrDefaultAsync(v => v.Id == id);
-        if (visita is null)
+        var visita = await contexto.Visitas
+            .Include(v => v.Solicitud)
+            .FirstOrDefaultAsync(v => v.Id == id);
+        if (visita is null ||
+            visita.Estado is "En proceso" or "En Espera Administración" ||
+            visita.Solicitud?.EstadoSolicitudId is 2 or 5)
         {
             return false;
         }
 
         visita.IsDeleted = true;
-
-        var otraVisitaActiva = await contexto.Visitas.AnyAsync(v => v.SolicitudId == visita.SolicitudId && v.Id != id && !v.IsDeleted);
-        if (!otraVisitaActiva)
-        {
-            var solicitud = await contexto.Solicitudes.FirstOrDefaultAsync(s => s.Id == visita.SolicitudId);
-            if (solicitud != null && solicitud.EstadoSolicitudId == 2)
-            {
-                solicitud.EstadoSolicitudId = 1;
-            }
-        }
+        visita.EliminadaPorSolicitud = false;
 
         return await contexto.SaveChangesAsync() > 0;
     }
