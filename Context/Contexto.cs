@@ -122,6 +122,15 @@ public class Contexto : DbContext
                 Nombre = "Luis Peña",
                 Cargo = "Técnico",
                 Rol = "Técnico"
+            },
+            new Usuario
+            {
+                Id = 3,
+                UsuarioLogin = "admin",
+                PasswordHash = "AQAAAAIAAYagAAAAEDlXkB6f7Cn7W7LhwqonLz2YWMWnkh0z783OtK2aOGgJYxTR1gP7p26z3JILLccOWQ==",
+                Nombre = "Administrador",
+                Cargo = "Administrador",
+                Rol = "Admin"
             });
 
         modelBuilder.Entity<EstadoSolicitud>().HasData(
