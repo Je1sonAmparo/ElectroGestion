@@ -1,0 +1,391 @@
+@page "/recuperacion"
+@using ElectroGestion.Models
+@inject ElectroGestion.Services.AppStateService AppState
+@inject ElectroGestion.Services.SolicitudService SolicitudService
+@inject ElectroGestion.Services.VisitaService VisitaService
+@inject BlazorBootstrap.ToastService ToastService
+@inject ILogger<Recuperacion> Logger
+
+<PageTitle>Recuperación | ElectroGestion</PageTitle>
+
+@if (!AppState.EsAdministrador)
+{
+    <div style="background:#fff;border:1px solid #E3E5EE;border-radius:14px;padding:28px;max-width:680px">
+        <h1 style="font-family:'Manrope';font-weight:800;font-size:24px;color:#14162B">Acceso restringido</h1>
+        <p style="color:#6B7085;margin:0">El módulo de recuperación está disponible únicamente para el usuario administrador.</p>
+    </div>
+}
+else
+{
+    <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:20px;margin-bottom:20px">
+        <div>
+            <div class="page-title" style="font-family:'Manrope';font-weight:800;font-size:31px;letter-spacing:-.8px;color:#1f2430;line-height:1.15">Recuperación</div>
+            <div style="color:#6B7085;font-size:14.5px;margin-top:5px">Consulta y recupera solicitudes y visitas eliminadas.</div>
+        </div>
+    </div>
+
+    <div style="display:flex;gap:8px;margin-bottom:16px;border-bottom:1px solid #E3E5EE">
+        <button @onclick='() => CambiarVista("Solicitudes")' style="padding:11px 17px;border:0;border-bottom:3px solid @(Vista == "Solicitudes" ? "#1D4ED8" : "transparent");background:transparent;color:@(Vista == "Solicitudes" ? "#1D4ED8" : "#6B7085");font-weight:800;cursor:pointer">Solicitudes eliminadas</button>
+        <button @onclick='() => CambiarVista("Agenda")' style="padding:11px 17px;border:0;border-bottom:3px solid @(Vista == "Agenda" ? "#1D4ED8" : "transparent");background:transparent;color:@(Vista == "Agenda" ? "#1D4ED8" : "#6B7085");font-weight:800;cursor:pointer">Agenda eliminada</button>
+    </div>
+
+    @if (Cargando)
+    {
+        <div style="background:#fff;border:1px solid #E3E5EE;border-radius:14px;padding:34px;text-align:center;color:#6B7085">Cargando registros eliminados...</div>
+    }
+    else if (Vista == "Solicitudes")
+    {
+        <section style="background:#fff;border:1px solid #E3E5EE;border-radius:14px;overflow:hidden">
+            <div style="display:flex;flex-direction:column;gap:18px;padding:18px 18px 12px;border-bottom:1px solid #EFF0F6">
+                <div style="display:flex;align-items:center;gap:20px;flex-wrap:wrap">
+                    <label style="display:flex;align-items:center;gap:10px;font-family:'Manrope';font-weight:800;font-size:15px">ID:
+                        <input @bind="SearchSolicitudId" @bind:event="oninput" placeholder="ID de solicitud" style="width:140px;padding:9px 12px;border:1px solid #D5D8E6;border-radius:6px;font-size:14px;font-weight:400" />
+                    </label>
+                    <label style="display:flex;align-items:center;gap:10px;font-family:'Manrope';font-weight:800;font-size:15px">Cliente:
+                        <input @bind="SearchSolicitudCliente" @bind:event="oninput" placeholder="Nombre del cliente" style="width:200px;padding:9px 12px;border:1px solid #D5D8E6;border-radius:6px;font-size:14px;font-weight:400" />
+                    </label>
+                    <label style="display:flex;align-items:center;gap:10px;font-family:'Manrope';font-weight:800;font-size:15px">Tipo de Servicio:
+                        <select @bind="SearchSolicitudServicio" style="width:190px;padding:9px 12px;border:1px solid #D5D8E6;border-radius:6px;font-size:14px;background:#fff;font-weight:400">
+                            <option value="">Seleccione Servicio</option>
+                            @foreach (var servicio in ServiciosSolicitud)
+                            {
+                                <option value="@servicio">@servicio</option>
+                            }
+                        </select>
+                    </label>
+                </div>
+                <div style="display:flex;align-items:center;gap:20px;flex-wrap:wrap">
+                    <label style="display:flex;align-items:center;gap:10px;font-family:'Manrope';font-weight:800;font-size:15px">Fecha Solicitud:
+                        <input type="date" @bind="SearchSolicitudFecha" style="width:160px;padding:9px 12px;border:1px solid #D5D8E6;border-radius:6px;font-size:14px;background:#fff;font-weight:400" />
+                    </label>
+                    <label style="display:flex;align-items:center;gap:10px;font-family:'Manrope';font-weight:800;font-size:15px">Estado:
+                        <select @bind="SearchSolicitudEstado" style="width:190px;padding:9px 12px;border:1px solid #D5D8E6;border-radius:6px;font-size:14px;background:#fff;font-weight:400">
+                            <option value="">Todos los estados</option>
+                            @foreach (var estado in EstadosSolicitud)
+                            {
+                                <option value="@estado">@estado</option>
+                            }
+                        </select>
+                    </label>
+                    <button @onclick="FiltrarSolicitudes" style="margin-left:auto;padding:9px 20px;background:#1D4ED8;color:#fff;border:0;border-radius:8px;font-weight:700;font-size:14px;cursor:pointer;font-family:'Manrope'">Buscar</button>
+                </div>
+            </div>
+
+            <div style="overflow-x:auto">
+                <table style="width:100%;border-collapse:collapse;font-size:14px;table-layout:fixed">
+                    <thead><tr style="border-bottom:1px solid #EFF0F6;background:#FAFAFC;color:#6B7085;font-family:'Manrope';font-weight:800;font-size:13px;text-transform:uppercase;letter-spacing:.5px">
+                        <th style="padding:14px 18px;text-align:left;width:12%">ID</th><th style="padding:14px 18px;text-align:left;width:21%">Cliente</th><th style="padding:14px 18px;text-align:left;width:21%">Tipo de Servicio</th><th style="padding:14px 18px;text-align:left;width:17%">Fecha Solicitud</th><th style="padding:14px 18px;text-align:center;width:17%">Estado</th><th style="padding:14px 18px;text-align:right;width:12%">Acciones</th>
+                    </tr></thead>
+                    <tbody>
+                        @if (!SolicitudesFiltradas.Any())
+                        {
+                            <tr><td colspan="6" style="padding:32px;text-align:center;color:#6B7085">No se encontraron solicitudes eliminadas con esos filtros.</td></tr>
+                        }
+                        else
+                        {
+                            @foreach (var solicitud in SolicitudesFiltradas)
+                            {
+                                <tr style="border-bottom:1px solid #EFF0F6">
+                                    <td style="padding:16px 18px;font-family:ui-monospace,Consolas,monospace;font-weight:700;color:#5B6173">@solicitud.Id.ToString("D4")</td>
+                                    <td style="padding:16px 18px;font-weight:700;color:#14162B">@solicitud.Cliente?.Nombre</td>
+                                    <td style="padding:16px 18px;color:#4A4E63">@solicitud.Servicio?.Nombre</td>
+                                    <td style="padding:16px 18px;color:#6B7085">@AppStateService.FormatFecha(solicitud.FechaSolicitud.ToString("yyyy-MM-dd"))</td>
+                                    <td style="padding:16px 18px;text-align:center"><div style="display:flex;flex-direction:column;align-items:center;gap:5px"><span style="display:inline-flex;padding:5px 10px;border-radius:999px;background:#F1F2F6;color:#4A4E63;font-size:12px;font-weight:700">@solicitud.EstadoSolicitud?.Nombre</span><span style="font-size:10px;font-weight:900;letter-spacing:.07em;color:#B42318">ELIMINADA</span></div></td>
+                                    <td style="padding:16px 18px;text-align:right"><div style="display:flex;gap:8px;justify-content:flex-end">
+                                        <button @onclick="() => AbrirDetalleSolicitud(solicitud)" title="Ver detalle" aria-label="Ver detalle" style="@ActionButtonStyle"><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s3.5-6 10-6 10 6 10 6-3.5 6-10 6S2 12 2 12Z"/><circle cx="12" cy="12" r="3"/></svg></button>
+                                        <button @onclick="() => AbrirRecuperarSolicitud(solicitud)" title="Recuperar solicitud" aria-label="Recuperar solicitud" style="@ActionButtonStyle"><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 2.64-6.36L3 8"/><path d="M3 3v5h5"/><path d="M12 7v5l3 2"/></svg></button>
+                                    </div></td>
+                                </tr>
+                            }
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </section>
+    }
+    else
+    {
+        <section style="background:#fff;border:1px solid #E3E5EE;border-radius:14px;overflow:hidden">
+            <div style="display:flex;flex-direction:column;gap:18px;padding:18px 18px 12px;border-bottom:1px solid #EFF0F6">
+                <div style="display:flex;align-items:center;gap:20px;flex-wrap:wrap">
+                    <label style="display:flex;align-items:center;gap:10px;font-family:'Manrope';font-weight:800;font-size:15px">ID visita:
+                        <input @bind="SearchVisitaId" @bind:event="oninput" placeholder="ID de visita" style="width:130px;padding:9px 12px;border:1px solid #D5D8E6;border-radius:6px;font-size:14px;font-weight:400" />
+                    </label>
+                    <label style="display:flex;align-items:center;gap:10px;font-family:'Manrope';font-weight:800;font-size:15px">Cliente:
+                        <input @bind="SearchVisitaCliente" @bind:event="oninput" placeholder="Nombre del cliente" style="width:200px;padding:9px 12px;border:1px solid #D5D8E6;border-radius:6px;font-size:14px;font-weight:400" />
+                    </label>
+                    <label style="display:flex;align-items:center;gap:10px;font-family:'Manrope';font-weight:800;font-size:15px">Tipo de Servicio:
+                        <select @bind="SearchVisitaServicio" style="width:190px;padding:9px 12px;border:1px solid #D5D8E6;border-radius:6px;font-size:14px;background:#fff;font-weight:400"><option value="">Todos</option>@foreach (var servicio in ServiciosVisita) { <option value="@servicio">@servicio</option> }</select>
+                    </label>
+                </div>
+                <div style="display:flex;align-items:center;gap:20px;flex-wrap:wrap">
+                    <label style="display:flex;align-items:center;gap:10px;font-family:'Manrope';font-weight:800;font-size:15px">Fecha programada:
+                        <input type="date" @bind="SearchVisitaFecha" style="width:160px;padding:9px 12px;border:1px solid #D5D8E6;border-radius:6px;font-size:14px;background:#fff;font-weight:400" />
+                    </label>
+                    <label style="display:flex;align-items:center;gap:10px;font-family:'Manrope';font-weight:800;font-size:15px">Estado:
+                        <select @bind="SearchVisitaEstado" style="width:190px;padding:9px 12px;border:1px solid #D5D8E6;border-radius:6px;font-size:14px;background:#fff;font-weight:400"><option value="">Todos</option>@foreach (var estado in EstadosVisita) { <option value="@estado">@estado</option> }</select>
+                    </label>
+                    <button @onclick="FiltrarVisitas" style="margin-left:auto;padding:9px 20px;background:#1D4ED8;color:#fff;border:0;border-radius:8px;font-weight:700;font-size:14px;cursor:pointer;font-family:'Manrope'">Buscar</button>
+                </div>
+            </div>
+            <div style="overflow-x:auto">
+                <table style="width:100%;border-collapse:collapse;font-size:14px;table-layout:fixed;min-width:900px">
+                    <thead><tr style="border-bottom:1px solid #EFF0F6;background:#FAFAFC;color:#6B7085;font-family:'Manrope';font-weight:800;font-size:13px;text-transform:uppercase;letter-spacing:.5px">
+                        <th style="padding:14px 15px;text-align:left;width:9%">Visita</th><th style="padding:14px 15px;text-align:left;width:9%">Solicitud</th><th style="padding:14px 15px;text-align:left;width:18%">Cliente</th><th style="padding:14px 15px;text-align:left;width:18%">Servicio</th><th style="padding:14px 15px;text-align:left;width:17%">Fecha y horario</th><th style="padding:14px 15px;text-align:center;width:11%">Estado</th><th style="padding:14px 15px;text-align:left;width:11%">Técnico</th><th style="padding:14px 15px;text-align:right;width:7%">Acciones</th>
+                    </tr></thead>
+                    <tbody>
+                        @if (!VisitasFiltradas.Any())
+                        {
+                            <tr><td colspan="8" style="padding:32px;text-align:center;color:#6B7085">No se encontraron visitas eliminadas con esos filtros.</td></tr>
+                        }
+                        else
+                        {
+                            @foreach (var visita in VisitasFiltradas)
+                            {
+                                <tr style="border-bottom:1px solid #EFF0F6">
+                                    <td style="padding:15px;font-family:ui-monospace,Consolas,monospace;font-weight:700;color:#5B6173">@visita.Id.ToString("D4")</td>
+                                    <td style="padding:15px;color:#5B6173">#@visita.SolicitudId.ToString("D4")</td>
+                                    <td style="padding:15px;font-weight:700;color:#14162B">@visita.Solicitud?.Cliente?.Nombre</td>
+                                    <td style="padding:15px;color:#4A4E63">@visita.Solicitud?.Servicio?.Nombre</td>
+                                    <td style="padding:15px;color:#6B7085">@AppStateService.FormatFecha(visita.Fecha.ToString("yyyy-MM-dd"))<br/><span style="font-size:12px">@AppStateService.FormatHora12(visita.Hora) – @AppStateService.FormatHora12(visita.HoraFin)</span></td>
+                                    <td style="padding:15px;text-align:center"><div style="display:flex;flex-direction:column;align-items:center;gap:5px"><span style="display:inline-flex;padding:5px 9px;border-radius:999px;background:#F1F2F6;color:#4A4E63;font-size:12px;font-weight:700">@visita.Estado</span><span style="font-size:10px;font-weight:900;letter-spacing:.07em;color:#B42318">ELIMINADA</span></div></td>
+                                    <td style="padding:15px;color:#4A4E63">@(visita.Tecnico?.Nombre ?? "Sin asignar")</td>
+                                    <td style="padding:15px;text-align:right"><div style="display:flex;gap:7px;justify-content:flex-end">
+                                        <button @onclick="() => AbrirDetalleVisita(visita)" title="Ver detalle" aria-label="Ver detalle" style="@ActionButtonStyle"><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s3.5-6 10-6 10 6 10 6-3.5 6-10 6S2 12 2 12Z"/><circle cx="12" cy="12" r="3"/></svg></button>
+                                        <button @onclick="() => AbrirRecuperarVisita(visita)" title="Recuperar visita" aria-label="Recuperar visita" style="@ActionButtonStyle"><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 2.64-6.36L3 8"/><path d="M3 3v5h5"/><path d="M12 7v5l3 2"/></svg></button>
+                                    </div></td>
+                                </tr>
+                            }
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </section>
+    }
+}
+
+@if (SolicitudSeleccionada is not null && MostrarSolicitud)
+{
+    <div style="position:fixed;inset:0;background:rgba(14,16,40,.5);display:flex;align-items:center;justify-content:center;z-index:9999;padding:20px">
+        <section role="dialog" aria-modal="true" style="background:#fff;border-radius:16px;width:100%;max-width:620px;padding:30px;box-shadow:0 20px 40px rgba(0,0,0,.2)">
+            <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:16px;margin-bottom:20px"><div><h2 style="font-family:'Manrope';font-size:21px;font-weight:800;margin:0;color:#14162B">@(ModoRecuperarSolicitud ? "Recuperar solicitud" : "Detalle de solicitud eliminada")</h2><div style="color:#6B7085;font-size:13px;margin-top:4px">Solicitud #@SolicitudSeleccionada.Id.ToString("D4")</div></div><span style="padding:6px 10px;background:#FEE4E2;color:#B42318;border-radius:999px;font-size:11px;font-weight:900">ELIMINADA</span></div>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+                <div style="@DetailCellStyle"><small>Cliente</small><strong>@SolicitudSeleccionada.Cliente?.Nombre</strong></div>
+                <div style="@DetailCellStyle"><small>Contacto</small><strong>@SolicitudSeleccionada.Contacto</strong></div>
+                <div style="@DetailCellStyle"><small>Servicio</small><strong>@SolicitudSeleccionada.Servicio?.Nombre</strong></div>
+                <div style="@DetailCellStyle"><small>Fecha de solicitud</small><strong>@AppStateService.FormatFecha(SolicitudSeleccionada.FechaSolicitud.ToString("yyyy-MM-dd"))</strong></div>
+                <div style="@DetailCellStyle"><small>Dirección</small><strong>@SolicitudSeleccionada.Direccion</strong></div>
+                <div style="@DetailCellStyle"><small>Estado conservado</small><strong>@SolicitudSeleccionada.EstadoSolicitud?.Nombre</strong></div>
+                @if (SolicitudSeleccionada.Levantamiento is not null)
+                {
+                    <div style="@DetailCellStyle"><small>Levantamiento</small><strong>Información técnica conservada</strong></div>
+                }
+            </div>
+            <div style="display:flex;justify-content:flex-end;gap:10px;margin-top:22px;padding-top:17px;border-top:1px solid #EFF0F6">
+                <button @onclick="CerrarSolicitud" style="@SecondaryButtonStyle">Cancelar</button>
+                @if (ModoRecuperarSolicitud)
+                {
+                    <button @onclick="SolicitarConfirmacionSolicitud" style="@PrimaryButtonStyle">Recuperar solicitud</button>
+                }
+            </div>
+        </section>
+    </div>
+}
+
+@if (SolicitudEnConfirmacion && SolicitudSeleccionada is not null)
+{
+    <div style="position:fixed;inset:0;background:rgba(14,16,40,.58);display:flex;align-items:center;justify-content:center;z-index:10000;padding:20px">
+        <section role="alertdialog" aria-modal="true" style="background:#fff;border-radius:16px;width:100%;max-width:420px;padding:28px;box-shadow:0 20px 40px rgba(0,0,0,.24)">
+            <h2 style="font-family:'Manrope';font-weight:800;font-size:20px;margin:0 0 10px;color:#14162B">Confirmar recuperación</h2>
+            <p style="color:#4A4E63;font-size:14px;margin:0 0 22px">¿Deseas recuperar la solicitud #@SolicitudSeleccionada.Id.ToString("D4") de <strong>@SolicitudSeleccionada.Cliente?.Nombre</strong>? La solicitud y sus visitas eliminadas junto con ella volverán a estar disponibles.</p>
+            <div style="display:flex;justify-content:flex-end;gap:10px"><button @onclick="CancelarConfirmacionSolicitud" style="@SecondaryButtonStyle">Cancelar</button><button @onclick="RecuperarSolicitudAsync" style="@PrimaryButtonStyle">Sí, recuperar</button></div>
+        </section>
+    </div>
+}
+
+@if (VisitaSeleccionada is not null && MostrarVisita)
+{
+    <div style="position:fixed;inset:0;background:rgba(14,16,40,.5);display:flex;align-items:center;justify-content:center;z-index:9999;padding:20px">
+        <section role="dialog" aria-modal="true" style="background:#fff;border-radius:16px;width:100%;max-width:620px;padding:30px;box-shadow:0 20px 40px rgba(0,0,0,.2)">
+            <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:16px;margin-bottom:20px"><div><h2 style="font-family:'Manrope';font-size:21px;font-weight:800;margin:0;color:#14162B">@(ModoRecuperarVisita ? "Recuperar visita" : "Detalle de visita eliminada")</h2><div style="color:#6B7085;font-size:13px;margin-top:4px">Visita #@VisitaSeleccionada.Id.ToString("D4") · Solicitud #@VisitaSeleccionada.SolicitudId.ToString("D4")</div></div><span style="padding:6px 10px;background:#FEE4E2;color:#B42318;border-radius:999px;font-size:11px;font-weight:900">ELIMINADA</span></div>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+                <div style="@DetailCellStyle"><small>Cliente</small><strong>@VisitaSeleccionada.Solicitud?.Cliente?.Nombre</strong></div>
+                <div style="@DetailCellStyle"><small>Servicio</small><strong>@VisitaSeleccionada.Solicitud?.Servicio?.Nombre</strong></div>
+                <div style="@DetailCellStyle"><small>Fecha programada</small><strong>@AppStateService.FormatFecha(VisitaSeleccionada.Fecha.ToString("yyyy-MM-dd"))</strong></div>
+                <div style="@DetailCellStyle"><small>Horario</small><strong>@AppStateService.FormatHora12(VisitaSeleccionada.Hora) – @AppStateService.FormatHora12(VisitaSeleccionada.HoraFin)</strong></div>
+                <div style="@DetailCellStyle"><small>Estado conservado</small><strong>@VisitaSeleccionada.Estado</strong></div>
+                <div style="@DetailCellStyle"><small>Técnico asignado</small><strong>@(VisitaSeleccionada.Tecnico?.Nombre ?? "Sin asignar")</strong></div>
+                <div style="@DetailCellStyle"><small>Dirección</small><strong>@VisitaSeleccionada.Solicitud?.Direccion</strong></div>
+            </div>
+            <div style="display:flex;justify-content:flex-end;gap:10px;margin-top:22px;padding-top:17px;border-top:1px solid #EFF0F6">
+                <button @onclick="CerrarVisita" style="@SecondaryButtonStyle">Cancelar</button>
+                @if (ModoRecuperarVisita)
+                {
+                    <button @onclick="SolicitarConfirmacionVisita" style="@PrimaryButtonStyle">Recuperar visita</button>
+                }
+            </div>
+        </section>
+    </div>
+}
+
+@if (VisitaEnConfirmacion && VisitaSeleccionada is not null)
+{
+    <div style="position:fixed;inset:0;background:rgba(14,16,40,.58);display:flex;align-items:center;justify-content:center;z-index:10000;padding:20px">
+        <section role="alertdialog" aria-modal="true" style="background:#fff;border-radius:16px;width:100%;max-width:420px;padding:28px;box-shadow:0 20px 40px rgba(0,0,0,.24)">
+            <h2 style="font-family:'Manrope';font-weight:800;font-size:20px;margin:0 0 10px;color:#14162B">Confirmar recuperación</h2>
+            <p style="color:#4A4E63;font-size:14px;margin:0 0 22px">¿Deseas recuperar la visita de <strong>@VisitaSeleccionada.Solicitud?.Cliente?.Nombre</strong> programada para <strong>@AppStateService.FormatFecha(VisitaSeleccionada.Fecha.ToString("yyyy-MM-dd"))</strong>?</p>
+            <div style="display:flex;justify-content:flex-end;gap:10px"><button @onclick="CancelarConfirmacionVisita" style="@SecondaryButtonStyle">Cancelar</button><button @onclick="RecuperarVisitaAsync" style="@PrimaryButtonStyle">Sí, recuperar</button></div>
+        </section>
+    </div>
+}
+
+@code {
+    private const string ActionButtonStyle = "width:30px;height:30px;border:1px solid #D5D8E6;background:#fff;border-radius:7px;cursor:pointer;color:#5F6479;display:flex;align-items:center;justify-content:center;padding:0";
+    private const string DetailCellStyle = "background:#F7F8FC;border:1px solid #EFF0F6;border-radius:10px;padding:12px 14px;display:flex;flex-direction:column;gap:4px";
+    private const string SecondaryButtonStyle = "padding:10px 18px;border:1px solid #D5D8E6;background:#fff;border-radius:8px;font-weight:700;font-size:14px;cursor:pointer;color:#4A4E63";
+    private const string PrimaryButtonStyle = "padding:10px 20px;border:0;background:#1D4ED8;color:#fff;border-radius:8px;font-weight:700;font-size:14px;cursor:pointer;font-family:'Manrope'";
+
+    private string Vista = "Solicitudes";
+    private bool Cargando;
+    private bool MostrarSolicitud;
+    private bool ModoRecuperarSolicitud;
+    private bool SolicitudEnConfirmacion;
+    private bool MostrarVisita;
+    private bool ModoRecuperarVisita;
+    private bool VisitaEnConfirmacion;
+    private Solicitud? SolicitudSeleccionada;
+    private Visita? VisitaSeleccionada;
+    private List<Solicitud> SolicitudesEliminadas = new();
+    private List<Visita> VisitasEliminadas = new();
+    private string SearchSolicitudId = "";
+    private string SearchSolicitudCliente = "";
+    private string SearchSolicitudServicio = "";
+    private DateTime? SearchSolicitudFecha;
+    private string SearchSolicitudEstado = "";
+    private string SearchVisitaId = "";
+    private string SearchVisitaCliente = "";
+    private string SearchVisitaServicio = "";
+    private DateTime? SearchVisitaFecha;
+    private string SearchVisitaEstado = "";
+    private List<Solicitud> SolicitudesFiltradas = new();
+    private List<Visita> VisitasFiltradas = new();
+    private List<string> ServiciosSolicitud = new();
+    private List<string> EstadosSolicitud = new();
+    private List<string> ServiciosVisita = new();
+    private List<string> EstadosVisita = new();
+
+    protected override async Task OnInitializedAsync()
+    {
+        if (AppState.EsAdministrador)
+        {
+            await CargarDatosAsync();
+        }
+    }
+
+    private async Task CargarDatosAsync()
+    {
+        Cargando = true;
+        try
+        {
+            SolicitudesEliminadas = await SolicitudService.ObtenerEliminadasAsync();
+            VisitasEliminadas = await VisitaService.ObtenerEliminadasAsync();
+            ServiciosSolicitud = SolicitudesEliminadas.Select(s => s.Servicio?.Nombre).Where(n => !string.IsNullOrWhiteSpace(n)).Distinct().OrderBy(n => n).Select(n => n!).ToList();
+            EstadosSolicitud = SolicitudesEliminadas.Select(s => s.EstadoSolicitud?.Nombre).Where(n => !string.IsNullOrWhiteSpace(n)).Distinct().OrderBy(n => n).Select(n => n!).ToList();
+            ServiciosVisita = VisitasEliminadas.Select(v => v.Solicitud?.Servicio?.Nombre).Where(n => !string.IsNullOrWhiteSpace(n)).Distinct().OrderBy(n => n).Select(n => n!).ToList();
+            EstadosVisita = VisitasEliminadas.Select(v => v.Estado).Where(n => !string.IsNullOrWhiteSpace(n)).Distinct().OrderBy(n => n).Select(n => n!).ToList();
+            FiltrarSolicitudes();
+            FiltrarVisitas();
+        }
+        catch (Exception ex)
+        {
+            Logger.LogError(ex, "No se pudieron cargar los registros eliminados.");
+            ToastService.ShowError("Ocurrió un error al cargar los datos de recuperación.", "Error");
+        }
+        finally
+        {
+            Cargando = false;
+        }
+    }
+
+    private void CambiarVista(string vista) => Vista = vista;
+
+    private void FiltrarSolicitudes()
+    {
+        IEnumerable<Solicitud> resultado = SolicitudesEliminadas;
+        if (!string.IsNullOrWhiteSpace(SearchSolicitudId)) resultado = resultado.Where(s => s.Id.ToString("D4").Contains(SearchSolicitudId.Trim(), StringComparison.OrdinalIgnoreCase));
+        if (!string.IsNullOrWhiteSpace(SearchSolicitudCliente)) resultado = resultado.Where(s => (s.Cliente?.Nombre ?? "").Contains(SearchSolicitudCliente.Trim(), StringComparison.OrdinalIgnoreCase));
+        if (!string.IsNullOrWhiteSpace(SearchSolicitudServicio)) resultado = resultado.Where(s => s.Servicio?.Nombre == SearchSolicitudServicio);
+        if (SearchSolicitudFecha.HasValue) resultado = resultado.Where(s => s.FechaSolicitud.Date == SearchSolicitudFecha.Value.Date);
+        if (!string.IsNullOrWhiteSpace(SearchSolicitudEstado)) resultado = resultado.Where(s => s.EstadoSolicitud?.Nombre == SearchSolicitudEstado);
+        SolicitudesFiltradas = resultado.OrderBy(s => s.Id).ToList();
+    }
+
+    private void FiltrarVisitas()
+    {
+        IEnumerable<Visita> resultado = VisitasEliminadas;
+        if (!string.IsNullOrWhiteSpace(SearchVisitaId)) resultado = resultado.Where(v => v.Id.ToString("D4").Contains(SearchVisitaId.Trim(), StringComparison.OrdinalIgnoreCase));
+        if (!string.IsNullOrWhiteSpace(SearchVisitaCliente)) resultado = resultado.Where(v => (v.Solicitud?.Cliente?.Nombre ?? "").Contains(SearchVisitaCliente.Trim(), StringComparison.OrdinalIgnoreCase));
+        if (!string.IsNullOrWhiteSpace(SearchVisitaServicio)) resultado = resultado.Where(v => v.Solicitud?.Servicio?.Nombre == SearchVisitaServicio);
+        if (SearchVisitaFecha.HasValue) resultado = resultado.Where(v => v.Fecha.Date == SearchVisitaFecha.Value.Date);
+        if (!string.IsNullOrWhiteSpace(SearchVisitaEstado)) resultado = resultado.Where(v => v.Estado == SearchVisitaEstado);
+        VisitasFiltradas = resultado.OrderBy(v => v.Id).ToList();
+    }
+
+    private void AbrirDetalleSolicitud(Solicitud solicitud) { SolicitudSeleccionada = solicitud; ModoRecuperarSolicitud = false; MostrarSolicitud = true; }
+    private void AbrirRecuperarSolicitud(Solicitud solicitud) { SolicitudSeleccionada = solicitud; ModoRecuperarSolicitud = true; MostrarSolicitud = true; }
+    private void CerrarSolicitud() { MostrarSolicitud = false; SolicitudEnConfirmacion = false; SolicitudSeleccionada = null; }
+    private void SolicitarConfirmacionSolicitud() { MostrarSolicitud = false; SolicitudEnConfirmacion = true; }
+    private void CancelarConfirmacionSolicitud() { SolicitudEnConfirmacion = false; MostrarSolicitud = true; }
+
+    private async Task RecuperarSolicitudAsync()
+    {
+        if (!AppState.EsAdministrador || SolicitudSeleccionada is null) return;
+        var id = SolicitudSeleccionada.Id;
+        try
+        {
+            if (!await SolicitudService.RecuperarAsync(id))
+            {
+                ToastService.ShowWarning("La solicitud ya no está disponible para recuperar.", "Atención");
+                return;
+            }
+            SolicitudEnConfirmacion = false;
+            SolicitudSeleccionada = null;
+            await CargarDatosAsync();
+            ToastService.ShowSuccess("La solicitud y sus visitas recuperables volvieron a estar disponibles.", "Éxito");
+        }
+        catch (Exception ex)
+        {
+            Logger.LogError(ex, "No se pudo recuperar la solicitud {SolicitudId}.", id);
+            ToastService.ShowError("Ocurrió un error al recuperar la solicitud.", "Error");
+        }
+    }
+
+    private void AbrirDetalleVisita(Visita visita) { VisitaSeleccionada = visita; ModoRecuperarVisita = false; MostrarVisita = true; }
+    private void AbrirRecuperarVisita(Visita visita) { VisitaSeleccionada = visita; ModoRecuperarVisita = true; MostrarVisita = true; }
+    private void CerrarVisita() { MostrarVisita = false; VisitaEnConfirmacion = false; VisitaSeleccionada = null; }
+    private void SolicitarConfirmacionVisita() { MostrarVisita = false; VisitaEnConfirmacion = true; }
+    private void CancelarConfirmacionVisita() { VisitaEnConfirmacion = false; MostrarVisita = true; }
+
+    private async Task RecuperarVisitaAsync()
+    {
+        if (!AppState.EsAdministrador || VisitaSeleccionada is null) return;
+        var id = VisitaSeleccionada.Id;
+        try
+        {
+            if (!await VisitaService.RecuperarAsync(id))
+            {
+                ToastService.ShowWarning("La visita ya no está disponible para recuperar.", "Atención");
+                return;
+            }
+            VisitaEnConfirmacion = false;
+            VisitaSeleccionada = null;
+            await CargarDatosAsync();
+            ToastService.ShowSuccess("La visita volvió a estar disponible en la agenda y los levantamientos.", "Éxito");
+        }
+        catch (Exception ex)
+        {
+            Logger.LogError(ex, "No se pudo recuperar la visita {VisitaId}.", id);
+            ToastService.ShowError("Ocurrió un error al recuperar la visita.", "Error");
+        }
+    }
+}
