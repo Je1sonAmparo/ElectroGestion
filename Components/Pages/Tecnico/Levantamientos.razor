@@ -147,7 +147,7 @@ else
             <button @onclick="CancelarEdicionAsync" style="padding:9px 14px;border:1px solid #A79EEE;background:#fff;color:#1D4ED8;border-radius:8px;font-size:13px;font-weight:700;cursor:pointer">
                 Volver a levantamientos
             </button>
-            @if (CurrentSolicitud.EstadoSolicitud?.Nombre == "En Espera Administración")
+            @if (PuedeEditarSolicitud(CurrentSolicitud) && CurrentSolicitud.EstadoSolicitud?.Nombre == "En Espera Administración")
             {
                 <button @onclick="SolicitarEdicionEnviada" style="padding:9px 14px;border:0;background:#1D4ED8;color:#fff;border-radius:8px;font-size:13px;font-weight:700;cursor:pointer">
                     Editar información
@@ -414,6 +414,21 @@ else
 
     private bool HayCambiosSinGuardar => InitialSnapshot.Length > 0 && InitialSnapshot != CrearSnapshot();
 
+    private bool PuedeEditarSolicitud(ElectroGestion.Models.Solicitud solicitud)
+    {
+        if (AppState.EsGerente)
+        {
+            return true;
+        }
+
+        if (AppState.Session?.Rol != "Técnico")
+        {
+            return false;
+        }
+
+        return ObtenerVisita(solicitud.Id)?.TecnicoId == AppState.Session.Id;
+    }
+
     private IEnumerable<ElectroGestion.Models.Solicitud> FilteredSolicitudes => solicitudes.Where(s =>
     {
         var visita = ObtenerVisita(s.Id);
@@ -436,6 +451,10 @@ else
         if (AppState.EsGerente)
         {
             SearchEstado = "En Espera Administración";
+        }
+        else if (AppState.Session?.Rol == "Técnico")
+        {
+            SearchTecnicoId = AppState.Session.Id.ToString();
         }
 
         AplicarFiltros();
@@ -545,10 +564,15 @@ else
         }
     }
 
-    private static string TextoAccion(
+    private string TextoAccion(
         ElectroGestion.Models.Solicitud solicitud,
         ElectroGestion.Models.Levantamiento? levantamiento)
     {
+        if (!PuedeEditarSolicitud(solicitud))
+        {
+            return "Ver detalle";
+        }
+
         var estado = solicitud.EstadoSolicitud?.Nombre ?? "Pendiente";
         if (estado == "Pendiente")
         {
@@ -565,8 +589,9 @@ else
         ErrorMessage = null;
         FormMessage = null;
         var estado = solicitud.EstadoSolicitud?.Nombre ?? "Pendiente";
+        var puedeEditar = PuedeEditarSolicitud(solicitud);
 
-        if (estado is "Pendiente" or "En proceso")
+        if (puedeEditar && (estado is "Pendiente" or "En proceso"))
         {
             IsSaving = true;
             try
@@ -596,7 +621,7 @@ else
         }
 
         CurrentSolicitud = solicitud;
-        SoloLectura = solicitud.EstadoSolicitud?.Nombre is "En Espera Administración" or "Cancelada";
+        SoloLectura = !puedeEditar || (solicitud.EstadoSolicitud?.Nombre is "En Espera Administración" or "Cancelada");
         EditandoEnviado = false;
         await CargarFormularioAsync(solicitud.Levantamiento);
     }
@@ -621,7 +646,7 @@ else
 
     private async Task GuardarBorradorAsync()
     {
-        if (CurrentSolicitud is null || SoloLectura)
+        if (CurrentSolicitud is null || SoloLectura || !PuedeEditarSolicitud(CurrentSolicitud))
         {
             return;
         }
@@ -637,6 +662,12 @@ else
 
     private async Task GuardarBorradorYSalirAsync()
     {
+        if (CurrentSolicitud is null || SoloLectura || !PuedeEditarSolicitud(CurrentSolicitud))
+        {
+            MostrarConfirmacionCancelar = false;
+            return;
+        }
+
         MostrarConfirmacionCancelar = false;
         await GuardarDatosAsync();
         if (string.IsNullOrWhiteSpace(FormMessage))
@@ -649,7 +680,7 @@ else
 
     private async Task GuardarDatosAsync()
     {
-        if (CurrentSolicitud is null)
+        if (CurrentSolicitud is null || SoloLectura || !PuedeEditarSolicitud(CurrentSolicitud))
         {
             return;
         }
@@ -686,7 +717,7 @@ else
 
     private async Task GuardarCambiosEnviadosAsync()
     {
-        if (CurrentSolicitud is null || !EditandoEnviado)
+        if (CurrentSolicitud is null || SoloLectura || !PuedeEditarSolicitud(CurrentSolicitud) || !EditandoEnviado)
         {
             return;
         }
@@ -728,12 +759,24 @@ else
         }
     }
 
-    private void SolicitarEdicionEnviada() => MostrarConfirmacionEdicion = true;
+    private void SolicitarEdicionEnviada()
+    {
+        if (CurrentSolicitud is not null && PuedeEditarSolicitud(CurrentSolicitud))
+        {
+            MostrarConfirmacionEdicion = true;
+        }
+    }
 
     private void CerrarConfirmacionEdicion() => MostrarConfirmacionEdicion = false;
 
     private void ConfirmarEdicionEnviada()
     {
+        if (CurrentSolicitud is null || !PuedeEditarSolicitud(CurrentSolicitud))
+        {
+            MostrarConfirmacionEdicion = false;
+            return;
+        }
+
         MostrarConfirmacionEdicion = false;
         SoloLectura = false;
         EditandoEnviado = true;
@@ -744,6 +787,11 @@ else
 
     private void SolicitarEnvio()
     {
+        if (CurrentSolicitud is null || SoloLectura || !PuedeEditarSolicitud(CurrentSolicitud))
+        {
+            return;
+        }
+
         FormMessage = null;
         if (!ValidarCamposRequeridos())
         {
@@ -755,7 +803,7 @@ else
 
     private async Task ConfirmarEnvioAsync()
     {
-        if (CurrentSolicitud is null)
+        if (CurrentSolicitud is null || SoloLectura || !PuedeEditarSolicitud(CurrentSolicitud))
         {
             return;
         }
@@ -885,7 +933,7 @@ else
 
     private async Task AgregarFotosAsync(InputFileChangeEventArgs args)
     {
-        if (SoloLectura)
+        if (SoloLectura || CurrentSolicitud is null || !PuedeEditarSolicitud(CurrentSolicitud))
         {
             return;
         }
