@@ -290,8 +290,9 @@ public class VisitaService(IDbContextFactory<Contexto> contextFactory)
             return false;
         }
 
-        if (visita.Estado is "En proceso" or "En Espera Administración" or "Finalizada" ||
-            visita.Solicitud?.EstadoSolicitudId is 2 or 3 or 5)
+        var esCancelacionPendiente = visita.Estado == "Pendiente" && estado == "Cancelada";
+        var esReactivacionCancelada = visita.Estado == "Cancelada" && estado == "En proceso";
+        if (!esCancelacionPendiente && !esReactivacionCancelada)
         {
             return false;
         }
