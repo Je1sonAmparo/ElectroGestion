@@ -160,7 +160,7 @@
 
             AppState.Login(usuario);
             ToastService.Notify(new ToastMessage(ToastType.Primary, $"Bienvenido, {usuario.Nombre.Split(' ')[0]}."));
-            NavManager.NavigateTo("/");
+            NavManager.NavigateTo(AppState.EsAdministrador ? "/recuperacion" : "/");
         }
         catch (Exception ex)
         {
