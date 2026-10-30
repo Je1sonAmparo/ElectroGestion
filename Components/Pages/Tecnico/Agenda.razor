@@ -384,7 +384,7 @@
             </div>
 
             <div style="display:flex;justify-content:flex-end;gap:12px;margin-top:24px">
-                @if (Detalle?.Estado is "En proceso" or "En Espera Administración")
+                @if (!AppState.EsGerente && (Detalle?.Estado is "En proceso" or "En Espera Administración"))
                 {
                     <button disabled title="Las visitas en proceso o en espera de administración están protegidas" style="padding:10px 18px;border:1px solid #D5D8E6;background:#F7F8FC;border-radius:8px;font-weight:700;color:#8B90A3;cursor:not-allowed">Visita protegida</button>
                 }
@@ -866,6 +866,10 @@
 
     private static ColorScheme GetEventColorScheme(string estado, int? tecnicoId, string? tecnicoNombre)
     {
+        if (estado == "Pendiente")
+        {
+            return new ColorScheme("#FFFBEB", "#D97706", "#FDE68A", "#F7E7C9", "#B57A00");
+        }
         if (estado == "Cancelada")
         {
             return new ColorScheme("#FEF2F2", "#EF4444", "#FCA5A5", "#FEE2E2", "#991B1B");
@@ -1005,7 +1009,48 @@
         showReactivar = true;
     }
 
-    private void OpenEliminarModal() => showEliminar = true;
+    private void OpenEliminarModal()
+    {
+        if (Detalle is null)
+        {
+            return;
+        }
+
+        var motivo = ObtenerMotivoBloqueoEliminacion(Detalle.Id);
+        if (motivo is not null)
+        {
+            ToastService.ShowWarning($"No se puede eliminar esta visita porque {motivo}.", "Atención");
+            return;
+        }
+
+        showEliminar = true;
+    }
+
+    private string? ObtenerMotivoBloqueoEliminacion(int visitaId)
+    {
+        var visita = visitas.FirstOrDefault(v => v.Id == visitaId);
+        if (visita is null)
+        {
+            return null;
+        }
+
+        if (visita.Estado == "En proceso")
+        {
+            return "se encuentra en proceso";
+        }
+
+        if (visita.Estado == "En Espera Administración")
+        {
+            return "está en espera de administración";
+        }
+
+        return visita.Solicitud?.EstadoSolicitudId switch
+        {
+            2 => "la solicitud asociada se encuentra en proceso",
+            5 => "la solicitud asociada está en espera de administración",
+            _ => null
+        };
+    }
 
     private void CloseModals()
     {
@@ -1149,7 +1194,8 @@
         {
             if (!await VisitaService.EliminarAsync(visitaId))
             {
-                ToastService.ShowWarning("No se puede eliminar una visita En proceso o En Espera Administración.", "Atención");
+                var motivo = ObtenerMotivoBloqueoEliminacion(visitaId) ?? "la visita cambió de estado";
+                ToastService.ShowWarning($"No se puede eliminar esta visita porque {motivo}.", "Atención");
                 return;
             }
 
