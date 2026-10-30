@@ -83,7 +83,7 @@ El sistema está desarrollado sobre la plataforma .NET utilizando una arquitectu
 
 ## Modelo de Base de Datos
 
-La base de datos se encuentra normalizada (3FN). La estructura contempla la separación de números de contacto mediante la entidad `ClientesTelefonos`, catálogos para estados de solicitud y detalles desagregados de servicios por solicitud. Las visitas de la agenda se almacenan en `Visitas` y se relacionan con su solicitud, conservando su fecha, hora y estado de forma independiente.
+El modelo de Entity Framework Core contiene clientes, usuarios, servicios y estados de solicitud, además de las solicitudes y sus datos operativos. Los teléfonos se almacenan por separado en `ClientesTelefonos`; los servicios incluidos en cada solicitud se registran en `DetallesSolicitud`. Cada solicitud puede tener una visita y un levantamiento. Las solicitudes y visitas utilizan bajas lógicas para permitir su recuperación.
 
 ```mermaid
 erDiagram
@@ -94,6 +94,8 @@ erDiagram
     ESTADOS_SOLICITUD ||--o{ SOLICITUDES : "clasifica (1:N)"
     SOLICITUDES ||--o{ DETALLES_SOLICITUD : "contiene (1:N)"
     SOLICITUDES ||--o{ VISITAS : "programa (1:N)"
+    USUARIOS o|--o{ VISITAS : "técnico asignado (opcional)"
+    SOLICITUDES ||--o| LEVANTAMIENTOS : "tiene (0:1)"
 
     CLIENTES {
         int Id PK
@@ -128,13 +130,12 @@ erDiagram
 
     SOLICITUDES {
         int Id PK
+        boolean IsDeleted
         int ClienteId FK
         int ServicioId FK
         string Contacto
         string Direccion
         datetime FechaSolicitud
-        datetime Fecha
-        string Hora
         int EstadoSolicitudId FK
         string TecnicoAsignado
         datetime FechaFin
@@ -142,9 +143,13 @@ erDiagram
 
     VISITAS {
         int Id PK
+        boolean IsDeleted
+        boolean EliminadaPorSolicitud
         int SolicitudId FK
+        int TecnicoId FK
         datetime Fecha
         string Hora
+        string HoraFin
         string Estado
     }
 
@@ -156,12 +161,40 @@ erDiagram
         decimal Precio
         string Descripcion
     }
+
+    USUARIOS {
+        int Id PK
+        string UsuarioLogin UK
+        string PasswordHash
+        string Nombre
+        string Cargo
+        string Rol
+    }
+
+    LEVANTAMIENTOS {
+        int Id PK
+        int SolicitudId FK, UK
+        string DisponibilidadEspacios
+        string CargasElectricas
+        string EstabilidadTension
+        string RecorridoTuberias
+        string RecorridoCableado
+        string Observaciones
+        string FotografiasJson
+        boolean BorradorGuardado
+    }
 ```
 
+`Telefono` y `Telefono2` son propiedades de compatibilidad de `Cliente`; no son columnas, porque los números se guardan en `ClientesTelefonos`. `SolicitudId` es único en `Levantamientos`, por lo que cada solicitud tiene como máximo un levantamiento.
+
 ### Reglas de Integridad Referencial
-- **Clientes a Teléfonos:** Cascada (`Cascade`). Al eliminar un cliente, se eliminan sus teléfonos de contacto.
-- **Clientes / Servicios a Solicitudes:** Restricción (`Restrict`). No es posible eliminar un cliente o un servicio que tenga solicitudes registradas.
-- **Solicitudes a Detalles:** Cascada (`Cascade`). Al remover una solicitud, se eliminan sus renglones de detalle.
+- **Clientes a Teléfonos:** Cascada (`Cascade`).
+- **Clientes, servicios y estados a Solicitudes:** Restricción (`Restrict`) cuando existen solicitudes relacionadas.
+- **Solicitudes a Detalles:** Cascada (`Cascade`).
+- **Solicitudes a Visitas:** Restricción (`Restrict`) en la relación física. El flujo de la aplicación conserva los registros mediante baja lógica.
+- **Solicitudes a Levantamientos:** Cascada (`Cascade`) en la relación física; las consultas también excluyen levantamientos cuya solicitud está dada de baja.
+- **Usuarios a Visitas:** La asignación del técnico es opcional. Si se elimina el usuario, `TecnicoId` queda nulo (`SetNull`).
+- **Bajas lógicas:** `Solicitudes.IsDeleted` y `Visitas.IsDeleted` marcan los registros eliminados. Las visitas también guardan `EliminadaPorSolicitud` para distinguir las que se ocultaron al eliminar su solicitud. Los filtros globales de EF Core excluyen de las consultas normales las solicitudes, visitas, detalles y levantamientos vinculados a solicitudes eliminadas.
 
 ---
 
