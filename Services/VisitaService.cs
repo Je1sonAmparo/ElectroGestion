@@ -290,6 +290,12 @@ public class VisitaService(IDbContextFactory<Contexto> contextFactory)
             return false;
         }
 
+        if (visita.Estado is "En proceso" or "En Espera Administración" or "Finalizada" ||
+            visita.Solicitud?.EstadoSolicitudId is 2 or 3 or 5)
+        {
+            return false;
+        }
+
         if (visita.Solicitud is not null)
         {
             if (estado == "Cancelada")
