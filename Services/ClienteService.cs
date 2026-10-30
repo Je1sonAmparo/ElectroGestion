@@ -103,16 +103,36 @@ public class ClienteService(IDbContextFactory<Contexto> contextFactory) : Aplica
         try
         {
             await using var contexto = await contextFactory.CreateDbContextAsync();
-            var tieneSolicitudes = await contexto.Solicitudes.AnyAsync(s => s.ClienteId == id);
-            if (tieneSolicitudes)
+            await using var transaccion = await contexto.Database.BeginTransactionAsync();
+            var solicitudes = contexto.Solicitudes
+                .IgnoreQueryFilters()
+                .Where(s => s.ClienteId == id);
+            if (await solicitudes.AnyAsync(s => s.EstadoSolicitudId == 2 || s.EstadoSolicitudId == 5))
             {
                 return false;
             }
 
+            var solicitudIds = await solicitudes.Select(s => s.Id).ToListAsync();
+            if (solicitudIds.Count > 0)
+            {
+                await contexto.Visitas
+                    .IgnoreQueryFilters()
+                    .Where(v => solicitudIds.Contains(v.SolicitudId))
+                    .ExecuteDeleteAsync();
+                await solicitudes.ExecuteDeleteAsync();
+            }
+
             await contexto.ClientesTelefonos.Where(t => t.ClienteId == id).ExecuteDeleteAsync();
-            return await contexto.Clientes
+            var eliminado = await contexto.Clientes
                 .Where(c => c.Id == id)
                 .ExecuteDeleteAsync() > 0;
+            if (!eliminado)
+            {
+                return false;
+            }
+
+            await transaccion.CommitAsync();
+            return true;
         }
         catch
         {
