@@ -7,6 +7,7 @@ public class AppStateService
     public Usuario? Session { get; set; }
     public bool IsAuthenticated => Session != null;
     public bool EsGerente => Session?.Rol == "Gerente";
+    public bool EsAdministrador => Session?.Rol == "Admin";
 
     public List<Usuario> Usuarios { get; set; } = new();
     public List<Cliente> Clientes { get; set; } = new();

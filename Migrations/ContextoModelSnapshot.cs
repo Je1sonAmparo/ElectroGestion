@@ -620,6 +620,15 @@ namespace ElectroGestion.Migrations
                             PasswordHash = "AQAAAAIAAYagAAAAEAXFkAX9eqMt9778g9tjjfmZCQWcmM5qlxzOI9VP6eXkDBo7XL52AGtJ9CTZWHUm7g==",
                             Rol = "Técnico",
                             UsuarioLogin = "luis"
+                        },
+                        new
+                        {
+                            Id = 3,
+                            Cargo = "Administrador",
+                            Nombre = "Administrador",
+                            PasswordHash = "AQAAAAIAAYagAAAAEDlXkB6f7Cn7W7LhwqonLz2YWMWnkh0z783OtK2aOGgJYxTR1gP7p26z3JILLccOWQ==",
+                            Rol = "Admin",
+                            UsuarioLogin = "admin"
                         });
                 });
 
@@ -630,6 +639,9 @@ namespace ElectroGestion.Migrations
                         .HasColumnType("int");
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<bool>("EliminadaPorSolicitud")
+                        .HasColumnType("bit");
 
                     b.Property<string>("Estado")
                         .IsRequired()

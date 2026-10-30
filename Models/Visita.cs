@@ -8,6 +8,7 @@ public class Visita
     public int Id { get; set; }
 
     public bool IsDeleted { get; set; }
+    public bool EliminadaPorSolicitud { get; set; }
 
     public int SolicitudId { get; set; }
     public Solicitud? Solicitud { get; set; }

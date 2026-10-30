@@ -226,12 +226,16 @@
             </div>
 
             <div style="display:flex;justify-content:flex-end;gap:12px;margin-top:28px">
-                @if (FormId.HasValue)
+                @if (FormId.HasValue && PuedeEliminarSolicitud(FormId.Value))
                 {
                     <button @onclick="() => ConfirmarEliminar(FormId.Value)" style="padding:10px 18px;border:0;background:#DC2626;color:#fff;border-radius:8px;font-weight:700;font-size:14px;cursor:pointer;font-family:'Manrope';display:flex;align-items:center;gap:6px">
                         <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 6h18M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2M10 11v6M14 11v6"/></svg>
                         <span>Eliminar</span>
                     </button>
+                }
+                else if (FormId.HasValue)
+                {
+                    <span style="align-self:center;color:#B42318;font-size:12px;font-weight:700">No se puede eliminar mientras esté En proceso o En Espera Administración.</span>
                 }
                 <button @onclick="CloseModal" style="padding:10px 20px;border:1px solid #D5D8E6;background:#fff;border-radius:8px;font-weight:700;font-size:14px;cursor:pointer;color:#4A4E63">
                     Cancelar
@@ -393,9 +397,18 @@
 
     private void ConfirmarEliminar(int id)
     {
+        if (!PuedeEliminarSolicitud(id))
+        {
+            ToastService.ShowWarning("No se puede eliminar una solicitud En proceso o En Espera Administración.", "Atención");
+            return;
+        }
+
         DeleteId = id;
         IsDeleteModalOpen = true;
     }
+
+    private bool PuedeEliminarSolicitud(int id) =>
+        solicitudes.FirstOrDefault(s => s.Id == id)?.EstadoSolicitud?.Nombre is not ("En proceso" or "En Espera Administración");
 
     private async Task EjecutarEliminar()
     {
@@ -410,7 +423,7 @@
             }
             else
             {
-                ToastService.ShowError("Error al eliminar la solicitud.");
+                ToastService.ShowWarning("No se pudo eliminar. Las solicitudes En proceso o En Espera Administración están protegidas.", "Atención");
             }
         }
         IsDeleteModalOpen = false;

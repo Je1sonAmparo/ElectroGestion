@@ -92,7 +92,7 @@ public class SolicitudService(IDbContextFactory<Contexto> contextFactory) : Apli
     {
         await using var contexto = await contextFactory.CreateDbContextAsync();
         var solicitud = await contexto.Solicitudes.FirstOrDefaultAsync(s => s.Id == id);
-        if (solicitud is null)
+        if (solicitud is null || solicitud.EstadoSolicitudId is 2 or 5)
         {
             return false;
         }
@@ -101,12 +101,63 @@ public class SolicitudService(IDbContextFactory<Contexto> contextFactory) : Apli
             .IgnoreQueryFilters()
             .Where(v => v.SolicitudId == id)
             .ToListAsync();
+        if (visitas.Any(v => v.Estado is "En proceso" or "En Espera Administración"))
+        {
+            return false;
+        }
+
         foreach (var visita in visitas)
         {
-            visita.IsDeleted = true;
+            if (!visita.IsDeleted)
+            {
+                visita.IsDeleted = true;
+                visita.EliminadaPorSolicitud = true;
+            }
         }
 
         solicitud.IsDeleted = true;
         return await contexto.SaveChangesAsync() > 0;
+    }
+
+    public async Task<List<Solicitud>> ObtenerEliminadasAsync()
+    {
+        await using var contexto = await contextFactory.CreateDbContextAsync();
+        return await contexto.Solicitudes
+            .IgnoreQueryFilters()
+            .Where(s => s.IsDeleted)
+            .Include(s => s.Cliente)
+            .Include(s => s.Servicio)
+            .Include(s => s.EstadoSolicitud)
+            .Include(s => s.Detalles)
+            .Include(s => s.Levantamiento)
+            .AsNoTracking()
+            .OrderByDescending(s => s.Id)
+            .ToListAsync();
+    }
+
+    public async Task<bool> RecuperarAsync(int id)
+    {
+        await using var contexto = await contextFactory.CreateDbContextAsync();
+        var solicitud = await contexto.Solicitudes
+            .IgnoreQueryFilters()
+            .FirstOrDefaultAsync(s => s.Id == id && s.IsDeleted);
+        if (solicitud is null)
+        {
+            return false;
+        }
+
+        solicitud.IsDeleted = false;
+        var visitasEliminadasEnCascada = await contexto.Visitas
+            .IgnoreQueryFilters()
+            .Where(v => v.SolicitudId == id && v.EliminadaPorSolicitud)
+            .ToListAsync();
+        foreach (var visita in visitasEliminadasEnCascada)
+        {
+            visita.IsDeleted = false;
+            visita.EliminadaPorSolicitud = false;
+        }
+
+        await contexto.SaveChangesAsync();
+        return true;
     }
 }

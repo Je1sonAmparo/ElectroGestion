@@ -200,6 +200,14 @@ else
 
     private IEnumerable<NavItem> GetNavItems()
     {
+        if (AppState.EsAdministrador)
+        {
+            return new List<NavItem>
+            {
+                new("/recuperacion", "Recuperación", "M4 4h16v16H4z", "M9 14l-3 3 3 3 M6 17h7a5 5 0 1 0-5-5")
+            };
+        }
+
         if (AppState.EsGerente)
         {
             return new List<NavItem>

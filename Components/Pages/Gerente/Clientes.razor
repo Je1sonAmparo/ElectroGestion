@@ -309,7 +309,7 @@
             }
             else
             {
-                ToastService.ShowError("No se pudo eliminar el cliente. Verifique si tiene solicitudes asociadas.");
+                ToastService.ShowWarning("No se puede eliminar un cliente con solicitudes En proceso o En Espera Administración.", "Atención");
             }
         }
         IsDeleteModalOpen = false;

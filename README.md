@@ -27,6 +27,7 @@ La migración crea estos usuarios para iniciar sesión. Las contraseñas se alma
 | Gerente (Ana Hernández) | `ana` | `ana` |
 | Técnico (Luis Peña) | `luis` | `luis` |
 | Técnico (Carlos Méndez) | `carlos` | `carlos` |
+| Administrador (Recuperación) | `admin` | `admin` |
 
 Estas credenciales son únicamente para demostración; deben cambiarse antes de usar el sistema en producción.
 
