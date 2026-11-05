@@ -46,7 +46,7 @@ public class CobroService(IDbContextFactory<Contexto> factory, AppStateService a
         if (!appState.EsGerente || estado != "Finalizada") return false;
         await using var db = await factory.CreateDbContextAsync();
         var cobro = await db.Cobros.Include(c => c.OrdenTrabajo).FirstOrDefaultAsync(c => c.Id == id);
-        if (cobro is null) return false;
+        if (cobro is null || cobro.Estado is not ("Pendiente de cobro" or "Finalizada")) return false;
         cobro.Estado = estado;
         if (estado == "Finalizada" && cobro.OrdenTrabajo is not null)
         {
@@ -90,7 +90,7 @@ public class CobroService(IDbContextFactory<Contexto> factory, AppStateService a
         if (!appState.EsGerente) return false;
         await using var db = await factory.CreateDbContextAsync();
         var cobro = await db.Cobros.Include(c => c.OrdenTrabajo).FirstOrDefaultAsync(c => c.Id == id);
-        if (cobro is null) return false;
+        if (cobro is null || cobro.Estado is not ("Pendiente de cobro" or "Finalizada")) return false;
 
         if (cobro.Estado == "Finalizada" && cobro.OrdenTrabajo is not null)
         {
