@@ -260,10 +260,10 @@ public class Contexto : DbContext
 
         modelBuilder.Entity<Cliente>().HasData(
             new Cliente { Id = 1, Nombre = "Melody Santos", Correo = "melody@email.com", Rnc = "402-1234567-1", Direccion = "Calle Duarte #24, Santiago", Servicios = 8, Ultimo = "Instalación de Sistema UPS" },
-            new Cliente { Id = 2, Nombre = "Constructora López", Correo = "info@clopez.com", Rnc = "101-987654-2", Direccion = "Av. Estrella Sadhalá #102, Santiago", Servicios = 5, Ultimo = "Instalación Solar" },
-            new Cliente { Id = 3, Nombre = "Farmacia El Sol", Correo = "farmacia@elsol.do", Rnc = "130-334455-3", Direccion = "Calle 16 #7, La Vega", Servicios = 6, Ultimo = "Mantenimiento Eléctrico" },
-            new Cliente { Id = 4, Nombre = "Colmado Hernández", Correo = "hernandez@colmado.com", Rnc = "402-667788-4", Direccion = "Calle Principal #58, Moca", Servicios = 3, Ultimo = "Cableado Estructurado" },
-            new Cliente { Id = 5, Nombre = "Taller Mecánico RD", Correo = "taller@mecanicord.com", Rnc = "130-112233-5", Direccion = "Carretera Luperón km 5, Santiago", Servicios = 1, Ultimo = "Instalación de Planta Eléctrica" }
+            new Cliente { Id = 2, Nombre = "Constructora López", Correo = "info@clopez.com", Rnc = "101-98765-2", Direccion = "Av. Estrella Sadhalá #102, Santiago", Servicios = 5, Ultimo = "Instalación Solar" },
+            new Cliente { Id = 3, Nombre = "Farmacia El Sol", Correo = "farmacia@elsol.do", Rnc = "130-33445-3", Direccion = "Calle 16 #7, La Vega", Servicios = 6, Ultimo = "Mantenimiento Eléctrico" },
+            new Cliente { Id = 4, Nombre = "Colmado Hernández", Correo = "hernandez@colmado.com", Rnc = "402-6677884-1", Direccion = "Calle Principal #58, Moca", Servicios = 3, Ultimo = "Cableado Estructurado" },
+            new Cliente { Id = 5, Nombre = "Taller Mecánico RD", Correo = "taller@mecanicord.com", Rnc = "130-11223-5", Direccion = "Carretera Luperón km 5, Santiago", Servicios = 1, Ultimo = "Instalación de Planta Eléctrica" }
         );
 
         modelBuilder.Entity<ClienteTelefono>().HasData(
