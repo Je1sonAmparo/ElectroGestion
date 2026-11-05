@@ -8,7 +8,7 @@ public sealed record FilaConsumoServicio(string Servicio, decimal Materiales, de
     public decimal Total => Materiales + Consumibles;
 }
 
-public sealed record MesConsumoServicio(string Etiqueta, decimal Total);
+public sealed record MesConsumoServicio(string Servicio, int NumeroMes, string Etiqueta, decimal Total);
 
 public sealed record DatosReporteConsumo(IReadOnlyList<FilaConsumoServicio> Servicios, IReadOnlyList<MesConsumoServicio> Meses);
 
@@ -55,12 +55,13 @@ public class ReporteConsumoService(IDbContextFactory<Contexto> contextFactory)
             return new FilaConsumoServicio(nombre, valor.Materiales, 0m, valor.Instalaciones, riesgo);
         }).ToList();
 
-        var meses = Enumerable.Range(1, 12).Select(mes =>
+        var meses = filas.SelectMany(fila => Enumerable.Range(1, 12).Select(mes =>
         {
             var fecha = new DateTime(anio, mes, 1);
-            return new MesConsumoServicio(fecha.ToString("MMM", System.Globalization.CultureInfo.GetCultureInfo("es-DO")),
-                terminadas.Where(x => x.Fecha.Month == mes).Sum(x => x.Materiales));
-        }).ToList();
+            return new MesConsumoServicio(fila.Servicio, mes,
+                fecha.ToString("MMM", System.Globalization.CultureInfo.GetCultureInfo("es-DO")),
+                terminadas.Where(x => x.Servicio == fila.Servicio && x.Fecha.Month == mes).Sum(x => x.Materiales));
+        })).ToList();
 
         return new DatosReporteConsumo(filas, meses);
     }
