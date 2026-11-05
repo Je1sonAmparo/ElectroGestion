@@ -113,6 +113,45 @@ public class VentaService(IDbContextFactory<Contexto> factory, AppStateService a
         return await db.Ventas.Where(v => v.Id == id && v.Estado == Venta.Borrador).ExecuteDeleteAsync() == 1;
     }
 
+    public async Task<HashSet<int>> ObtenerElegiblesAsync(IEnumerable<int> ids)
+    {
+        var idList = ids.Distinct().ToList();
+        if (!appState.EsGerente || idList.Count == 0) return [];
+        await using var db = await factory.CreateDbContextAsync();
+        return (await db.Ventas.AsNoTracking()
+            .Where(v => idList.Contains(v.Id) && v.Estado == Venta.Borrador)
+            .Select(v => v.Id).ToListAsync()).ToHashSet();
+    }
+
+    public async Task<int> EliminarBorradoresAsync(IReadOnlyCollection<int> ids)
+    {
+        var idList = ids.Distinct().ToList();
+        if (!appState.EsGerente || idList.Count == 0) return 0;
+        await using var db = await factory.CreateDbContextAsync();
+        await using var transaccion = await db.Database.BeginTransactionAsync(IsolationLevel.Serializable);
+        try
+        {
+            var borradores = await db.Ventas.AsNoTracking()
+                .Where(v => idList.Contains(v.Id) && v.Estado == Venta.Borrador)
+                .Select(v => v.Id).ToListAsync();
+            if (borradores.Count == 0)
+            {
+                await transaccion.RollbackAsync();
+                return 0;
+            }
+            var eliminados = await db.Ventas
+                .Where(v => borradores.Contains(v.Id) && v.Estado == Venta.Borrador)
+                .ExecuteDeleteAsync();
+            await transaccion.CommitAsync();
+            return eliminados;
+        }
+        catch (Exception ex) when (ex is DbException or DbUpdateException)
+        {
+            await transaccion.RollbackAsync();
+            return 0;
+        }
+    }
+
     public async Task<bool> AnularAsync(int id)
     {
         if (!appState.EsGerente) return false;

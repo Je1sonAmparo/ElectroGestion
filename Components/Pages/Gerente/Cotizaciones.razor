@@ -20,7 +20,14 @@
         <div class="page-title" style="font-family:'Manrope';font-weight:800;font-size:31px;letter-spacing:-.6px">Cotizaciones</div>
         <div style="color:#6B7085;font-size:14.5px;margin-top:5px">Cotizaciones creadas a partir de levantamientos enviados a administración.</div>
     </div>
-    <button class="primary-btn" @onclick="AbrirNueva" style="padding:11px 20px;background:#1D4ED8;color:#fff;border:0;border-radius:9px;font-weight:700;font-size:14.5px;cursor:pointer;font-family:'Manrope'">Nueva Cotización</button>
+    <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;justify-content:flex-end">
+        <button @onclick="AlternarModoSeleccion" title="Seleccionar varias cotizaciones para eliminar"
+            style="padding:10px 16px 10px 14px;background:#fff;border:1px solid @(ModoSeleccion ? "#B42318" : "#D5D8E6");color:@(ModoSeleccion ? "#B42318" : "#4A4E63");border-radius:8px;font-weight:700;font-size:14px;cursor:pointer;font-family:'Manrope';white-space:nowrap;display:flex;align-items:center;gap:8px;transition:all .15s">
+            <svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="4"/><path d="m8.5 12.5 2.5 2.5 5-5.5"/></svg>
+            <span>@(ModoSeleccion ? "Salir de selección" : "Seleccionar")</span>
+        </button>
+        <button class="primary-btn" @onclick="AbrirNueva" style="padding:11px 20px;background:#1D4ED8;color:#fff;border:0;border-radius:9px;font-weight:700;font-size:14.5px;cursor:pointer;font-family:'Manrope'">Nueva Cotización</button>
+    </div>
 </div>
 
 <div style="background:#fff;border:1px solid #E3E5EE;border-radius:12px;overflow:hidden">
@@ -38,6 +45,25 @@
             <div style="margin-left:auto"><button @onclick="() => StateHasChanged()" style="padding:9px 20px;border:0;border-radius:7px;background:#1D4ED8;color:#fff;font-weight:700;cursor:pointer">Buscar</button></div>
         </div>
     </div>
+    @if (ModoSeleccion)
+    {
+        <div style="padding:10px 18px;display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:12px;background:#EFF6FF">
+            <div style="display:flex;align-items:center;gap:9px;font-size:13.5px;color:#1D4ED8;font-weight:700;flex-wrap:wrap">
+                <svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="4"/><path d="m8.5 12.5 2.5 2.5 5-5.5"/></svg>
+                <span>@(Seleccionadas.Count == 1 ? "1 cotización seleccionada" : $"{Seleccionadas.Count} cotizaciones seleccionadas")</span>
+                <span style="color:#6B7085;font-weight:500">· Haz clic en una fila para marcarla o desmarcarla</span>
+            </div>
+            <div style="display:flex;align-items:center;gap:10px">
+                <button @onclick="AlternarTodas" style="padding:8px 14px;border:1px solid #B6C8F5;background:#fff;color:#1D4ED8;border-radius:8px;font-weight:700;font-size:13px;cursor:pointer;font-family:'Manrope'">
+                    @(TodasMarcadas ? "Desmarcar todas" : "Marcar todas")
+                </button>
+                <button disabled="@(Seleccionadas.Count == 0)" @onclick="ConfirmarSeleccionadas" style="padding:8px 16px;border:0;background:@(Seleccionadas.Count == 0 ? "#F1A4A7" : "#C0392B");color:#fff;border-radius:8px;font-weight:700;font-size:13px;cursor:pointer;font-family:'Manrope';display:flex;align-items:center;gap:7px">
+                    <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 6h18M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2M10 11v6M14 11v6"/></svg>
+                    <span>Eliminar @(Seleccionadas.Count == 1 ? "(1)" : $"({Seleccionadas.Count})")</span>
+                </button>
+            </div>
+        </div>
+    }
     @if (Cargando)
     {
         <div style="padding:28px;text-align:center;color:#6B7085">Cargando cotizaciones...</div>
@@ -50,34 +76,34 @@
     {
         <div style="overflow-x:auto"><table style="width:100%;border-collapse:collapse;font-size:14px">
             <thead style="background:#F8F9FC"><tr>
-                <th style="padding:14px 18px;text-align:left">ID</th><th style="padding:14px 18px;text-align:left">Solicitud</th><th style="padding:14px 18px;text-align:left">Cliente</th><th style="padding:14px 18px;text-align:left">Servicio</th><th style="padding:14px 18px;text-align:left">Fecha</th><th style="padding:14px 18px;text-align:left">Monto</th><th style="padding:14px 18px;text-align:left">Estado</th><th style="padding:14px 18px;text-align:left">Seguimiento</th><th style="padding:14px 18px;text-align:center">Acciones</th>
+                <th style="padding:14px 18px;text-align:left">ID@if (ModoSeleccion) { <input type="checkbox" aria-label="Seleccionar todas las cotizaciones visibles que se pueden eliminar" checked="@TodasMarcadas" @onchange="e => SeleccionarTodas((bool)(e.Value ?? false))" @onclick:stopPropagation style="margin-left:5px" /> }</th><th style="padding:14px 18px;text-align:left">Solicitud</th><th style="padding:14px 18px;text-align:left">Cliente</th><th style="padding:14px 18px;text-align:left">Servicio</th><th style="padding:14px 18px;text-align:left">Fecha</th><th style="padding:14px 18px;text-align:left">Monto</th><th style="padding:14px 18px;text-align:left">Estado</th><th style="padding:14px 18px;text-align:left">Seguimiento</th><th style="padding:14px 18px;text-align:center">Acciones</th>
             </tr></thead><tbody>
                 @foreach (var cot in CotizacionesFiltradas)
                 {
                     var colores = Colores(cot.Estado);
-                    <tr style="border-top:1px solid #EFF0F6">
-                        <td style="padding:14px 18px">@cot.Id</td><td style="padding:14px 18px">@(cot.SolicitudId)</td><td style="padding:14px 18px">@cot.Cliente</td><td style="padding:14px 18px">@(cot.Solicitud?.Servicio?.Nombre ?? "—")</td><td style="padding:14px 18px">@cot.Fecha.ToString("dd/MM/yyyy")</td><td style="padding:14px 18px;font-weight:700">RD$ @cot.MontoTotal.ToString("N2")</td>
+                    <tr @onclick="@(() => FilaClicked(cot.Id))" style="border-top:1px solid #EFF0F6;transition:background 0.15s;background:@(ModoSeleccion && Seleccionadas.Contains(cot.Id) ? "#EFF6FF" : "transparent");cursor:@(ModoSeleccion ? "pointer" : "default")">
+                        <td style="padding:14px 18px">@if (ModoSeleccion) { <input type="checkbox" aria-label="Seleccionar cotización @cot.Id" checked="@Seleccionadas.Contains(cot.Id)" disabled="@(!PuedeEliminarCotizacion(cot.Id))" @onchange="e => CambiarSeleccion(cot.Id, (bool)(e.Value ?? false))" @onclick:stopPropagation style="margin-right:8px" /> } <span style="font-family:ui-monospace,'SFMono-Regular',Consolas,monospace;font-weight:700;color:@(ModoSeleccion && Seleccionadas.Contains(cot.Id) ? "#1D4ED8" : "#5B6173")">@cot.Id</span></td><td style="padding:14px 18px">@(cot.SolicitudId)</td><td style="padding:14px 18px">@cot.Cliente</td><td style="padding:14px 18px">@(cot.Solicitud?.Servicio?.Nombre ?? "—")</td><td style="padding:14px 18px">@cot.Fecha.ToString("dd/MM/yyyy")</td><td style="padding:14px 18px;font-weight:700">RD$ @cot.MontoTotal.ToString("N2")</td>
                         <td style="padding:14px 18px;min-width:155px"><span style="display:inline-block;white-space:nowrap;padding:4px 10px;border-radius:20px;font-size:12.5px;font-weight:700;background:@colores.Bg;color:@colores.Fg">@cot.Estado</span></td>
                         <td style="padding:14px 18px;font-size:12px;color:#6B7085">@if (cot.FechaEnvio.HasValue) { <div>Enviada: @cot.FechaEnvio.Value.ToString("dd/MM/yyyy HH:mm")</div> } @if (cot.FechaRespuesta.HasValue) { <div>Respuesta: @cot.FechaRespuesta.Value.ToString("dd/MM/yyyy HH:mm")</div> } @if (!string.IsNullOrWhiteSpace(cot.MotivoRechazo)) { <div title="@cot.MotivoRechazo">Motivo: @cot.MotivoRechazo</div> }</td>
                         <td style="padding:14px 18px;text-align:center"><div style="display:flex;gap:6px;justify-content:center;flex-wrap:wrap">
                             @if (cot.Estado == ElectroGestion.Services.CotizacionService.EnRevision)
                             {
-                                <button @onclick="() => Editar(cot)" style="padding:7px 11px;border:1px solid #D5D8E6;background:#fff;border-radius:7px;cursor:pointer">Editar detalle</button>
-                                <button @onclick='() => AbrirConfirmacion(cot.Id, "Enviada al cliente")' style="padding:7px 11px;border:0;background:#1D4ED8;color:#fff;border-radius:7px;cursor:pointer">Marcar enviada</button>
+                                <button @onclick="() => Editar(cot)" @onclick:stopPropagation style="padding:7px 11px;border:1px solid #D5D8E6;background:#fff;border-radius:7px;cursor:pointer">Editar detalle</button>
+                                <button @onclick='() => AbrirConfirmacion(cot.Id, "Enviada al cliente")' @onclick:stopPropagation style="padding:7px 11px;border:0;background:#1D4ED8;color:#fff;border-radius:7px;cursor:pointer">Marcar enviada</button>
                             }
                             else if (cot.Estado == "Enviada al cliente")
                             {
-                                <button @onclick='() => AbrirConfirmacion(cot.Id, "Aprobada")' style="padding:7px 11px;border:0;background:#059669;color:#fff;border-radius:7px;cursor:pointer">Aprobar</button>
-                                <button @onclick="() => AbrirRechazo(cot.Id)" style="padding:7px 11px;border:1px solid #F5C2C4;background:#fff;color:#C4141B;border-radius:7px;cursor:pointer">Rechazar</button>
+                                <button @onclick='() => AbrirConfirmacion(cot.Id, "Aprobada")' @onclick:stopPropagation style="padding:7px 11px;border:0;background:#059669;color:#fff;border-radius:7px;cursor:pointer">Aprobar</button>
+                                <button @onclick="() => AbrirRechazo(cot.Id)" @onclick:stopPropagation style="padding:7px 11px;border:1px solid #F5C2C4;background:#fff;color:#C4141B;border-radius:7px;cursor:pointer">Rechazar</button>
                             }
                             @if (cot.Estado == "Enviada al cliente")
-                            { <button @onclick='() => Transicionar(cot.Id, "En revisión")' style="padding:7px 11px;border:1px solid #D5D8E6;background:#fff;border-radius:7px;cursor:pointer">Volver a revisión</button> }
+                            { <button @onclick='() => Transicionar(cot.Id, "En revisión")' @onclick:stopPropagation style="padding:7px 11px;border:1px solid #D5D8E6;background:#fff;border-radius:7px;cursor:pointer">Volver a revisión</button> }
                             else if (cot.Estado == "Aprobada")
-                            { <button @onclick='() => Transicionar(cot.Id, "Enviada al cliente")' style="padding:7px 11px;border:1px solid #D5D8E6;background:#fff;border-radius:7px;cursor:pointer">Volver a enviada</button> }
+                            { <button @onclick='() => Transicionar(cot.Id, "Enviada al cliente")' @onclick:stopPropagation style="padding:7px 11px;border:1px solid #D5D8E6;background:#fff;border-radius:7px;cursor:pointer">Volver a enviada</button> }
                             else if (cot.Estado == "Rechazada")
-                            { <button @onclick='() => Transicionar(cot.Id, "En revisión")' style="padding:7px 11px;border:1px solid #D5D8E6;background:#fff;border-radius:7px;cursor:pointer">Volver a revisión</button> }
-                            @if (cot.Solicitud?.Levantamiento is not null) { <button @onclick="() => VerLevantamiento(cot.Solicitud)" style="padding:7px 11px;border:1px solid #D5D8E6;background:#fff;border-radius:7px;cursor:pointer">Levantamiento</button> }
-                            <button @onclick="() => VerCotizacion(cot)" style="padding:7px 11px;border:1px solid #D5D8E6;background:#fff;border-radius:7px;cursor:pointer">Detalle</button>
+                            { <button @onclick='() => Transicionar(cot.Id, "En revisión")' @onclick:stopPropagation style="padding:7px 11px;border:1px solid #D5D8E6;background:#fff;border-radius:7px;cursor:pointer">Volver a revisión</button> }
+                            @if (cot.Solicitud?.Levantamiento is not null) { <button @onclick="() => VerLevantamiento(cot.Solicitud)" @onclick:stopPropagation style="padding:7px 11px;border:1px solid #D5D8E6;background:#fff;border-radius:7px;cursor:pointer">Levantamiento</button> }
+                            <button @onclick="() => VerCotizacion(cot)" @onclick:stopPropagation style="padding:7px 11px;border:1px solid #D5D8E6;background:#fff;border-radius:7px;cursor:pointer">Detalle</button>
                         </div>
                         </td>
                     </tr>
@@ -144,13 +170,41 @@
 
 <CotizacionDocumento Cotizacion="CotizacionDetalleSeleccionada" OnClose="CerrarDetalle" OnDelete="SolicitarEliminacion" MostrarEliminar="true" />
 
-@if (CotizacionAEliminar.HasValue)
+@if (IsDeleteModalOpen)
 {
-    <div style="position:fixed;inset:0;background:rgba(20,22,43,.55);display:flex;align-items:center;justify-content:center;z-index:10003;padding:20px" @onclick="() => CotizacionAEliminar = null">
-        <div style="background:#fff;width:100%;max-width:430px;border-radius:14px;padding:24px" @onclick:stopPropagation>
-            <h3 style="margin:0 0 10px">Eliminar cotización</h3>
-            <p style="color:#4A4E63">¿Desea eliminar la cotización COT-@CotizacionAEliminar.Value.ToString("D5")? Esta acción no se puede deshacer.</p>
-            <div style="display:flex;justify-content:flex-end;gap:10px"><button @onclick="() => CotizacionAEliminar = null" style="padding:9px 14px;border:1px solid #D5D8E6;background:#fff;border-radius:8px;cursor:pointer">Cancelar</button><button @onclick="ConfirmarEliminacion" style="padding:9px 14px;border:0;background:#C4141B;color:#fff;border-radius:8px;cursor:pointer">Eliminar cotización</button></div>
+    <div style="position:fixed;inset:0;background:rgba(14,16,40,0.5);display:flex;align-items:center;justify-content:center;z-index:10003;padding:20px">
+        <div style="background:#fff;border-radius:14px;width:100%;max-width:430px;padding:30px;box-shadow:0 20px 40px rgba(0,0,0,0.2);animation:tin 0.2s ease-out">
+            <div style="font-family:'Manrope';font-weight:800;font-size:23px;color:#14162B;margin-bottom:12px">Eliminar @(DeleteIds.Count == 1 ? "cotización" : "cotizaciones")</div>
+            <div style="color:#4A4E63;font-size:14.5px;line-height:1.55">¿Está seguro que desea eliminar @(DeleteIds.Count == 1 ? "esta cotización" : $"estas {DeleteIds.Count} cotizaciones")? Esta acción no se puede deshacer.</div>
+            @if (DeleteIds.Count > 1)
+            {
+                <div style="background:#F9FAFB;border:1px solid #EFF0F6;border-radius:10px;max-height:200px;overflow:auto;margin-top:16px" class="resp-lista-eliminar">
+                    @foreach (var cot in CotizacionesAEliminar)
+                    {
+                        <div style="display:flex;align-items:center;gap:12px;padding:9px 14px;border-bottom:1px solid #EFF0F6">
+                            <span style="font-family:ui-monospace,'SFMono-Regular',Consolas,monospace;font-size:12.5px;font-weight:700;letter-spacing:.05em;color:#C0392B;background:#FDECEC;border-radius:6px;padding:2px 8px;flex-shrink:0">@cot.Id</span>
+                            <div style="min-width:0">
+                                <div style="font-size:13.5px;font-weight:700;color:#14162B;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">@cot.Cliente</div>
+                                <div style="font-size:12px;color:#6B7085;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">@(cot.Solicitud?.Servicio?.Nombre ?? "—") · @cot.Fecha.ToString("dd/MM/yyyy")</div>
+                            </div>
+                        </div>
+                    }
+                </div>
+            }
+            @if (Seleccionadas.Count > DeleteIds.Count)
+            {
+                <div style="background:#FFF7E6;border:1px solid #F5E2B8;border-radius:8px;padding:9px 12px;font-size:12.5px;color:#8A6100;margin-top:12px">
+                    Nota: se omitieron @(Seleccionadas.Count - DeleteIds.Count) cotización(es) protegidas (solicitud finalizada o vinculadas a una orden o a un cobro); no se pueden eliminar.
+                </div>
+            }
+            <div style="display:flex;justify-content:flex-end;gap:12px;margin-top:28px">
+                <button @onclick="CerrarEliminar" style="padding:11px 24px;border:1px solid #E3E5EE;background:#fff;border-radius:10px;font-weight:600;font-size:15px;cursor:pointer;color:#14162B;font-family:'Manrope'">
+                    Cancelar
+                </button>
+                <button @onclick="EjecutarEliminar" style="padding:11px 26px;border:0;background:#C0392B;color:#fff;border-radius:10px;font-weight:700;font-size:15px;cursor:pointer;font-family:'Manrope'">
+                    Eliminar
+                </button>
+            </div>
         </div>
     </div>
 }
@@ -229,7 +283,11 @@
     private int? CambioPendienteId;
     private string EstadoPendiente = "";
     private Cotizacion? CotizacionDetalleSeleccionada;
-    private int? CotizacionAEliminar;
+    private bool ModoSeleccion;
+    private HashSet<int> Seleccionadas = [];
+    private HashSet<int> DeleteIds = [];
+    private bool IsDeleteModalOpen;
+    private HashSet<int> ElegiblesCotizaciones = [];
     private Solicitud? SolicitudActual => LevantamientosPendientes.FirstOrDefault(s => s.Id == SolicitudSeleccionada);
     private IEnumerable<Cotizacion> CotizacionesFiltradas => CotizacionRows.Where(c =>
         (string.IsNullOrWhiteSpace(FiltroId) || c.Id.ToString().Contains(FiltroId.Trim(), StringComparison.OrdinalIgnoreCase)) &&
@@ -239,6 +297,13 @@
         (!FiltroDesde.HasValue || c.Fecha.Date >= FiltroDesde.Value.Date) &&
         (!FiltroHasta.HasValue || c.Fecha.Date <= FiltroHasta.Value.Date) &&
         (string.IsNullOrWhiteSpace(EstadoFiltro) || c.Estado == EstadoFiltro));
+    private IEnumerable<int> ElegiblesVisibles => CotizacionesFiltradas.Where(c => PuedeEliminarCotizacion(c.Id)).Select(c => c.Id);
+    private bool TodasMarcadas => ElegiblesVisibles.Any() && ElegiblesVisibles.All(Seleccionadas.Contains);
+    private List<Cotizacion> CotizacionesAEliminar => DeleteIds
+        .Select(id => CotizacionRows.FirstOrDefault(c => c.Id == id))
+        .Where(c => c != null)
+        .Cast<Cotizacion>()
+        .ToList();
 
     protected override async Task OnInitializedAsync()
     {
@@ -255,6 +320,8 @@
             CotizacionRows = await CotizacionService.ObtenerTodasAsync();
             LevantamientosPendientes = await CotizacionService.ObtenerLevantamientosPendientesAsync();
             AppState.Inventario = await InventarioService.ObtenerTodosAsync();
+            ElegiblesCotizaciones = await CotizacionService.ObtenerElegiblesAsync(CotizacionRows.Select(c => c.Id));
+            Seleccionadas.IntersectWith(CotizacionRows.Select(c => c.Id));
         }
         catch (Exception)
         {
@@ -368,37 +435,72 @@
     }
     private void VerCotizacion(Cotizacion cotizacion) => CotizacionDetalleSeleccionada = cotizacion;
     private void CerrarDetalle() => CotizacionDetalleSeleccionada = null;
-    private void SolicitarEliminacion(int id) => CotizacionAEliminar = id;
-    private async Task ConfirmarEliminacion()
+    private void SolicitarEliminacion(int id)
     {
-        if (!CotizacionAEliminar.HasValue) return;
-        var id = CotizacionAEliminar.Value;
-        CotizacionAEliminar = null;
-        var resultado = await CotizacionService.EliminarAsync(id);
-        if (resultado == ElectroGestion.Services.ResultadoEliminarCotizacion.VinculadaAOrden)
+        DeleteIds = [id];
+        IsDeleteModalOpen = true;
+    }
+
+    private bool PuedeEliminarCotizacion(int id) => ElegiblesCotizaciones.Contains(id);
+
+    private void AlternarModoSeleccion()
+    {
+        ModoSeleccion = !ModoSeleccion;
+        if (!ModoSeleccion) Seleccionadas.Clear();
+    }
+
+    private void FilaClicked(int id)
+    {
+        if (!ModoSeleccion) return;
+        if (!PuedeEliminarCotizacion(id))
         {
-            ToastService.Notify(new ToastMessage(ToastType.Warning, "No se puede eliminar: la cotización tiene una orden de trabajo vinculada."));
+            ToastService.Notify(new ToastMessage(ToastType.Warning, "Esta cotización está protegida (solicitud finalizada o vinculada a una orden o a un cobro) y no se puede eliminar."));
             return;
         }
-        if (resultado == ElectroGestion.Services.ResultadoEliminarCotizacion.VinculadaACobro)
+        CambiarSeleccion(id, !Seleccionadas.Contains(id));
+    }
+
+    private void CambiarSeleccion(int id, bool marcado) { if (marcado && PuedeEliminarCotizacion(id)) Seleccionadas.Add(id); else Seleccionadas.Remove(id); }
+    private void SeleccionarTodas(bool marcado) { foreach (var id in ElegiblesVisibles) { if (marcado) Seleccionadas.Add(id); else Seleccionadas.Remove(id); } }
+    private void AlternarTodas() => SeleccionarTodas(!TodasMarcadas);
+
+    private void ConfirmarSeleccionadas()
+    {
+        DeleteIds = Seleccionadas.Where(PuedeEliminarCotizacion).ToHashSet();
+        IsDeleteModalOpen = DeleteIds.Count > 0;
+    }
+
+    private void CerrarEliminar()
+    {
+        IsDeleteModalOpen = false;
+        DeleteIds.Clear();
+    }
+
+    private async Task EjecutarEliminar()
+    {
+        if (DeleteIds.Count > 0)
         {
-            ToastService.Notify(new ToastMessage(ToastType.Warning, "No se puede eliminar una cotización que ya tiene un cobro asociado."));
-            return;
+            var idDetalle = CotizacionDetalleSeleccionada?.Id;
+            var eliminadas = await CotizacionService.EliminarVariosAsync(DeleteIds);
+            if (eliminadas > 0)
+            {
+                ToastService.Notify(new ToastMessage(ToastType.Success, eliminadas == 1 ? "Cotización eliminada correctamente." : $"{eliminadas} cotizaciones eliminadas correctamente."));
+                await Recargar();
+                Seleccionadas.Clear();
+                ModoSeleccion = false;
+                if (idDetalle.HasValue && DeleteIds.Contains(idDetalle.Value))
+                {
+                    CotizacionDetalleSeleccionada = null;
+                    if (DetalleId == idDetalle.Value) Nav.NavigateTo("/cotizaciones", replace: true);
+                }
+            }
+            else
+            {
+                ToastService.Notify(new ToastMessage(ToastType.Warning, "No se pudo eliminar. Las cotizaciones seleccionadas están protegidas (solicitud finalizada o vinculadas a una orden o a un cobro)."));
+            }
         }
-        if (resultado == ElectroGestion.Services.ResultadoEliminarCotizacion.SolicitudFinalizada)
-        {
-            ToastService.Notify(new ToastMessage(ToastType.Warning, "No se puede eliminar una cotización vinculada a una solicitud finalizada."));
-            return;
-        }
-        if (resultado != ElectroGestion.Services.ResultadoEliminarCotizacion.Eliminada)
-        {
-            ToastService.Notify(new ToastMessage(ToastType.Warning, "La cotización ya no existe."));
-            return;
-        }
-        CotizacionDetalleSeleccionada = null;
-        ToastService.Notify(new ToastMessage(ToastType.Success, "Cotización eliminada."));
-        await Recargar();
-        if (DetalleId == id) Nav.NavigateTo("/cotizaciones", replace: true);
+        IsDeleteModalOpen = false;
+        DeleteIds.Clear();
     }
     private static DetalleCotizacion CopiarLinea(DetalleCotizacion d) => new() { ArticuloInventarioId = d.ArticuloInventarioId, CodigoArticulo = d.CodigoArticulo, NombreArticulo = d.NombreArticulo, Cantidad = d.Cantidad, PrecioUnitario = d.PrecioUnitario };
     private void CerrarModal() => ModalAbierto = false;

@@ -99,44 +99,74 @@ public class ClienteService(IDbContextFactory<Contexto> contextFactory) : Aplica
     }
 
     public async Task<bool> Eliminar(int id)
+        => await EliminarVarios([id]) == 1;
+
+    public async Task<HashSet<int>> ObtenerElegiblesAsync(IEnumerable<int> ids)
     {
+        var listaIds = ids.Distinct().ToList();
+        if (listaIds.Count == 0) return [];
+
+        await using var contexto = await contextFactory.CreateDbContextAsync();
+        var protegidos = await contexto.Solicitudes
+            .IgnoreQueryFilters()
+            .Where(s => listaIds.Contains(s.ClienteId) && (s.EstadoSolicitudId == 2 || s.EstadoSolicitudId == 5))
+            .Select(s => s.ClienteId)
+            .ToListAsync();
+
+        return listaIds.Except(protegidos).ToHashSet();
+    }
+
+    public async Task<int> EliminarVarios(IReadOnlyCollection<int> ids)
+    {
+        if (ids.Count == 0 || ids.Count != ids.Distinct().Count()) return 0;
+
         try
         {
             await using var contexto = await contextFactory.CreateDbContextAsync();
             await using var transaccion = await contexto.Database.BeginTransactionAsync();
-            var solicitudes = contexto.Solicitudes
+
+            var protegidos = await contexto.Solicitudes
                 .IgnoreQueryFilters()
-                .Where(s => s.ClienteId == id);
-            if (await solicitudes.AnyAsync(s => s.EstadoSolicitudId == 2 || s.EstadoSolicitudId == 5))
+                .Where(s => ids.Contains(s.ClienteId) && (s.EstadoSolicitudId == 2 || s.EstadoSolicitudId == 5))
+                .Select(s => s.ClienteId)
+                .ToListAsync();
+            var elegibles = ids.Except(protegidos).ToList();
+            if (elegibles.Count == 0)
             {
-                return false;
+                await transaccion.RollbackAsync();
+                return 0;
             }
 
-            var solicitudIds = await solicitudes.Select(s => s.Id).ToListAsync();
+            var solicitudIds = await contexto.Solicitudes
+                .IgnoreQueryFilters()
+                .Where(s => elegibles.Contains(s.ClienteId))
+                .Select(s => s.Id)
+                .ToListAsync();
             if (solicitudIds.Count > 0)
             {
                 await contexto.Visitas
                     .IgnoreQueryFilters()
                     .Where(v => solicitudIds.Contains(v.SolicitudId))
                     .ExecuteDeleteAsync();
-                await solicitudes.ExecuteDeleteAsync();
+                await contexto.Solicitudes
+                    .IgnoreQueryFilters()
+                    .Where(s => solicitudIds.Contains(s.Id))
+                    .ExecuteDeleteAsync();
             }
 
-            await contexto.ClientesTelefonos.Where(t => t.ClienteId == id).ExecuteDeleteAsync();
-            var eliminado = await contexto.Clientes
-                .Where(c => c.Id == id)
-                .ExecuteDeleteAsync() > 0;
-            if (!eliminado)
-            {
-                return false;
-            }
+            await contexto.ClientesTelefonos
+                .Where(t => elegibles.Contains(t.ClienteId))
+                .ExecuteDeleteAsync();
+            var eliminados = await contexto.Clientes
+                .Where(c => elegibles.Contains(c.Id))
+                .ExecuteDeleteAsync();
 
             await transaccion.CommitAsync();
-            return true;
+            return elegibles.Count;
         }
         catch
         {
-            return false;
+            return 0;
         }
     }
 }

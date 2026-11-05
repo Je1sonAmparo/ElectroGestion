@@ -169,17 +169,63 @@ public class CotizacionService(IDbContextFactory<Contexto> contextFactory)
         await using var db = await contextFactory.CreateDbContextAsync();
         var cotizacion = await db.Cotizaciones.FindAsync(id);
         if (cotizacion is null) return ResultadoEliminarCotizacion.NoEncontrada;
-        if (cotizacion.SolicitudDbId.HasValue && await SolicitudFinalizadaAsync(db, cotizacion.SolicitudDbId.Value))
-            return ResultadoEliminarCotizacion.SolicitudFinalizada;
-        if (await db.OrdenesTrabajo.AnyAsync(o => o.CotizacionId == id))
-            return ResultadoEliminarCotizacion.VinculadaAOrden;
-        if (await db.Cobros.AnyAsync(c => c.CotizacionId == id))
-            return ResultadoEliminarCotizacion.VinculadaACobro;
+        var resultado = await EvaluarGuardasAsync(db, cotizacion);
+        if (resultado != ResultadoEliminarCotizacion.Eliminada) return resultado;
 
         if (cotizacion.SolicitudDbId.HasValue)
             RegistroEventosSolicitud.Agregar(db, cotizacion.SolicitudDbId.Value, "Cotización eliminada", "Se eliminó la cotización vinculada.");
         db.Cotizaciones.Remove(cotizacion);
         await db.SaveChangesAsync();
+        return ResultadoEliminarCotizacion.Eliminada;
+    }
+
+    public async Task<int> EliminarVariosAsync(IReadOnlyCollection<int> ids)
+    {
+        if (ids.Count == 0 || ids.Count != ids.Distinct().Count()) return 0;
+        await using var db = await contextFactory.CreateDbContextAsync();
+        await using var transaccion = await db.Database.BeginTransactionAsync();
+        var cotizaciones = await db.Cotizaciones.Where(c => ids.Contains(c.Id)).ToListAsync();
+        var elegibles = new List<Cotizacion>();
+        foreach (var cotizacion in cotizaciones)
+        {
+            if (await EvaluarGuardasAsync(db, cotizacion) == ResultadoEliminarCotizacion.Eliminada)
+                elegibles.Add(cotizacion);
+        }
+
+        foreach (var cotizacion in elegibles)
+        {
+            if (cotizacion.SolicitudDbId.HasValue)
+                RegistroEventosSolicitud.Agregar(db, cotizacion.SolicitudDbId.Value, "Cotización eliminada", "Se eliminó la cotización vinculada.");
+            db.Cotizaciones.Remove(cotizacion);
+        }
+        await db.SaveChangesAsync();
+        await transaccion.CommitAsync();
+        return elegibles.Count;
+    }
+
+    public async Task<HashSet<int>> ObtenerElegiblesAsync(IEnumerable<int> ids)
+    {
+        var idsSolicitud = ids.Distinct().ToList();
+        if (idsSolicitud.Count == 0) return [];
+        await using var db = await contextFactory.CreateDbContextAsync();
+        var cotizaciones = await db.Cotizaciones.AsNoTracking().Where(c => idsSolicitud.Contains(c.Id)).ToListAsync();
+        var elegibles = new HashSet<int>();
+        foreach (var cotizacion in cotizaciones)
+        {
+            if (await EvaluarGuardasAsync(db, cotizacion) == ResultadoEliminarCotizacion.Eliminada)
+                elegibles.Add(cotizacion.Id);
+        }
+        return elegibles;
+    }
+
+    private static async Task<ResultadoEliminarCotizacion> EvaluarGuardasAsync(Contexto db, Cotizacion cotizacion)
+    {
+        if (cotizacion.SolicitudDbId.HasValue && await SolicitudFinalizadaAsync(db, cotizacion.SolicitudDbId.Value))
+            return ResultadoEliminarCotizacion.SolicitudFinalizada;
+        if (await db.OrdenesTrabajo.AnyAsync(o => o.CotizacionId == cotizacion.Id))
+            return ResultadoEliminarCotizacion.VinculadaAOrden;
+        if (await db.Cobros.AnyAsync(c => c.CotizacionId == cotizacion.Id))
+            return ResultadoEliminarCotizacion.VinculadaACobro;
         return ResultadoEliminarCotizacion.Eliminada;
     }
 

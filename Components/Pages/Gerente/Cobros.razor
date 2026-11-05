@@ -9,7 +9,7 @@
     .abono-accion{width:32px;height:32px;display:inline-flex;align-items:center;justify-content:center;border:1px solid #D5D8E6;border-radius:7px;background:#fff;color:#4A4E63;cursor:pointer}.abono-accion:hover{background:#F7F8FC}.abono-accion.eliminar{color:#C4141B;border-color:#F5C2C4}
 </style>
 
-<div style="display:flex;align-items:flex-start;justify-content:space-between;gap:20px;margin-bottom:24px;flex-wrap:wrap"><div><div class="page-title" style="font-family:'Manrope';font-weight:800;font-size:31px;letter-spacing:-.6px">Cobros</div><div style="color:#6B7085;font-size:14.5px;margin-top:5px">Registra abonos de cotizaciones aprobadas y consulta sus saldos.</div></div><button @onclick="AbrirNuevo" style="padding:11px 20px;background:#1D4ED8;color:#fff;border:0;border-radius:9px;font-weight:700;cursor:pointer">+ Nuevo cobro</button></div>
+<div style="display:flex;align-items:flex-start;justify-content:space-between;gap:20px;margin-bottom:24px;flex-wrap:wrap"><div><div class="page-title" style="font-family:'Manrope';font-weight:800;font-size:31px;letter-spacing:-.6px">Cobros</div><div style="color:#6B7085;font-size:14.5px;margin-top:5px">Registra abonos de cotizaciones aprobadas y consulta sus saldos.</div></div><div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;justify-content:flex-end"><button @onclick="AlternarModoSeleccion" title="Seleccionar varios cobros para eliminar" style="padding:10px 16px 10px 14px;background:#fff;border:1px solid @(ModoSeleccion ? "#B42318" : "#D5D8E6");color:@(ModoSeleccion ? "#B42318" : "#4A4E63");border-radius:8px;font-weight:700;font-size:14px;cursor:pointer;font-family:'Manrope';white-space:nowrap;display:flex;align-items:center;gap:8px;transition:all .15s"><svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="4"/><path d="m8.5 12.5 2.5 2.5 5-5.5"/></svg><span>@(ModoSeleccion ? "Salir de selección" : "Seleccionar")</span></button><button @onclick="AbrirNuevo" style="padding:11px 20px;background:#1D4ED8;color:#fff;border:0;border-radius:9px;font-weight:700;cursor:pointer">+ Nuevo cobro</button></div></div>
 
 <div style="background:#fff;border:1px solid #E3E5EE;border-radius:12px;overflow:hidden;margin-bottom:18px"><div class="cobros-filtros"><div class="cobros-fila">
     <div class="cobro-filtro"><label for="cobro-id">ID:</label><input id="cobro-id" @bind="FiltroId" @bind:event="oninput" placeholder="ID" style="width:120px" /></div>
@@ -18,10 +18,29 @@
     <div class="cobro-filtro"><label for="cobro-estado">Estado:</label><select id="cobro-estado" @bind="FiltroEstado" style="width:170px"><option value="">Todos</option><option value="Pendiente de cobro">Pendiente de cobro</option><option>Finalizada</option></select></div>
     <button @onclick="() => StateHasChanged()" style="margin-left:auto;padding:9px 20px;border:0;border-radius:7px;background:#1D4ED8;color:#fff;font-weight:700;cursor:pointer">Buscar</button>
 </div></div>
-<div style="overflow-x:auto"><table class="cobro-tabla" style="width:100%;border-collapse:collapse;font-size:14px"><thead><tr><th>ID</th><th>Solicitud</th><th>Cliente</th><th>Factura</th><th>Fecha</th><th>Método reciente</th><th class="num">Total</th><th class="num">Pagado</th><th class="num">Saldo</th><th>Estado</th><th style="text-align:center">Acciones</th></tr></thead><tbody>
+@if (ModoSeleccion)
+{
+    <div style="padding:10px 18px;display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:12px;background:#EFF6FF">
+        <div style="display:flex;align-items:center;gap:9px;font-size:13.5px;color:#1D4ED8;font-weight:700;flex-wrap:wrap">
+            <svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="4"/><path d="m8.5 12.5 2.5 2.5 5-5.5"/></svg>
+            <span>@(Seleccionadas.Count == 1 ? "1 cobro seleccionado" : $"{Seleccionadas.Count} cobros seleccionados")</span>
+            <span style="color:#6B7085;font-weight:500">· Haz clic en una fila para marcarla o desmarcarla</span>
+        </div>
+        <div style="display:flex;align-items:center;gap:10px">
+            <button @onclick="AlternarTodas" style="padding:8px 14px;border:1px solid #B6C8F5;background:#fff;color:#1D4ED8;border-radius:8px;font-weight:700;font-size:13px;cursor:pointer;font-family:'Manrope'">
+                @(TodasMarcadas ? "Desmarcar todas" : "Marcar todas")
+            </button>
+            <button disabled="@(Seleccionadas.Count == 0)" @onclick="ConfirmarSeleccionadas" style="padding:8px 16px;border:0;background:@(Seleccionadas.Count == 0 ? "#F1A4A7" : "#C0392B");color:#fff;border-radius:8px;font-weight:700;font-size:13px;cursor:pointer;font-family:'Manrope';display:flex;align-items:center;gap:7px">
+                <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 6h18M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2M10 11v6M14 11v6"/></svg>
+                <span>Eliminar @(Seleccionadas.Count == 1 ? "(1)" : $"({Seleccionadas.Count})")</span>
+            </button>
+        </div>
+    </div>
+}
+<div style="overflow-x:auto"><table class="cobro-tabla" style="width:100%;border-collapse:collapse;font-size:14px"><thead><tr><th>ID@if (ModoSeleccion) { <input type="checkbox" aria-label="Seleccionar todos los cobros visibles que se pueden eliminar" checked="@TodasMarcadas" @onchange="e => SeleccionarTodas((bool)(e.Value ?? false))" @onclick:stopPropagation style="margin-left:5px" /> }</th><th>Solicitud</th><th>Cliente</th><th>Factura</th><th>Fecha</th><th>Método reciente</th><th class="num">Total</th><th class="num">Pagado</th><th class="num">Saldo</th><th>Estado</th><th style="text-align:center">Acciones</th></tr></thead><tbody>
 @if (Cargando) { <tr><td colspan="11" style="padding:25px;text-align:center">Cargando cobros...</td></tr> }
 else if (!Filtrados.Any()) { <tr><td colspan="11" style="padding:25px;text-align:center;color:#6B7085">No hay cobros para los filtros seleccionados.</td></tr> }
-else { @foreach (var cobro in Filtrados) { var (bg, fg) = ElectroGestion.Services.AppStateService.GetBadgeColors(cobro.Estado); <tr><td>@cobro.Id</td><td>@(cobro.Cotizacion?.SolicitudId ?? "—")</td><td>@cobro.Cliente</td><td>@cobro.FacturaId</td><td>@cobro.Fecha.ToString("dd/MM/yyyy")</td><td>@(string.IsNullOrWhiteSpace(cobro.MetodoPago) ? "—" : cobro.MetodoPago)</td><td class="num">RD$ @cobro.Monto.ToString("N2")</td><td class="num">RD$ @cobro.MontoPagado.ToString("N2")</td><td class="num">RD$ @cobro.SaldoPendiente.ToString("N2")</td><td><span style="padding:4px 10px;border-radius:20px;font-size:12px;font-weight:700;background:@bg;color:@fg">@cobro.Estado</span></td><td><div style="display:flex;justify-content:center;gap:7px;flex-wrap:wrap"><button @onclick="() => VerDetalleCobro(cobro.Id)" style="padding:7px 9px;background:#fff;border:1px solid #D5D8E6;border-radius:7px;cursor:pointer">Detalle</button><button @onclick="() => VerFactura(cobro)" style="padding:7px 9px;background:#fff;border:1px solid #D5D8E6;border-radius:7px;cursor:pointer">Factura</button><button @onclick="() => ConfirmarEliminarId = cobro.Id" style="padding:7px 9px;background:#fff;border:1px solid #F5C2C4;color:#C4141B;border-radius:7px;cursor:pointer">Eliminar</button></div></td></tr> } }
+else { @foreach (var cobro in Filtrados) { var (bg, fg) = ElectroGestion.Services.AppStateService.GetBadgeColors(cobro.Estado); <tr @onclick="@(() => FilaClicked(cobro.Id))" style="background:@(ModoSeleccion && Seleccionadas.Contains(cobro.Id) ? "#EFF6FF" : "transparent");cursor:@(ModoSeleccion ? "pointer" : "default")"><td>@if (ModoSeleccion) { <input type="checkbox" aria-label="Seleccionar cobro @cobro.Id" checked="@Seleccionadas.Contains(cobro.Id)" disabled="@(!PuedeEliminarCobro(cobro.Id))" @onchange="e => CambiarSeleccion(cobro.Id, (bool)(e.Value ?? false))" @onclick:stopPropagation style="margin-right:8px" /> } <span style="font-family:ui-monospace,'SFMono-Regular',Consolas,monospace;font-weight:700;color:@(ModoSeleccion && Seleccionadas.Contains(cobro.Id) ? "#1D4ED8" : "#5B6173")">@cobro.Id</span></td><td>@(cobro.Cotizacion?.SolicitudId ?? "—")</td><td>@cobro.Cliente</td><td>@cobro.FacturaId</td><td>@cobro.Fecha.ToString("dd/MM/yyyy")</td><td>@(string.IsNullOrWhiteSpace(cobro.MetodoPago) ? "—" : cobro.MetodoPago)</td><td class="num">RD$ @cobro.Monto.ToString("N2")</td><td class="num">RD$ @cobro.MontoPagado.ToString("N2")</td><td class="num">RD$ @cobro.SaldoPendiente.ToString("N2")</td><td><span style="padding:4px 10px;border-radius:20px;font-size:12px;font-weight:700;background:@bg;color:@fg">@cobro.Estado</span></td><td><div style="display:flex;justify-content:center;gap:7px;flex-wrap:wrap"><button @onclick="() => VerDetalleCobro(cobro.Id)" @onclick:stopPropagation style="padding:7px 9px;background:#fff;border:1px solid #D5D8E6;border-radius:7px;cursor:pointer">Detalle</button><button @onclick="() => VerFactura(cobro)" @onclick:stopPropagation style="padding:7px 9px;background:#fff;border:1px solid #D5D8E6;border-radius:7px;cursor:pointer">Factura</button><button @onclick="() => SolicitarEliminarCobro(cobro.Id)" @onclick:stopPropagation style="padding:7px 9px;background:#fff;border:1px solid #F5C2C4;color:#C4141B;border-radius:7px;cursor:pointer">Eliminar</button></div></td></tr> } }
 </tbody></table></div></div>
 
 @if (ModalAbierto)
@@ -59,8 +78,50 @@ else { @foreach (var cobro in Filtrados) { var (bg, fg) = ElectroGestion.Service
 @if (ConfirmarReaperturaId.HasValue)
 { <div style="position:fixed;inset:0;background:rgba(14,16,40,.5);display:flex;align-items:center;justify-content:center;z-index:10001;padding:20px"><div style="background:#fff;border-radius:16px;max-width:430px;padding:28px"><h3>Revertir cobro</h3><p>Se anulará el pago más reciente y se recalculará el saldo. Si la orden ya estaba terminada, volverá a Pendiente de cobro.</p><div style="display:flex;justify-content:flex-end;gap:10px"><button @onclick="() => ConfirmarReaperturaId = null" style="padding:9px 14px;border:1px solid #D5D8E6;background:#fff;border-radius:8px">Cancelar</button><button @onclick="ReabrirCobro" style="padding:9px 16px;background:#1D4ED8;color:#fff;border:0;border-radius:8px">Revertir</button></div></div></div> }
 
-@if (ConfirmarEliminarId.HasValue)
-{ var cobroAEliminar = ListaCobros.FirstOrDefault(c => c.Id == ConfirmarEliminarId.Value); <div style="position:fixed;inset:0;background:rgba(14,16,40,.5);display:flex;align-items:center;justify-content:center;z-index:10002;padding:20px"><div style="background:#fff;border-radius:16px;max-width:440px;padding:28px"><h3>Eliminar cobro</h3><p>¿Está seguro de eliminar esta cuenta y sus abonos registrados?@if (cobroAEliminar?.Estado == "Finalizada" && cobroAEliminar.OrdenTrabajo is not null) { <span> La orden volverá a Pendiente de cobro.</span> }</p><div style="display:flex;justify-content:flex-end;gap:10px"><button @onclick="() => ConfirmarEliminarId = null" style="padding:9px 14px;border:1px solid #D5D8E6;background:#fff;border-radius:8px">Cancelar</button><button @onclick="EliminarCobro" style="padding:9px 16px;background:#C4141B;color:#fff;border:0;border-radius:8px">Sí, eliminar</button></div></div></div> }
+@if (IsDeleteModalOpen)
+{
+    <div style="position:fixed;inset:0;background:rgba(14,16,40,0.5);display:flex;align-items:center;justify-content:center;z-index:10002;padding:20px">
+        <div style="background:#fff;border-radius:14px;width:100%;max-width:430px;padding:30px;box-shadow:0 20px 40px rgba(0,0,0,0.2);animation:tin 0.2s ease-out">
+            <div style="font-family:'Manrope';font-weight:800;font-size:23px;color:#14162B;margin-bottom:12px">Eliminar @(DeleteIds.Count == 1 ? "cobro" : "cobros")</div>
+            <div style="color:#4A4E63;font-size:14.5px;line-height:1.55">¿Está seguro que desea eliminar @(DeleteIds.Count == 1 ? "este cobro" : $"estos {DeleteIds.Count} cobros")? Se eliminarán también los abonos registrados. Esta acción no se puede deshacer.</div>
+            @if (DeleteIds.Count > 1)
+            {
+                <div style="background:#F9FAFB;border:1px solid #EFF0F6;border-radius:10px;max-height:200px;overflow:auto;margin-top:16px" class="resp-lista-eliminar">
+                    @foreach (var cobroElim in CobrosAEliminar)
+                    {
+                        <div style="display:flex;align-items:center;gap:12px;padding:9px 14px;border-bottom:1px solid #EFF0F6">
+                            <span style="font-family:ui-monospace,'SFMono-Regular',Consolas,monospace;font-size:12.5px;font-weight:700;letter-spacing:.05em;color:#C0392B;background:#FDECEC;border-radius:6px;padding:2px 8px;flex-shrink:0">@cobroElim.Id</span>
+                            <div style="min-width:0">
+                                <div style="font-size:13.5px;font-weight:700;color:#14162B;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">@cobroElim.Cliente</div>
+                                <div style="font-size:12px;color:#6B7085;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">RD$ @cobroElim.Monto.ToString("N2") · @cobroElim.Fecha.ToString("dd/MM/yyyy")</div>
+                            </div>
+                        </div>
+                    }
+                </div>
+            }
+            @if (CobrosAEliminar.Any() && CobrosAEliminar.All(c => c.Estado == "Finalizada" && c.OrdenTrabajo is not null))
+            {
+                <div style="background:#FFF7E6;border:1px solid #F5E2B8;border-radius:8px;padding:9px 12px;font-size:12.5px;color:#8A6100;margin-top:12px">
+                    La orden de trabajo y su solicitud asociadas volverán a Pendiente de cobro.
+                </div>
+            }
+            @if (Seleccionadas.Count > DeleteIds.Count)
+            {
+                <div style="background:#FFF7E6;border:1px solid #F5E2B8;border-radius:8px;padding:9px 12px;font-size:12.5px;color:#8A6100;margin-top:12px">
+                    Nota: se omitieron @(Seleccionadas.Count - DeleteIds.Count) cobro(s) fuera de los estados Pendiente de cobro o Finalizada; no se pueden eliminar.
+                </div>
+            }
+            <div style="display:flex;justify-content:flex-end;gap:12px;margin-top:28px">
+                <button @onclick="CerrarEliminar" style="padding:11px 24px;border:1px solid #E3E5EE;background:#fff;border-radius:10px;font-weight:600;font-size:15px;cursor:pointer;color:#14162B;font-family:'Manrope'">
+                    Cancelar
+                </button>
+                <button @onclick="EjecutarEliminarCobro" style="padding:11px 26px;border:0;background:#C0392B;color:#fff;border-radius:10px;font-weight:700;font-size:15px;cursor:pointer;font-family:'Manrope'">
+                    Eliminar
+                </button>
+            </div>
+        </div>
+    </div>
+}
 
 @if (ConfirmarEliminarAbonoId.HasValue)
 { <div style="position:fixed;inset:0;background:rgba(14,16,40,.5);display:flex;align-items:center;justify-content:center;z-index:10002;padding:20px"><div style="background:#fff;border-radius:16px;max-width:440px;padding:28px"><h3>Eliminar abono</h3><p>El monto se descontará de lo pagado y el saldo pendiente se recalculará. ¿Desea continuar?</p><div style="display:flex;justify-content:flex-end;gap:10px"><button @onclick="() => ConfirmarEliminarAbonoId = null" style="padding:9px 14px;border:1px solid #D5D8E6;background:#fff;border-radius:8px">Cancelar</button><button @onclick="EliminarAbono" style="padding:9px 16px;background:#C4141B;color:#fff;border:0;border-radius:8px">Sí, eliminar</button></div></div></div> }
@@ -75,7 +136,12 @@ else { @foreach (var cobro in Filtrados) { var (bg, fg) = ElectroGestion.Service
     private string FiltroId = "", FiltroCliente = "", FiltroFactura = "", FiltroEstado = "", MetodoPago = "Transferencia", MetodoAbono = "Transferencia", MetodoAbonoEditar = "Transferencia";
     private int CotizacionSeleccionadaId;
     private decimal AbonoInicial, MontoAbono, MontoAbonoEditar;
-    private int? ConfirmarFinalizacionId, ConfirmarReaperturaId, ConfirmarEliminarId, ConfirmarEliminarAbonoId, AbonoEditarId;
+    private int? ConfirmarFinalizacionId, ConfirmarReaperturaId, ConfirmarEliminarAbonoId, AbonoEditarId;
+    private bool ModoSeleccion;
+    private HashSet<int> Seleccionadas = [];
+    private HashSet<int> DeleteIds = [];
+    private bool IsDeleteModalOpen;
+    private HashSet<int> ElegiblesCobros = [];
     private ElectroGestion.Models.Cotizacion? CotizacionSeleccionada => CotizacionesAprobadas.FirstOrDefault(q => q.Id == CotizacionSeleccionadaId);
     private ElectroGestion.Models.Cobro? FacturaSeleccionada;
     private ElectroGestion.Models.Cobro? CobroDetalle;
@@ -84,11 +150,18 @@ else { @foreach (var cobro in Filtrados) { var (bg, fg) = ElectroGestion.Service
         (string.IsNullOrWhiteSpace(FiltroCliente) || c.Cliente.Contains(FiltroCliente, StringComparison.OrdinalIgnoreCase)) &&
         (string.IsNullOrWhiteSpace(FiltroFactura) || c.FacturaId.ToString().Contains(FiltroFactura)) &&
         (string.IsNullOrWhiteSpace(FiltroEstado) || c.Estado == FiltroEstado));
+    private IEnumerable<int> ElegiblesVisibles => Filtrados.Where(c => PuedeEliminarCobro(c.Id)).Select(c => c.Id);
+    private bool TodasMarcadas => ElegiblesVisibles.Any() && ElegiblesVisibles.All(Seleccionadas.Contains);
+    private List<ElectroGestion.Models.Cobro> CobrosAEliminar => DeleteIds
+        .Select(id => ListaCobros.FirstOrDefault(c => c.Id == id))
+        .Where(c => c != null)
+        .Cast<ElectroGestion.Models.Cobro>()
+        .ToList();
     protected override async Task OnInitializedAsync() => await Recargar();
     private async Task Recargar()
     {
         Cargando = true;
-        try { ListaCobros = await CobroService.ObtenerTodosAsync(); CotizacionesAprobadas = await CobroService.ObtenerCotizacionesAprobadasAsync(); }
+        try { ListaCobros = await CobroService.ObtenerTodosAsync(); CotizacionesAprobadas = await CobroService.ObtenerCotizacionesAprobadasAsync(); ElegiblesCobros = await CobroService.ObtenerElegiblesAsync(ListaCobros.Select(c => c.Id)); Seleccionadas.IntersectWith(ListaCobros.Select(c => c.Id)); }
         catch { ToastService.Notify(new ToastMessage(ToastType.Danger, "No se pudieron cargar los cobros.")); }
         finally { Cargando = false; }
     }
@@ -116,7 +189,47 @@ else { @foreach (var cobro in Filtrados) { var (bg, fg) = ElectroGestion.Service
         else ToastService.Notify(new ToastMessage(ToastType.Warning, "No se pudo finalizar: confirme que el saldo esté completamente pagado."));
     }
     private async Task ReabrirCobro() { if (!ConfirmarReaperturaId.HasValue) return; var id = ConfirmarReaperturaId.Value; ConfirmarReaperturaId = null; if (await CobroService.ReabrirAsync(id)) { await Recargar(); CobroDetalle = ListaCobros.FirstOrDefault(c => c.Id == id); var aviso = CobroDetalle?.SaldoPendiente <= 0 ? "El saldo sigue cubierto; puedes finalizar el cobro nuevamente." : $"Abono revertido. Falta RD$ {CobroDetalle?.SaldoPendiente.ToString("N2")} por pagar."; ToastService.Notify(new ToastMessage(ToastType.Success, aviso)); } else ToastService.Notify(new ToastMessage(ToastType.Warning, "No se pudo reabrir el cobro.")); }
-    private async Task EliminarCobro() { if (!ConfirmarEliminarId.HasValue) return; var id = ConfirmarEliminarId.Value; ConfirmarEliminarId = null; if (await CobroService.EliminarAsync(id)) { if (CobroDetalle?.Id == id) CobroDetalle = null; ToastService.Notify(new ToastMessage(ToastType.Success, "Cobro eliminado.")); await Recargar(); } else ToastService.Notify(new ToastMessage(ToastType.Warning, "No se pudo eliminar el cobro.")); }
+    private bool PuedeEliminarCobro(int id) => ElegiblesCobros.Contains(id);
+    private void AlternarModoSeleccion()
+    {
+        ModoSeleccion = !ModoSeleccion;
+        if (!ModoSeleccion) Seleccionadas.Clear();
+    }
+    private void FilaClicked(int id)
+    {
+        if (!ModoSeleccion) return;
+        if (!PuedeEliminarCobro(id))
+        {
+            ToastService.Notify(new ToastMessage(ToastType.Warning, "Este cobro está protegido (no está en estado Pendiente de cobro o Finalizada) y no se puede eliminar."));
+            return;
+        }
+        CambiarSeleccion(id, !Seleccionadas.Contains(id));
+    }
+    private void CambiarSeleccion(int id, bool marcado) { if (marcado && PuedeEliminarCobro(id)) Seleccionadas.Add(id); else Seleccionadas.Remove(id); }
+    private void SeleccionarTodas(bool marcado) { foreach (var id in ElegiblesVisibles) { if (marcado) Seleccionadas.Add(id); else Seleccionadas.Remove(id); } }
+    private void AlternarTodas() => SeleccionarTodas(!TodasMarcadas);
+    private void ConfirmarSeleccionadas() { DeleteIds = Seleccionadas.Where(PuedeEliminarCobro).ToHashSet(); IsDeleteModalOpen = DeleteIds.Count > 0; }
+    private void SolicitarEliminarCobro(int id) { DeleteIds = [id]; IsDeleteModalOpen = true; }
+    private void CerrarEliminar() { IsDeleteModalOpen = false; DeleteIds.Clear(); }
+    private async Task EjecutarEliminarCobro()
+    {
+        if (DeleteIds.Count > 0)
+        {
+            var eliminados = await CobroService.EliminarVariosAsync(DeleteIds);
+            if (eliminados > 0)
+            {
+                if (CobroDetalle is not null && DeleteIds.Contains(CobroDetalle.Id)) CobroDetalle = null;
+                if (FacturaSeleccionada is not null && DeleteIds.Contains(FacturaSeleccionada.Id)) FacturaSeleccionada = null;
+                ToastService.Notify(new ToastMessage(ToastType.Success, eliminados == 1 ? "Cobro eliminado correctamente." : $"{eliminados} cobros eliminados correctamente."));
+                await Recargar();
+                Seleccionadas.Clear();
+                ModoSeleccion = false;
+            }
+            else ToastService.Notify(new ToastMessage(ToastType.Warning, "No se pudo eliminar. Los cobros seleccionados están protegidos o ya no existen."));
+        }
+        IsDeleteModalOpen = false;
+        DeleteIds.Clear();
+    }
     private void VerDetalleCobro(int id) { CobroDetalle = ListaCobros.FirstOrDefault(c => c.Id == id); MontoAbono = 0; }
     private void CerrarDetalleCobro() => CobroDetalle = null;
     private void AbrirModalAbono() { if (CobroDetalle is null || CobroDetalle.SaldoPendiente <= 0) return; MontoAbono = CobroDetalle.SaldoPendiente; MetodoAbono = string.IsNullOrWhiteSpace(CobroDetalle.MetodoPago) ? "Transferencia" : CobroDetalle.MetodoPago; ModalAbonoAbierto = true; }

@@ -70,4 +70,63 @@ public class InventarioService(IDbContextFactory<Contexto> factory)
         return await db.ArticulosInventario.Where(a => a.Id == id && a.Cantidad <= int.MaxValue - cantidad)
             .ExecuteUpdateAsync(set => set.SetProperty(a => a.Cantidad, a => a.Cantidad + cantidad)) == 1;
     }
+
+    // Un artículo es elegible para eliminar cuando no hay registros que lo referencien
+    // (FKs reales: Venta.ArticuloInventarioId y DetalleVenta.ArticuloInventarioId; además, los
+    // detalles de cotización guardan el Id como instantánea histórica).
+    private static async Task<bool> ArticuloReferenciadoAsync(Contexto db, int id) =>
+        await db.Ventas.AnyAsync(v => v.ArticuloInventarioId == id) ||
+        await db.DetallesVenta.AnyAsync(d => d.ArticuloInventarioId == id) ||
+        await db.DetallesCotizacion.AnyAsync(d => d.ArticuloInventarioId == id);
+
+    public async Task<HashSet<int>> ObtenerElegiblesAsync(IEnumerable<int> ids)
+    {
+        var idList = ids.Distinct().Where(i => i > 0).ToList();
+        if (idList.Count == 0) return [];
+        await using var db = await factory.CreateDbContextAsync();
+        var referenciados = new HashSet<int>();
+        var enVentas = await db.Ventas.AsNoTracking()
+            .Where(v => idList.Contains(v.ArticuloInventarioId))
+            .Select(v => v.ArticuloInventarioId).ToListAsync();
+        foreach (var id in enVentas) referenciados.Add(id);
+        var enDetallesVenta = await db.DetallesVenta.AsNoTracking()
+            .Where(d => idList.Contains(d.ArticuloInventarioId))
+            .Select(d => d.ArticuloInventarioId).ToListAsync();
+        foreach (var id in enDetallesVenta) referenciados.Add(id);
+        var enDetallesCotizacion = await db.DetallesCotizacion.AsNoTracking()
+            .Where(d => d.ArticuloInventarioId > 0 && idList.Contains(d.ArticuloInventarioId))
+            .Select(d => d.ArticuloInventarioId).ToListAsync();
+        foreach (var id in enDetallesCotizacion) referenciados.Add(id);
+        return idList.Where(i => !referenciados.Contains(i)).ToHashSet();
+    }
+
+    public async Task<(int eliminados, int omitidos)> EliminarVariosAsync(IReadOnlyCollection<int> ids)
+    {
+        var idList = ids.Distinct().Where(i => i > 0).ToList();
+        if (idList.Count == 0) return (0, 0);
+        await using var db = await factory.CreateDbContextAsync();
+        await using var transaccion = await db.Database.BeginTransactionAsync(System.Data.IsolationLevel.Serializable);
+        try
+        {
+            var articulos = await db.ArticulosInventario.Where(a => idList.Contains(a.Id)).ToListAsync();
+            var elegibles = new List<ArticuloInventario>();
+            foreach (var articulo in articulos)
+            {
+                if (!await ArticuloReferenciadoAsync(db, articulo.Id)) elegibles.Add(articulo);
+                else db.Entry(articulo).State = EntityState.Detached;
+            }
+            if (elegibles.Count > 0)
+            {
+                db.ArticulosInventario.RemoveRange(elegibles);
+                await db.SaveChangesAsync();
+            }
+            await transaccion.CommitAsync();
+            return (elegibles.Count, articulos.Count - elegibles.Count);
+        }
+        catch (Exception ex) when (ex is System.Data.Common.DbException or DbUpdateException)
+        {
+            await transaccion.RollbackAsync();
+            return (0, idList.Count);
+        }
+    }
 }
