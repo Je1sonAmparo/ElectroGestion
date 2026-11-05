@@ -125,25 +125,6 @@ public class AppStateService
             new() { Id = 7, SolicitudId = 8, Solicitud = Solicitudes[7], Fecha = DateTime.Today.AddDays(-28), Hora = "15:00", HoraFin = "17:30", Estado = "Cancelada" }
         };
 
-        Ordenes = new List<OrdenTrabajo>
-        {
-            new()
-            {
-                Id = 1, Code = "OT-0001", SolicitudId = 1, Estado = "En proceso",
-                Trabajos = new() { "Montaje del gabinete UPS en sala técnica", "Conexión de banco de baterías y puesta a tierra", "Pruebas de transferencia y respaldo (30 min)" },
-                Materiales = new() { "UPS 6 kVA", "Baterías 12V x8", "Cable THHN #6", "Breaker 60A", "Canaleta metálica", "Multímetro" },
-                Observaciones = "Coordinar con el cliente el corte de energía entre 9:00 y 11:00 AM. Requiere dos técnicos."
-            },
-            new()
-            {
-                Id = 2, Code = "OT-0002", SolicitudId = 2, Estado = "En proceso",
-                Trabajos = new() { "Instalación de estructura en techo (12 paneles)", "Tendido de tubería y cableado DC", "Configuración de inversor y monitoreo" },
-                Materiales = new() { "Paneles 550W x12", "Inversor híbrido 6kW", "Riel de aluminio", "Tubería EMT 3/4", "Cable solar #10", "Herramienta de crimpado" },
-                Observaciones = "Verificar disponibilidad de andamio en obra. Entregar informe fotográfico al finalizar."
-            }
-        };
-
-
         Cotizaciones = new List<Cotizacion>
         {
             new() { Id = 1, SolicitudId = "REQ-001", Cliente = "Acme Corp", Fecha = DateTime.Today.AddDays(-2), MontoTotal = 15000.00m, Estado = "Aprobada" },
