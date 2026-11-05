@@ -53,7 +53,8 @@ public class LevantamientoService(IDbContextFactory<Contexto> contextFactory)
         var solicitud = await contexto.Solicitudes
             .Include(s => s.Levantamiento)
             .FirstOrDefaultAsync(s => s.Id == solicitudId);
-        if (solicitud is null || !await TieneVisitaActivaAsync(contexto, solicitudId))
+        if (solicitud is null || solicitud.EstadoSolicitudId == EstadoFinalizadaId ||
+            !await TieneVisitaActivaAsync(contexto, solicitudId))
         {
             return false;
         }
