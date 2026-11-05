@@ -56,11 +56,31 @@
         </nav>
         <div class="report-section-heading">
             <h2>Reporte de ventas de los últimos 3 meses</h2>
-            <p>Ventas directas registradas durante el mes actual y los dos anteriores. Los ingresos se muestran antes de ITBIS.</p>
+            <p>Cuantificación de los ingresos por comercialización directa de equipos y materiales durante el mes actual y los dos anteriores.</p>
         </div>
         @if (SalesMonths.Count == 3)
         {
-            var max = SalesMonths.Max(m => m.Ingresos);
+            <section class="report-metrics-layout" aria-label="Indicadores del reporte de ventas">
+                <div class="report-metric-stack">
+                    <article class="report-metric-card"><div class="report-metric-label">Total de Ventas (RD$)</div><div class="report-metric-value">@FormatMoney(SalesTotal)</div></article>
+                    <article class="report-metric-card"><div class="report-metric-label">ITBIS Generado (RD$)</div><div class="report-metric-value">@FormatMoney(SalesTax)</div></article>
+                </div>
+                <div class="report-metric-stack">
+                    <article class="report-metric-card"><div class="report-metric-label">Ingreso Promedio por Venta (RD$)</div><div class="report-metric-value">@FormatMoney(SalesAverage)</div></article>
+                    <article class="report-metric-card"><div class="report-metric-label">Mes con Más Ingresos</div><div class="report-metric-service">@TopSalesMonth</div></article>
+                </div>
+                <article class="report-chart-card">
+                    <h2>Porcentaje de Ingresos por Mes</h2>
+                    <div class="report-donut-layout">
+                        <svg class="report-donut-svg" viewBox="0 0 220 220" role="img" aria-label="Distribución de ingresos por mes">
+                            <g transform="translate(45 0)"><g transform="translate(100 110) rotate(-90) translate(-100 -110)">
+                                @foreach (var segment in SalesDonutSegments) { <circle cx="100" cy="110" r="55" fill="none" stroke="@segment.Color" stroke-width="30" stroke-dasharray="@($"{FormatNumber(segment.Length)} {FormatNumber(DonutCircumference - segment.Length)}")" stroke-dashoffset="@(-segment.Offset)" /> }
+                            </g><circle cx="100" cy="110" r="40" fill="#fff" stroke="#E3E5EE" stroke-width="1.5" /><text class="donut-total-label" x="100" y="106">TOTAL</text><text class="donut-total-value" x="100" y="122">RD$ @FormatChartMoney(SalesTotal)</text></g>
+                        </svg>
+                        <div class="report-legend">@foreach (var segment in SalesDonutSegments) { <div><span class="legend-swatch" style="background:@segment.Color"></span><span>@segment.Servicio</span><strong>@FormatPercent(segment.Porcentaje)%</strong></div> }</div>
+                    </div>
+                </article>
+            </section>
             <section class="report-data-layout">
                 <div class="report-table-wrap">
                     <table class="report-data-table">
@@ -75,16 +95,15 @@
                     </table>
                 </div>
                 <article class="report-monthly-card">
-                    <h2>Ingresos mensuales por ventas directas</h2>
-                    @foreach (var mes in SalesMonths)
-                    {
-                        <div class="sales-month">
-                            <div><span>@SalesMonth(mes)</span><strong>RD$ @FormatMoney(mes.Ingresos)</strong></div>
-                            <div class="sales-month-track" aria-hidden="true"><span style="width:@(FormatNumber(max == 0 ? 0 : (double)(mes.Ingresos / max * 100)))%"></span></div>
-                        </div>
-                    }
+                    <h2>Tendencia Mensual de Ventas (Ingresos)</h2>
+                    <div class="report-bar-chart" role="img" aria-label="Tendencia mensual de ingresos por ventas directas">
+                        <div class="report-y-axis">@foreach (var mark in SalesAxisMarks) { <span>@FormatAxis(mark)</span> }</div>
+                        <div class="report-bars">@foreach (var mes in SalesMonths) { <div class="report-bar-column" style="--bar-height:@SalesBarHeight(mes.Ingresos)%" title="@SalesMonth(mes): RD$ @FormatMoney(mes.Ingresos)"><strong>@FormatChartMoney(mes.Ingresos)</strong>@if (mes.Ingresos > 0) { <span class="report-bar"></span> }<span class="report-month">@mes.Mes.ToString("MMM", System.Globalization.CultureInfo.GetCultureInfo("es-DO"))</span></div> }</div>
+                    </div>
+                    <div class="report-chart-caption"><span class="legend-swatch swatch-blue-2"></span>Ingresos por ventas (RD$)</div>
                 </article>
             </section>
+            <p class="sales-report-note">Se incluyen ventas directas registradas; los ingresos se calculan antes del ITBIS. Las ventas anuladas y los borradores no forman parte del reporte.</p>
         }
     }
     else if (View == ConsumptionListView)
@@ -300,6 +319,22 @@
     }
 
     private static string SalesMonth(MesVentas mes) => mes.Mes.ToString("MMMM yyyy", System.Globalization.CultureInfo.GetCultureInfo("es-DO"));
+    private decimal SalesTotal => SalesMonths.Sum(m => m.Ingresos);
+    private decimal SalesTax => SalesMonths.Sum(m => m.Itbis);
+    private int SalesCount => SalesMonths.Sum(m => m.Ventas);
+    private decimal SalesAverage => SalesCount == 0 ? 0 : SalesTotal / SalesCount;
+    private string TopSalesMonth => SalesMonths.OrderByDescending(m => m.Ingresos).FirstOrDefault()?.Ingresos > 0 ? SalesMonth(SalesMonths.OrderByDescending(m => m.Ingresos).First()) : "—";
+    private IEnumerable<decimal> SalesAxisMarks => Enumerable.Range(0, 6).Reverse().Select(i => decimal.Round(Math.Max(1m, SalesMonths.Max(m => m.Ingresos)) * i / 5m, 0));
+    private double SalesBarHeight(decimal value) => (double)(value / Math.Max(1m, SalesMonths.Max(m => m.Ingresos)) * 100m);
+    private List<DonutSegment> SalesDonutSegments
+    {
+        get
+        {
+            var total = SalesMonths.Sum(m => m.Ingresos); var offset = 0d; var segments = new List<DonutSegment>();
+            for (var i = 0; i < SalesMonths.Count; i++) { var month = SalesMonths[i]; var percent = total == 0 ? 0 : (double)(month.Ingresos / total); var length = DonutCircumference * percent; segments.Add(new DonutSegment(SalesMonth(month), percent * 100, length, offset, ChartColors[i % ChartColors.Length])); offset += length; }
+            return segments;
+        }
+    }
     private const string AllServices = "Todos los Servicios";
 
     private string View = OverviewView;
