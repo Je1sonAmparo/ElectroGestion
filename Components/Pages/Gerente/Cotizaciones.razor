@@ -53,7 +53,7 @@
             <div class="cotizacion-filtro"><label for="filtro-cot-desde">Desde:</label><input id="filtro-cot-desde" type="date" @bind="FiltroDesde" /></div>
             <div class="cotizacion-filtro"><label for="filtro-cot-hasta">Hasta:</label><input id="filtro-cot-hasta" type="date" @bind="FiltroHasta" /></div>
             <div class="cotizacion-filtro"><label for="filtro-cot-estado">Estado:</label><select id="filtro-cot-estado" @bind="EstadoFiltro" style="width:210px"><option value="">Todos</option>@foreach (var estado in ElectroGestion.Services.CotizacionService.Estados) { <option value="@estado">@estado</option> }</select></div>
-            <div style="margin-left:auto;display:flex;gap:8px"><button @onclick="LimpiarFiltros" style="padding:9px 14px;border:1px solid #D5D8E6;border-radius:7px;background:#fff;color:#4A4E63;cursor:pointer">Limpiar</button><button @onclick="() => StateHasChanged()" style="padding:9px 20px;border:0;border-radius:7px;background:#1D4ED8;color:#fff;font-weight:700;cursor:pointer">Buscar</button></div>
+            <div style="margin-left:auto"><button @onclick="() => StateHasChanged()" style="padding:9px 20px;border:0;border-radius:7px;background:#1D4ED8;color:#fff;font-weight:700;cursor:pointer">Buscar</button></div>
         </div>
     </div>
     @if (Cargando)
@@ -75,19 +75,23 @@
                     var colores = Colores(cot.Estado);
                     <tr style="border-top:1px solid #EFF0F6">
                         <td style="padding:14px 18px">@cot.Id</td><td style="padding:14px 18px">@(cot.SolicitudId)</td><td style="padding:14px 18px">@cot.Cliente</td><td style="padding:14px 18px">@(cot.Solicitud?.Servicio?.Nombre ?? "—")</td><td style="padding:14px 18px">@cot.Fecha.ToString("dd/MM/yyyy")</td><td style="padding:14px 18px;font-weight:700">RD$ @cot.MontoTotal.ToString("N2")</td>
-                        <td style="padding:14px 18px"><span style="padding:4px 10px;border-radius:20px;font-size:12.5px;font-weight:700;background:@colores.Bg;color:@colores.Fg">@cot.Estado</span></td>
+                        <td style="padding:14px 18px;min-width:155px"><span style="display:inline-block;white-space:nowrap;padding:4px 10px;border-radius:20px;font-size:12.5px;font-weight:700;background:@colores.Bg;color:@colores.Fg">@cot.Estado</span></td>
                         <td style="padding:14px 18px;font-size:12px;color:#6B7085">@if (cot.FechaEnvio.HasValue) { <div>Enviada: @cot.FechaEnvio.Value.ToString("dd/MM/yyyy HH:mm")</div> } @if (cot.FechaRespuesta.HasValue) { <div>Respuesta: @cot.FechaRespuesta.Value.ToString("dd/MM/yyyy HH:mm")</div> } @if (!string.IsNullOrWhiteSpace(cot.MotivoRechazo)) { <div title="@cot.MotivoRechazo">Motivo: @cot.MotivoRechazo</div> }</td>
                         <td style="padding:14px 18px;text-align:center"><div style="display:flex;gap:6px;justify-content:center;flex-wrap:wrap">
                             @if (cot.Estado == ElectroGestion.Services.CotizacionService.EnRevision)
                             {
                                 <button @onclick="() => Editar(cot)" style="padding:7px 11px;border:1px solid #D5D8E6;background:#fff;border-radius:7px;cursor:pointer">Editar detalle</button>
-                                <button @onclick='() => Transicionar(cot.Id, "Enviada al cliente")' style="padding:7px 11px;border:0;background:#1D4ED8;color:#fff;border-radius:7px;cursor:pointer">Marcar enviada</button>
+                                <button @onclick='() => AbrirConfirmacion(cot.Id, "Enviada al cliente")' style="padding:7px 11px;border:0;background:#1D4ED8;color:#fff;border-radius:7px;cursor:pointer">Marcar enviada</button>
                             }
                             else if (cot.Estado == "Enviada al cliente")
                             {
-                                <button @onclick='() => Transicionar(cot.Id, "Aprobada")' style="padding:7px 11px;border:0;background:#059669;color:#fff;border-radius:7px;cursor:pointer">Aprobar</button>
+                                <button @onclick='() => AbrirConfirmacion(cot.Id, "Aprobada")' style="padding:7px 11px;border:0;background:#059669;color:#fff;border-radius:7px;cursor:pointer">Aprobar</button>
                                 <button @onclick="() => AbrirRechazo(cot.Id)" style="padding:7px 11px;border:1px solid #F5C2C4;background:#fff;color:#C4141B;border-radius:7px;cursor:pointer">Rechazar</button>
                             }
+                            @if (cot.Estado == "Enviada al cliente")
+                            { <button @onclick='() => Transicionar(cot.Id, "En revisión")' style="padding:7px 11px;border:1px solid #D5D8E6;background:#fff;border-radius:7px;cursor:pointer">Volver a revisión</button> }
+                            else if (cot.Estado is "Aprobada" or "Rechazada")
+                            { <button @onclick='() => Transicionar(cot.Id, "Enviada al cliente")' style="padding:7px 11px;border:1px solid #D5D8E6;background:#fff;border-radius:7px;cursor:pointer">Volver a enviada</button> }
                             @if (cot.Solicitud?.Levantamiento is not null) { <button @onclick="() => VerLevantamiento(cot.Solicitud)" style="padding:7px 11px;border:1px solid #D5D8E6;background:#fff;border-radius:7px;cursor:pointer">Levantamiento</button> }
                             <button @onclick="() => VerCotizacion(cot)" style="padding:7px 11px;border:1px solid #D5D8E6;background:#fff;border-radius:7px;cursor:pointer">Detalle</button>
                         </div>
@@ -210,6 +214,17 @@
     </div>
 }
 
+@if (CambioPendienteId.HasValue)
+{
+    <div style="position:fixed;inset:0;background:rgba(20,22,43,.45);display:flex;align-items:center;justify-content:center;z-index:10001;padding:20px" @onclick="CerrarConfirmacion">
+        <div style="background:#fff;width:100%;max-width:420px;border-radius:14px;padding:24px" @onclick:stopPropagation>
+            <h3 style="margin:0 0 10px">Confirmar cambio de estado</h3>
+            <p style="color:#4A4E63">¿Desea marcar la cotización #@CambioPendienteId como <strong>@EstadoPendiente</strong>?</p>
+            <div style="display:flex;justify-content:flex-end;gap:10px"><button @onclick="CerrarConfirmacion" style="padding:9px 14px;border:1px solid #D5D8E6;background:#fff;border-radius:8px;cursor:pointer">Cancelar</button><button @onclick="ConfirmarCambio" style="padding:9px 14px;border:0;background:#1D4ED8;color:#fff;border-radius:8px;cursor:pointer">Confirmar</button></div>
+        </div>
+    </div>
+}
+
 @if (LevantamientoSeleccionado is not null)
 {
     var lev = LevantamientoSeleccionado.Levantamiento!;
@@ -217,10 +232,14 @@
         <div style="background:#fff;width:100%;max-width:650px;border-radius:14px;padding:24px;max-height:90vh;overflow:auto" @onclick:stopPropagation>
             <h3>Levantamiento · Solicitud #@LevantamientoSeleccionado.Id</h3><p><b>Cliente:</b> @LevantamientoSeleccionado.Cliente?.Nombre</p><p><b>Servicio:</b> @LevantamientoSeleccionado.Servicio?.Nombre</p>
             <p><b>Disponibilidad de espacios:</b> @lev.DisponibilidadEspacios</p><p><b>Cargas eléctricas:</b> @lev.CargasElectricas</p><p><b>Estabilidad de tensión:</b> @lev.EstabilidadTension</p><p><b>Recorrido de tuberías:</b> @lev.RecorridoTuberias</p><p><b>Recorrido del cableado:</b> @lev.RecorridoCableado</p><p><b>Observaciones:</b> @lev.Observaciones</p>
+            @if (FotosLevantamiento.Count > 0)
+            { <h4>Fotografías</h4><div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(120px,1fr));gap:10px">@foreach (var foto in FotosLevantamiento) { <button @onclick="() => FotoAmpliada = foto" title="Ampliar fotografía" style="padding:0;border:1px solid #D5D8E6;border-radius:8px;overflow:hidden;background:#fff;cursor:zoom-in"><img src="@foto" alt="Fotografía del levantamiento" style="display:block;width:100%;height:110px;object-fit:cover" /></button> }</div> }
             <button @onclick="() => LevantamientoSeleccionado = null" style="float:right;padding:9px 16px;border:1px solid #D5D8E6;background:#fff;border-radius:8px;cursor:pointer">Cerrar</button>
         </div>
     </div>
 }
+@if (FotoAmpliada is not null)
+{ <div style="position:fixed;inset:0;z-index:10002;background:rgba(0,0,0,.85);display:flex;align-items:center;justify-content:center;padding:24px" @onclick="() => FotoAmpliada = null"><img src="@FotoAmpliada" alt="Fotografía ampliada del levantamiento" style="max-width:100%;max-height:90vh;object-fit:contain" /></div> }
 
 @code {
     private List<Cotizacion> CotizacionRows = [];
@@ -249,6 +268,10 @@
     private string MotivoRechazo = "";
     private bool ModalRechazoAbierto;
     private Solicitud? LevantamientoSeleccionado;
+    private string? FotoAmpliada;
+    private List<string> FotosLevantamiento = [];
+    private int? CambioPendienteId;
+    private string EstadoPendiente = "";
     private Cotizacion? CotizacionDetalleSeleccionada;
     private Solicitud? SolicitudActual => LevantamientosPendientes.FirstOrDefault(s => s.Id == SolicitudSeleccionada);
     private IEnumerable<Cotizacion> CotizacionesFiltradas => CotizacionRows.Where(c =>
@@ -259,12 +282,6 @@
         (!FiltroDesde.HasValue || c.Fecha.Date >= FiltroDesde.Value.Date) &&
         (!FiltroHasta.HasValue || c.Fecha.Date <= FiltroHasta.Value.Date) &&
         (string.IsNullOrWhiteSpace(EstadoFiltro) || c.Estado == EstadoFiltro));
-
-    private void LimpiarFiltros()
-    {
-        FiltroId = FiltroSolicitud = FiltroCliente = FiltroServicio = EstadoFiltro = "";
-        FiltroDesde = FiltroHasta = null;
-    }
 
     protected override async Task OnInitializedAsync() => await Recargar();
 
@@ -345,6 +362,17 @@
         if (actualizado) await Recargar();
     }
 
+    private void AbrirConfirmacion(int id, string estado) { CambioPendienteId = id; EstadoPendiente = estado; }
+    private void CerrarConfirmacion() { CambioPendienteId = null; EstadoPendiente = ""; }
+    private async Task ConfirmarCambio()
+    {
+        if (!CambioPendienteId.HasValue) return;
+        var id = CambioPendienteId.Value;
+        var estado = EstadoPendiente;
+        CerrarConfirmacion();
+        await Transicionar(id, estado);
+    }
+
     private void AbrirRechazo(int id) { CotizacionARechazar = id; MotivoRechazo = ""; ModalRechazoAbierto = true; }
     private void CerrarRechazo() { ModalRechazoAbierto = false; CotizacionARechazar = null; }
     private async Task ConfirmarRechazo()
@@ -358,7 +386,13 @@
         else ToastService.Notify(new ToastMessage(ToastType.Warning, "No se pudo registrar el rechazo. Verifique el estado actual."));
     }
 
-    private void VerLevantamiento(Solicitud solicitud) => LevantamientoSeleccionado = solicitud;
+    private void VerLevantamiento(Solicitud solicitud)
+    {
+        LevantamientoSeleccionado = solicitud;
+        FotoAmpliada = null;
+        try { FotosLevantamiento = System.Text.Json.JsonSerializer.Deserialize<List<string>>(solicitud.Levantamiento?.FotografiasJson ?? "[]")?.Where(f => f.StartsWith("data:image/", StringComparison.OrdinalIgnoreCase)).ToList() ?? []; }
+        catch (System.Text.Json.JsonException) { FotosLevantamiento = []; }
+    }
     private void VerCotizacion(Cotizacion cotizacion) => CotizacionDetalleSeleccionada = cotizacion;
     private async Task Imprimir() => await JS.InvokeVoidAsync("window.print");
     private static DetalleCotizacion CopiarLinea(DetalleCotizacion d) => new() { ArticuloInventarioId = d.ArticuloInventarioId, CodigoArticulo = d.CodigoArticulo, NombreArticulo = d.NombreArticulo, Cantidad = d.Cantidad, PrecioUnitario = d.PrecioUnitario };
