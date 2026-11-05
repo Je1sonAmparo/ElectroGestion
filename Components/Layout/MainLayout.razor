@@ -73,26 +73,33 @@ else
           <nav style="display:flex;flex-direction:column;gap:4px;padding:0 12px;overflow-y:auto">
             @foreach (var item in GetNavItems())
             {
-                var isActive = IsActiveRoute(item.Href);
-                <NavLink class="@($"nav-item-btn {(isActive ? "active" : "")}")" 
-                         href="@item.Href" 
-                         Match="@(item.Href == "/" ? NavLinkMatch.All : NavLinkMatch.Prefix)" 
-                         style="@($"position:relative;display:flex;align-items:center;gap:12px;width:100%;text-align:left;border:0;cursor:pointer;padding:12px {(SidebarCollapsed ? "16px" : "14px")};border-radius:10px;font-size:14.5px;font-weight:{(isActive ? "800" : "600")};background:{(isActive ? "#EDEBFF" : "transparent")};color:{(isActive ? "#1D4ED8" : "#4A4E63")};transition:all 0.2s;text-decoration:none;")"
-                         title="@(SidebarCollapsed ? item.Label : "")">
-                    <div style="position:relative;display:flex;align-items:center;justify-content:center;width:24px;height:24px;flex:0 0 24px">
-                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="22" height="22" fill="none" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="position:relative;z-index:1;display:block;stroke: @(isActive ? "#1D4ED8" : "#6B7085")">
-                            <path class="path-d1" d="@item.D1" stroke="@(isActive ? "#1D4ED8" : "#6B7085")" fill="none"></path>
-                            @if (!string.IsNullOrEmpty(item.D2))
-                            {
-                                <path class="path-d2" d="@item.D2" stroke="@(isActive ? "#F59E0B" : "#A1A5B7")" fill="none"></path>
-                            }
-                        </svg>
-                    </div>
-                    @if (!SidebarCollapsed)
-                    {
-                        <span style="white-space:nowrap">@item.Label</span>
-                    }
-                </NavLink>
+                @if (item.IsSeparator)
+                {
+                    <div role="separator" aria-orientation="horizontal" aria-hidden="true" style="height:1px;background:#E3E5EE;margin:9px 4px"></div>
+                }
+                else
+                {
+                    var isActive = IsActiveRoute(item.Href);
+                    <NavLink class="@($"nav-item-btn {(isActive ? "active" : "")}")" 
+                             href="@item.Href" 
+                             Match="@(item.Href == "/" ? NavLinkMatch.All : NavLinkMatch.Prefix)" 
+                             style="@($"position:relative;display:flex;align-items:center;gap:12px;width:100%;text-align:left;border:0;cursor:pointer;padding:12px {(SidebarCollapsed ? "16px" : "14px")};border-radius:10px;font-size:14.5px;font-weight:{(isActive ? "800" : "600")};background:{(isActive ? "#EDEBFF" : "transparent")};color:{(isActive ? "#1D4ED8" : "#4A4E63")};transition:all 0.2s;text-decoration:none;")"
+                             title="@(SidebarCollapsed ? item.Label : "")">
+                        <div style="position:relative;display:flex;align-items:center;justify-content:center;width:24px;height:24px;flex:0 0 24px">
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="22" height="22" fill="none" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="position:relative;z-index:1;display:block;stroke: @(isActive ? "#1D4ED8" : "#6B7085")">
+                                <path class="path-d1" d="@item.D1" stroke="@(isActive ? "#1D4ED8" : "#6B7085")" fill="none"></path>
+                                @if (!string.IsNullOrEmpty(item.D2))
+                                {
+                                    <path class="path-d2" d="@item.D2" stroke="@(isActive ? "#F59E0B" : "#A1A5B7")" fill="none"></path>
+                                }
+                            </svg>
+                        </div>
+                        @if (!SidebarCollapsed)
+                        {
+                            <span style="white-space:nowrap">@item.Label</span>
+                        }
+                    </NavLink>
+                }
             }
           </nav>
 
@@ -163,7 +170,7 @@ else
     private bool SidebarCollapsed { get; set; } = false;
     private bool showLogoutConfirm = false;
 
-    public record NavItem(string Href, string Label, string D1, string D2);
+    public record NavItem(string Href, string Label, string D1, string D2, bool IsSeparator = false);
 
     protected override void OnInitialized()
     {
@@ -220,6 +227,7 @@ else
                 new("/ordenes", "Órdenes", "M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2 M15 2H9a1 1 0 0 0-1 1v2a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1V3a1 1 0 0 0-1-1z", "M11 11h5 M11 15h5 M11 19h5 M7 11l1.5 1.5 2-2 M7 15l1.5 1.5 2-2 M7 19l1.5 1.5 2-2"),
                 new("/clientes", "Clientes", "M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2 M7.5 7a4 4 0 1 1 8 0 4 4 0 0 1-8 0", "M22 21v-2a4 4 0 0 0-3-3.87 M15 3.13a4 4 0 0 1 0 7.75"),
                 new("/cobros", "Cobros", "M12 21a9 9 0 1 0 0-18 9 9 0 0 0 0 18", "M12 7v10 M8.5 13.5h7"),
+                new("", "", "", "", true),
                 new("/servicios", "Servicios", "M12 3.5L3.5 8v12.5h17V8z M12 3.5v5", "M9 14.5h6 M9 17.5h6"),
                 new("/inventario", "Inventario", "M6 4h12a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2z M9 4v4h6V4", "M15 15h5v5h-5z M16 15v-2h3v2"),
                 new("/proveedores", "Proveedores", "M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2 M7.5 7a4 4 0 1 1 8 0 4 4 0 0 1-8 0 M22 21v-2a4 4 0 0 0-3-3.87", "M16 16a4 4 0 1 1 8 0 4 4 0 0 1-8 0 M20 14.5a1.5 1.5 0 0 0-3 0v.5l1.5.5v1 M20 18h0"),
