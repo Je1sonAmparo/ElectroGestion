@@ -31,7 +31,7 @@ public class CobroService(IDbContextFactory<Contexto> factory, AppStateService a
         await using var db = await factory.CreateDbContextAsync();
         var orden = await db.OrdenesTrabajo.Include(o => o.Cotizacion).FirstOrDefaultAsync(o => o.Id == ordenId && o.Estado == "Pendiente de cobro");
         if (orden is null || orden.Cotizacion is null || await db.Cobros.AnyAsync(c => c.OrdenTrabajoId == ordenId)) return false;
-        var cobro = new Cobro { OrdenTrabajoId = orden.Id, Cliente = orden.Cliente, FacturaId = 0, Fecha = DateTime.Now, MetodoPago = metodoPago.Trim(), Monto = orden.Cotizacion.MontoTotal, Estado = "Pendiente" };
+        var cobro = new Cobro { OrdenTrabajoId = orden.Id, Cliente = orden.Cliente, FacturaId = 0, Fecha = DateTime.Now, MetodoPago = metodoPago.Trim(), Monto = orden.Cotizacion.MontoTotal, Estado = "Pendiente de cobro" };
         db.Cobros.Add(cobro);
         await db.SaveChangesAsync();
         cobro.FacturaId = 1000 + cobro.Id;
@@ -41,7 +41,7 @@ public class CobroService(IDbContextFactory<Contexto> factory, AppStateService a
 
     public async Task<bool> CambiarEstadoAsync(int id, string estado)
     {
-        if (!appState.EsGerente || estado is not ("Pendiente" or "Finalizada")) return false;
+        if (!appState.EsGerente || estado is not ("Pendiente de cobro" or "Finalizada")) return false;
         await using var db = await factory.CreateDbContextAsync();
         var cobro = await db.Cobros.Include(c => c.OrdenTrabajo).FirstOrDefaultAsync(c => c.Id == id);
         if (cobro is null) return false;
@@ -57,3 +57,4 @@ public class CobroService(IDbContextFactory<Contexto> factory, AppStateService a
         return true;
     }
 }
+
