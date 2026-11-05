@@ -15,6 +15,7 @@ public class Contexto : DbContext
     public DbSet<DetalleCotizacion> DetallesCotizacion { get; set; }
     public DbSet<OrdenTrabajo> OrdenesTrabajo { get; set; }
     public DbSet<Cobro> Cobros { get; set; }
+    public DbSet<AbonoCobro> AbonosCobro { get; set; }
     public DbSet<Cliente> Clientes { get; set; }
     public DbSet<Usuario> Usuarios { get; set; }
     public DbSet<Servicio> Servicios { get; set; }
@@ -120,8 +121,18 @@ public class Contexto : DbContext
             entity.Property(c => c.MetodoPago).HasMaxLength(40).IsRequired();
             entity.Property(c => c.Estado).HasMaxLength(20).IsRequired();
             entity.Property(c => c.Monto).HasPrecision(18, 2);
-            entity.HasIndex(c => c.OrdenTrabajoId).IsUnique();
+            entity.HasIndex(c => c.CotizacionId).IsUnique();
+            entity.HasIndex(c => c.OrdenTrabajoId);
+            entity.HasOne(c => c.Cotizacion).WithMany().HasForeignKey(c => c.CotizacionId).OnDelete(DeleteBehavior.Restrict);
             entity.HasOne(c => c.OrdenTrabajo).WithMany().HasForeignKey(c => c.OrdenTrabajoId).OnDelete(DeleteBehavior.Restrict);
+        });
+
+        modelBuilder.Entity<AbonoCobro>(entity =>
+        {
+            entity.Property(a => a.Monto).HasPrecision(18, 2);
+            entity.Property(a => a.MetodoPago).HasMaxLength(40).IsRequired();
+            entity.HasIndex(a => new { a.CobroId, a.Fecha });
+            entity.HasOne(a => a.Cobro).WithMany(c => c.Abonos).HasForeignKey(a => a.CobroId).OnDelete(DeleteBehavior.Cascade);
         });
 
         modelBuilder.Entity<SolicitudEvento>(entity =>
