@@ -76,5 +76,26 @@ public class CobroService(IDbContextFactory<Contexto> factory, AppStateService a
         await db.SaveChangesAsync();
         return true;
     }
+
+    public async Task<bool> EliminarAsync(int id)
+    {
+        if (!appState.EsGerente) return false;
+        await using var db = await factory.CreateDbContextAsync();
+        var cobro = await db.Cobros.Include(c => c.OrdenTrabajo).FirstOrDefaultAsync(c => c.Id == id);
+        if (cobro is null) return false;
+
+        if (cobro.Estado == "Finalizada" && cobro.OrdenTrabajo is not null)
+        {
+            var estadoPendiente = await db.EstadosSolicitud.FirstOrDefaultAsync(e => e.Nombre == "Pendiente de cobro");
+            var solicitud = await db.Solicitudes.FirstOrDefaultAsync(s => s.Id == cobro.OrdenTrabajo.SolicitudId);
+            if (estadoPendiente is null || solicitud is null) return false;
+            cobro.OrdenTrabajo.Estado = "Pendiente de cobro";
+            solicitud.EstadoSolicitudId = estadoPendiente.Id;
+        }
+
+        db.Cobros.Remove(cobro);
+        await db.SaveChangesAsync();
+        return true;
+    }
 }
 
