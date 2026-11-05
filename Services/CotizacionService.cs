@@ -131,6 +131,12 @@ public class CotizacionService(IDbContextFactory<Contexto> contextFactory)
             cotizacion.FechaRespuesta = null;
             cotizacion.MotivoRechazo = "";
         }
+        else if (cotizacion.Estado == "Rechazada" && nuevoEstado == EnRevision)
+        {
+            cotizacion.FechaEnvio = null;
+            cotizacion.FechaRespuesta = null;
+            cotizacion.MotivoRechazo = "";
+        }
         else if (cotizacion.Estado is "Aprobada" or "Rechazada" && nuevoEstado == "Enviada al cliente")
         {
             cotizacion.FechaRespuesta = null;
