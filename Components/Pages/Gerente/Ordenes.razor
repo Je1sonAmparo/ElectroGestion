@@ -156,7 +156,7 @@ else
     }
 
     private void AbrirNueva() { EditandoId = null; FormCotizacionId = 0; FormTrabajos = FormHerramientas = FormObservaciones = ""; ModalAbierto = true; }
-    private void Editar(ElectroGestion.Models.OrdenTrabajo orden) { EditandoId = orden.Id; FormCotizacionId = orden.CotizacionId; FormTrabajos = string.Join("\n", orden.Trabajos); FormHerramientas = string.Join("\n", orden.Herramientas); FormObservaciones = orden.Observaciones; ModalAbierto = true; }
+    private async Task Editar(ElectroGestion.Models.OrdenTrabajo orden) { if (!await OrdenService.PuedeModificarAsync(orden.Id)) { ToastService.Notify(new ToastMessage(ToastType.Warning, "La orden no se puede modificar porque ya tiene un cobro o su solicitud fue finalizada.")); return; } EditandoId = orden.Id; FormCotizacionId = orden.CotizacionId; FormTrabajos = string.Join("\n", orden.Trabajos); FormHerramientas = string.Join("\n", orden.Herramientas); FormObservaciones = orden.Observaciones; ModalAbierto = true; }
     private void CerrarModal() => ModalAbierto = false;
     private static List<string> Lineas(string texto) => texto.Split(['\r', '\n'], StringSplitOptions.RemoveEmptyEntries).Select(x => x.Trim()).Where(x => x.Length > 0).ToList();
 
@@ -170,8 +170,13 @@ else
         CerrarModal(); ToastService.Notify(new ToastMessage(ToastType.Success, "Orden guardada.")); await Recargar();
     }
 
-    private void SolicitarCambioEstado(ElectroGestion.Models.OrdenTrabajo orden)
+    private async Task SolicitarCambioEstado(ElectroGestion.Models.OrdenTrabajo orden)
     {
+        if (orden.Estado == "Pendiente de cobro" && await OrdenService.TieneCobroAsync(orden.Id))
+        {
+            ToastService.Notify(new ToastMessage(ToastType.Warning, "No se puede reabrir la orden porque ya hay un cobro creado. Revise el detalle del cobro para reabrirlo."));
+            return;
+        }
         OrdenEstadoPendienteId = orden.Id;
         EstadoOrdenPendiente = orden.Estado == "Pendiente de cobro" ? "En proceso" : "Pendiente de cobro";
     }
@@ -184,6 +189,7 @@ else
         var estado = EstadoOrdenPendiente;
         CerrarConfirmacionEstado();
         if (await OrdenService.CambiarEstadoAsync(id, estado)) { await Recargar(); ToastService.Notify(new ToastMessage(ToastType.Success, "Estado de la orden actualizado.")); }
+        else ToastService.Notify(new ToastMessage(ToastType.Warning, "No se puede cambiar el estado porque la solicitud ya finalizó o la orden tiene un cobro creado."));
     }
 
     private async Task Eliminar()
@@ -191,6 +197,7 @@ else
         if (!OrdenAEliminar.HasValue) return;
         var id = OrdenAEliminar.Value; OrdenAEliminar = null;
         if (await OrdenService.EliminarAsync(id)) { await Recargar(); ToastService.Notify(new ToastMessage(ToastType.Success, "Orden eliminada.")); }
+        else ToastService.Notify(new ToastMessage(ToastType.Warning, "No se puede eliminar una orden vinculada a una solicitud finalizada o a un cobro."));
     }
     private void CerrarEliminar() => OrdenAEliminar = null;
 
