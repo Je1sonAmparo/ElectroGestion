@@ -68,7 +68,7 @@ else
             <div style="margin-top:auto;padding-top:20px;display:flex;gap:10px">
                 <button @onclick="() => Editar(orden)" style="width:33%;padding:12px;border:1px solid #E3E5EE;background:#fff;color:#4A4E63;border-radius:9px;font-weight:700;font-size:14px;cursor:pointer;font-family:'Manrope'">Editar</button>
                 <button @onclick="() => OrdenAEliminar = orden.Id" style="width:33%;padding:12px;border:1px solid #F5C2C4;background:#fff;color:#C4141B;border-radius:9px;font-weight:700;font-size:14px;cursor:pointer;font-family:'Manrope'">Eliminar</button>
-                <button @onclick="() => CambiarEstado(orden)" style="width:34%;padding:12px;border:1px solid #1D4ED8;background:#1D4ED8;color:#fff;border-radius:9px;font-weight:700;font-size:14px;cursor:pointer;font-family:'Manrope'">@(orden.Estado == "Finalizada" ? "Reabrir" : "Cambiar Estado")</button>
+                <button @onclick="() => SolicitarCambioEstado(orden)" style="width:34%;padding:12px;border:1px solid #1D4ED8;background:#1D4ED8;color:#fff;border-radius:9px;font-weight:700;font-size:14px;cursor:pointer;font-family:'Manrope'">@(orden.Estado == "Finalizada" ? "Reabrir" : "Marcar finalizada")</button>
             </div>
         </article>
     }
@@ -109,6 +109,17 @@ else
     </div>
 }
 
+@if (OrdenEstadoPendienteId.HasValue)
+{
+    <div style="position:fixed;inset:0;background:rgba(14,16,40,.5);display:flex;align-items:center;justify-content:center;z-index:10001;padding:20px" @onclick="CerrarConfirmacionEstado">
+        <div style="background:#fff;border-radius:16px;width:100%;max-width:400px;padding:32px;box-shadow:0 20px 40px rgba(0,0,0,.2)" @onclick:stopPropagation>
+            <div style="font-family:'Manrope';font-weight:800;font-size:22px;color:#14162B;margin-bottom:10px">Confirmar cambio de estado</div>
+            <div style="color:#4A4E63;font-size:14px;margin-bottom:24px">¿Desea cambiar la orden a <strong>@EstadoOrdenPendiente</strong>?</div>
+            <div style="display:flex;justify-content:flex-end;gap:12px"><button @onclick="CerrarConfirmacionEstado" style="padding:10px 20px;border:1px solid #D5D8E6;background:#fff;border-radius:8px;font-weight:700;cursor:pointer;color:#4A4E63">Cancelar</button><button @onclick="ConfirmarCambioEstado" style="padding:10px 24px;border:0;background:#1D4ED8;color:#fff;border-radius:8px;font-weight:700;cursor:pointer">Confirmar</button></div>
+        </div>
+    </div>
+}
+
 @if (AppState.EsGerente && CotizacionDetalle is not null)
 { <CotizacionDocumento Cotizacion="CotizacionDetalle" OnClose="CerrarCotizacion" /> }
 
@@ -121,6 +132,8 @@ else
     private ElectroGestion.Models.Cotizacion? CotizacionDetalle;
     private bool ModalAbierto;
     private int? EditandoId, OrdenAEliminar;
+    private int? OrdenEstadoPendienteId;
+    private string EstadoOrdenPendiente = "";
     private int FormCotizacionId;
     private string FormTrabajos = "", FormHerramientas = "", FormObservaciones = "";
     private ElectroGestion.Models.Cotizacion? CotizacionSeleccionada => CotizacionesDisponibles.FirstOrDefault(c => c.Id == FormCotizacionId);
@@ -157,9 +170,20 @@ else
         CerrarModal(); ToastService.Notify(new ToastMessage(ToastType.Success, "Orden guardada.")); await Recargar();
     }
 
-    private async Task CambiarEstado(ElectroGestion.Models.OrdenTrabajo orden)
+    private void SolicitarCambioEstado(ElectroGestion.Models.OrdenTrabajo orden)
     {
-        if (await OrdenService.CambiarEstadoAsync(orden.Id, orden.Estado == "Finalizada" ? "En proceso" : "Finalizada")) { await Recargar(); ToastService.Notify(new ToastMessage(ToastType.Success, "Estado de la orden actualizado.")); }
+        OrdenEstadoPendienteId = orden.Id;
+        EstadoOrdenPendiente = orden.Estado == "Finalizada" ? "En proceso" : "Finalizada";
+    }
+
+    private void CerrarConfirmacionEstado() { OrdenEstadoPendienteId = null; EstadoOrdenPendiente = ""; }
+    private async Task ConfirmarCambioEstado()
+    {
+        if (!OrdenEstadoPendienteId.HasValue) return;
+        var id = OrdenEstadoPendienteId.Value;
+        var estado = EstadoOrdenPendiente;
+        CerrarConfirmacionEstado();
+        if (await OrdenService.CambiarEstadoAsync(id, estado)) { await Recargar(); ToastService.Notify(new ToastMessage(ToastType.Success, "Estado de la orden actualizado.")); }
     }
 
     private async Task Eliminar()
