@@ -58,6 +58,20 @@
             <h2>Reporte de ventas de los últimos 3 meses</h2>
             <p>Cuantificación de los ingresos por comercialización directa de equipos y materiales durante el mes actual y los dos anteriores.</p>
         </div>
+        <section class="report-filter-bar" aria-label="Filtros del reporte de ventas">
+            <div class="report-period">
+                <svg viewBox="0 0 24 24" width="21" height="21" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4.5 6.5h15v14h-15zM4.5 11h15M8.5 3.8v4M15.5 3.8v4"/></svg>
+                <span>Período: <strong>Últimos 3 meses</strong></span>
+            </div>
+            <label class="report-filter-control report-category-control">
+                <span>Categoría:</span>
+                <select @bind="SelectedSalesCategory">
+                    <option value="">Todos los productos</option>
+                    @foreach (var category in SalesCategories) { <option value="@category">@category</option> }
+                </select>
+            </label>
+            <button class="report-update-button" @onclick="UpdateSalesReport">Actualizar Reporte</button>
+        </section>
         @if (SalesMonths.Count == 3)
         {
             <section class="report-metrics-layout" aria-label="Indicadores del reporte de ventas">
@@ -308,14 +322,30 @@
     private const string AnnualView = "annual-consumption";
     private const string SalesView = "ventas";
     private List<MesVentas> SalesMonths = [];
+    private List<string> SalesCategories = [];
+    private string SelectedSalesCategory = "";
+    private string AppliedSalesCategory = "";
 
     private async Task OpenSalesReport()
     {
         if (!AppState.EsGerente) return;
         View = SalesView;
         SalesMonths = [];
-        try { SalesMonths = await VentaService.UltimosTresMesesAsync(); }
+        SelectedSalesCategory = AppliedSalesCategory = "";
+        try
+        {
+            SalesCategories = await VentaService.CategoriasInventarioAsync();
+            SalesMonths = await VentaService.UltimosTresMesesAsync(AppliedSalesCategory);
+        }
         catch { ToastService.Notify(new ToastMessage(ToastType.Danger, "No se pudo cargar el reporte de ventas.")); }
+    }
+
+    private async Task UpdateSalesReport()
+    {
+        if (!AppState.EsGerente) return;
+        AppliedSalesCategory = SelectedSalesCategory;
+        try { SalesMonths = await VentaService.UltimosTresMesesAsync(AppliedSalesCategory); }
+        catch { ToastService.Notify(new ToastMessage(ToastType.Danger, "No se pudo actualizar el reporte de ventas.")); }
     }
 
     private static string SalesMonth(MesVentas mes) => mes.Mes.ToString("MMMM yyyy", System.Globalization.CultureInfo.GetCultureInfo("es-DO"));
