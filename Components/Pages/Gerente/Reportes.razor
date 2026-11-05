@@ -218,7 +218,17 @@
                 <div class="report-bar-chart" role="img" aria-label="Tendencia mensual de consumo de materiales en @AppliedYear">
                     <div class="report-y-axis">@foreach(var mark in AxisMarks){<span>@FormatAxis(mark)</span>}</div>
                     <div class="report-bars">
-                        @foreach(var mes in VisibleMonths){<div class="report-bar-column" title="@mes.Etiqueta: RD$ @FormatMoney(mes.Total)"><strong>@FormatChartMoney(mes.Total)</strong><span class="report-bar" style="--bar-height:@BarHeight(mes.Total)%"></span><span class="report-month">@mes.Etiqueta</span></div>}
+                        @foreach (var mes in VisibleMonths)
+                        {
+                            <div class="report-bar-column" style="--bar-height:@BarHeight(mes.Total)%" title="@mes.Etiqueta: RD$ @FormatMoney(mes.Total)">
+                                <strong>@FormatChartMoney(mes.Total)</strong>
+                                @if (mes.Total > 0)
+                                {
+                                    <span class="report-bar"></span>
+                                }
+                                <span class="report-month">@mes.Etiqueta</span>
+                            </div>
+                        }
                     </div>
                 </div>
                 <div class="report-chart-caption"><span class="legend-swatch swatch-blue-2"></span>Consumo Total (RD$)</div>
