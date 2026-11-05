@@ -66,13 +66,14 @@
         </div>
     </div>
 
+    <div style="padding:10px 18px;display:flex;justify-content:flex-end;align-items:center;gap:12px"><span style="font-size:13px;color:#6B7085">@Seleccionadas.Count seleccionadas</span><button disabled="@(Seleccionadas.Count == 0)" @onclick="ConfirmarSeleccionadas" style="padding:8px 14px;border:1px solid #F5C2C4;background:#fff;color:#C4141B;border-radius:8px;font-weight:700;cursor:pointer">Eliminar seleccionadas</button></div>
     <div style="overflow-x:auto">
         <table style="width:100%;border-collapse:collapse;font-size:14px;table-layout:fixed">
             <thead>
                 <tr style="border-bottom:1px solid #EFF0F6;background:#FAFAFC;color:#6B7085;font-family:'Manrope';font-weight:800;font-size:13px;text-transform:uppercase;letter-spacing:0.5px">
                     <th @onclick='() => OrdenarPor("Id")' style="padding:14px 18px;text-align:left;width:12%;cursor:pointer;user-select:none" title="Ordenar por ID">
                         <div style="display:inline-flex;align-items:center;gap:6px">
-                            <span>ID</span>
+                            <input type="checkbox" aria-label="Seleccionar todas las solicitudes visibles que se pueden eliminar" checked="@(ElegiblesVisibles.Count > 0 && ElegiblesVisibles.All(id => Seleccionadas.Contains(id)))" @onchange="e => SeleccionarTodas((bool)(e.Value ?? false))" @onclick:stopPropagation style="margin-right:5px" /><span>ID</span>
                             @if (SortColumn == "Id") { <span style="font-size:11px">@(SortAscending ? "▲" : "▼")</span> }
                         </div>
                     </th>
@@ -118,7 +119,7 @@
                     {
                         <tr style="border-bottom:1px solid #EFF0F6">
                             <td style="padding:18px;vertical-align:middle">
-                                <span style="font-family:ui-monospace,'SFMono-Regular',Consolas,monospace;font-size:14px;font-weight:700;letter-spacing:.05em;color:#5B6173">@s.Id.ToString("D4")</span>
+                                <input type="checkbox" aria-label="Seleccionar solicitud @s.Id" checked="@Seleccionadas.Contains(s.Id)" disabled="@(!PuedeEliminarSolicitud(s.Id))" @onchange="e => CambiarSeleccion(s.Id, (bool)(e.Value ?? false))" style="margin-right:8px" /><span style="font-family:ui-monospace,'SFMono-Regular',Consolas,monospace;font-size:14px;font-weight:700;letter-spacing:.05em;color:#5B6173">@s.Id.ToString("D4")</span>
                             </td>
                             <td style="padding:18px;vertical-align:middle;font-weight:700;color:#14162B">
                                 @s.Cliente?.Nombre
@@ -186,7 +187,16 @@
             </div>
             <div style="display:flex;flex-direction:column;gap:16px">
                 <div><label style="display:block;font-size:13px;font-weight:700;color:#14162B;margin-bottom:6px">Cliente *</label><select @bind="FormCliente" disabled="@FormId.HasValue" style="width:100%;padding:10px 14px;border:1px solid #D5D8E6;border-radius:8px;font-size:14px;background:@(FormId.HasValue ? "#F7F8FC" : "#fff");color:@(FormId.HasValue ? "#6B7085" : "#14162B");cursor:@(FormId.HasValue ? "not-allowed" : "pointer");opacity:1"><option value="">Seleccione un cliente registrado</option>@foreach (var cliente in clientes) { <option value="@cliente.Nombre">@cliente.Nombre</option> }</select></div>
-                <div><label style="display:block;font-size:13px;font-weight:700;color:#14162B;margin-bottom:6px">Tipo de Servicio *</label><select @bind="FormTipo" style="width:100%;padding:10px 14px;border:1px solid #D5D8E6;border-radius:8px;font-size:14px;background:#fff"><option value="">Seleccione el tipo de servicio</option>@foreach (var tipo in TiposServicio) { <option value="@tipo">@tipo</option> }</select></div>
+                <div>
+                    <label style="display:block;font-size:13px;font-weight:700;color:#14162B;margin-bottom:6px">Tipo de Servicio *</label>
+                    <select @bind="FormServicioId" style="width:100%;padding:10px 14px;border:1px solid #D5D8E6;border-radius:8px;font-size:14px;background:#fff">
+                        <option value="0">Seleccione el tipo de servicio</option>
+                        @foreach (var servicio in ServiciosDelFormulario)
+                        {
+                            <option value="@servicio.Id">@servicio.Nombre@(servicio.Estado == "Inactivo" ? " (inactivo)" : "")</option>
+                        }
+                    </select>
+                </div>
                 <div><label style="display:block;font-size:13px;font-weight:700;color:#14162B;margin-bottom:6px">Dirección del Servicio *</label><input @bind="FormDireccion" placeholder="ej. Calle Principal #12, Santiago" style="width:100%;padding:10px 14px;border:1px solid #D5D8E6;border-radius:8px;font-size:14px" /></div>
             </div>
             <div style="display:flex;justify-content:flex-end;gap:12px;margin-top:28px">
@@ -197,7 +207,37 @@
     </div>
 }
 
+@if (IsDeleteModalOpen)
+{
+    <div style="position:fixed;inset:0;background:rgba(14,16,40,.5);display:flex;align-items:center;justify-content:center;z-index:9999;padding:20px">
+        <div style="background:#fff;border-radius:16px;width:100%;max-width:400px;padding:32px;box-shadow:0 20px 40px rgba(0,0,0,.2)">
+            <div style="font-family:'Manrope';font-weight:800;font-size:22px;color:#14162B;margin-bottom:10px">Eliminar solicitudes</div>
+            <div style="color:#4A4E63;font-size:14px;margin-bottom:24px">¿Deseas eliminar @(DeleteIds.Count == 1 ? "esta solicitud" : $"estas {DeleteIds.Count} solicitudes")? Confirma para continuar.</div>
+            <div style="display:flex;justify-content:flex-end;gap:12px"><button @onclick="() => IsDeleteModalOpen = false" style="padding:10px 20px;border:1px solid #D5D8E6;background:#fff;border-radius:8px">Cancelar</button><button @onclick="EjecutarEliminar" style="padding:10px 24px;border:0;background:#C0392B;color:#fff;border-radius:8px;font-weight:700">Sí, eliminar</button></div>
+        </div>
+    </div>
+}
+
 @code {
+    private bool IsDeleteModalOpen;
+    private HashSet<int> Seleccionadas = [];
+    private HashSet<int> DeleteIds = [];
+    private bool PuedeEliminarSolicitud(int id) => solicitudes.FirstOrDefault(s => s.Id == id)?.EstadoSolicitud?.Nombre is not ("En proceso" or "En Espera Administración" or "Finalizada");
+    private List<int> ElegiblesVisibles => FilteredSolicitudes.Where(s => PuedeEliminarSolicitud(s.Id)).Select(s => s.Id).ToList();
+    private void CambiarSeleccion(int id, bool marcado) { if (marcado && PuedeEliminarSolicitud(id)) Seleccionadas.Add(id); else Seleccionadas.Remove(id); }
+    private void SeleccionarTodas(bool marcado) { foreach (var id in ElegiblesVisibles) { if (marcado) Seleccionadas.Add(id); else Seleccionadas.Remove(id); } }
+    private void ConfirmarSeleccionadas() { DeleteIds = Seleccionadas.Where(PuedeEliminarSolicitud).ToHashSet(); IsDeleteModalOpen = DeleteIds.Count > 0; }
+    private async Task EjecutarEliminar()
+    {
+        var eliminado = await SolicitudService.EliminarVarios(DeleteIds);
+        IsDeleteModalOpen = false;
+        DeleteIds.Clear();
+        if (!eliminado) { ToastService.ShowWarning("No se pudieron eliminar las solicitudes seleccionadas.", "Atención"); return; }
+        Seleccionadas.Clear();
+        AppState.NotifyStateChanged();
+        await CargarDatos();
+        ToastService.ShowSuccess("Solicitudes eliminadas correctamente.");
+    }
     private string SearchId { get; set; } = "";
     private string SearchCliente { get; set; } = "";
     private string SearchTipo { get; set; } = "";
@@ -208,7 +248,7 @@
     private string ModalSub = "";
     private int? FormId;
     private string FormCliente = "";
-    private string FormTipo = "";
+    private int FormServicioId;
     private string FormDireccion = "";
     private List<string> TiposServicio = new();
 
@@ -218,6 +258,8 @@
     private List<ElectroGestion.Models.Solicitud> solicitudes = new();
     private List<ElectroGestion.Models.Cliente> clientes = new();
     private List<ElectroGestion.Models.Servicio> servicios = new();
+    private IEnumerable<ElectroGestion.Models.Servicio> ServiciosDelFormulario => servicios.Where(s =>
+        s.Estado == "Activo" || solicitudes.Any(sol => sol.Id == FormId && sol.ServicioId == s.Id));
     private List<ElectroGestion.Models.Solicitud> FilteredSolicitudes = new();
 
     protected override async Task OnInitializedAsync()
@@ -287,6 +329,7 @@
             "Estado" => SortAscending ? q.OrderBy(x => x.EstadoSolicitud != null ? x.EstadoSolicitud.Nombre : "") : q.OrderByDescending(x => x.EstadoSolicitud != null ? x.EstadoSolicitud.Nombre : ""),
             _ => SortAscending ? q.OrderBy(x => x.Id) : q.OrderByDescending(x => x.Id)
         }).ToList();
+        Seleccionadas.IntersectWith(FilteredSolicitudes.Select(s => s.Id));
     }
 
     private async Task NuevaSolicitud()
@@ -295,7 +338,8 @@
         ModalTitle = "Nueva Solicitud";
         ModalSub = "Complete los datos para registrar una nueva solicitud de servicio.";
         FormId = null;
-        FormCliente = FormTipo = FormDireccion = "";
+        FormCliente = FormDireccion = "";
+        FormServicioId = 0;
         IsFormModalOpen = true;
     }
 
@@ -309,21 +353,21 @@
         ModalSub = "Modifique los datos de la solicitud.";
         FormId = solicitud.Id;
         FormCliente = solicitud.Cliente?.Nombre ?? "";
-        FormTipo = solicitud.Servicio?.Nombre ?? "";
+        FormServicioId = solicitud.ServicioId;
         FormDireccion = solicitud.Direccion;
         IsFormModalOpen = true;
     }
 
     private async Task SaveModal()
     {
-        if (string.IsNullOrWhiteSpace(FormCliente) || string.IsNullOrWhiteSpace(FormTipo) || string.IsNullOrWhiteSpace(FormDireccion))
+        if (string.IsNullOrWhiteSpace(FormCliente) || FormServicioId <= 0 || string.IsNullOrWhiteSpace(FormDireccion))
         {
             ToastService.ShowWarning("Por favor complete los campos requeridos.", "Atención");
             return;
         }
 
         var clienteEntity = clientes.FirstOrDefault(c => c.Nombre == FormCliente);
-        var servicioEntity = servicios.FirstOrDefault(serv => serv.Nombre == FormTipo);
+        var servicioEntity = ServiciosDelFormulario.FirstOrDefault(serv => serv.Id == FormServicioId);
 
         if (clienteEntity == null || servicioEntity == null)
         {

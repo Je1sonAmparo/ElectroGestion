@@ -81,12 +81,7 @@
                             @if (SortColumn == "Categoria") { <span style="font-size:11px">@(SortAscending ? "▲" : "▼")</span> }
                         </div>
                     </th>
-                    <th @onclick='() => OrdenarPor("Precio")' style="padding:14px 18px;text-align:left;color:#4A4E63;font-weight:700;cursor:pointer;user-select:none" title="Ordenar por Precio Base">
-                        <div style="display:inline-flex;align-items:center;gap:6px">
-                            <span>Precio Base</span>
-                            @if (SortColumn == "Precio") { <span style="font-size:11px">@(SortAscending ? "▲" : "▼")</span> }
-                        </div>
-                    </th>
+
                     <th @onclick='() => OrdenarPor("Estado")' style="padding:14px 18px;text-align:left;color:#4A4E63;font-weight:700;cursor:pointer;user-select:none" title="Ordenar por Estado">
                         <div style="display:inline-flex;align-items:center;gap:6px">
                             <span>Estado</span>
@@ -100,7 +95,7 @@
                 @if (!FilteredServicios.Any())
                 {
                     <tr>
-                        <td colspan="7" style="padding:24px;text-align:center;color:#6B7085">No se encontraron servicios.</td>
+                        <td colspan="6" style="padding:24px;text-align:center;color:#6B7085">No se encontraron servicios.</td>
                     </tr>
                 }
                 else
@@ -113,7 +108,6 @@
                             <td style="padding:14px 18px;color:#4A4E63">@serv.ServicioId</td>
                             <td style="padding:14px 18px;color:#4A4E63">@serv.Nombre</td>
                             <td style="padding:14px 18px;color:#4A4E63">@serv.Categoria</td>
-                            <td style="padding:14px 18px;color:#4A4E63;font-weight:700">RD$ @serv.PrecioBase.ToString("N2")</td>
                             <td style="padding:14px 18px">
                                 <span style="display:inline-block;padding:4px 10px;border-radius:20px;font-size:12.5px;font-weight:700;background:@bg;color:@fg">
                                     @serv.Estado
@@ -161,10 +155,6 @@
                     <label style="display:block;font-family:'Manrope';font-weight:700;font-size:14px;color:#4A4E63;margin-bottom:6px">Categoría</label>
                     <input @bind="FormCategoria" style="width:100%;padding:10px 14px;border:1px solid #D5D8E6;border-radius:8px;font-size:14px;color:#14162B" placeholder="Categoría" />
                 </div>
-                <div>
-                    <label style="display:block;font-family:'Manrope';font-weight:700;font-size:14px;color:#4A4E63;margin-bottom:6px">Precio Base</label>
-                    <input @bind="FormPrecio" type="number" step="0.01" style="width:100%;padding:10px 14px;border:1px solid #D5D8E6;border-radius:8px;font-size:14px;color:#14162B" placeholder="0.00" />
-                </div>
                 @if (EditId.HasValue)
                 {
                     <div>
@@ -209,7 +199,6 @@
                 <div style="background:#F7F8FC;border:1px solid #EFF0F6;border-radius:10px;padding:12px 14px"><div style="font-size:11.5px;color:#8B90A3;font-weight:800;text-transform:uppercase">Código</div><div style="font-size:14px;margin-top:4px;font-weight:700;color:#14162B">@SelectedServicio.ServicioId</div></div>
                 <div style="background:#F7F8FC;border:1px solid #EFF0F6;border-radius:10px;padding:12px 14px"><div style="font-size:11.5px;color:#8B90A3;font-weight:800;text-transform:uppercase">Nombre</div><div style="font-size:14px;margin-top:4px;font-weight:700;color:#14162B">@SelectedServicio.Nombre</div></div>
                 <div style="background:#F7F8FC;border:1px solid #EFF0F6;border-radius:10px;padding:12px 14px"><div style="font-size:11.5px;color:#8B90A3;font-weight:800;text-transform:uppercase">Categoría</div><div style="font-size:14px;margin-top:4px;font-weight:700;color:#14162B">@SelectedServicio.Categoria</div></div>
-                <div style="background:#F7F8FC;border:1px solid #EFF0F6;border-radius:10px;padding:12px 14px"><div style="font-size:11.5px;color:#8B90A3;font-weight:800;text-transform:uppercase">Precio Base</div><div style="font-size:14px;margin-top:4px;font-weight:700;color:#14162B">RD$ @SelectedServicio.PrecioBase.ToString("N2")</div></div>
                 <div style="background:#F7F8FC;border:1px solid #EFF0F6;border-radius:10px;padding:12px 14px"><div style="font-size:11.5px;color:#8B90A3;font-weight:800;text-transform:uppercase">Estado</div><div style="font-size:14px;margin-top:4px;font-weight:700;color:#14162B">
                     @{ var (bg, fg) = ElectroGestion.Services.AppStateService.GetBadgeColors(SelectedServicio.Estado); }
                     <span style="display:inline-block;padding:4px 10px;border-radius:20px;font-size:12.5px;font-weight:700;background:@bg;color:@fg">@SelectedServicio.Estado</span>
@@ -245,6 +234,7 @@
     private string SearchNombre = "";
     private string SearchCategoria = "";
     private string SearchEstado = "";
+    private (string Codigo, string Nombre, string Categoria, string Estado) FiltrosAplicados = ("", "", "", "");
 
     private string SortColumn = "Id";
     private bool SortAscending = true;
@@ -264,7 +254,7 @@
 
     private void Filtrar()
     {
-        StateHasChanged();
+        FiltrosAplicados = (SearchCodigo.Trim(), SearchNombre.Trim(), SearchCategoria.Trim(), SearchEstado);
     }
 
     private bool IsModalOpen = false;
@@ -287,20 +277,18 @@
     private string FormServicioId = "";
     private string FormNombre = "";
     private string FormCategoria = "";
-    private decimal FormPrecio = 0;
     private string FormEstado = "Activo";
 
     private List<ElectroGestion.Models.Servicio> FilteredServicios
     {
         get
         {
-            var q = servicios.Where(s => {
-                bool matchCod = string.IsNullOrEmpty(SearchCodigo) || s.ServicioId.Contains(SearchCodigo, StringComparison.OrdinalIgnoreCase);
-                bool matchNombre = string.IsNullOrEmpty(SearchNombre) || s.Nombre.Contains(SearchNombre, StringComparison.OrdinalIgnoreCase);
-                bool matchCat = string.IsNullOrEmpty(SearchCategoria) || (!string.IsNullOrEmpty(s.Categoria) && s.Categoria.Contains(SearchCategoria, StringComparison.OrdinalIgnoreCase));
-                bool matchEst = string.IsNullOrEmpty(SearchEstado) || (!string.IsNullOrEmpty(s.Estado) && s.Estado.Equals(SearchEstado, StringComparison.OrdinalIgnoreCase));
-                return matchCod && matchNombre && matchCat && matchEst;
-            });
+            var filtros = FiltrosAplicados;
+            var q = servicios.Where(s =>
+                s.ServicioId.Contains(filtros.Codigo, StringComparison.OrdinalIgnoreCase) &&
+                s.Nombre.Contains(filtros.Nombre, StringComparison.OrdinalIgnoreCase) &&
+                s.Categoria.Contains(filtros.Categoria, StringComparison.OrdinalIgnoreCase) &&
+                (filtros.Estado.Length == 0 || s.Estado == filtros.Estado));
 
             return (SortColumn switch
             {
@@ -308,7 +296,6 @@
                 "Codigo" => SortAscending ? q.OrderBy(s => s.ServicioId) : q.OrderByDescending(s => s.ServicioId),
                 "Nombre" => SortAscending ? q.OrderBy(s => s.Nombre) : q.OrderByDescending(s => s.Nombre),
                 "Categoria" => SortAscending ? q.OrderBy(s => s.Categoria) : q.OrderByDescending(s => s.Categoria),
-                "Precio" => SortAscending ? q.OrderBy(s => s.PrecioBase) : q.OrderByDescending(s => s.PrecioBase),
                 "Estado" => SortAscending ? q.OrderBy(s => s.Estado) : q.OrderByDescending(s => s.Estado),
                 _ => SortAscending ? q.OrderBy(s => s.Id) : q.OrderByDescending(s => s.Id)
             }).ToList();
@@ -325,7 +312,6 @@
             FormServicioId = item.ServicioId;
             FormNombre = item.Nombre;
             FormCategoria = item.Categoria ?? "";
-            FormPrecio = item.PrecioBase;
             FormEstado = item.Estado ?? "Activo";
         }
         else
@@ -334,7 +320,6 @@
             FormServicioId = "";
             FormNombre = "";
             FormCategoria = "";
-            FormPrecio = 0;
             FormEstado = "Activo";
         }
         IsModalOpen = true;
@@ -361,7 +346,7 @@
             }
             else
             {
-                ToastService.Notify(new ToastMessage(ToastType.Danger, "No se pudo eliminar el servicio. Verifique si tiene solicitudes asociadas."));
+                ToastService.Notify(new ToastMessage(ToastType.Danger, "No se pudo eliminar el servicio. Verifique si está vinculado a solicitudes o a sus detalles."));
             }
         }
         IsDeleteModalOpen = false;
@@ -382,7 +367,7 @@
 
     private async Task GuardarServicio()
     {
-        if (string.IsNullOrWhiteSpace(FormServicioId) || string.IsNullOrWhiteSpace(FormNombre) || FormPrecio <= 0)
+        if (string.IsNullOrWhiteSpace(FormServicioId) || string.IsNullOrWhiteSpace(FormNombre))
         {
             ToastService.Notify(new ToastMessage(ToastType.Warning, "Complete todos los campos correctamente."));
             return;
@@ -394,7 +379,6 @@
             ServicioId = FormServicioId,
             Nombre = FormNombre,
             Categoria = FormCategoria,
-            PrecioBase = FormPrecio,
             Estado = FormEstado
         };
 
@@ -403,13 +387,13 @@
         {
             ToastService.Notify(new ToastMessage(ToastType.Success, EditId.HasValue ? "Servicio actualizado con éxito." : "Servicio creado con éxito."));
             await CargarServicios();
+            CerrarModal();
         }
         else
         {
             ToastService.Notify(new ToastMessage(ToastType.Danger, "Error al guardar el servicio."));
         }
 
-        CerrarModal();
     }
 
     private void VerDetalle(int id)

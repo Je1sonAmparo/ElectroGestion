@@ -9,6 +9,12 @@ public class AutenticacionService(
     IDbContextFactory<Contexto> contextFactory,
     IPasswordHasher<Usuario> passwordHasher)
 {
+    public async Task<Usuario?> ObtenerUsuarioAsync(int id)
+    {
+        await using var contexto = await contextFactory.CreateDbContextAsync();
+        return await contexto.Usuarios.AsNoTracking().SingleOrDefaultAsync(u => u.Id == id);
+    }
+
     public async Task<Usuario?> AutenticarAsync(string usuarioLogin, string password)
     {
         await using var contexto = await contextFactory.CreateDbContextAsync();

@@ -8,4 +8,5 @@ public class ArticuloInventario
     public string Categoria { get; set; } = "";
     public int Cantidad { get; set; }
     public decimal PrecioUnidad { get; set; }
+    public string Estado => Cantidad > 0 ? "Con stock" : "Sin stock";
 }

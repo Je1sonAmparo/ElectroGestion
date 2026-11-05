@@ -1,6 +1,5 @@
 @inject ElectroGestion.Services.AppStateService AppState
-@inject ElectroGestion.Services.LevantamientoService LevantamientoService
-@inject ElectroGestion.Services.OrdenTrabajoService OrdenService
+@inject ElectroGestion.Services.InicioDashboardService DashboardService
 @inject NavigationManager NavManager
 @inject IJSRuntime JS
 
@@ -118,34 +117,23 @@
 @code {
     private string UserName => AppState.Session?.Nombre ?? "Usuario";
 
-    private IEnumerable<ElectroGestion.Models.Visita> VisitsToday => AppState.Visitas
-        .Where(v => v.Fecha.Date == DateTime.Today &&
-                    v.Estado != "Cancelada" && v.Estado != "Finalizada")
-        .OrderBy(v => v.Hora);
+    private ElectroGestion.Services.InicioDashboardDatos Datos { get; set; } = new([], [], 0, 0, 0);
+
+    private IEnumerable<ElectroGestion.Models.Visita> VisitsToday => Datos.VisitasHoy;
 
     private ElectroGestion.Models.Visita? NextVisit => VisitsToday.FirstOrDefault();
 
-    private IEnumerable<ElectroGestion.Models.Solicitud> RecentActivity => AppState.Solicitudes
-        .OrderByDescending(s => s.FechaSolicitud)
-        .ThenByDescending(s => s.Id)
-        .Take(3);
-
-    private int LevantamientosPendientes { get; set; }
-    private int OrdenesPendientes { get; set; }
-
-    protected override async Task OnInitializedAsync()
-    {
-        LevantamientosPendientes = await LevantamientoService.ContarPendientesAsync();
-        OrdenesPendientes = (await OrdenService.ObtenerTodasAsync()).Count(o => o.Estado == "En proceso");
-    }
+    private IEnumerable<ElectroGestion.Models.Solicitud> RecentActivity => Datos.ActividadReciente;
 
     private IEnumerable<HomeMetric> Metrics => new[]
     {
-        new HomeMetric("Solicitudes pendientes", AppState.Solicitudes.Count(s => s.EstadoSolicitud?.Nombre == "Pendiente"), "Ver solicitudes", "/solicitudes"),
+        new HomeMetric("Solicitudes pendientes", Datos.SolicitudesPendientes, "Ver solicitudes", "/solicitudes"),
         new HomeMetric("Visitas programadas", VisitsToday.Count(), "Ver agenda", "/agenda"),
-        new HomeMetric("Levantamientos pendientes", LevantamientosPendientes, "Ver levantamientos", "/levantamientos"),
-        new HomeMetric("Órdenes de trabajo nuevas", OrdenesPendientes, "Ver órdenes", "/ordenes")
+        new HomeMetric("Levantamientos pendientes", Datos.LevantamientosPendientes, "Ver levantamientos", "/levantamientos"),
+        new HomeMetric("Órdenes de trabajo nuevas", Datos.OrdenesPendientes, "Ver órdenes", "/ordenes")
     };
+
+    protected override async Task OnInitializedAsync() => Datos = await DashboardService.ObtenerDatosAsync(DateTime.Today);
 
     private readonly HomeQuickAccess[] QuickAccesses =
     [

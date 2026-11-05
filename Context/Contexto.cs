@@ -16,6 +16,9 @@ public class Contexto : DbContext
     public DbSet<OrdenTrabajo> OrdenesTrabajo { get; set; }
     public DbSet<Cobro> Cobros { get; set; }
     public DbSet<AbonoCobro> AbonosCobro { get; set; }
+    public DbSet<ArticuloInventario> ArticulosInventario { get; set; }
+    public DbSet<Venta> Ventas { get; set; }
+    public DbSet<DetalleVenta> DetallesVenta { get; set; }
     public DbSet<Cliente> Clientes { get; set; }
     public DbSet<Usuario> Usuarios { get; set; }
     public DbSet<Servicio> Servicios { get; set; }
@@ -26,6 +29,36 @@ public class Contexto : DbContext
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         base.OnModelCreating(modelBuilder);
+
+        modelBuilder.Entity<Venta>(entity =>
+        {
+            entity.Property(v => v.PrecioUnitario).HasPrecision(18, 2);
+            entity.Property(v => v.TasaItbis).HasPrecision(5, 2);
+            entity.HasIndex(v => v.Ncf).IsUnique();
+            entity.HasIndex(v => new { v.Estado, v.FechaVenta });
+            entity.HasOne<ArticuloInventario>().WithMany().HasForeignKey(v => v.ArticuloInventarioId)
+                .OnDelete(DeleteBehavior.Restrict);
+            entity.HasMany(v => v.Detalles).WithOne(d => d.Venta).HasForeignKey(d => d.VentaId)
+                .OnDelete(DeleteBehavior.Cascade);
+        });
+
+        modelBuilder.Entity<DetalleVenta>(entity =>
+        {
+            entity.Property(d => d.PrecioUnitario).HasPrecision(18, 2);
+            entity.Ignore(d => d.Subtotal);
+            entity.HasOne<ArticuloInventario>().WithMany().HasForeignKey(d => d.ArticuloInventarioId)
+                .OnDelete(DeleteBehavior.Restrict);
+        });
+
+        modelBuilder.Entity<ArticuloInventario>(entity =>
+        {
+            entity.Ignore(a => a.Estado);
+            entity.Property(a => a.PrecioUnidad).HasPrecision(18, 2);
+            entity.HasIndex(a => a.Codigo).IsUnique();
+            entity.HasData(
+                new ArticuloInventario { Id = 1, Codigo = "ART-001", Nombre = "Cable de Cobre", Categoria = "Materiales", Cantidad = 500, PrecioUnidad = 15m },
+                new ArticuloInventario { Id = 2, Codigo = "ART-002", Nombre = "Transformador 50kVA", Categoria = "Equipos", Cantidad = 10, PrecioUnidad = 25000m });
+        });
 
         modelBuilder.Entity<Cliente>(entity =>
         {
@@ -227,10 +260,10 @@ public class Contexto : DbContext
 
         modelBuilder.Entity<Cliente>().HasData(
             new Cliente { Id = 1, Nombre = "Melody Santos", Correo = "melody@email.com", Rnc = "402-1234567-1", Direccion = "Calle Duarte #24, Santiago", Servicios = 8, Ultimo = "Instalación de Sistema UPS" },
-            new Cliente { Id = 2, Nombre = "Constructora López", Correo = "info@clopez.com", Rnc = "101-987654-2", Direccion = "Av. Estrella Sadhalá #102, Santiago", Servicios = 5, Ultimo = "Instalación Solar" },
-            new Cliente { Id = 3, Nombre = "Farmacia El Sol", Correo = "farmacia@elsol.do", Rnc = "130-334455-3", Direccion = "Calle 16 #7, La Vega", Servicios = 6, Ultimo = "Mantenimiento Eléctrico" },
-            new Cliente { Id = 4, Nombre = "Colmado Hernández", Correo = "hernandez@colmado.com", Rnc = "402-667788-4", Direccion = "Calle Principal #58, Moca", Servicios = 3, Ultimo = "Cableado Estructurado" },
-            new Cliente { Id = 5, Nombre = "Taller Mecánico RD", Correo = "taller@mecanicord.com", Rnc = "130-112233-5", Direccion = "Carretera Luperón km 5, Santiago", Servicios = 1, Ultimo = "Instalación de Planta Eléctrica" }
+            new Cliente { Id = 2, Nombre = "Constructora López", Correo = "info@clopez.com", Rnc = "101-98765-2", Direccion = "Av. Estrella Sadhalá #102, Santiago", Servicios = 5, Ultimo = "Instalación Solar" },
+            new Cliente { Id = 3, Nombre = "Farmacia El Sol", Correo = "farmacia@elsol.do", Rnc = "130-33445-3", Direccion = "Calle 16 #7, La Vega", Servicios = 6, Ultimo = "Mantenimiento Eléctrico" },
+            new Cliente { Id = 4, Nombre = "Colmado Hernández", Correo = "hernandez@colmado.com", Rnc = "402-6677884-1", Direccion = "Calle Principal #58, Moca", Servicios = 3, Ultimo = "Cableado Estructurado" },
+            new Cliente { Id = 5, Nombre = "Taller Mecánico RD", Correo = "taller@mecanicord.com", Rnc = "130-11223-5", Direccion = "Carretera Luperón km 5, Santiago", Servicios = 1, Ultimo = "Instalación de Planta Eléctrica" }
         );
 
         modelBuilder.Entity<ClienteTelefono>().HasData(
@@ -244,11 +277,11 @@ public class Contexto : DbContext
         );
 
         modelBuilder.Entity<Servicio>().HasData(
-            new Servicio { Id = 1, ServicioId = "SV-001", Nombre = "Instalación de Paneles Solares", Categoria = "Instalaciones", PrecioBase = 85000, Estado = "Activo" },
-            new Servicio { Id = 2, ServicioId = "SV-002", Nombre = "Instalación de Sistema UPS", Categoria = "Instalaciones", PrecioBase = 45000, Estado = "Activo" },
-            new Servicio { Id = 3, ServicioId = "SV-003", Nombre = "Mantenimiento Eléctrico", Categoria = "Mantenimiento", PrecioBase = 12500, Estado = "Activo" },
-            new Servicio { Id = 4, ServicioId = "SV-004", Nombre = "Cableado Estructurado", Categoria = "Redes y Cableado", PrecioBase = 28000, Estado = "Activo" },
-            new Servicio { Id = 5, ServicioId = "SV-005", Nombre = "Instalación de Planta Eléctrica", Categoria = "Instalaciones", PrecioBase = 120000, Estado = "Activo" }
+            new Servicio { Id = 1, ServicioId = "SV-001", Nombre = "Instalación de Paneles Solares", Categoria = "Instalaciones", Estado = "Activo" },
+            new Servicio { Id = 2, ServicioId = "SV-002", Nombre = "Instalación de Sistema UPS", Categoria = "Instalaciones", Estado = "Activo" },
+            new Servicio { Id = 3, ServicioId = "SV-003", Nombre = "Mantenimiento Eléctrico", Categoria = "Mantenimiento", Estado = "Activo" },
+            new Servicio { Id = 4, ServicioId = "SV-004", Nombre = "Cableado Estructurado", Categoria = "Redes y Cableado", Estado = "Activo" },
+            new Servicio { Id = 5, ServicioId = "SV-005", Nombre = "Instalación de Planta Eléctrica", Categoria = "Instalaciones", Estado = "Activo" }
         );
 
         modelBuilder.Entity<Solicitud>().HasData(

@@ -1,0 +1,57 @@
+.ventas-header { display:flex; justify-content:space-between; align-items:flex-start; gap:20px; margin-bottom:24px; flex-wrap:wrap; }
+.ventas-header h1 { margin:0; font-family:Manrope,sans-serif; font-size:31px; font-weight:800; }
+.ventas-header p, .ventas-modal p { color:#6B7085; margin:6px 0 14px; }
+.ventas-panel { background:#fff; border:1px solid #E3E5EE; border-radius:12px; overflow:hidden; }
+.ventas-filtros { display:flex; gap:14px 18px; flex-wrap:wrap; align-items:center; padding:18px; border-bottom:1px solid #EFF0F6; }
+.ventas-filtros label { display:flex; gap:9px; align-items:center; }
+.ventas-filtros button { margin-left:auto; }
+.ventas-filtros label, .ventas-formulario label { font-weight:700; color:#14162B; font-size:14px; }
+input, select { min-width:0; padding:9px 11px; border:1px solid #D5D8E6; border-radius:8px; background:#fff; color:#14162B; }
+button { padding:8px 13px; border:1px solid #D5D8E6; background:#fff; color:#14162B; border-radius:8px; cursor:pointer; font-weight:700; }
+button:disabled { cursor:wait; opacity:.6; }
+.ventas-primary { color:#fff; background:#1D4ED8; border-color:#1D4ED8; }
+.ventas-danger { color:#B91C1C; border-color:#FECACA; }
+.ventas-tabla { overflow-x:auto; }
+table { border-collapse:collapse; width:100%; font-size:14px; }
+th, td { padding:13px 16px; text-align:left; border-bottom:1px solid #EFF0F6; white-space:nowrap; }
+th { background:#F8F9FC; color:#4A4E63; }
+td small { display:block; color:#6B7085; }
+.ventas-acciones { display:flex; gap:7px; }
+.ventas-acciones .ventas-icono { width:30px; height:30px; padding:0; display:flex; align-items:center; justify-content:center; color:#5F6479; background:#fff; border:1px solid #D5D8E6; border-radius:7px; flex:none; }
+.ventas-estado { padding:4px 10px; border-radius:20px; font-weight:700; font-size:12px; background:#FEF3C7; color:#92400E; }
+.ventas-estado[data-estado="Registrada"] { background:#D1FAE5; color:#065F46; }
+.ventas-estado[data-estado="Anulada"] { background:#FEE2E2; color:#991B1B; }
+.ventas-overlay { position:fixed; inset:0; background:rgba(14,16,40,.5); z-index:9999; display:grid; place-items:center; padding:20px; }
+.ventas-modal { width:min(100%, 840px); max-height:90vh; overflow:auto; padding:26px; border-radius:16px; background:#fff; box-shadow:0 20px 40px rgba(0,0,0,.2); }
+.ventas-modal h2 { font-size:22px; font-weight:800; margin:0 0 16px; }
+.ventas-formulario { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:14px; }
+.ventas-formulario label { display:grid; gap:5px; }
+.ventas-formulario .ventas-producto { grid-column:1 / -1; }
+.ventas-formulario .ventas-producto select { width:100%; min-height:48px; font-size:15px; }
+.ventas-agregar { display:flex; align-items:end; }
+.ventas-agregar button { min-height:40px; }
+.ventas-lineas { margin-top:16px; border:1px solid #E3E5EE; border-radius:8px; }
+.ventas-quitar { color:#B91C1C; border-color:#FECACA; }
+.ventas-cantidad-linea { width:76px; padding:6px 8px; }
+.ventas-lineas .ventas-disponibilidad { display:block; margin-top:3px; }
+.ventas-disponibilidad { color:#6B7085; font-size:12px; font-weight:500; }
+.ventas-modal .ventas-resumen { display:flex; justify-content:flex-end; margin-top:16px; padding:12px 16px; background:#F7F8FC; border-radius:8px; }
+.ventas-resumen-filas { display:grid; grid-template-columns:minmax(145px,auto) auto; gap:7px 22px; min-width:min(100%, 330px); color:#4A4E63; font-size:14px; }
+.ventas-resumen-filas strong { text-align:right; color:#14162B; }
+.ventas-resumen-filas .ventas-total-label, .ventas-resumen-filas .ventas-total { border-top:1px solid #D5D8E6; padding-top:9px; font-size:16px; }
+.factura-encabezado { display:flex; align-items:flex-start; justify-content:space-between; gap:20px; border-bottom:1px solid #777; padding-bottom:14px; }
+.factura-encabezado img { width:min(42%, 260px); height:auto; object-fit:contain; }
+.factura-encabezado div { text-align:right; }
+.factura-encabezado h2 { margin:0 0 6px; }
+.factura-encabezado p { margin:3px 0; }
+.factura-cliente { display:grid; gap:5px; margin:18px 0; }
+.factura-totales { display:flex; justify-content:flex-end; margin-top:12px; }
+.factura-totales div { display:grid; grid-template-columns:minmax(150px,auto) auto; gap:7px 22px; min-width:300px; }
+.factura-totales strong { text-align:right; }
+.factura-totales .factura-total-label, .factura-totales .factura-total { border-top:1px solid #8B90A3; padding-top:9px; font-size:18px; }
+.ventas-pie { display:flex; justify-content:flex-end; gap:10px; flex-wrap:wrap; margin-top:18px; padding-top:14px; border-top:1px solid #EFF0F6; }
+@media (max-width:600px) { .ventas-formulario { grid-template-columns:1fr; } }
+@media print {
+    .factura-encabezado img { width:260px; }
+    .factura-encabezado h2 { font-size:20px; }
+}

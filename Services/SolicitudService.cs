@@ -30,13 +30,18 @@ public class SolicitudService(IDbContextFactory<Contexto> contextFactory) : Apli
         try
         {
             await using var contexto = await contextFactory.CreateDbContextAsync();
+            await using var transaccion = await contexto.Database.BeginTransactionAsync(System.Data.IsolationLevel.Serializable);
+            if (!await contexto.Servicios.AnyAsync(s => s.Id == solicitud.ServicioId && s.Estado == "Activo"))
+                return false;
             solicitud.Cliente = null;
             solicitud.Servicio = null;
             solicitud.EstadoSolicitud = null;
             contexto.Solicitudes.Add(solicitud);
             await contexto.SaveChangesAsync();
             RegistroEventosSolicitud.Agregar(contexto, solicitud.Id, "Solicitud creada", "Se registró la solicitud del servicio.");
-            return await contexto.SaveChangesAsync() > 0;
+            await contexto.SaveChangesAsync();
+            await transaccion.CommitAsync();
+            return true;
         }
         catch
         {
@@ -49,9 +54,13 @@ public class SolicitudService(IDbContextFactory<Contexto> contextFactory) : Apli
         try
         {
             await using var contexto = await contextFactory.CreateDbContextAsync();
+            await using var transaccion = await contexto.Database.BeginTransactionAsync(System.Data.IsolationLevel.Serializable);
             var existente = await contexto.Solicitudes.FirstOrDefaultAsync(s => s.Id == solicitud.Id);
             if (existente == null) return false;
             if (await contexto.EstadosSolicitud.AnyAsync(e => e.Id == existente.EstadoSolicitudId && e.Nombre == "Finalizada")) return false;
+            if (existente.ServicioId != solicitud.ServicioId &&
+                !await contexto.Servicios.AnyAsync(s => s.Id == solicitud.ServicioId && s.Estado == "Activo"))
+                return false;
 
             existente.ClienteId = solicitud.ClienteId;
             existente.ServicioId = solicitud.ServicioId;
@@ -60,7 +69,9 @@ public class SolicitudService(IDbContextFactory<Contexto> contextFactory) : Apli
             existente.EstadoSolicitudId = solicitud.EstadoSolicitudId;
             RegistroEventosSolicitud.Agregar(contexto, existente.Id, "Solicitud actualizada", "Se actualizaron los datos principales de la solicitud.");
 
-            return await contexto.SaveChangesAsync() > 0;
+            await contexto.SaveChangesAsync();
+            await transaccion.CommitAsync();
+            return true;
         }
         catch
         {
@@ -93,23 +104,20 @@ public class SolicitudService(IDbContextFactory<Contexto> contextFactory) : Apli
     }
 
     public async Task<bool> Eliminar(int id)
-    {
-        await using var contexto = await contextFactory.CreateDbContextAsync();
-        var solicitud = await contexto.Solicitudes.FirstOrDefaultAsync(s => s.Id == id);
-        if (solicitud is null || solicitud.EstadoSolicitudId is 2 or 5 ||
-            await contexto.EstadosSolicitud.AnyAsync(e => e.Id == solicitud.EstadoSolicitudId && e.Nombre == "Finalizada"))
-        {
-            return false;
-        }
+        => await EliminarVarios([id]);
 
+    public async Task<bool> EliminarVarios(IReadOnlyCollection<int> ids)
+    {
+        if (ids.Count == 0 || ids.Count != ids.Distinct().Count()) return false;
+        await using var contexto = await contextFactory.CreateDbContextAsync();
+        await using var transaccion = await contexto.Database.BeginTransactionAsync();
+        var solicitudes = await contexto.Solicitudes.Include(s => s.EstadoSolicitud).Where(s => ids.Contains(s.Id)).ToListAsync();
+        if (solicitudes.Count != ids.Count || solicitudes.Any(s => s.EstadoSolicitudId is 2 or 5 || s.EstadoSolicitud?.Nombre == "Finalizada")) return false;
         var visitas = await contexto.Visitas
             .IgnoreQueryFilters()
-            .Where(v => v.SolicitudId == id)
+            .Where(v => ids.Contains(v.SolicitudId))
             .ToListAsync();
-        if (visitas.Any(v => v.Estado is "En proceso" or "En Espera Administración"))
-        {
-            return false;
-        }
+        if (visitas.Any(v => v.Estado is "En proceso" or "En Espera Administración")) return false;
 
         foreach (var visita in visitas)
         {
@@ -120,8 +128,10 @@ public class SolicitudService(IDbContextFactory<Contexto> contextFactory) : Apli
             }
         }
 
-        solicitud.IsDeleted = true;
-        return await contexto.SaveChangesAsync() > 0;
+        foreach (var solicitud in solicitudes) solicitud.IsDeleted = true;
+        await contexto.SaveChangesAsync();
+        await transaccion.CommitAsync();
+        return true;
     }
 
     public async Task<List<Solicitud>> ObtenerEliminadasAsync()

@@ -1,5 +1,6 @@
 @page "/cotizaciones"
 @inject ElectroGestion.Services.CotizacionService CotizacionService
+@inject ElectroGestion.Services.InventarioService InventarioService
 @inject ElectroGestion.Services.AppStateService AppState
 @inject BlazorBootstrap.ToastService ToastService
 @inject NavigationManager Nav
@@ -109,14 +110,14 @@
                 { <p style="color:#6B7085">No hay levantamientos pendientes de cotización.</p> }
             }
             <h4 style="margin:18px 0 8px">Productos de inventario</h4>
-            @if (!AppState.Inventario.Any())
+            @if (!AppState.Inventario.Any(a => a.Cantidad > 0))
             {
                 <p style="color:#B45309">No hay productos en el inventario para cotizar.</p>
             }
             else
             {
                 <div style="display:grid;grid-template-columns:minmax(0,1fr) 100px auto;gap:8px;align-items:end">
-                    <div><label style="display:block;margin-bottom:5px;font-size:13px;font-weight:700">Producto</label><select @bind="ArticuloSeleccionadoId" style="width:100%;padding:9px;border:1px solid #D5D8E6;border-radius:7px;background:#fff"><option value="0">Seleccione producto</option>@foreach (var art in AppState.Inventario.OrderBy(a => a.Nombre)) { <option value="@art.Id">@art.Codigo · @art.Nombre (Stock: @art.Cantidad) — RD$ @art.PrecioUnidad.ToString("N2")</option> }</select></div>
+                    <div><label style="display:block;margin-bottom:5px;font-size:13px;font-weight:700">Producto</label><select @bind="ArticuloSeleccionadoId" style="width:100%;padding:9px;border:1px solid #D5D8E6;border-radius:7px;background:#fff"><option value="0">Seleccione producto</option>@foreach (var art in AppState.Inventario.Where(a => a.Cantidad > 0).OrderBy(a => a.Nombre)) { <option value="@art.Id">@art.Codigo · @art.Nombre (Stock: @art.Cantidad) — RD$ @art.PrecioUnidad.ToString("N2")</option> }</select></div>
                     <div><label style="display:block;margin-bottom:5px;font-size:13px;font-weight:700">Cantidad</label><input @bind="CantidadArticulo" type="number" min="1" style="width:100%;padding:9px;border:1px solid #D5D8E6;border-radius:7px" /></div>
                     <button @onclick="AgregarArticulo" style="padding:9px 12px;border:0;background:#1D4ED8;color:#fff;border-radius:7px;font-weight:700;cursor:pointer">Agregar</button>
                 </div>
@@ -253,6 +254,7 @@
         {
             CotizacionRows = await CotizacionService.ObtenerTodasAsync();
             LevantamientosPendientes = await CotizacionService.ObtenerLevantamientosPendientesAsync();
+            AppState.Inventario = await InventarioService.ObtenerTodosAsync();
         }
         catch (Exception)
         {
@@ -299,6 +301,15 @@
     {
         if (MontoManoObra < 0)
         { ToastService.Notify(new ToastMessage(ToastType.Warning, "La mano de obra no puede tener un monto negativo.")); return; }
+        if (FormDetalles.Count > 0)
+        {
+            try { AppState.Inventario = await InventarioService.ObtenerTodosAsync(); }
+            catch
+            {
+                ToastService.Notify(new ToastMessage(ToastType.Warning, "No se pudo consultar el stock disponible."));
+                return;
+            }
+        }
         if (SubtotalNeto <= 0 || FormDetalles.Any(d => d.Cantidad <= 0 || d.Cantidad > (AppState.Inventario.FirstOrDefault(a => a.Id == d.ArticuloInventarioId)?.Cantidad ?? 0)))
         {
             ToastService.Notify(new ToastMessage(ToastType.Warning, "Ingrese materiales o mano de obra y verifique el stock disponible.")); return;

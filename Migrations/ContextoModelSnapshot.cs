@@ -55,6 +55,61 @@ namespace ElectroGestion.Migrations
                     b.ToTable("AbonosCobro");
                 });
 
+            modelBuilder.Entity("ElectroGestion.Models.ArticuloInventario", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("Cantidad")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Categoria")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Codigo")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("Nombre")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<decimal>("PrecioUnidad")
+                        .HasPrecision(18, 2)
+                        .HasColumnType("decimal(18,2)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("Codigo")
+                        .IsUnique();
+
+                    b.ToTable("ArticulosInventario");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 1,
+                            Cantidad = 500,
+                            Categoria = "Materiales",
+                            Codigo = "ART-001",
+                            Nombre = "Cable de Cobre",
+                            PrecioUnidad = 15m
+                        },
+                        new
+                        {
+                            Id = 2,
+                            Cantidad = 10,
+                            Categoria = "Equipos",
+                            Codigo = "ART-002",
+                            Nombre = "Transformador 50kVA",
+                            PrecioUnidad = 25000m
+                        });
+                });
+
             modelBuilder.Entity("ElectroGestion.Models.Cliente", b =>
                 {
                     b.Property<int>("Id")
@@ -112,7 +167,7 @@ namespace ElectroGestion.Migrations
                             Correo = "info@clopez.com",
                             Direccion = "Av. Estrella Sadhalá #102, Santiago",
                             Nombre = "Constructora López",
-                            Rnc = "101-987654-2",
+                            Rnc = "101-98765-2",
                             Servicios = 5,
                             Ultimo = "Instalación Solar"
                         },
@@ -122,7 +177,7 @@ namespace ElectroGestion.Migrations
                             Correo = "farmacia@elsol.do",
                             Direccion = "Calle 16 #7, La Vega",
                             Nombre = "Farmacia El Sol",
-                            Rnc = "130-334455-3",
+                            Rnc = "130-33445-3",
                             Servicios = 6,
                             Ultimo = "Mantenimiento Eléctrico"
                         },
@@ -132,7 +187,7 @@ namespace ElectroGestion.Migrations
                             Correo = "hernandez@colmado.com",
                             Direccion = "Calle Principal #58, Moca",
                             Nombre = "Colmado Hernández",
-                            Rnc = "402-667788-4",
+                            Rnc = "402-6677884-1",
                             Servicios = 3,
                             Ultimo = "Cableado Estructurado"
                         },
@@ -142,7 +197,7 @@ namespace ElectroGestion.Migrations
                             Correo = "taller@mecanicord.com",
                             Direccion = "Carretera Luperón km 5, Santiago",
                             Nombre = "Taller Mecánico RD",
-                            Rnc = "130-112233-5",
+                            Rnc = "130-11223-5",
                             Servicios = 1,
                             Ultimo = "Instalación de Planta Eléctrica"
                         });
@@ -409,6 +464,46 @@ namespace ElectroGestion.Migrations
                     b.ToTable("DetallesSolicitud");
                 });
 
+            modelBuilder.Entity("ElectroGestion.Models.DetalleVenta", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("ArticuloInventarioId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("Cantidad")
+                        .HasColumnType("int");
+
+                    b.Property<string>("CodigoArticulo")
+                        .IsRequired()
+                        .HasMaxLength(40)
+                        .HasColumnType("nvarchar(40)");
+
+                    b.Property<string>("NombreArticulo")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
+
+                    b.Property<decimal>("PrecioUnitario")
+                        .HasPrecision(18, 2)
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<int>("VentaId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ArticuloInventarioId");
+
+                    b.HasIndex("VentaId");
+
+                    b.ToTable("DetallesVenta");
+                });
+
             modelBuilder.Entity("ElectroGestion.Models.EstadoSolicitud", b =>
                 {
                     b.Property<int>("Id")
@@ -622,9 +717,6 @@ namespace ElectroGestion.Migrations
                         .HasMaxLength(150)
                         .HasColumnType("nvarchar(150)");
 
-                    b.Property<decimal>("PrecioBase")
-                        .HasColumnType("decimal(18,2)");
-
                     b.Property<string>("ServicioId")
                         .IsRequired()
                         .HasMaxLength(20)
@@ -641,7 +733,6 @@ namespace ElectroGestion.Migrations
                             Categoria = "Instalaciones",
                             Estado = "Activo",
                             Nombre = "Instalación de Paneles Solares",
-                            PrecioBase = 85000m,
                             ServicioId = "SV-001"
                         },
                         new
@@ -650,7 +741,6 @@ namespace ElectroGestion.Migrations
                             Categoria = "Instalaciones",
                             Estado = "Activo",
                             Nombre = "Instalación de Sistema UPS",
-                            PrecioBase = 45000m,
                             ServicioId = "SV-002"
                         },
                         new
@@ -659,7 +749,6 @@ namespace ElectroGestion.Migrations
                             Categoria = "Mantenimiento",
                             Estado = "Activo",
                             Nombre = "Mantenimiento Eléctrico",
-                            PrecioBase = 12500m,
                             ServicioId = "SV-003"
                         },
                         new
@@ -668,7 +757,6 @@ namespace ElectroGestion.Migrations
                             Categoria = "Redes y Cableado",
                             Estado = "Activo",
                             Nombre = "Cableado Estructurado",
-                            PrecioBase = 28000m,
                             ServicioId = "SV-004"
                         },
                         new
@@ -677,7 +765,6 @@ namespace ElectroGestion.Migrations
                             Categoria = "Instalaciones",
                             Estado = "Activo",
                             Nombre = "Instalación de Planta Eléctrica",
-                            PrecioBase = 120000m,
                             ServicioId = "SV-005"
                         });
                 });
@@ -933,6 +1020,84 @@ namespace ElectroGestion.Migrations
                         });
                 });
 
+            modelBuilder.Entity("ElectroGestion.Models.Venta", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("ArticuloInventarioId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("Cantidad")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("ClienteId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("CodigoArticulo")
+                        .IsRequired()
+                        .HasMaxLength(40)
+                        .HasColumnType("nvarchar(40)");
+
+                    b.Property<string>("DocumentoCliente")
+                        .IsRequired()
+                        .HasMaxLength(30)
+                        .HasColumnType("nvarchar(30)");
+
+                    b.Property<string>("Estado")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("nvarchar(20)");
+
+                    b.Property<DateTime>("FechaCreacion")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime?>("FechaVenta")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Ncf")
+                        .HasMaxLength(13)
+                        .HasColumnType("nvarchar(13)");
+
+                    b.Property<string>("NombreArticulo")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
+
+                    b.Property<string>("NombreCliente")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
+
+                    b.Property<decimal>("PrecioUnitario")
+                        .HasPrecision(18, 2)
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<decimal>("TasaItbis")
+                        .HasPrecision(5, 2)
+                        .HasColumnType("decimal(5,2)");
+
+                    b.Property<string>("TipoComprobante")
+                        .IsRequired()
+                        .HasMaxLength(30)
+                        .HasColumnType("nvarchar(30)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ArticuloInventarioId");
+
+                    b.HasIndex("Ncf")
+                        .IsUnique()
+                        .HasFilter("[Ncf] IS NOT NULL");
+
+                    b.HasIndex("Estado", "FechaVenta");
+
+                    b.ToTable("Ventas");
+                });
+
             modelBuilder.Entity("ElectroGestion.Models.Visita", b =>
                 {
                     b.Property<int>("Id")
@@ -1060,6 +1225,23 @@ namespace ElectroGestion.Migrations
                     b.Navigation("Solicitud");
                 });
 
+            modelBuilder.Entity("ElectroGestion.Models.DetalleVenta", b =>
+                {
+                    b.HasOne("ElectroGestion.Models.ArticuloInventario", null)
+                        .WithMany()
+                        .HasForeignKey("ArticuloInventarioId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("ElectroGestion.Models.Venta", "Venta")
+                        .WithMany("Detalles")
+                        .HasForeignKey("VentaId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Venta");
+                });
+
             modelBuilder.Entity("ElectroGestion.Models.Levantamiento", b =>
                 {
                     b.HasOne("ElectroGestion.Models.Solicitud", "Solicitud")
@@ -1126,6 +1308,15 @@ namespace ElectroGestion.Migrations
                     b.Navigation("Solicitud");
                 });
 
+            modelBuilder.Entity("ElectroGestion.Models.Venta", b =>
+                {
+                    b.HasOne("ElectroGestion.Models.ArticuloInventario", null)
+                        .WithMany()
+                        .HasForeignKey("ArticuloInventarioId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+                });
+
             modelBuilder.Entity("ElectroGestion.Models.Visita", b =>
                 {
                     b.HasOne("ElectroGestion.Models.Solicitud", "Solicitud")
@@ -1180,6 +1371,11 @@ namespace ElectroGestion.Migrations
                     b.Navigation("Eventos");
 
                     b.Navigation("Levantamiento");
+                });
+
+            modelBuilder.Entity("ElectroGestion.Models.Venta", b =>
+                {
+                    b.Navigation("Detalles");
                 });
 #pragma warning restore 612, 618
         }
