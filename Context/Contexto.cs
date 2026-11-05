@@ -8,6 +8,7 @@ public class Contexto : DbContext
     public Contexto(DbContextOptions<Contexto> options) : base(options) { }
 
     public DbSet<Solicitud> Solicitudes { get; set; }
+    public DbSet<SolicitudEvento> SolicitudesEventos { get; set; }
     public DbSet<Visita> Visitas { get; set; }
     public DbSet<Levantamiento> Levantamientos { get; set; }
     public DbSet<Cotizacion> Cotizaciones { get; set; }
@@ -121,6 +122,15 @@ public class Contexto : DbContext
             entity.Property(c => c.Monto).HasPrecision(18, 2);
             entity.HasIndex(c => c.OrdenTrabajoId).IsUnique();
             entity.HasOne(c => c.OrdenTrabajo).WithMany().HasForeignKey(c => c.OrdenTrabajoId).OnDelete(DeleteBehavior.Restrict);
+        });
+
+        modelBuilder.Entity<SolicitudEvento>(entity =>
+        {
+            entity.Property(e => e.Titulo).HasMaxLength(120).IsRequired();
+            entity.Property(e => e.Detalle).HasMaxLength(500).IsRequired();
+            entity.HasIndex(e => new { e.SolicitudId, e.Fecha });
+            entity.HasOne(e => e.Solicitud).WithMany(s => s.Eventos)
+                .HasForeignKey(e => e.SolicitudId).OnDelete(DeleteBehavior.Restrict);
         });
 
         modelBuilder.Entity<DetalleSolicitud>()
