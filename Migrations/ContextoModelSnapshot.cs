@@ -55,6 +55,61 @@ namespace ElectroGestion.Migrations
                     b.ToTable("AbonosCobro");
                 });
 
+            modelBuilder.Entity("ElectroGestion.Models.ArticuloInventario", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("Cantidad")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Categoria")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Codigo")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("Nombre")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<decimal>("PrecioUnidad")
+                        .HasPrecision(18, 2)
+                        .HasColumnType("decimal(18,2)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("Codigo")
+                        .IsUnique();
+
+                    b.ToTable("ArticulosInventario");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 1,
+                            Cantidad = 500,
+                            Categoria = "Materiales",
+                            Codigo = "ART-001",
+                            Nombre = "Cable de Cobre",
+                            PrecioUnidad = 15m
+                        },
+                        new
+                        {
+                            Id = 2,
+                            Cantidad = 10,
+                            Categoria = "Equipos",
+                            Codigo = "ART-002",
+                            Nombre = "Transformador 50kVA",
+                            PrecioUnidad = 25000m
+                        });
+                });
+
             modelBuilder.Entity("ElectroGestion.Models.Cliente", b =>
                 {
                     b.Property<int>("Id")

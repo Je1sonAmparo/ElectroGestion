@@ -136,12 +136,6 @@ public class AppStateService
             new() { Id = 2, Cliente = "Globex S.A.", FacturaId = 1002, Fecha = DateTime.Today, Monto = 4000.00m, MetodoPago = "Cheque", Estado = "Pendiente de cobro" }
         };
 
-        Inventario = new List<ArticuloInventario>
-        {
-            new() { Id = 1, Codigo = "ART-001", Nombre = "Cable de Cobre", Categoria = "Materiales", Cantidad = 500, PrecioUnidad = 15.00m },
-            new() { Id = 2, Codigo = "ART-002", Nombre = "Transformador 50kVA", Categoria = "Equipos", Cantidad = 10, PrecioUnidad = 25000.00m }
-        };
-
         Proveedores = new List<Proveedor>
         {
             new() { Id = 1, Nombre = "Ferretería Industrial", Rnc = "101-23456-7", Correo = "ventas@ferreind.com", Telefono = "809-555-1234", Direccion = "Av. Principal #123" },

@@ -16,6 +16,7 @@ public class Contexto : DbContext
     public DbSet<OrdenTrabajo> OrdenesTrabajo { get; set; }
     public DbSet<Cobro> Cobros { get; set; }
     public DbSet<AbonoCobro> AbonosCobro { get; set; }
+    public DbSet<ArticuloInventario> ArticulosInventario { get; set; }
     public DbSet<Cliente> Clientes { get; set; }
     public DbSet<Usuario> Usuarios { get; set; }
     public DbSet<Servicio> Servicios { get; set; }
@@ -26,6 +27,16 @@ public class Contexto : DbContext
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         base.OnModelCreating(modelBuilder);
+
+        modelBuilder.Entity<ArticuloInventario>(entity =>
+        {
+            entity.Ignore(a => a.Estado);
+            entity.Property(a => a.PrecioUnidad).HasPrecision(18, 2);
+            entity.HasIndex(a => a.Codigo).IsUnique();
+            entity.HasData(
+                new ArticuloInventario { Id = 1, Codigo = "ART-001", Nombre = "Cable de Cobre", Categoria = "Materiales", Cantidad = 500, PrecioUnidad = 15m },
+                new ArticuloInventario { Id = 2, Codigo = "ART-002", Nombre = "Transformador 50kVA", Categoria = "Equipos", Cantidad = 10, PrecioUnidad = 25000m });
+        });
 
         modelBuilder.Entity<Cliente>(entity =>
         {
