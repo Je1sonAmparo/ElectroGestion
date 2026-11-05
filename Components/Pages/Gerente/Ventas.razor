@@ -103,8 +103,8 @@ else
                 {
                     var subtotal = form.Detalles.Sum(d => d.Subtotal);
                     var impuesto = CotizacionService.CalcularImpuesto(subtotal, 18m);
-                    <div class="ventas-tabla ventas-lineas"><table><thead><tr><th>Código</th><th>Producto</th><th>Cantidad</th><th>Precio unitario</th><th>Subtotal</th><th>Acción</th></tr></thead><tbody>
-                        @foreach (var linea in form.Detalles) { <tr><td>@linea.CodigoArticulo</td><td>@linea.NombreArticulo</td><td>@linea.Cantidad</td><td>@Moneda(linea.PrecioUnitario)</td><td>@Moneda(linea.Subtotal)</td><td><button type="button" class="ventas-quitar" @onclick="() => QuitarProducto(linea.ArticuloInventarioId)">Quitar</button></td></tr> }
+                    <div class="ventas-tabla ventas-lineas"><table><thead><tr><th>Código</th><th>Producto</th><th>Cantidad / stock</th><th>Precio unitario</th><th>Subtotal</th><th>Acción</th></tr></thead><tbody>
+                        @foreach (var linea in form.Detalles) { <tr><td>@linea.CodigoArticulo</td><td>@linea.NombreArticulo</td><td><input class="ventas-cantidad-linea" type="number" min="1" max="@(Articulos.FirstOrDefault(a => a.Id == linea.ArticuloInventarioId)?.Cantidad ?? 0)" step="1" @bind="linea.Cantidad" @bind:event="oninput" /><small class="ventas-disponibilidad">Stock: @(Articulos.FirstOrDefault(a => a.Id == linea.ArticuloInventarioId)?.Cantidad ?? 0)</small></td><td>@Moneda(linea.PrecioUnitario)</td><td>@Moneda(linea.Subtotal)</td><td><button type="button" class="ventas-quitar" @onclick="() => QuitarProducto(linea.ArticuloInventarioId)">Quitar</button></td></tr> }
                     </tbody></table></div>
                     <div class="ventas-resumen"><div class="ventas-resumen-filas"><span>Subtotal</span><strong>@Moneda(subtotal)</strong><span>ITBIS (18%)</span><strong>@Moneda(impuesto)</strong><span class="ventas-total-label">Total</span><strong class="ventas-total">@Moneda(subtotal + impuesto)</strong></div></div>
                 }
