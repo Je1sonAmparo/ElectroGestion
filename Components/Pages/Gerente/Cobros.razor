@@ -26,12 +26,12 @@ else { @foreach (var cobro in Filtrados) { var (bg, fg) = ElectroGestion.Service
 @if (ModalAbierto)
 { <div style="position:fixed;inset:0;background:rgba(14,16,40,.5);display:flex;align-items:center;justify-content:center;z-index:9999;padding:20px" @onclick="CerrarModal"><div class="modal-scroll" style="background:#fff;border-radius:16px;width:100%;max-width:560px;padding:28px;box-shadow:0 20px 40px rgba(0,0,0,.2)" @onclick:stopPropagation>
     <h2 style="margin:0 0 18px;font-family:'Manrope'">Nuevo cobro</h2>
-    <label style="font-weight:700">Cotización aprobada</label><select @bind="CotizacionSeleccionadaId" @bind:after="AlSeleccionarCotizacion" style="display:block;width:100%;padding:10px;margin:6px 0 15px;border:1px solid #D5D8E6;border-radius:8px"><option value="0">@(CotizacionesAprobadas.Any() ? "Seleccione una cotización" : "No hay cotizaciones aprobadas disponibles")</option>@foreach(var q in CotizacionesAprobadas){<option value="@q.Id">COT-@q.Id.ToString("D5") · @q.Cliente · Solicitud @q.SolicitudId</option>}</select>
-    @if (CotizacionSeleccionada is not null){<div style="background:#F7F8FC;padding:12px;border-radius:9px;margin-bottom:15px"><b>Cliente:</b> @CotizacionSeleccionada.Cliente<br/><b>Solicitud:</b> @CotizacionSeleccionada.SolicitudId<br/><b>Total de la cotización:</b> RD$ @CotizacionSeleccionada.MontoTotal.ToString("N2")</div>}
-    <label style="font-weight:700">Abono inicial (opcional)</label><input type="number" min="0" max="@(CotizacionSeleccionada?.MontoTotal ?? 0)" step="0.01" @bind="AbonoInicial" style="display:block;width:100%;padding:10px;margin:6px 0 15px;border:1px solid #D5D8E6;border-radius:8px" />
+    <label style="font-weight:700">Cotización aprobada</label><select @bind="CotizacionSeleccionadaId" @bind:after="AlSeleccionarCotizacion" style="display:block;width:100%;padding:10px;margin:6px 0 15px;border:1px solid #D5D8E6;border-radius:8px"><option value="0">@(CotizacionesAprobadas.Any() ? "Seleccione una cotización" : "No hay cotizaciones aprobadas con cobro pendiente")</option>@foreach(var q in CotizacionesAprobadas){<option value="@q.Id">COT-@q.Id.ToString("D5") · @q.Cliente · Solicitud @q.SolicitudId</option>}</select>
+    @if (CotizacionSeleccionada is not null){<div style="background:#F7F8FC;padding:12px;border-radius:9px;margin-bottom:15px"><b>Cliente:</b> @CotizacionSeleccionada.Cliente<br/><b>Solicitud:</b> @CotizacionSeleccionada.SolicitudId<br/><b>Total:</b> RD$ @CotizacionSeleccionada.MontoTotal.ToString("N2")@if (CobroExistente is not null){<br/><b>Pagado:</b> <span>RD$ @CobroExistente.MontoPagado.ToString("N2")</span><br/><b>Saldo pendiente:</b> <span>RD$ @CobroExistente.SaldoPendiente.ToString("N2")</span><div style="margin-top:8px;color:#1E40AF">Esta cotización ya tiene una cuenta de cobro. El monto que registres se añadirá como otro abono.</div>}</div>}
+    <label style="font-weight:700">Monto recibido ahora (abono inicial)</label><input type="number" min="0" max="@(CobroExistente?.SaldoPendiente ?? CotizacionSeleccionada?.MontoTotal ?? 0)" step="0.01" @bind="AbonoInicial" style="display:block;width:100%;padding:10px;margin:6px 0 15px;border:1px solid #D5D8E6;border-radius:8px" />
     <label style="font-weight:700">Método de pago del abono</label><select @bind="MetodoPago" style="display:block;width:100%;padding:10px;margin:6px 0 20px;border:1px solid #D5D8E6;border-radius:8px"><option>Efectivo</option><option>Transferencia</option><option>Cheque</option><option>Tarjeta de Crédito</option></select>
     @if(CotizacionSeleccionada is not null && AbonoInicial > 0){<div style="margin:-8px 0 18px;color:#4A4E63">Saldo inicial: <b>RD$ @Math.Max(0, CotizacionSeleccionada.MontoTotal - AbonoInicial).ToString("N2")</b></div>}
-    <div style="display:flex;justify-content:flex-end;gap:10px"><button @onclick="CerrarModal" style="padding:10px 16px;border:1px solid #D5D8E6;background:white;border-radius:8px">Cancelar</button><button @onclick="GuardarCobro" disabled="@(CotizacionSeleccionadaId <= 0 || AbonoInicial < 0 || (CotizacionSeleccionada is not null && AbonoInicial > CotizacionSeleccionada.MontoTotal))" style="padding:10px 18px;border:0;background:#1D4ED8;color:white;border-radius:8px">Crear cobro</button></div>
+    <div style="display:flex;justify-content:flex-end;gap:10px"><button @onclick="CerrarModal" style="padding:10px 16px;border:1px solid #D5D8E6;background:white;border-radius:8px">Cancelar</button><button @onclick="GuardarCobro" disabled="@(CotizacionSeleccionadaId <= 0 || AbonoInicial < 0 || (CotizacionSeleccionada is not null && AbonoInicial > (CobroExistente?.SaldoPendiente ?? CotizacionSeleccionada.MontoTotal)) || (CobroExistente is not null && AbonoInicial <= 0))" style="padding:10px 18px;border:0;background:#1D4ED8;color:white;border-radius:8px">@(CobroExistente is null ? "Crear cobro" : "Registrar abono")</button></div>
 </div></div> }
 
 @if (CobroDetalle is not null)
@@ -63,6 +63,7 @@ else { @foreach (var cobro in Filtrados) { var (bg, fg) = ElectroGestion.Service
     private decimal AbonoInicial, MontoAbono;
     private int? ConfirmarReaperturaId, ConfirmarEliminarId;
     private ElectroGestion.Models.Cotizacion? CotizacionSeleccionada => CotizacionesAprobadas.FirstOrDefault(q => q.Id == CotizacionSeleccionadaId);
+    private ElectroGestion.Models.Cobro? CobroExistente => CotizacionSeleccionada is null ? null : ListaCobros.FirstOrDefault(c => c.CotizacionId == CotizacionSeleccionada.Id);
     private ElectroGestion.Models.Cobro? FacturaSeleccionada;
     private ElectroGestion.Models.Cobro? CobroDetalle;
     private IEnumerable<ElectroGestion.Models.Cobro> Filtrados => ListaCobros.Where(c =>
@@ -78,8 +79,8 @@ else { @foreach (var cobro in Filtrados) { var (bg, fg) = ElectroGestion.Service
         catch { ToastService.Notify(new ToastMessage(ToastType.Danger, "No se pudieron cargar los cobros.")); }
         finally { Cargando = false; }
     }
-    private void AbrirNuevo() { CotizacionSeleccionadaId = 0; AbonoInicial = 0; MetodoPago = "Transferencia"; ModalAbierto = true; }
-    private void AlSeleccionarCotizacion() { AbonoInicial = CotizacionSeleccionada is null ? 0 : Math.Round(CotizacionSeleccionada.MontoTotal * .5m, 2); }
+    private async Task AbrirNuevo() { await Recargar(); CotizacionSeleccionadaId = 0; AbonoInicial = 0; MetodoPago = "Transferencia"; ModalAbierto = true; }
+    private void AlSeleccionarCotizacion() { AbonoInicial = CotizacionSeleccionada is null ? 0 : Math.Min(Math.Round(CotizacionSeleccionada.MontoTotal * .5m, 2), CobroExistente?.SaldoPendiente ?? CotizacionSeleccionada.MontoTotal); }
     private void CerrarModal() => ModalAbierto = false;
     private async Task GuardarCobro()
     {
