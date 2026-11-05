@@ -4,7 +4,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace ElectroGestion.Services;
 
-public enum ResultadoEliminarCotizacion { Eliminada, VinculadaAOrden, NoEncontrada }
+public enum ResultadoEliminarCotizacion { Eliminada, VinculadaAOrden, SolicitudFinalizada, NoEncontrada }
 
 public class CotizacionService(IDbContextFactory<Contexto> contextFactory)
 {
@@ -155,7 +155,7 @@ public class CotizacionService(IDbContextFactory<Contexto> contextFactory)
         var cotizacion = await db.Cotizaciones.FindAsync(id);
         if (cotizacion is null) return ResultadoEliminarCotizacion.NoEncontrada;
         if (cotizacion.SolicitudDbId.HasValue && await SolicitudFinalizadaAsync(db, cotizacion.SolicitudDbId.Value))
-            return ResultadoEliminarCotizacion.NoEncontrada;
+            return ResultadoEliminarCotizacion.SolicitudFinalizada;
         if (await db.OrdenesTrabajo.AnyAsync(o => o.CotizacionId == id))
             return ResultadoEliminarCotizacion.VinculadaAOrden;
 
