@@ -329,6 +329,7 @@
             "Estado" => SortAscending ? q.OrderBy(x => x.EstadoSolicitud != null ? x.EstadoSolicitud.Nombre : "") : q.OrderByDescending(x => x.EstadoSolicitud != null ? x.EstadoSolicitud.Nombre : ""),
             _ => SortAscending ? q.OrderBy(x => x.Id) : q.OrderByDescending(x => x.Id)
         }).ToList();
+        Seleccionadas.IntersectWith(FilteredSolicitudes.Select(s => s.Id));
     }
 
     private async Task NuevaSolicitud()
