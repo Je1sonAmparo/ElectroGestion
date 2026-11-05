@@ -27,7 +27,7 @@
         <div class="orden-filtros-fila">
             <div class="orden-filtro"><label for="orden-desde">Desde:</label><input id="orden-desde" type="date" @bind="FiltroDesde" /></div>
             <div class="orden-filtro"><label for="orden-hasta">Hasta:</label><input id="orden-hasta" type="date" @bind="FiltroHasta" /></div>
-            <div class="orden-filtro"><label for="orden-estado">Estado:</label><select id="orden-estado" @bind="FiltroEstado" style="width:210px"><option value="">Todos</option><option>En proceso</option><option>Finalizada</option></select></div>
+            <div class="orden-filtro"><label for="orden-estado">Estado:</label><select id="orden-estado" @bind="FiltroEstado" style="width:210px"><option value="">Todos</option><option>En proceso</option><option>Pendiente de cobro</option><option>Finalizada</option></select></div>
             <div style="margin-left:auto"><button @onclick="() => StateHasChanged()" style="padding:9px 20px;border:0;border-radius:7px;background:#1D4ED8;color:#fff;font-weight:700;cursor:pointer">Buscar</button></div>
         </div>
     </div>
@@ -68,7 +68,7 @@ else
             <div style="margin-top:auto;padding-top:20px;display:flex;gap:10px">
                 <button @onclick="() => Editar(orden)" style="width:33%;padding:12px;border:1px solid #E3E5EE;background:#fff;color:#4A4E63;border-radius:9px;font-weight:700;font-size:14px;cursor:pointer;font-family:'Manrope'">Editar</button>
                 <button @onclick="() => OrdenAEliminar = orden.Id" style="width:33%;padding:12px;border:1px solid #F5C2C4;background:#fff;color:#C4141B;border-radius:9px;font-weight:700;font-size:14px;cursor:pointer;font-family:'Manrope'">Eliminar</button>
-                <button @onclick="() => SolicitarCambioEstado(orden)" style="width:34%;padding:12px;border:1px solid #1D4ED8;background:#1D4ED8;color:#fff;border-radius:9px;font-weight:700;font-size:14px;cursor:pointer;font-family:'Manrope'">@(orden.Estado == "Finalizada" ? "Reabrir" : "Marcar finalizada")</button>
+                @if (orden.Estado != "Finalizada") { <button @onclick="() => SolicitarCambioEstado(orden)" style="width:34%;padding:12px;border:1px solid #1D4ED8;background:#1D4ED8;color:#fff;border-radius:9px;font-weight:700;font-size:14px;cursor:pointer;font-family:'Manrope'">@(orden.Estado == "Pendiente de cobro" ? "Reabrir orden" : "Marcar lista para cobro")</button> }
             </div>
         </article>
     }
@@ -173,7 +173,7 @@ else
     private void SolicitarCambioEstado(ElectroGestion.Models.OrdenTrabajo orden)
     {
         OrdenEstadoPendienteId = orden.Id;
-        EstadoOrdenPendiente = orden.Estado == "Finalizada" ? "En proceso" : "Finalizada";
+        EstadoOrdenPendiente = orden.Estado == "Pendiente de cobro" ? "En proceso" : "Pendiente de cobro";
     }
 
     private void CerrarConfirmacionEstado() { OrdenEstadoPendienteId = null; EstadoOrdenPendiente = ""; }
