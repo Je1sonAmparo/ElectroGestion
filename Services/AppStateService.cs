@@ -13,7 +13,6 @@ public class AppStateService
     public List<Cliente> Clientes { get; set; } = new();
     public List<Solicitud> Solicitudes { get; set; } = new();
     public List<Visita> Visitas { get; set; } = new();
-    public List<OrdenTrabajo> Ordenes { get; set; } = new();
     public List<Servicio> Servicios { get; set; } = new();
     public List<EstadoSolicitud> EstadosSolicitud { get; set; } = new();
     public List<DetalleSolicitud> DetallesSolicitud { get; set; } = new();
@@ -153,7 +152,6 @@ public class AppStateService
     public int NextSolicitudId() => Solicitudes.Count > 0 ? Solicitudes.Max(s => s.Id) + 1 : 1;
     public int NextClienteId() => Clientes.Count > 0 ? Clientes.Max(c => c.Id) + 1 : 1;
     public int NextUsuarioId() => Usuarios.Count > 0 ? Usuarios.Max(u => u.Id) + 1 : 1;
-    public int NextOrdenId() => Ordenes.Count > 0 ? Ordenes.Max(o => o.Id) + 1 : 1;
     public int NextServicioId() => Servicios.Count > 0 ? Servicios.Max(s => s.Id) + 1 : 1;
     public int NextCotizacionId() => Cotizaciones.Count > 0 ? Cotizaciones.Max(c => c.Id) + 1 : 1;
     public int NextCobroId() => Cobros.Count > 0 ? Cobros.Max(c => c.Id) + 1 : 1;
