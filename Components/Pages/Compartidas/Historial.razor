@@ -92,8 +92,8 @@
 
 @if (IsModalOpen && SelectedHistorial != null)
 {
-    <div style="position:fixed;inset:0;background:rgba(14,16,40,.5);display:flex;align-items:center;justify-content:center;z-index:9999;padding:20px" @onclick="CerrarDetalle">
-        <div style="background:#fff;border-radius:16px;width:100%;max-width:620px;padding:32px;box-shadow:0 20px 40px rgba(0,0,0,.2);animation:tin .2s ease-out" @onclick:stopPropagation>
+    <div style="position:fixed;inset:0;background:rgba(14,16,40,.5);display:flex;align-items:center;justify-content:center;z-index:9999;padding:20px;overflow-y:auto" @onclick="CerrarDetalle">
+        <div style="background:#fff;border-radius:16px;width:100%;max-width:620px;max-height:calc(100vh - 40px);max-height:calc(100dvh - 40px);overflow-y:auto;overscroll-behavior:contain;box-sizing:border-box;padding:32px;box-shadow:0 20px 40px rgba(0,0,0,.2);animation:tin .2s ease-out" @onclick:stopPropagation>
             <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:20px">
                 <div>
                     <div style="font-family:'Manrope';font-weight:800;font-size:22px;color:#14162B">Detalle de Historial</div>
