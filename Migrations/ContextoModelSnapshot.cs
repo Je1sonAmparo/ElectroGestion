@@ -194,6 +194,50 @@ namespace ElectroGestion.Migrations
                         });
                 });
 
+            modelBuilder.Entity("ElectroGestion.Models.Cobro", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Cliente")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
+
+                    b.Property<string>("Estado")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("nvarchar(20)");
+
+                    b.Property<int>("FacturaId")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("Fecha")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("MetodoPago")
+                        .IsRequired()
+                        .HasMaxLength(40)
+                        .HasColumnType("nvarchar(40)");
+
+                    b.Property<decimal>("Monto")
+                        .HasPrecision(18, 2)
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<int>("OrdenTrabajoId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("OrdenTrabajoId")
+                        .IsUnique();
+
+                    b.ToTable("Cobros");
+                });
+
             modelBuilder.Entity("ElectroGestion.Models.Cotizacion", b =>
                 {
                     b.Property<int>("Id")
@@ -369,6 +413,31 @@ namespace ElectroGestion.Migrations
                         {
                             Id = 5,
                             Nombre = "En Espera Administración"
+                        },
+                        new
+                        {
+                            Id = 6,
+                            Nombre = "En revisión"
+                        },
+                        new
+                        {
+                            Id = 7,
+                            Nombre = "Enviada al cliente"
+                        },
+                        new
+                        {
+                            Id = 8,
+                            Nombre = "Aprobada"
+                        },
+                        new
+                        {
+                            Id = 9,
+                            Nombre = "Rechazada"
+                        },
+                        new
+                        {
+                            Id = 10,
+                            Nombre = "Pendiente de cobro"
                         });
                 });
 
@@ -851,6 +920,17 @@ namespace ElectroGestion.Migrations
                         .IsRequired();
 
                     b.Navigation("Cliente");
+                });
+
+            modelBuilder.Entity("ElectroGestion.Models.Cobro", b =>
+                {
+                    b.HasOne("ElectroGestion.Models.OrdenTrabajo", "OrdenTrabajo")
+                        .WithMany()
+                        .HasForeignKey("OrdenTrabajoId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("OrdenTrabajo");
                 });
 
             modelBuilder.Entity("ElectroGestion.Models.Cotizacion", b =>
