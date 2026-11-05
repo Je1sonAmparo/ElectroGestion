@@ -85,7 +85,7 @@ else
 }
 
 @code {
-    private List<ElectroGestion.Models.OrdenTrabajo> Ordenes = [];
+    private List<ElectroGestion.Models.OrdenTrabajo> OrdenesRows = [];
     private List<ElectroGestion.Models.Cotizacion> CotizacionesDisponibles = [];
     private ElectroGestion.Models.Cotizacion? CotizacionDetalle;
     private bool Cargando;
@@ -95,7 +95,7 @@ else
     private int FormCotizacionId;
     private string FormTrabajos = "", FormHerramientas = "", FormObservaciones = "";
     private ElectroGestion.Models.Cotizacion? CotizacionSeleccionada => CotizacionesDisponibles.FirstOrDefault(c => c.Id == FormCotizacionId);
-    private IEnumerable<ElectroGestion.Models.OrdenTrabajo> OrdenesFiltradas => Ordenes.Where(o =>
+    private IEnumerable<ElectroGestion.Models.OrdenTrabajo> OrdenesFiltradas => OrdenesRows.Where(o =>
         (string.IsNullOrWhiteSpace(FiltroId) || o.Id.ToString().Contains(FiltroId) || o.Code.Contains(FiltroId, StringComparison.OrdinalIgnoreCase)) &&
         (string.IsNullOrWhiteSpace(FiltroCliente) || o.Cliente.Contains(FiltroCliente, StringComparison.OrdinalIgnoreCase)) &&
         (string.IsNullOrWhiteSpace(FiltroEstado) || o.Estado == FiltroEstado));
@@ -105,7 +105,7 @@ else
     private async Task Recargar()
     {
         Cargando = true;
-        try { Ordenes = await OrdenService.ObtenerTodasAsync(); CotizacionesDisponibles = await OrdenService.ObtenerCotizacionesDisponiblesAsync(); }
+        try { OrdenesRows = await OrdenService.ObtenerTodasAsync(); CotizacionesDisponibles = await OrdenService.ObtenerCotizacionesDisponiblesAsync(); }
         catch { ToastService.Notify(new ToastMessage(ToastType.Danger, "No se pudieron cargar las órdenes.")); }
         finally { Cargando = false; }
     }
