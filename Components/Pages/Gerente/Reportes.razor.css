@@ -382,6 +382,7 @@
 .sales-month > div:first-child { display:flex; justify-content:space-between; gap:8px; font-size:13px; }
 .sales-month-track { height:14px; margin-top:6px; background:#EFF6FF; border-radius:4px; overflow:hidden; }
 .sales-month-track span { display:block; height:100%; background:#3B82F6; }
+.sales-report-note { margin:10px 2px; color:#6B7085; font-size:12px; }
 
 .report-donut-layout {
     flex: 1;
