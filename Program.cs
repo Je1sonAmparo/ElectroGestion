@@ -29,6 +29,7 @@ builder.Services.AddScoped<LevantamientoService>();
 builder.Services.AddScoped<CotizacionService>();
 builder.Services.AddScoped<OrdenTrabajoService>();
 builder.Services.AddScoped<CobroService>();
+builder.Services.AddScoped<InicioDashboardService>();
 
 builder.Services.AddBlazorBootstrap();
 
