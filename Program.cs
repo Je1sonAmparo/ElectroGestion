@@ -93,7 +93,9 @@ app.UseAuthorization();
 
 app.Use(async (context, next) =>
 {
-    if (context.Request.Method == "GET" && context.Request.Headers.Accept.Any(a => a?.Contains("text/html") == true)
+    var ruta = context.Request.Path.Value ?? "/";
+    if (context.Request.Method == "GET" && !ruta.StartsWith("/_", StringComparison.OrdinalIgnoreCase)
+        && string.IsNullOrEmpty(Path.GetExtension(ruta))
         && context.Request.Path != "/login" && context.Request.Path != "/not-found" && context.Request.Path != "/Error"
         && context.User.Identity?.IsAuthenticated != true)
     {
