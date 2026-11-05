@@ -23,6 +23,7 @@ builder.Services.AddScoped<IPasswordHasher<Usuario>, PasswordHasher<Usuario>>();
 builder.Services.AddScoped<ClienteService>();
 builder.Services.AddScoped<ServicioService>();
 builder.Services.AddScoped<InventarioService>();
+builder.Services.AddScoped<VentaService>();
 builder.Services.AddScoped<SolicitudService>();
 builder.Services.AddScoped<SolicitudEventoService>();
 builder.Services.AddScoped<VisitaService>();

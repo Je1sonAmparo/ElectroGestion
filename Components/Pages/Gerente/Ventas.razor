@@ -1,0 +1,256 @@
+@page "/ventas"
+@inject AppStateService AppState
+@inject VentaService VentaService
+@inject InventarioService InventarioService
+@inject ClienteService ClienteService
+@inject ToastService ToastService
+@inject IJSRuntime JS
+
+<PageTitle>Ventas | ElectroGestión</PageTitle>
+
+@if (!AppState.EsGerente)
+{
+    <p>Esta página está disponible para el gerente.</p>
+}
+else
+{
+    <header class="ventas-header">
+        <div><h1 class="page-title">Ventas</h1><p>Venta directa de equipos y materiales a clientes.</p></div>
+        <button class="ventas-primary" @onclick="() => Abrir(null)">+ Nueva venta</button>
+    </header>
+
+    <div class="ventas-panel">
+        <div class="ventas-filtros">
+            <label>Buscar <input @bind="Busqueda" placeholder="Cliente, producto o NCF" /></label>
+            <label>Comprobante <select @bind="Tipo"><option value="">Todos</option><option>@Venta.Consumo</option><option>@Venta.CreditoFiscal</option></select></label>
+            <label>Estado <select @bind="Estado"><option value="">Todos</option><option>@Venta.Borrador</option><option>@Venta.Registrada</option><option>@Venta.Anulada</option></select></label>
+            <button class="ventas-primary" @onclick="AplicarFiltros">Buscar</button>
+        </div>
+        <div class="ventas-tabla">
+            <table>
+                <thead><tr><th>ID</th><th>Fecha</th><th>Cliente</th><th>Producto</th><th>Comprobante</th><th>Total</th><th>Estado</th><th>Acciones</th></tr></thead>
+                <tbody>
+                    @foreach (var venta in Filtradas)
+                    {
+                        <tr @key="venta.Id">
+                            <td>@venta.Id</td><td>@((venta.FechaVenta ?? venta.FechaCreacion).ToString("dd/MM/yyyy"))</td>
+                            <td>@Comprador(venta)</td><td>@venta.NombreArticulo × @venta.Cantidad</td>
+                            <td>@venta.TipoComprobante <small>@venta.Ncf</small></td>
+                            <td>@Moneda(venta.Total)</td><td><span class="ventas-estado" data-estado="@venta.Estado">@venta.Estado</span></td>
+                            <td><div class="ventas-acciones">
+                                <button @onclick="() => Detalle = venta">Detalle</button>
+                                @if (venta.Estado == Venta.Borrador)
+                                {
+                                    <button @onclick="() => Abrir(venta)">Editar</button>
+                                    <button class="ventas-danger" @onclick="() => Confirmacion = venta">Eliminar</button>
+                                }
+                                else if (venta.Estado == Venta.Registrada)
+                                {
+                                    <button class="ventas-danger" @onclick="() => Confirmacion = venta">Anular</button>
+                                }
+                            </div></td>
+                        </tr>
+                    }
+                    @if (!Filtradas.Any())
+                    {
+                        <tr><td colspan="8">No se encontraron ventas.</td></tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    @if (Formulario is { } form)
+    {
+        <div class="ventas-overlay" @onclick="CerrarFormulario">
+            <section class="ventas-modal" role="dialog" aria-modal="true" aria-labelledby="titulo-venta" @onclick:stopPropagation>
+                <h2 id="titulo-venta">@(form.Id == 0 ? "Nueva venta" : "Editar borrador")</h2>
+                <div class="ventas-formulario">
+                    <label>Producto
+                        <select @bind="form.ArticuloInventarioId">
+                            <option value="0">Seleccione un producto</option>
+                            @foreach (var articulo in Articulos)
+                            {
+                                <option value="@articulo.Id">@articulo.Codigo · @articulo.Nombre (@articulo.Cantidad disponibles)</option>
+                            }
+                        </select>
+                    </label>
+                    <label>Cantidad <input type="number" min="1" step="1" @bind="form.Cantidad" /></label>
+                    <label>Cliente del catálogo
+                        <select @bind="form.ClienteId" @bind:after="SeleccionarCliente">
+                            <option value="">Sin cliente registrado</option>
+                            @foreach (var cliente in Clientes)
+                            {
+                                <option value="@cliente.Id">@cliente.Nombre</option>
+                            }
+                        </select>
+                    </label>
+                    <label>Nombre o razón social <input maxlength="200" @bind="form.NombreCliente" /></label>
+                    <label>RNC, cédula o documento <input maxlength="30" @bind="form.DocumentoCliente" /></label>
+                    <label>Tipo de comprobante <select @bind="form.TipoComprobante"><option>@Venta.Consumo</option><option>@Venta.CreditoFiscal</option></select></label>
+                    <label>NCF o e-NCF emitido <input maxlength="13" @bind="form.Ncf" placeholder="Requerido para registrar" /></label>
+                    <label>ITBIS (%) <input type="number" min="0" max="100" step="0.01" @bind="form.TasaItbis" /></label>
+                </div>
+                @if (ArticuloSeleccionado is { } elegido)
+                {
+                    var subtotal = elegido.PrecioUnidad * form.Cantidad;
+                    var impuesto = CotizacionService.CalcularImpuesto(subtotal, form.TasaItbis);
+                    <p class="ventas-resumen">Precio unitario @Moneda(elegido.PrecioUnidad) · Subtotal @Moneda(subtotal) · ITBIS @Moneda(impuesto) · <strong>Total @Moneda(subtotal + impuesto)</strong></p>
+                }
+                <div class="ventas-pie">
+                    <button disabled="@Ocupado" @onclick="CerrarFormulario">Cancelar</button>
+                    <button disabled="@Ocupado" @onclick="() => Guardar(false)">Guardar borrador</button>
+                    <button class="ventas-primary" disabled="@Ocupado" @onclick="() => Guardar(true)">Registrar venta</button>
+                </div>
+            </section>
+        </div>
+    }
+
+    @if (Detalle is { } detalle)
+    {
+        <style>
+            @@media print {
+                body * { visibility:hidden; }
+                .venta-documento, .venta-documento * { visibility:visible; }
+                .ventas-overlay { position:absolute; inset:0; display:block; padding:0; background:white; }
+                .venta-documento { width:100%; max-height:none; box-shadow:none; }
+                .venta-documento .ventas-pie { display:none; }
+            }
+        </style>
+        <div class="ventas-overlay" @onclick="() => Detalle = null">
+            <section class="ventas-modal venta-documento" role="dialog" aria-modal="true" aria-labelledby="detalle-venta" @onclick:stopPropagation>
+                <h2 id="detalle-venta">ElectroGestión · Venta @detalle.Id</h2>
+                <p>Registro interno · @detalle.TipoComprobante · @detalle.Estado</p>
+                <p><strong>Cliente</strong> @Comprador(detalle) @detalle.DocumentoCliente</p>
+                <p><strong>Fecha</strong> @((detalle.FechaVenta ?? detalle.FechaCreacion).ToString("dd/MM/yyyy HH:mm"))</p>
+                @if (detalle.Ncf is not null)
+                {
+                    <p><strong>Comprobante registrado</strong> @detalle.Ncf</p>
+                }
+                <div class="ventas-tabla">
+                    <table><thead><tr><th>Producto</th><th>Cantidad</th><th>Precio unitario</th><th>Subtotal</th></tr></thead>
+                        <tbody><tr><td>@detalle.CodigoArticulo · @detalle.NombreArticulo</td><td>@detalle.Cantidad</td><td>@Moneda(detalle.PrecioUnitario)</td><td>@Moneda(detalle.Subtotal)</td></tr></tbody>
+                    </table>
+                </div>
+                <p>ITBIS (@detalle.TasaItbis.ToString("0.##") %) @Moneda(detalle.Itbis)</p>
+                <p><strong>Total @Moneda(detalle.Total)</strong></p>
+                <div class="ventas-pie">
+                    <button @onclick="() => Detalle = null">Cerrar</button>
+                    <button class="ventas-primary" @onclick="Imprimir">Imprimir detalle</button>
+                </div>
+            </section>
+        </div>
+    }
+
+    @if (Confirmacion is { } confirmar)
+    {
+        <div class="ventas-overlay">
+            <section class="ventas-modal" role="dialog" aria-modal="true" aria-labelledby="confirmar-venta">
+                <h2 id="confirmar-venta">@(confirmar.Estado == Venta.Borrador ? "Eliminar borrador" : "Anular venta")</h2>
+                <p>@(confirmar.Estado == Venta.Borrador ? "Se eliminará el borrador seleccionado." : "Confirme que el comprobante ya fue corregido en su sistema de facturación y que las unidades regresaron al inventario.")</p>
+                <div class="ventas-pie">
+                    <button disabled="@Ocupado" @onclick="() => Confirmacion = null">Cancelar</button>
+                    <button class="ventas-danger" disabled="@Ocupado" @onclick="ConfirmarAccion">Confirmar</button>
+                </div>
+            </section>
+        </div>
+    }
+}
+
+@code {
+    private List<Venta> Lista = [];
+    private List<ArticuloInventario> Articulos = [];
+    private List<Cliente> Clientes = [];
+    private Venta? Formulario, Detalle, Confirmacion;
+    private bool Ocupado;
+    private string Busqueda = "", Tipo = "", Estado = "";
+    private (string Texto, string Tipo, string Estado) Filtros = ("", "", "");
+
+    private IEnumerable<Venta> Filtradas => Lista.Where(v =>
+        (Filtros.Tipo.Length == 0 || v.TipoComprobante == Filtros.Tipo) &&
+        (Filtros.Estado.Length == 0 || v.Estado == Filtros.Estado) &&
+        (Comprador(v).Contains(Filtros.Texto, StringComparison.OrdinalIgnoreCase) ||
+            v.NombreArticulo.Contains(Filtros.Texto, StringComparison.OrdinalIgnoreCase) ||
+            (v.Ncf ?? "").Contains(Filtros.Texto, StringComparison.OrdinalIgnoreCase)));
+
+    private ArticuloInventario? ArticuloSeleccionado => Articulos.FirstOrDefault(a => a.Id == Formulario?.ArticuloInventarioId);
+    private static string Comprador(Venta v) => string.IsNullOrWhiteSpace(v.NombreCliente) ? "Consumidor final" : v.NombreCliente;
+    private static string Moneda(decimal importe) => $"RD$ {importe:N2}";
+    private void AplicarFiltros() => Filtros = (Busqueda.Trim(), Tipo, Estado);
+    private void CerrarFormulario() { if (!Ocupado) Formulario = null; }
+    private async Task Imprimir() => await JS.InvokeVoidAsync("window.print");
+
+    protected override async Task OnInitializedAsync()
+    {
+        if (AppState.EsGerente) await Recargar();
+    }
+
+    private async Task Recargar()
+    {
+        try { Lista = await VentaService.ListarAsync(); }
+        catch { ToastService.Notify(new ToastMessage(ToastType.Danger, "No se pudieron cargar las ventas.")); }
+    }
+
+    private async Task Abrir(Venta? venta)
+    {
+        try
+        {
+            Articulos = await InventarioService.ObtenerTodosAsync();
+            Clientes = (await ClienteService.GetList(c => true)).OrderBy(c => c.Nombre).ToList();
+            Formulario = venta is null ? new Venta() : new Venta
+            {
+                Id = venta.Id, ArticuloInventarioId = venta.ArticuloInventarioId, ClienteId = venta.ClienteId,
+                NombreCliente = venta.NombreCliente, DocumentoCliente = venta.DocumentoCliente,
+                Cantidad = venta.Cantidad, TipoComprobante = venta.TipoComprobante, TasaItbis = venta.TasaItbis
+            };
+        }
+        catch { ToastService.Notify(new ToastMessage(ToastType.Danger, "No se pudieron cargar los productos o clientes.")); }
+    }
+
+    private void SeleccionarCliente()
+    {
+        if (Formulario is not { } form) return;
+        var cliente = Clientes.FirstOrDefault(c => c.Id == form.ClienteId);
+        form.NombreCliente = cliente?.Nombre ?? "";
+        form.DocumentoCliente = cliente?.Rnc ?? "";
+    }
+
+    private async Task Guardar(bool registrar)
+    {
+        if (Ocupado || Formulario is not { } form) return;
+        Ocupado = true;
+        try
+        {
+            var error = await VentaService.GuardarAsync(form, registrar);
+            if (error is not null)
+            {
+                ToastService.Notify(new ToastMessage(ToastType.Warning, error));
+                return;
+            }
+            Formulario = null;
+            await Recargar();
+            ToastService.Notify(new ToastMessage(ToastType.Success, registrar ? "Venta registrada." : "Borrador guardado."));
+        }
+        catch { ToastService.Notify(new ToastMessage(ToastType.Danger, "No se pudo guardar la venta.")); }
+        finally { Ocupado = false; }
+    }
+
+    private async Task ConfirmarAccion()
+    {
+        if (Ocupado || Confirmacion is not { } venta) return;
+        Ocupado = true;
+        try
+        {
+            var hecho = venta.Estado == Venta.Borrador
+                ? await VentaService.EliminarBorradorAsync(venta.Id)
+                : await VentaService.AnularAsync(venta.Id);
+            Confirmacion = null;
+            await Recargar();
+            ToastService.Notify(hecho
+                ? new ToastMessage(ToastType.Success, "Operación realizada.")
+                : new ToastMessage(ToastType.Warning, "No se pudo completar la operación."));
+        }
+        catch { ToastService.Notify(new ToastMessage(ToastType.Danger, "No se pudo completar la operación.")); }
+        finally { Ocupado = false; }
+    }
+}

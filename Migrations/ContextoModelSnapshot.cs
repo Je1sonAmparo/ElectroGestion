@@ -980,6 +980,84 @@ namespace ElectroGestion.Migrations
                         });
                 });
 
+            modelBuilder.Entity("ElectroGestion.Models.Venta", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("ArticuloInventarioId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("Cantidad")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("ClienteId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("CodigoArticulo")
+                        .IsRequired()
+                        .HasMaxLength(40)
+                        .HasColumnType("nvarchar(40)");
+
+                    b.Property<string>("DocumentoCliente")
+                        .IsRequired()
+                        .HasMaxLength(30)
+                        .HasColumnType("nvarchar(30)");
+
+                    b.Property<string>("Estado")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("nvarchar(20)");
+
+                    b.Property<DateTime>("FechaCreacion")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime?>("FechaVenta")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Ncf")
+                        .HasMaxLength(13)
+                        .HasColumnType("nvarchar(13)");
+
+                    b.Property<string>("NombreArticulo")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
+
+                    b.Property<string>("NombreCliente")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
+
+                    b.Property<decimal>("PrecioUnitario")
+                        .HasPrecision(18, 2)
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<decimal>("TasaItbis")
+                        .HasPrecision(5, 2)
+                        .HasColumnType("decimal(5,2)");
+
+                    b.Property<string>("TipoComprobante")
+                        .IsRequired()
+                        .HasMaxLength(30)
+                        .HasColumnType("nvarchar(30)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ArticuloInventarioId");
+
+                    b.HasIndex("Ncf")
+                        .IsUnique()
+                        .HasFilter("[Ncf] IS NOT NULL");
+
+                    b.HasIndex("Estado", "FechaVenta");
+
+                    b.ToTable("Ventas");
+                });
+
             modelBuilder.Entity("ElectroGestion.Models.Visita", b =>
                 {
                     b.Property<int>("Id")
@@ -1171,6 +1249,15 @@ namespace ElectroGestion.Migrations
                         .IsRequired();
 
                     b.Navigation("Solicitud");
+                });
+
+            modelBuilder.Entity("ElectroGestion.Models.Venta", b =>
+                {
+                    b.HasOne("ElectroGestion.Models.ArticuloInventario", null)
+                        .WithMany()
+                        .HasForeignKey("ArticuloInventarioId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
                 });
 
             modelBuilder.Entity("ElectroGestion.Models.Visita", b =>

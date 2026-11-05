@@ -17,6 +17,7 @@ public class Contexto : DbContext
     public DbSet<Cobro> Cobros { get; set; }
     public DbSet<AbonoCobro> AbonosCobro { get; set; }
     public DbSet<ArticuloInventario> ArticulosInventario { get; set; }
+    public DbSet<Venta> Ventas { get; set; }
     public DbSet<Cliente> Clientes { get; set; }
     public DbSet<Usuario> Usuarios { get; set; }
     public DbSet<Servicio> Servicios { get; set; }
@@ -27,6 +28,16 @@ public class Contexto : DbContext
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         base.OnModelCreating(modelBuilder);
+
+        modelBuilder.Entity<Venta>(entity =>
+        {
+            entity.Property(v => v.PrecioUnitario).HasPrecision(18, 2);
+            entity.Property(v => v.TasaItbis).HasPrecision(5, 2);
+            entity.HasIndex(v => v.Ncf).IsUnique();
+            entity.HasIndex(v => new { v.Estado, v.FechaVenta });
+            entity.HasOne<ArticuloInventario>().WithMany().HasForeignKey(v => v.ArticuloInventarioId)
+                .OnDelete(DeleteBehavior.Restrict);
+        });
 
         modelBuilder.Entity<ArticuloInventario>(entity =>
         {
