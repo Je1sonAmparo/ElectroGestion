@@ -37656,6 +37656,32 @@ public class SolicitudEventoService(IDbContextFactory<Contexto> factory, AppStat
 }
 </file>
 
+<file path="Models/Cobro.cs">
+namespace ElectroGestion.Models;
+
+public class Cobro
+{
+    public int Id { get; set; }
+    public string Cliente { get; set; } = "";
+    public int FacturaId { get; set; }
+    public int CotizacionId { get; set; }
+    public Cotizacion? Cotizacion { get; set; }
+    public int? OrdenTrabajoId { get; set; }
+    public OrdenTrabajo? OrdenTrabajo { get; set; }
+    public DateTime Fecha { get; set; }
+    public decimal Monto { get; set; }
+    public string MetodoPago { get; set; } = "";
+    public string Estado { get; set; } = "Pendiente de cobro";
+    public ICollection<AbonoCobro> Abonos { get; set; } = new List<AbonoCobro>();
+
+    [System.ComponentModel.DataAnnotations.Schema.NotMapped]
+    public decimal MontoPagado => Abonos.Where(a => !a.Anulado).Sum(a => a.Monto);
+
+    [System.ComponentModel.DataAnnotations.Schema.NotMapped]
+    public decimal SaldoPendiente => Math.Max(0, Monto - MontoPagado);
+}
+</file>
+
 <file path="Services/SolicitudService.cs">
 using Microsoft.EntityFrameworkCore;
 using ElectroGestion.Context;
@@ -38247,275 +38273,6 @@ app.MapRazorComponents<App>()
     .AddInteractiveServerRenderMode();
 
 app.Run();
-</file>
-
-<file path="Components/Layout/MainLayout.razor">
-@inherits LayoutComponentBase
-@implements IDisposable
-@inject ElectroGestion.Services.AppStateService AppState
-@inject NavigationManager NavManager
-@inject BlazorBootstrap.ToastService ToastService
-
-@if (!AppState.IsAuthenticated)
-{
-    <ElectroGestion.Components.Pages.Compartidas.Login />
-}
-else
-{
-    <div style="min-height:100vh;display:flex">
-        <aside class="@(SidebarCollapsed ? "is-collapsed" : "is-open")"
-          style="width:@(SidebarCollapsed ? "80px" : "250px");flex:0 0 @(SidebarCollapsed ? "80px" : "250px");background:#fff;border-right:1px solid #E3E5EE;display:flex;flex-direction:column;padding:24px 0;position:sticky;top:0;height:100vh;transition:width 0.3s cubic-bezier(0.4, 0, 0.2, 1)">
-          <button @onclick="ToggleSidebar" class="sidebar-toggle-btn"
-            style="position:absolute;top:28px;right:-14px;width:28px;height:28px;border:1px solid #E3E5EE;background:#fff;border-radius:50%;cursor:pointer;display:flex;align-items:center;justify-content:center;color:#6B7085;z-index:10;box-shadow:0 2px 5px rgba(0,0,0,0.05)">
-            @if (SidebarCollapsed)
-            {
-              <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.3"
-                stroke-linecap="round" stroke-linejoin="round">
-                <path d="M9 18l6-6-6-6" />
-              </svg>
-            }
-            else
-            {
-              <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.3"
-                stroke-linecap="round" stroke-linejoin="round">
-                <path d="M15 18l-6-6 6-6" />
-              </svg>
-            }
-          </button>
-          
-          <div style="padding:32px 0 28px;display:flex;flex-direction:row;align-items:center;justify-content:center;gap:3px;overflow:hidden;width:100%;cursor:pointer" @onclick='() => NavManager.NavigateTo("/")'>
-            @if (!SidebarCollapsed)
-            {
-              <div style="display:flex;align-items:center;justify-content:center;width:100%;padding-left:14px;padding-right:14px">
-                <svg viewBox="10 0 74 60" width="42" height="34" style="flex:0 0 auto">
-                  <defs>
-                    <mask id="bolt-mask-sidebar-row">
-                      <rect width="100" height="60" fill="white" />
-                      <path d="M46 5 L34 32 H46 L38 58 L54 28 H42 Z" fill="black" stroke="black" stroke-width="2.5"
-                        stroke-linejoin="round" />
-                    </mask>
-                  </defs>
-                  <text x="10" y="48" font-family="'Manrope', sans-serif" font-weight="900" font-size="52" fill="#1D4ED8" letter-spacing="-1.5">E</text>
-                  <text x="44" y="48" font-family="'Manrope', sans-serif" font-weight="900" font-size="52" fill="#F59E0B" mask="url(#bolt-mask-sidebar-row)" letter-spacing="-1.5">G</text>
-                  <path d="M46 5 L34 32 H46 L38 58 L54 28 H42 Z" fill="#F59E0B" stroke="#F59E0B" stroke-width="0" stroke-linejoin="round" />
-                </svg>
-                <div style="font-family:'Manrope';font-weight:900;font-size:20px;letter-spacing:-0.5px;white-space:nowrap;line-height:1;margin-top:2px;margin-left:4px">
-                  <span style="color:#1D4ED8">ELECTRO</span><span style="color:#334155">GESTIÓN</span>
-                </div>
-              </div>
-            }
-            else
-            {
-              <div style="display:flex;align-items:center;justify-content:center;width:100%">
-                <svg viewBox="10 0 74 60" width="52" height="42">
-                  <defs>
-                    <mask id="bolt-mask-sidebar-col">
-                      <rect width="100" height="60" fill="white" />
-                      <path d="M46 5 L34 32 H46 L38 58 L54 28 H42 Z" fill="black" stroke="black" stroke-width="2.5" stroke-linejoin="round" />
-                    </mask>
-                  </defs>
-                  <text x="10" y="48" font-family="'Manrope', sans-serif" font-weight="900" font-size="52" fill="#1D4ED8" letter-spacing="-1.5">E</text>
-                  <text x="44" y="48" font-family="'Manrope', sans-serif" font-weight="900" font-size="52" fill="#F59E0B" mask="url(#bolt-mask-sidebar-col)" letter-spacing="-1.5">G</text>
-                  <path d="M46 5 L34 32 H46 L38 58 L54 28 H42 Z" fill="#F59E0B" stroke="#F59E0B" stroke-width="0" stroke-linejoin="round" />
-                </svg>
-              </div>
-            }
-          </div>
-
-          <nav style="display:flex;flex-direction:column;gap:4px;padding:0 12px;overflow-y:auto">
-            @foreach (var item in GetNavItems())
-            {
-                @if (item.IsSeparator)
-                {
-                    <div role="separator" aria-orientation="horizontal" aria-hidden="true" style="height:1px;background:#D9DDE7;margin:10px 0"></div>
-                }
-                else
-                {
-                    var isActive = IsActiveRoute(item.Href);
-                    <NavLink class="@($"nav-item-btn {(isActive ? "active" : "")}")" 
-                             href="@item.Href" 
-                             Match="@(item.Href == "/" ? NavLinkMatch.All : NavLinkMatch.Prefix)" 
-                             style="@($"position:relative;display:flex;align-items:center;gap:12px;width:100%;text-align:left;border:0;cursor:pointer;padding:12px {(SidebarCollapsed ? "16px" : "14px")};border-radius:10px;font-size:14.5px;font-weight:{(isActive ? "800" : "600")};background:{(isActive ? "#EDEBFF" : "transparent")};color:{(isActive ? "#1D4ED8" : "#4A4E63")};transition:all 0.2s;text-decoration:none;")"
-                             title="@(SidebarCollapsed ? item.Label : "")">
-                        <div style="position:relative;display:flex;align-items:center;justify-content:center;width:24px;height:24px;flex:0 0 24px">
-                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="22" height="22" fill="none" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="position:relative;z-index:1;display:block;stroke: @(isActive ? "#1D4ED8" : "#6B7085")">
-                                <path class="path-d1" d="@item.D1" stroke="@(isActive ? "#1D4ED8" : "#6B7085")" fill="none"></path>
-                                @if (!string.IsNullOrEmpty(item.D2))
-                                {
-                                    <path class="path-d2" d="@item.D2" stroke="@(isActive ? "#F59E0B" : "#A1A5B7")" fill="none"></path>
-                                }
-                            </svg>
-                        </div>
-                        @if (!SidebarCollapsed)
-                        {
-                            <span style="white-space:nowrap">@item.Label</span>
-                        }
-                    </NavLink>
-                }
-            }
-          </nav>
-
-          <div style="margin-top:auto;border-top:1px solid #EFF0F6;padding-top:18px;width:100%">
-            @if (!SidebarCollapsed)
-            {
-              <div style="display:flex;align-items:center;gap:11px;padding-left:26px;padding-right:20px;width:100%;box-sizing:border-box">
-                <div style="width:38px;height:38px;border-radius:50%;background:#1D4ED8;color:#fff;display:flex;align-items:center;justify-content:center;font-weight:800;font-family:'Manrope';flex:0 0 38px">
-                  @(AppState.Session?.Inicial ?? "U")</div>
-                <div style="min-width:0">
-                  <div style="font-weight:700;font-size:14px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">
-                    @(AppState.Session?.Nombre ?? "Usuario")</div>
-                  <div style="font-size:12px;color:#8B90A3">@(AppState.Session?.Rol ?? "Rol")</div>
-                </div>
-              </div>
-              <button @onclick="() => showLogoutConfirm = true" class="logout-btn" style="margin:12px 20px 0;width:calc(100% - 40px);padding:9px;border:1px solid #E3E5EE;background:#fff;border-radius:9px;font-size:13px;font-weight:700;color:#C4141B;cursor:pointer">Cerrar sesión</button>
-            }
-            else
-            {
-              <div style="display:flex;align-items:center;justify-content:center;width:100%">
-                <div style="width:38px;height:38px;border-radius:50%;background:#1D4ED8;color:#fff;display:flex;align-items:center;justify-content:center;font-weight:800;font-family:'Manrope';flex:0 0 38px"
-                  title="@(AppState.Session?.Nombre ?? "Usuario")">@(AppState.Session?.Inicial ?? "U")</div>
-              </div>
-              <button @onclick="() => showLogoutConfirm = true" class="logout-btn" title="Cerrar sesión"
-                style="margin:12px 12px 0;padding:9px;border:1px solid #E3E5EE;background:#fff;border-radius:9px;font-size:13px;font-weight:700;color:#C4141B;cursor:pointer;display:flex;align-items:center;justify-content:center">
-                <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                  <path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4"></path>
-                  <path d="M16 17l5-5-5-5"></path>
-                  <path d="M21 12H9"></path>
-                </svg>
-              </button>
-            }
-          </div>
-        </aside>
-        
-        <div class="sidebar-backdrop" @onclick="ToggleSidebar"></div>
-
-        <main style="flex:1;min-width:0;padding:32px 38px 60px" class="resp-main">
-          <CascadingValue Value="this">
-            @Body
-          </CascadingValue>
-        </main>
-    </div>
-
-    @* Confirmation Modal for Logout *@
-    @if (showLogoutConfirm)
-    {
-        <div style="position:fixed;inset:0;background:rgba(14,16,40,.5);display:flex;align-items:center;justify-content:center;padding:20px;z-index:9999">
-            <div style="background:#fff;border-radius:16px;max-width:420px;width:100%;padding:26px;animation:tin .18s ease-out;box-shadow:0 20px 40px rgba(0,0,0,0.15)">
-                <div style="font-family:'Manrope';font-weight:800;font-size:20px;color:#14162B">Cerrar sesión</div>
-                <div style="color:#4A4E63;font-size:14.5px;margin-top:10px;line-height:1.55">¿Deseas cerrar la sesión actual? Los cambios guardados se mantienen.</div>
-                <div style="display:flex;justify-content:flex-end;gap:11px;margin-top:22px">
-                    <button @onclick="() => showLogoutConfirm = false"
-                        style="padding:11px 18px;border:1px solid #D5D8E6;background:#fff;border-radius:9px;font-weight:700;font-size:14px;cursor:pointer;color:#4A4E63">Cancelar</button>
-                    <button @onclick="ConfirmLogout"
-                        style="padding:11px 20px;border:0;background:#C4141B;color:#fff;border-radius:9px;font-weight:700;font-size:14px;cursor:pointer;font-family:'Manrope'">Cerrar sesión</button>
-                </div>
-            </div>
-        </div>
-    }
-
-}
-
-@* BlazorBootstrap Toasts Container Matching XML *@
-<Toasts class="toast-container p-0 m-0" AutoHide="true" Delay="6000" Placement="ToastsPlacement.TopRight" />
-
-@code {
-    private bool SidebarCollapsed { get; set; } = false;
-    private bool showLogoutConfirm = false;
-
-    public record NavItem(string Href, string Label, string D1, string D2, bool IsSeparator = false);
-
-    protected override void OnInitialized()
-    {
-        AppState.OnChange += OnAppStateChanged;
-        NavManager.LocationChanged += OnLocationChanged;
-    }
-
-    public void Dispose()
-    {
-        AppState.OnChange -= OnAppStateChanged;
-        NavManager.LocationChanged -= OnLocationChanged;
-    }
-
-    private async void OnAppStateChanged()
-    {
-        await InvokeAsync(StateHasChanged);
-    }
-
-    private async void OnLocationChanged(object? sender, LocationChangedEventArgs e)
-    {
-        await InvokeAsync(StateHasChanged);
-    }
-
-    private bool IsActiveRoute(string href)
-    {
-        var rel = NavManager.ToBaseRelativePath(NavManager.Uri);
-        var path = rel.Split('?')[0].Trim('/');
-        if (string.IsNullOrEmpty(path)) path = "/";
-        else path = "/" + path;
-
-        if (href == "/") return path == "/";
-        return path.StartsWith(href, StringComparison.OrdinalIgnoreCase);
-    }
-
-    private IEnumerable<NavItem> GetNavItems()
-    {
-        if (AppState.EsAdministrador)
-        {
-            return new List<NavItem>
-            {
-                new("/recuperacion", "Recuperación", "M4 4h16v16H4z", "M9 14l-3 3 3 3 M6 17h7a5 5 0 1 0-5-5")
-            };
-        }
-
-        if (AppState.EsGerente)
-        {
-            return new List<NavItem>
-            {
-                new("/", "Inicio", "M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z", "M9 22V12h6v10"),
-                new("/solicitudes", "Solicitudes", "M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z M14 2v6h6", "M9 9a2 2 0 1 1 4 0 2 2 0 0 1-4 0 M8 13h8 M8 17h8"),
-                new("/agenda", "Agenda", "M19 4H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6a2 2 0 0 0-2-2z M3 10h18", "M16 2v4 M8 2v4 M8 14h2 M14 14h2 M8 18h2 M14 18h2"),
-                new("/levantamientos", "Levantamientos", "M12 21a9 9 0 1 0 0-18 9 9 0 0 0 0 18z M12 21v2", "M9.5 14.5l2-5 4-1-2 5z"),
-                new("/cotizaciones", "Cotizaciones", "M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z", "M14 2v6h6 M8 10h8 M8 14h8 M8 18h5"),
-                new("/ordenes", "Órdenes de trabajo", "M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2 M15 2H9a1 1 0 0 0-1 1v2a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1V3a1 1 0 0 0-1-1z", "M11 11h5 M11 15h5 M11 19h5 M7 11l1.5 1.5 2-2 M7 15l1.5 1.5 2-2 M7 19l1.5 1.5 2-2"),
-                new("/cobros", "Cobros", "M12 21a9 9 0 1 0 0-18 9 9 0 0 0 0 18", "M12 7v10 M8.5 13.5h7"),
-                new("/clientes", "Clientes", "M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2 M7.5 7a4 4 0 1 1 8 0 4 4 0 0 1-8 0", "M22 21v-2a4 4 0 0 0-3-3.87 M15 3.13a4 4 0 0 1 0 7.75"),
-                new("/historial", "Historial", "M12 20.5a8.5 8.5 0 1 0 0-17 8.5 8.5 0 0 0 0 17", "M12 7.6V12l3.4 2.1"),
-                new("", "", "", "", true),
-                new("/servicios", "Servicios", "M12 3.5L3.5 8v12.5h17V8z M12 3.5v5", "M9 14.5h6 M9 17.5h6"),
-                new("/inventario", "Inventario", "M6 4h12a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2z M9 4v4h6V4", "M15 15h5v5h-5z M16 15v-2h3v2"),
-                new("/proveedores", "Proveedores", "M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2 M7.5 7a4 4 0 1 1 8 0 4 4 0 0 1-8 0 M22 21v-2a4 4 0 0 0-3-3.87", "M16 16a4 4 0 1 1 8 0 4 4 0 0 1-8 0 M20 14.5a1.5 1.5 0 0 0-3 0v.5l1.5.5v1 M20 18h0"),
-                new("/reportes", "Reportes", "M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z M14 2v6h6", "M8 18v-4 M12 18v-8 M16 18v-6 M7 12l4-4 3 3 4-4")
-            };
-        }
-        else
-        {
-            return new List<NavItem>
-            {
-                new("/", "Inicio", "M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z", "M9 22V12h6v10"),
-                new("/solicitudes", "Solicitudes", "M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z M14 2v6h6", "M9 9a2 2 0 1 1 4 0 2 2 0 0 1-4 0 M8 13h8 M8 17h8"),
-                new("/agenda", "Agenda", "M19 4H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6a2 2 0 0 0-2-2z M3 10h18", "M16 2v4 M8 2v4 M8 14h2 M14 14h2 M8 18h2 M14 18h2"),
-                new("/levantamientos", "Levantamientos", "M12 21a9 9 0 1 0 0-18 9 9 0 0 0 0 18z M12 21v2", "M9.5 14.5l2-5 4-1-2 5z"),
-                new("/ordenes", "Órdenes de trabajo", "M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2 M15 2H9a1 1 0 0 0-1 1v2a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1V3a1 1 0 0 0-1-1z", "M11 11h5 M11 15h5 M11 19h5 M7 11l1.5 1.5 2-2 M7 15l1.5 1.5 2-2 M7 19l1.5 1.5 2-2"),
-                new("/clientes", "Clientes", "M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2 M7.5 7a4 4 0 1 1 8 0 4 4 0 0 1-8 0", "M22 21v-2a4 4 0 0 0-3-3.87 M15 3.13a4 4 0 0 1 0 7.75"),
-                new("/historial", "Historial", "M12 20.5a8.5 8.5 0 1 0 0-17 8.5 8.5 0 0 0 0 17", "M12 7.6V12l3.4 2.1")
-            };
-        }
-    }
-
-    public void ToggleSidebar()
-    {
-        SidebarCollapsed = !SidebarCollapsed;
-        StateHasChanged();
-    }
-
-    private void ConfirmLogout()
-    {
-        showLogoutConfirm = false;
-        AppState.Logout();
-        ToastService.ShowSuccess("Sesión cerrada correctamente.", "Éxito");
-        NavManager.NavigateTo("/");
-    }
-}
 </file>
 
 <file path="Components/Pages/Compartidas/CotizacionDocumento.razor">
@@ -39538,6 +39295,346 @@ else
         
         IsFormModalOpen = false;
         await CargarDatos();
+    }
+}
+</file>
+
+<file path="Context/Contexto.cs">
+using Microsoft.EntityFrameworkCore;
+using ElectroGestion.Models;
+
+namespace ElectroGestion.Context;
+
+public class Contexto : DbContext
+{
+    public Contexto(DbContextOptions<Contexto> options) : base(options) { }
+
+    public DbSet<Solicitud> Solicitudes { get; set; }
+    public DbSet<SolicitudEvento> SolicitudesEventos { get; set; }
+    public DbSet<Visita> Visitas { get; set; }
+    public DbSet<Levantamiento> Levantamientos { get; set; }
+    public DbSet<Cotizacion> Cotizaciones { get; set; }
+    public DbSet<DetalleCotizacion> DetallesCotizacion { get; set; }
+    public DbSet<OrdenTrabajo> OrdenesTrabajo { get; set; }
+    public DbSet<Cobro> Cobros { get; set; }
+    public DbSet<AbonoCobro> AbonosCobro { get; set; }
+    public DbSet<Cliente> Clientes { get; set; }
+    public DbSet<Usuario> Usuarios { get; set; }
+    public DbSet<Servicio> Servicios { get; set; }
+    public DbSet<EstadoSolicitud> EstadosSolicitud { get; set; }
+    public DbSet<DetalleSolicitud> DetallesSolicitud { get; set; }
+    public DbSet<ClienteTelefono> ClientesTelefonos { get; set; }
+
+    protected override void OnModelCreating(ModelBuilder modelBuilder)
+    {
+        base.OnModelCreating(modelBuilder);
+
+        modelBuilder.Entity<Cliente>(entity =>
+        {
+            entity.HasMany(c => c.Telefonos)
+                .WithOne(t => t.Cliente)
+                .HasForeignKey(t => t.ClienteId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            entity.HasMany(c => c.Solicitudes)
+                .WithOne(s => s.Cliente)
+                .HasForeignKey(s => s.ClienteId)
+                .OnDelete(DeleteBehavior.Restrict);
+        });
+
+        modelBuilder.Entity<Servicio>(entity =>
+        {
+            entity.HasMany(s => s.Solicitudes)
+                .WithOne(sol => sol.Servicio)
+                .HasForeignKey(sol => sol.ServicioId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            entity.HasMany(s => s.Detalles)
+                .WithOne(d => d.Servicio)
+                .HasForeignKey(d => d.ServicioId)
+                .OnDelete(DeleteBehavior.Restrict);
+        });
+
+        modelBuilder.Entity<EstadoSolicitud>(entity =>
+        {
+            entity.HasMany(e => e.Solicitudes)
+                .WithOne(s => s.EstadoSolicitud)
+                .HasForeignKey(s => s.EstadoSolicitudId)
+                .OnDelete(DeleteBehavior.Restrict);
+        });
+
+        modelBuilder.Entity<Levantamiento>(entity =>
+        {
+            entity.HasQueryFilter(l => l.Solicitud != null && !l.Solicitud.IsDeleted);
+            entity.HasIndex(l => l.SolicitudId).IsUnique();
+            entity.Property(l => l.FotografiasJson).HasColumnType("nvarchar(max)");
+            entity.HasOne(l => l.Solicitud)
+                .WithOne(s => s.Levantamiento)
+                .HasForeignKey<Levantamiento>(l => l.SolicitudId)
+                .OnDelete(DeleteBehavior.Cascade);
+        });
+
+        modelBuilder.Entity<Cotizacion>(entity =>
+        {
+            entity.Property(c => c.Cliente).HasMaxLength(200).IsRequired();
+            entity.Property(c => c.SolicitudId).HasMaxLength(50).IsRequired();
+            entity.Property(c => c.Estado).HasMaxLength(40).IsRequired();
+            entity.Property(c => c.MotivoRechazo).HasMaxLength(1000).IsRequired();
+            entity.Property(c => c.MontoTotal).HasPrecision(18, 2);
+            entity.Property(c => c.PorcentajeItbis).HasPrecision(5, 2);
+            entity.Property(c => c.MontoManoObra).HasPrecision(18, 2);
+            entity.HasOne(c => c.Solicitud)
+                .WithMany()
+                .HasForeignKey(c => c.SolicitudDbId)
+                .OnDelete(DeleteBehavior.Restrict);
+            entity.HasIndex(c => c.SolicitudDbId).IsUnique().HasFilter("[SolicitudDbId] IS NOT NULL");
+        });
+
+        modelBuilder.Entity<DetalleCotizacion>(entity =>
+        {
+            entity.Property(d => d.CodigoArticulo).HasMaxLength(40).IsRequired();
+            entity.Property(d => d.NombreArticulo).HasMaxLength(200).IsRequired();
+            entity.Property(d => d.PrecioUnitario).HasPrecision(18, 2);
+            entity.Ignore(d => d.Subtotal);
+            entity.HasOne(d => d.Cotizacion)
+                .WithMany(c => c.Detalles)
+                .HasForeignKey(d => d.CotizacionId)
+                .OnDelete(DeleteBehavior.Cascade);
+        });
+
+        modelBuilder.Entity<OrdenTrabajo>(entity =>
+        {
+            entity.Property(o => o.Code).HasMaxLength(20).IsRequired();
+            entity.Property(o => o.Cliente).HasMaxLength(200).IsRequired();
+            entity.Property(o => o.TipoServicio).HasMaxLength(200).IsRequired();
+            entity.Property(o => o.Estado).HasMaxLength(30).IsRequired();
+            entity.Property(o => o.TrabajosJson).HasColumnType("nvarchar(max)");
+            entity.Property(o => o.MaterialesJson).HasColumnType("nvarchar(max)");
+            entity.Property(o => o.HerramientasJson).HasColumnType("nvarchar(max)");
+            entity.Property(o => o.Observaciones).HasMaxLength(2000);
+            entity.HasIndex(o => o.CotizacionId).IsUnique();
+            entity.HasOne(o => o.Cotizacion).WithMany().HasForeignKey(o => o.CotizacionId).OnDelete(DeleteBehavior.Restrict);
+            entity.HasOne<Solicitud>().WithMany().HasForeignKey(o => o.SolicitudId).OnDelete(DeleteBehavior.Restrict);
+        });
+
+        modelBuilder.Entity<Cobro>(entity =>
+        {
+            entity.Property(c => c.Cliente).HasMaxLength(200).IsRequired();
+            entity.Property(c => c.MetodoPago).HasMaxLength(40).IsRequired();
+            entity.Property(c => c.Estado).HasMaxLength(20).IsRequired();
+            entity.Property(c => c.Monto).HasPrecision(18, 2);
+            entity.HasIndex(c => c.CotizacionId).IsUnique();
+            entity.HasIndex(c => c.OrdenTrabajoId);
+            entity.HasOne(c => c.Cotizacion).WithMany().HasForeignKey(c => c.CotizacionId).OnDelete(DeleteBehavior.Restrict);
+            entity.HasOne(c => c.OrdenTrabajo).WithMany().HasForeignKey(c => c.OrdenTrabajoId).OnDelete(DeleteBehavior.Restrict);
+        });
+
+        modelBuilder.Entity<AbonoCobro>(entity =>
+        {
+            entity.Property(a => a.Monto).HasPrecision(18, 2);
+            entity.Property(a => a.MetodoPago).HasMaxLength(40).IsRequired();
+            entity.HasIndex(a => new { a.CobroId, a.Fecha });
+            entity.HasOne(a => a.Cobro).WithMany(c => c.Abonos).HasForeignKey(a => a.CobroId).OnDelete(DeleteBehavior.Cascade);
+        });
+
+        modelBuilder.Entity<SolicitudEvento>(entity =>
+        {
+            entity.HasQueryFilter(e => e.Solicitud != null && !e.Solicitud.IsDeleted);
+            entity.Property(e => e.Titulo).HasMaxLength(120).IsRequired();
+            entity.Property(e => e.Detalle).HasMaxLength(500).IsRequired();
+            entity.HasIndex(e => new { e.SolicitudId, e.Fecha });
+            entity.HasOne(e => e.Solicitud).WithMany(s => s.Eventos)
+                .HasForeignKey(e => e.SolicitudId).OnDelete(DeleteBehavior.Restrict);
+        });
+
+        modelBuilder.Entity<DetalleSolicitud>()
+            .HasQueryFilter(d => d.Solicitud != null && !d.Solicitud.IsDeleted);
+
+        modelBuilder.Entity<Solicitud>(entity =>
+        {
+            entity.HasQueryFilter(s => !s.IsDeleted);
+
+            entity.HasMany(s => s.Detalles)
+                .WithOne(d => d.Solicitud)
+                .HasForeignKey(d => d.SolicitudId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            entity.HasMany<Visita>()
+                .WithOne(v => v.Solicitud)
+                .HasForeignKey(v => v.SolicitudId)
+                .OnDelete(DeleteBehavior.Restrict);
+        });
+
+        modelBuilder.Entity<Visita>(entity =>
+        {
+            entity.HasQueryFilter(v => !v.IsDeleted && v.Solicitud != null && !v.Solicitud.IsDeleted);
+
+            entity.HasOne(v => v.Tecnico)
+                .WithMany()
+                .HasForeignKey(v => v.TecnicoId)
+                .OnDelete(DeleteBehavior.SetNull);
+        });
+
+        modelBuilder.Entity<Usuario>(entity =>
+        {
+            entity.Property(u => u.UsuarioLogin).HasMaxLength(50).IsRequired();
+            entity.Property(u => u.PasswordHash).HasMaxLength(500).IsRequired();
+            entity.Property(u => u.Nombre).HasMaxLength(150).IsRequired();
+            entity.Property(u => u.Cargo).HasMaxLength(80).IsRequired();
+            entity.Property(u => u.Rol).HasMaxLength(30).IsRequired();
+            entity.HasIndex(u => u.UsuarioLogin).IsUnique();
+        });
+
+        modelBuilder.Entity<Usuario>().HasData(
+            new Usuario
+            {
+                Id = 1,
+                UsuarioLogin = "ana",
+                PasswordHash = "AQAAAAIAAYagAAAAEHjAvVupymZcL4Z7wSkz9ro//N3Hyz31400GKF9GEPnxQFaOPv8TGpO2FJZ8XqCSwg==",
+                Nombre = "Ana Hernández",
+                Cargo = "Gerente",
+                Rol = "Gerente"
+            },
+            new Usuario
+            {
+                Id = 2,
+                UsuarioLogin = "luis",
+                PasswordHash = "AQAAAAIAAYagAAAAEAXFkAX9eqMt9778g9tjjfmZCQWcmM5qlxzOI9VP6eXkDBo7XL52AGtJ9CTZWHUm7g==",
+                Nombre = "Luis Peña",
+                Cargo = "Técnico",
+                Rol = "Técnico"
+            },
+            new Usuario
+            {
+                Id = 3,
+                UsuarioLogin = "admin",
+                PasswordHash = "AQAAAAIAAYagAAAAEDlXkB6f7Cn7W7LhwqonLz2YWMWnkh0z783OtK2aOGgJYxTR1gP7p26z3JILLccOWQ==",
+                Nombre = "Administrador",
+                Cargo = "Administrador",
+                Rol = "Admin"
+            });
+
+        modelBuilder.Entity<EstadoSolicitud>().HasData(
+            new EstadoSolicitud { Id = 1, Nombre = "Pendiente" },
+            new EstadoSolicitud { Id = 2, Nombre = "En proceso" },
+            new EstadoSolicitud { Id = 3, Nombre = "Finalizada" },
+            new EstadoSolicitud { Id = 4, Nombre = "Cancelada" },
+            new EstadoSolicitud { Id = 5, Nombre = "En Espera Administración" },
+            new EstadoSolicitud { Id = 6, Nombre = "En revisión" },
+            new EstadoSolicitud { Id = 7, Nombre = "Enviada al cliente" },
+            new EstadoSolicitud { Id = 8, Nombre = "Aprobada" },
+            new EstadoSolicitud { Id = 9, Nombre = "Rechazada" },
+            new EstadoSolicitud { Id = 10, Nombre = "Pendiente de cobro" }
+        );
+
+        modelBuilder.Entity<Cliente>().HasData(
+            new Cliente { Id = 1, Nombre = "Melody Santos", Correo = "melody@email.com", Rnc = "402-1234567-1", Direccion = "Calle Duarte #24, Santiago", Servicios = 8, Ultimo = "Instalación de Sistema UPS" },
+            new Cliente { Id = 2, Nombre = "Constructora López", Correo = "info@clopez.com", Rnc = "101-987654-2", Direccion = "Av. Estrella Sadhalá #102, Santiago", Servicios = 5, Ultimo = "Instalación Solar" },
+            new Cliente { Id = 3, Nombre = "Farmacia El Sol", Correo = "farmacia@elsol.do", Rnc = "130-334455-3", Direccion = "Calle 16 #7, La Vega", Servicios = 6, Ultimo = "Mantenimiento Eléctrico" },
+            new Cliente { Id = 4, Nombre = "Colmado Hernández", Correo = "hernandez@colmado.com", Rnc = "402-667788-4", Direccion = "Calle Principal #58, Moca", Servicios = 3, Ultimo = "Cableado Estructurado" },
+            new Cliente { Id = 5, Nombre = "Taller Mecánico RD", Correo = "taller@mecanicord.com", Rnc = "130-112233-5", Direccion = "Carretera Luperón km 5, Santiago", Servicios = 1, Ultimo = "Instalación de Planta Eléctrica" }
+        );
+
+        modelBuilder.Entity<ClienteTelefono>().HasData(
+            new ClienteTelefono { Id = 1, ClienteId = 1, Numero = "809-000-0000", Tipo = "Principal" },
+            new ClienteTelefono { Id = 2, ClienteId = 1, Numero = "829-111-2222", Tipo = "Alternativo" },
+            new ClienteTelefono { Id = 3, ClienteId = 2, Numero = "809-555-1212", Tipo = "Principal" },
+            new ClienteTelefono { Id = 4, ClienteId = 3, Numero = "829-441-8890", Tipo = "Principal" },
+            new ClienteTelefono { Id = 5, ClienteId = 4, Numero = "849-220-3311", Tipo = "Principal" },
+            new ClienteTelefono { Id = 6, ClienteId = 5, Numero = "809-778-4402", Tipo = "Principal" },
+            new ClienteTelefono { Id = 7, ClienteId = 5, Numero = "809-999-0000", Tipo = "Alternativo" }
+        );
+
+        modelBuilder.Entity<Servicio>().HasData(
+            new Servicio { Id = 1, ServicioId = "SV-001", Nombre = "Instalación de Paneles Solares", Categoria = "Instalaciones", PrecioBase = 85000, Estado = "Activo" },
+            new Servicio { Id = 2, ServicioId = "SV-002", Nombre = "Instalación de Sistema UPS", Categoria = "Instalaciones", PrecioBase = 45000, Estado = "Activo" },
+            new Servicio { Id = 3, ServicioId = "SV-003", Nombre = "Mantenimiento Eléctrico", Categoria = "Mantenimiento", PrecioBase = 12500, Estado = "Activo" },
+            new Servicio { Id = 4, ServicioId = "SV-004", Nombre = "Cableado Estructurado", Categoria = "Redes y Cableado", PrecioBase = 28000, Estado = "Activo" },
+            new Servicio { Id = 5, ServicioId = "SV-005", Nombre = "Instalación de Planta Eléctrica", Categoria = "Instalaciones", PrecioBase = 120000, Estado = "Activo" }
+        );
+
+        modelBuilder.Entity<Solicitud>().HasData(
+            new Solicitud
+            {
+                Id = 1,
+                ClienteId = 1,
+                ServicioId = 2,
+                Contacto = "Melody Santos",
+                Direccion = "Calle Duarte #24, Santiago",
+                FechaSolicitud = new DateTime(2026, 10, 1),
+                EstadoSolicitudId = 1
+            },
+            new Solicitud
+            {
+                Id = 2,
+                ClienteId = 2,
+                ServicioId = 1,
+                Contacto = "Constructora López",
+                Direccion = "Av. Estrella Sadhalá #102, Santiago",
+                FechaSolicitud = new DateTime(2026, 10, 2),
+                EstadoSolicitudId = 2
+            },
+            new Solicitud
+            {
+                Id = 3,
+                ClienteId = 3,
+                ServicioId = 3,
+                Contacto = "Farmacia El Sol",
+                Direccion = "Calle 16 #7, La Vega",
+                FechaSolicitud = new DateTime(2026, 10, 3),
+                EstadoSolicitudId = 1
+            },
+            new Solicitud
+            {
+                Id = 4,
+                ClienteId = 4,
+                ServicioId = 4,
+                Contacto = "Colmado Hernández",
+                Direccion = "Calle Principal #58, Moca",
+                FechaSolicitud = new DateTime(2026, 9, 29),
+                EstadoSolicitudId = 3
+            },
+            new Solicitud
+            {
+                Id = 5,
+                ClienteId = 5,
+                ServicioId = 5,
+                Contacto = "Taller Mecánico RD",
+                Direccion = "Carretera Luperón km 5, Santiago",
+                FechaSolicitud = new DateTime(2026, 10, 4),
+                EstadoSolicitudId = 2
+            },
+            new Solicitud
+            {
+                Id = 6,
+                ClienteId = 1,
+                ServicioId = 3,
+                Contacto = "Melody Santos",
+                Direccion = "Calle Duarte #24, Santiago",
+                FechaSolicitud = new DateTime(2026, 9, 20),
+                EstadoSolicitudId = 3
+            },
+            new Solicitud
+            {
+                Id = 7,
+                ClienteId = 2,
+                ServicioId = 4,
+                Contacto = "Constructora López",
+                Direccion = "Av. Estrella Sadhalá #102, Santiago",
+                FechaSolicitud = new DateTime(2026, 9, 25),
+                EstadoSolicitudId = 4
+            },
+            new Solicitud
+            {
+                Id = 8,
+                ClienteId = 3,
+                ServicioId = 2,
+                Contacto = "Farmacia El Sol",
+                Direccion = "Calle 16 #7, La Vega",
+                FechaSolicitud = new DateTime(2026, 10, 6),
+                EstadoSolicitudId = 1
+            }
+        );
     }
 }
 </file>
@@ -40732,32 +40829,6 @@ namespace ElectroGestion.Migrations
 }
 </file>
 
-<file path="Models/Cobro.cs">
-namespace ElectroGestion.Models;
-
-public class Cobro
-{
-    public int Id { get; set; }
-    public string Cliente { get; set; } = "";
-    public int FacturaId { get; set; }
-    public int CotizacionId { get; set; }
-    public Cotizacion? Cotizacion { get; set; }
-    public int? OrdenTrabajoId { get; set; }
-    public OrdenTrabajo? OrdenTrabajo { get; set; }
-    public DateTime Fecha { get; set; }
-    public decimal Monto { get; set; }
-    public string MetodoPago { get; set; } = "";
-    public string Estado { get; set; } = "Pendiente de cobro";
-    public ICollection<AbonoCobro> Abonos { get; set; } = new List<AbonoCobro>();
-
-    [System.ComponentModel.DataAnnotations.Schema.NotMapped]
-    public decimal MontoPagado => Abonos.Where(a => !a.Anulado).Sum(a => a.Monto);
-
-    [System.ComponentModel.DataAnnotations.Schema.NotMapped]
-    public decimal SaldoPendiente => Math.Max(0, Monto - MontoPagado);
-}
-</file>
-
 <file path="Services/AppStateService.cs">
 using ElectroGestion.Models;
 
@@ -41154,6 +41225,275 @@ public class LevantamientoService(IDbContextFactory<Contexto> contextFactory)
         {
             visita.Estado = estado;
         }
+    }
+}
+</file>
+
+<file path="Components/Layout/MainLayout.razor">
+@inherits LayoutComponentBase
+@implements IDisposable
+@inject ElectroGestion.Services.AppStateService AppState
+@inject NavigationManager NavManager
+@inject BlazorBootstrap.ToastService ToastService
+
+@if (!AppState.IsAuthenticated)
+{
+    <ElectroGestion.Components.Pages.Compartidas.Login />
+}
+else
+{
+    <div style="min-height:100vh;display:flex">
+        <aside class="@(SidebarCollapsed ? "is-collapsed" : "is-open")"
+          style="width:@(SidebarCollapsed ? "80px" : "250px");flex:0 0 @(SidebarCollapsed ? "80px" : "250px");background:#fff;border-right:1px solid #E3E5EE;display:flex;flex-direction:column;padding:24px 0;position:sticky;top:0;height:100vh;transition:width 0.3s cubic-bezier(0.4, 0, 0.2, 1)">
+          <button @onclick="ToggleSidebar" class="sidebar-toggle-btn"
+            style="position:absolute;top:28px;right:-14px;width:28px;height:28px;border:1px solid #E3E5EE;background:#fff;border-radius:50%;cursor:pointer;display:flex;align-items:center;justify-content:center;color:#6B7085;z-index:10;box-shadow:0 2px 5px rgba(0,0,0,0.05)">
+            @if (SidebarCollapsed)
+            {
+              <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.3"
+                stroke-linecap="round" stroke-linejoin="round">
+                <path d="M9 18l6-6-6-6" />
+              </svg>
+            }
+            else
+            {
+              <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.3"
+                stroke-linecap="round" stroke-linejoin="round">
+                <path d="M15 18l-6-6 6-6" />
+              </svg>
+            }
+          </button>
+          
+          <div style="padding:32px 0 28px;display:flex;flex-direction:row;align-items:center;justify-content:center;gap:3px;overflow:hidden;width:100%;cursor:pointer" @onclick='() => NavManager.NavigateTo("/")'>
+            @if (!SidebarCollapsed)
+            {
+              <div style="display:flex;align-items:center;justify-content:center;width:100%;padding-left:14px;padding-right:14px">
+                <svg viewBox="10 0 74 60" width="42" height="34" style="flex:0 0 auto">
+                  <defs>
+                    <mask id="bolt-mask-sidebar-row">
+                      <rect width="100" height="60" fill="white" />
+                      <path d="M46 5 L34 32 H46 L38 58 L54 28 H42 Z" fill="black" stroke="black" stroke-width="2.5"
+                        stroke-linejoin="round" />
+                    </mask>
+                  </defs>
+                  <text x="10" y="48" font-family="'Manrope', sans-serif" font-weight="900" font-size="52" fill="#1D4ED8" letter-spacing="-1.5">E</text>
+                  <text x="44" y="48" font-family="'Manrope', sans-serif" font-weight="900" font-size="52" fill="#F59E0B" mask="url(#bolt-mask-sidebar-row)" letter-spacing="-1.5">G</text>
+                  <path d="M46 5 L34 32 H46 L38 58 L54 28 H42 Z" fill="#F59E0B" stroke="#F59E0B" stroke-width="0" stroke-linejoin="round" />
+                </svg>
+                <div style="font-family:'Manrope';font-weight:900;font-size:20px;letter-spacing:-0.5px;white-space:nowrap;line-height:1;margin-top:2px;margin-left:4px">
+                  <span style="color:#1D4ED8">ELECTRO</span><span style="color:#334155">GESTIÓN</span>
+                </div>
+              </div>
+            }
+            else
+            {
+              <div style="display:flex;align-items:center;justify-content:center;width:100%">
+                <svg viewBox="10 0 74 60" width="52" height="42">
+                  <defs>
+                    <mask id="bolt-mask-sidebar-col">
+                      <rect width="100" height="60" fill="white" />
+                      <path d="M46 5 L34 32 H46 L38 58 L54 28 H42 Z" fill="black" stroke="black" stroke-width="2.5" stroke-linejoin="round" />
+                    </mask>
+                  </defs>
+                  <text x="10" y="48" font-family="'Manrope', sans-serif" font-weight="900" font-size="52" fill="#1D4ED8" letter-spacing="-1.5">E</text>
+                  <text x="44" y="48" font-family="'Manrope', sans-serif" font-weight="900" font-size="52" fill="#F59E0B" mask="url(#bolt-mask-sidebar-col)" letter-spacing="-1.5">G</text>
+                  <path d="M46 5 L34 32 H46 L38 58 L54 28 H42 Z" fill="#F59E0B" stroke="#F59E0B" stroke-width="0" stroke-linejoin="round" />
+                </svg>
+              </div>
+            }
+          </div>
+
+          <nav style="display:flex;flex-direction:column;gap:4px;padding:0 12px;overflow-y:auto">
+            @foreach (var item in GetNavItems())
+            {
+                @if (item.IsSeparator)
+                {
+                    <hr role="separator" aria-orientation="horizontal" aria-hidden="true" style="display:block;flex:0 0 auto;width:100%;height:0;box-sizing:border-box;border:0;border-top:1px solid #C9CED9;opacity:1;margin:10px 0;padding:0" />
+                }
+                else
+                {
+                    var isActive = IsActiveRoute(item.Href);
+                    <NavLink class="@($"nav-item-btn {(isActive ? "active" : "")}")" 
+                             href="@item.Href" 
+                             Match="@(item.Href == "/" ? NavLinkMatch.All : NavLinkMatch.Prefix)" 
+                             style="@($"position:relative;display:flex;align-items:center;gap:12px;width:100%;text-align:left;border:0;cursor:pointer;padding:12px {(SidebarCollapsed ? "16px" : "14px")};border-radius:10px;font-size:14.5px;font-weight:{(isActive ? "800" : "600")};background:{(isActive ? "#EDEBFF" : "transparent")};color:{(isActive ? "#1D4ED8" : "#4A4E63")};transition:all 0.2s;text-decoration:none;")"
+                             title="@(SidebarCollapsed ? item.Label : "")">
+                        <div style="position:relative;display:flex;align-items:center;justify-content:center;width:24px;height:24px;flex:0 0 24px">
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="22" height="22" fill="none" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="position:relative;z-index:1;display:block;stroke: @(isActive ? "#1D4ED8" : "#6B7085")">
+                                <path class="path-d1" d="@item.D1" stroke="@(isActive ? "#1D4ED8" : "#6B7085")" fill="none"></path>
+                                @if (!string.IsNullOrEmpty(item.D2))
+                                {
+                                    <path class="path-d2" d="@item.D2" stroke="@(isActive ? "#F59E0B" : "#A1A5B7")" fill="none"></path>
+                                }
+                            </svg>
+                        </div>
+                        @if (!SidebarCollapsed)
+                        {
+                            <span style="white-space:nowrap">@item.Label</span>
+                        }
+                    </NavLink>
+                }
+            }
+          </nav>
+
+          <div style="margin-top:auto;border-top:1px solid #EFF0F6;padding-top:18px;width:100%">
+            @if (!SidebarCollapsed)
+            {
+              <div style="display:flex;align-items:center;gap:11px;padding-left:26px;padding-right:20px;width:100%;box-sizing:border-box">
+                <div style="width:38px;height:38px;border-radius:50%;background:#1D4ED8;color:#fff;display:flex;align-items:center;justify-content:center;font-weight:800;font-family:'Manrope';flex:0 0 38px">
+                  @(AppState.Session?.Inicial ?? "U")</div>
+                <div style="min-width:0">
+                  <div style="font-weight:700;font-size:14px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">
+                    @(AppState.Session?.Nombre ?? "Usuario")</div>
+                  <div style="font-size:12px;color:#8B90A3">@(AppState.Session?.Rol ?? "Rol")</div>
+                </div>
+              </div>
+              <button @onclick="() => showLogoutConfirm = true" class="logout-btn" style="margin:12px 20px 0;width:calc(100% - 40px);padding:9px;border:1px solid #E3E5EE;background:#fff;border-radius:9px;font-size:13px;font-weight:700;color:#C4141B;cursor:pointer">Cerrar sesión</button>
+            }
+            else
+            {
+              <div style="display:flex;align-items:center;justify-content:center;width:100%">
+                <div style="width:38px;height:38px;border-radius:50%;background:#1D4ED8;color:#fff;display:flex;align-items:center;justify-content:center;font-weight:800;font-family:'Manrope';flex:0 0 38px"
+                  title="@(AppState.Session?.Nombre ?? "Usuario")">@(AppState.Session?.Inicial ?? "U")</div>
+              </div>
+              <button @onclick="() => showLogoutConfirm = true" class="logout-btn" title="Cerrar sesión"
+                style="margin:12px 12px 0;padding:9px;border:1px solid #E3E5EE;background:#fff;border-radius:9px;font-size:13px;font-weight:700;color:#C4141B;cursor:pointer;display:flex;align-items:center;justify-content:center">
+                <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4"></path>
+                  <path d="M16 17l5-5-5-5"></path>
+                  <path d="M21 12H9"></path>
+                </svg>
+              </button>
+            }
+          </div>
+        </aside>
+        
+        <div class="sidebar-backdrop" @onclick="ToggleSidebar"></div>
+
+        <main style="flex:1;min-width:0;padding:32px 38px 60px" class="resp-main">
+          <CascadingValue Value="this">
+            @Body
+          </CascadingValue>
+        </main>
+    </div>
+
+    @* Confirmation Modal for Logout *@
+    @if (showLogoutConfirm)
+    {
+        <div style="position:fixed;inset:0;background:rgba(14,16,40,.5);display:flex;align-items:center;justify-content:center;padding:20px;z-index:9999">
+            <div style="background:#fff;border-radius:16px;max-width:420px;width:100%;padding:26px;animation:tin .18s ease-out;box-shadow:0 20px 40px rgba(0,0,0,0.15)">
+                <div style="font-family:'Manrope';font-weight:800;font-size:20px;color:#14162B">Cerrar sesión</div>
+                <div style="color:#4A4E63;font-size:14.5px;margin-top:10px;line-height:1.55">¿Deseas cerrar la sesión actual? Los cambios guardados se mantienen.</div>
+                <div style="display:flex;justify-content:flex-end;gap:11px;margin-top:22px">
+                    <button @onclick="() => showLogoutConfirm = false"
+                        style="padding:11px 18px;border:1px solid #D5D8E6;background:#fff;border-radius:9px;font-weight:700;font-size:14px;cursor:pointer;color:#4A4E63">Cancelar</button>
+                    <button @onclick="ConfirmLogout"
+                        style="padding:11px 20px;border:0;background:#C4141B;color:#fff;border-radius:9px;font-weight:700;font-size:14px;cursor:pointer;font-family:'Manrope'">Cerrar sesión</button>
+                </div>
+            </div>
+        </div>
+    }
+
+}
+
+@* BlazorBootstrap Toasts Container Matching XML *@
+<Toasts class="toast-container p-0 m-0" AutoHide="true" Delay="6000" Placement="ToastsPlacement.TopRight" />
+
+@code {
+    private bool SidebarCollapsed { get; set; } = false;
+    private bool showLogoutConfirm = false;
+
+    public record NavItem(string Href, string Label, string D1, string D2, bool IsSeparator = false);
+
+    protected override void OnInitialized()
+    {
+        AppState.OnChange += OnAppStateChanged;
+        NavManager.LocationChanged += OnLocationChanged;
+    }
+
+    public void Dispose()
+    {
+        AppState.OnChange -= OnAppStateChanged;
+        NavManager.LocationChanged -= OnLocationChanged;
+    }
+
+    private async void OnAppStateChanged()
+    {
+        await InvokeAsync(StateHasChanged);
+    }
+
+    private async void OnLocationChanged(object? sender, LocationChangedEventArgs e)
+    {
+        await InvokeAsync(StateHasChanged);
+    }
+
+    private bool IsActiveRoute(string href)
+    {
+        var rel = NavManager.ToBaseRelativePath(NavManager.Uri);
+        var path = rel.Split('?')[0].Trim('/');
+        if (string.IsNullOrEmpty(path)) path = "/";
+        else path = "/" + path;
+
+        if (href == "/") return path == "/";
+        return path.StartsWith(href, StringComparison.OrdinalIgnoreCase);
+    }
+
+    private IEnumerable<NavItem> GetNavItems()
+    {
+        if (AppState.EsAdministrador)
+        {
+            return new List<NavItem>
+            {
+                new("/recuperacion", "Recuperación", "M4 4h16v16H4z", "M9 14l-3 3 3 3 M6 17h7a5 5 0 1 0-5-5")
+            };
+        }
+
+        if (AppState.EsGerente)
+        {
+            return new List<NavItem>
+            {
+                new("/", "Inicio", "M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z", "M9 22V12h6v10"),
+                new("/solicitudes", "Solicitudes", "M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z M14 2v6h6", "M9 9a2 2 0 1 1 4 0 2 2 0 0 1-4 0 M8 13h8 M8 17h8"),
+                new("/agenda", "Agenda", "M19 4H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6a2 2 0 0 0-2-2z M3 10h18", "M16 2v4 M8 2v4 M8 14h2 M14 14h2 M8 18h2 M14 18h2"),
+                new("/levantamientos", "Levantamientos", "M12 21a9 9 0 1 0 0-18 9 9 0 0 0 0 18z M12 21v2", "M9.5 14.5l2-5 4-1-2 5z"),
+                new("/cotizaciones", "Cotizaciones", "M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z", "M14 2v6h6 M8 10h8 M8 14h8 M8 18h5"),
+                new("/ordenes", "Órdenes de trabajo", "M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2 M15 2H9a1 1 0 0 0-1 1v2a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1V3a1 1 0 0 0-1-1z", "M11 11h5 M11 15h5 M11 19h5 M7 11l1.5 1.5 2-2 M7 15l1.5 1.5 2-2 M7 19l1.5 1.5 2-2"),
+                new("/cobros", "Cobros", "M12 21a9 9 0 1 0 0-18 9 9 0 0 0 0 18", "M12 7v10 M8.5 13.5h7"),
+                new("/clientes", "Clientes", "M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2 M7.5 7a4 4 0 1 1 8 0 4 4 0 0 1-8 0", "M22 21v-2a4 4 0 0 0-3-3.87 M15 3.13a4 4 0 0 1 0 7.75"),
+                new("/historial", "Historial", "M12 20.5a8.5 8.5 0 1 0 0-17 8.5 8.5 0 0 0 0 17", "M12 7.6V12l3.4 2.1"),
+                new("", "", "", "", true),
+                new("/servicios", "Servicios", "M12 3.5L3.5 8v12.5h17V8z M12 3.5v5", "M9 14.5h6 M9 17.5h6"),
+                new("/inventario", "Inventario", "M6 4h12a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2z M9 4v4h6V4", "M15 15h5v5h-5z M16 15v-2h3v2"),
+                new("/proveedores", "Proveedores", "M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2 M7.5 7a4 4 0 1 1 8 0 4 4 0 0 1-8 0 M22 21v-2a4 4 0 0 0-3-3.87", "M16 16a4 4 0 1 1 8 0 4 4 0 0 1-8 0 M20 14.5a1.5 1.5 0 0 0-3 0v.5l1.5.5v1 M20 18h0"),
+                new("/reportes", "Reportes", "M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z M14 2v6h6", "M8 18v-4 M12 18v-8 M16 18v-6 M7 12l4-4 3 3 4-4")
+            };
+        }
+        else
+        {
+            return new List<NavItem>
+            {
+                new("/", "Inicio", "M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z", "M9 22V12h6v10"),
+                new("/solicitudes", "Solicitudes", "M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z M14 2v6h6", "M9 9a2 2 0 1 1 4 0 2 2 0 0 1-4 0 M8 13h8 M8 17h8"),
+                new("/agenda", "Agenda", "M19 4H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6a2 2 0 0 0-2-2z M3 10h18", "M16 2v4 M8 2v4 M8 14h2 M14 14h2 M8 18h2 M14 18h2"),
+                new("/levantamientos", "Levantamientos", "M12 21a9 9 0 1 0 0-18 9 9 0 0 0 0 18z M12 21v2", "M9.5 14.5l2-5 4-1-2 5z"),
+                new("/ordenes", "Órdenes de trabajo", "M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2 M15 2H9a1 1 0 0 0-1 1v2a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1V3a1 1 0 0 0-1-1z", "M11 11h5 M11 15h5 M11 19h5 M7 11l1.5 1.5 2-2 M7 15l1.5 1.5 2-2 M7 19l1.5 1.5 2-2"),
+                new("/clientes", "Clientes", "M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2 M7.5 7a4 4 0 1 1 8 0 4 4 0 0 1-8 0", "M22 21v-2a4 4 0 0 0-3-3.87 M15 3.13a4 4 0 0 1 0 7.75"),
+                new("/historial", "Historial", "M12 20.5a8.5 8.5 0 1 0 0-17 8.5 8.5 0 0 0 0 17", "M12 7.6V12l3.4 2.1")
+            };
+        }
+    }
+
+    public void ToggleSidebar()
+    {
+        SidebarCollapsed = !SidebarCollapsed;
+        StateHasChanged();
+    }
+
+    private void ConfirmLogout()
+    {
+        showLogoutConfirm = false;
+        AppState.Logout();
+        ToastService.ShowSuccess("Sesión cerrada correctamente.", "Éxito");
+        NavManager.NavigateTo("/");
     }
 }
 </file>
@@ -41557,346 +41897,6 @@ public class LevantamientoService(IDbContextFactory<Contexto> contextFactory)
         "En revisión" => ("#FEF3C7", "#92400E"), "Enviada al cliente" => ("#DBEAFE", "#1E40AF"),
         "Aprobada" => ("#D1FAE5", "#065F46"), "Rechazada" => ("#FEE2E2", "#991B1B"), _ => ("#F3F4F6", "#374151")
     };
-}
-</file>
-
-<file path="Context/Contexto.cs">
-using Microsoft.EntityFrameworkCore;
-using ElectroGestion.Models;
-
-namespace ElectroGestion.Context;
-
-public class Contexto : DbContext
-{
-    public Contexto(DbContextOptions<Contexto> options) : base(options) { }
-
-    public DbSet<Solicitud> Solicitudes { get; set; }
-    public DbSet<SolicitudEvento> SolicitudesEventos { get; set; }
-    public DbSet<Visita> Visitas { get; set; }
-    public DbSet<Levantamiento> Levantamientos { get; set; }
-    public DbSet<Cotizacion> Cotizaciones { get; set; }
-    public DbSet<DetalleCotizacion> DetallesCotizacion { get; set; }
-    public DbSet<OrdenTrabajo> OrdenesTrabajo { get; set; }
-    public DbSet<Cobro> Cobros { get; set; }
-    public DbSet<AbonoCobro> AbonosCobro { get; set; }
-    public DbSet<Cliente> Clientes { get; set; }
-    public DbSet<Usuario> Usuarios { get; set; }
-    public DbSet<Servicio> Servicios { get; set; }
-    public DbSet<EstadoSolicitud> EstadosSolicitud { get; set; }
-    public DbSet<DetalleSolicitud> DetallesSolicitud { get; set; }
-    public DbSet<ClienteTelefono> ClientesTelefonos { get; set; }
-
-    protected override void OnModelCreating(ModelBuilder modelBuilder)
-    {
-        base.OnModelCreating(modelBuilder);
-
-        modelBuilder.Entity<Cliente>(entity =>
-        {
-            entity.HasMany(c => c.Telefonos)
-                .WithOne(t => t.Cliente)
-                .HasForeignKey(t => t.ClienteId)
-                .OnDelete(DeleteBehavior.Cascade);
-
-            entity.HasMany(c => c.Solicitudes)
-                .WithOne(s => s.Cliente)
-                .HasForeignKey(s => s.ClienteId)
-                .OnDelete(DeleteBehavior.Restrict);
-        });
-
-        modelBuilder.Entity<Servicio>(entity =>
-        {
-            entity.HasMany(s => s.Solicitudes)
-                .WithOne(sol => sol.Servicio)
-                .HasForeignKey(sol => sol.ServicioId)
-                .OnDelete(DeleteBehavior.Restrict);
-
-            entity.HasMany(s => s.Detalles)
-                .WithOne(d => d.Servicio)
-                .HasForeignKey(d => d.ServicioId)
-                .OnDelete(DeleteBehavior.Restrict);
-        });
-
-        modelBuilder.Entity<EstadoSolicitud>(entity =>
-        {
-            entity.HasMany(e => e.Solicitudes)
-                .WithOne(s => s.EstadoSolicitud)
-                .HasForeignKey(s => s.EstadoSolicitudId)
-                .OnDelete(DeleteBehavior.Restrict);
-        });
-
-        modelBuilder.Entity<Levantamiento>(entity =>
-        {
-            entity.HasQueryFilter(l => l.Solicitud != null && !l.Solicitud.IsDeleted);
-            entity.HasIndex(l => l.SolicitudId).IsUnique();
-            entity.Property(l => l.FotografiasJson).HasColumnType("nvarchar(max)");
-            entity.HasOne(l => l.Solicitud)
-                .WithOne(s => s.Levantamiento)
-                .HasForeignKey<Levantamiento>(l => l.SolicitudId)
-                .OnDelete(DeleteBehavior.Cascade);
-        });
-
-        modelBuilder.Entity<Cotizacion>(entity =>
-        {
-            entity.Property(c => c.Cliente).HasMaxLength(200).IsRequired();
-            entity.Property(c => c.SolicitudId).HasMaxLength(50).IsRequired();
-            entity.Property(c => c.Estado).HasMaxLength(40).IsRequired();
-            entity.Property(c => c.MotivoRechazo).HasMaxLength(1000).IsRequired();
-            entity.Property(c => c.MontoTotal).HasPrecision(18, 2);
-            entity.Property(c => c.PorcentajeItbis).HasPrecision(5, 2);
-            entity.Property(c => c.MontoManoObra).HasPrecision(18, 2);
-            entity.HasOne(c => c.Solicitud)
-                .WithMany()
-                .HasForeignKey(c => c.SolicitudDbId)
-                .OnDelete(DeleteBehavior.Restrict);
-            entity.HasIndex(c => c.SolicitudDbId).IsUnique().HasFilter("[SolicitudDbId] IS NOT NULL");
-        });
-
-        modelBuilder.Entity<DetalleCotizacion>(entity =>
-        {
-            entity.Property(d => d.CodigoArticulo).HasMaxLength(40).IsRequired();
-            entity.Property(d => d.NombreArticulo).HasMaxLength(200).IsRequired();
-            entity.Property(d => d.PrecioUnitario).HasPrecision(18, 2);
-            entity.Ignore(d => d.Subtotal);
-            entity.HasOne(d => d.Cotizacion)
-                .WithMany(c => c.Detalles)
-                .HasForeignKey(d => d.CotizacionId)
-                .OnDelete(DeleteBehavior.Cascade);
-        });
-
-        modelBuilder.Entity<OrdenTrabajo>(entity =>
-        {
-            entity.Property(o => o.Code).HasMaxLength(20).IsRequired();
-            entity.Property(o => o.Cliente).HasMaxLength(200).IsRequired();
-            entity.Property(o => o.TipoServicio).HasMaxLength(200).IsRequired();
-            entity.Property(o => o.Estado).HasMaxLength(30).IsRequired();
-            entity.Property(o => o.TrabajosJson).HasColumnType("nvarchar(max)");
-            entity.Property(o => o.MaterialesJson).HasColumnType("nvarchar(max)");
-            entity.Property(o => o.HerramientasJson).HasColumnType("nvarchar(max)");
-            entity.Property(o => o.Observaciones).HasMaxLength(2000);
-            entity.HasIndex(o => o.CotizacionId).IsUnique();
-            entity.HasOne(o => o.Cotizacion).WithMany().HasForeignKey(o => o.CotizacionId).OnDelete(DeleteBehavior.Restrict);
-            entity.HasOne<Solicitud>().WithMany().HasForeignKey(o => o.SolicitudId).OnDelete(DeleteBehavior.Restrict);
-        });
-
-        modelBuilder.Entity<Cobro>(entity =>
-        {
-            entity.Property(c => c.Cliente).HasMaxLength(200).IsRequired();
-            entity.Property(c => c.MetodoPago).HasMaxLength(40).IsRequired();
-            entity.Property(c => c.Estado).HasMaxLength(20).IsRequired();
-            entity.Property(c => c.Monto).HasPrecision(18, 2);
-            entity.HasIndex(c => c.CotizacionId).IsUnique();
-            entity.HasIndex(c => c.OrdenTrabajoId);
-            entity.HasOne(c => c.Cotizacion).WithMany().HasForeignKey(c => c.CotizacionId).OnDelete(DeleteBehavior.Restrict);
-            entity.HasOne(c => c.OrdenTrabajo).WithMany().HasForeignKey(c => c.OrdenTrabajoId).OnDelete(DeleteBehavior.Restrict);
-        });
-
-        modelBuilder.Entity<AbonoCobro>(entity =>
-        {
-            entity.Property(a => a.Monto).HasPrecision(18, 2);
-            entity.Property(a => a.MetodoPago).HasMaxLength(40).IsRequired();
-            entity.HasIndex(a => new { a.CobroId, a.Fecha });
-            entity.HasOne(a => a.Cobro).WithMany(c => c.Abonos).HasForeignKey(a => a.CobroId).OnDelete(DeleteBehavior.Cascade);
-        });
-
-        modelBuilder.Entity<SolicitudEvento>(entity =>
-        {
-            entity.HasQueryFilter(e => e.Solicitud != null && !e.Solicitud.IsDeleted);
-            entity.Property(e => e.Titulo).HasMaxLength(120).IsRequired();
-            entity.Property(e => e.Detalle).HasMaxLength(500).IsRequired();
-            entity.HasIndex(e => new { e.SolicitudId, e.Fecha });
-            entity.HasOne(e => e.Solicitud).WithMany(s => s.Eventos)
-                .HasForeignKey(e => e.SolicitudId).OnDelete(DeleteBehavior.Restrict);
-        });
-
-        modelBuilder.Entity<DetalleSolicitud>()
-            .HasQueryFilter(d => d.Solicitud != null && !d.Solicitud.IsDeleted);
-
-        modelBuilder.Entity<Solicitud>(entity =>
-        {
-            entity.HasQueryFilter(s => !s.IsDeleted);
-
-            entity.HasMany(s => s.Detalles)
-                .WithOne(d => d.Solicitud)
-                .HasForeignKey(d => d.SolicitudId)
-                .OnDelete(DeleteBehavior.Cascade);
-
-            entity.HasMany<Visita>()
-                .WithOne(v => v.Solicitud)
-                .HasForeignKey(v => v.SolicitudId)
-                .OnDelete(DeleteBehavior.Restrict);
-        });
-
-        modelBuilder.Entity<Visita>(entity =>
-        {
-            entity.HasQueryFilter(v => !v.IsDeleted && v.Solicitud != null && !v.Solicitud.IsDeleted);
-
-            entity.HasOne(v => v.Tecnico)
-                .WithMany()
-                .HasForeignKey(v => v.TecnicoId)
-                .OnDelete(DeleteBehavior.SetNull);
-        });
-
-        modelBuilder.Entity<Usuario>(entity =>
-        {
-            entity.Property(u => u.UsuarioLogin).HasMaxLength(50).IsRequired();
-            entity.Property(u => u.PasswordHash).HasMaxLength(500).IsRequired();
-            entity.Property(u => u.Nombre).HasMaxLength(150).IsRequired();
-            entity.Property(u => u.Cargo).HasMaxLength(80).IsRequired();
-            entity.Property(u => u.Rol).HasMaxLength(30).IsRequired();
-            entity.HasIndex(u => u.UsuarioLogin).IsUnique();
-        });
-
-        modelBuilder.Entity<Usuario>().HasData(
-            new Usuario
-            {
-                Id = 1,
-                UsuarioLogin = "ana",
-                PasswordHash = "AQAAAAIAAYagAAAAEHjAvVupymZcL4Z7wSkz9ro//N3Hyz31400GKF9GEPnxQFaOPv8TGpO2FJZ8XqCSwg==",
-                Nombre = "Ana Hernández",
-                Cargo = "Gerente",
-                Rol = "Gerente"
-            },
-            new Usuario
-            {
-                Id = 2,
-                UsuarioLogin = "luis",
-                PasswordHash = "AQAAAAIAAYagAAAAEAXFkAX9eqMt9778g9tjjfmZCQWcmM5qlxzOI9VP6eXkDBo7XL52AGtJ9CTZWHUm7g==",
-                Nombre = "Luis Peña",
-                Cargo = "Técnico",
-                Rol = "Técnico"
-            },
-            new Usuario
-            {
-                Id = 3,
-                UsuarioLogin = "admin",
-                PasswordHash = "AQAAAAIAAYagAAAAEDlXkB6f7Cn7W7LhwqonLz2YWMWnkh0z783OtK2aOGgJYxTR1gP7p26z3JILLccOWQ==",
-                Nombre = "Administrador",
-                Cargo = "Administrador",
-                Rol = "Admin"
-            });
-
-        modelBuilder.Entity<EstadoSolicitud>().HasData(
-            new EstadoSolicitud { Id = 1, Nombre = "Pendiente" },
-            new EstadoSolicitud { Id = 2, Nombre = "En proceso" },
-            new EstadoSolicitud { Id = 3, Nombre = "Finalizada" },
-            new EstadoSolicitud { Id = 4, Nombre = "Cancelada" },
-            new EstadoSolicitud { Id = 5, Nombre = "En Espera Administración" },
-            new EstadoSolicitud { Id = 6, Nombre = "En revisión" },
-            new EstadoSolicitud { Id = 7, Nombre = "Enviada al cliente" },
-            new EstadoSolicitud { Id = 8, Nombre = "Aprobada" },
-            new EstadoSolicitud { Id = 9, Nombre = "Rechazada" },
-            new EstadoSolicitud { Id = 10, Nombre = "Pendiente de cobro" }
-        );
-
-        modelBuilder.Entity<Cliente>().HasData(
-            new Cliente { Id = 1, Nombre = "Melody Santos", Correo = "melody@email.com", Rnc = "402-1234567-1", Direccion = "Calle Duarte #24, Santiago", Servicios = 8, Ultimo = "Instalación de Sistema UPS" },
-            new Cliente { Id = 2, Nombre = "Constructora López", Correo = "info@clopez.com", Rnc = "101-987654-2", Direccion = "Av. Estrella Sadhalá #102, Santiago", Servicios = 5, Ultimo = "Instalación Solar" },
-            new Cliente { Id = 3, Nombre = "Farmacia El Sol", Correo = "farmacia@elsol.do", Rnc = "130-334455-3", Direccion = "Calle 16 #7, La Vega", Servicios = 6, Ultimo = "Mantenimiento Eléctrico" },
-            new Cliente { Id = 4, Nombre = "Colmado Hernández", Correo = "hernandez@colmado.com", Rnc = "402-667788-4", Direccion = "Calle Principal #58, Moca", Servicios = 3, Ultimo = "Cableado Estructurado" },
-            new Cliente { Id = 5, Nombre = "Taller Mecánico RD", Correo = "taller@mecanicord.com", Rnc = "130-112233-5", Direccion = "Carretera Luperón km 5, Santiago", Servicios = 1, Ultimo = "Instalación de Planta Eléctrica" }
-        );
-
-        modelBuilder.Entity<ClienteTelefono>().HasData(
-            new ClienteTelefono { Id = 1, ClienteId = 1, Numero = "809-000-0000", Tipo = "Principal" },
-            new ClienteTelefono { Id = 2, ClienteId = 1, Numero = "829-111-2222", Tipo = "Alternativo" },
-            new ClienteTelefono { Id = 3, ClienteId = 2, Numero = "809-555-1212", Tipo = "Principal" },
-            new ClienteTelefono { Id = 4, ClienteId = 3, Numero = "829-441-8890", Tipo = "Principal" },
-            new ClienteTelefono { Id = 5, ClienteId = 4, Numero = "849-220-3311", Tipo = "Principal" },
-            new ClienteTelefono { Id = 6, ClienteId = 5, Numero = "809-778-4402", Tipo = "Principal" },
-            new ClienteTelefono { Id = 7, ClienteId = 5, Numero = "809-999-0000", Tipo = "Alternativo" }
-        );
-
-        modelBuilder.Entity<Servicio>().HasData(
-            new Servicio { Id = 1, ServicioId = "SV-001", Nombre = "Instalación de Paneles Solares", Categoria = "Instalaciones", PrecioBase = 85000, Estado = "Activo" },
-            new Servicio { Id = 2, ServicioId = "SV-002", Nombre = "Instalación de Sistema UPS", Categoria = "Instalaciones", PrecioBase = 45000, Estado = "Activo" },
-            new Servicio { Id = 3, ServicioId = "SV-003", Nombre = "Mantenimiento Eléctrico", Categoria = "Mantenimiento", PrecioBase = 12500, Estado = "Activo" },
-            new Servicio { Id = 4, ServicioId = "SV-004", Nombre = "Cableado Estructurado", Categoria = "Redes y Cableado", PrecioBase = 28000, Estado = "Activo" },
-            new Servicio { Id = 5, ServicioId = "SV-005", Nombre = "Instalación de Planta Eléctrica", Categoria = "Instalaciones", PrecioBase = 120000, Estado = "Activo" }
-        );
-
-        modelBuilder.Entity<Solicitud>().HasData(
-            new Solicitud
-            {
-                Id = 1,
-                ClienteId = 1,
-                ServicioId = 2,
-                Contacto = "Melody Santos",
-                Direccion = "Calle Duarte #24, Santiago",
-                FechaSolicitud = new DateTime(2026, 10, 1),
-                EstadoSolicitudId = 1
-            },
-            new Solicitud
-            {
-                Id = 2,
-                ClienteId = 2,
-                ServicioId = 1,
-                Contacto = "Constructora López",
-                Direccion = "Av. Estrella Sadhalá #102, Santiago",
-                FechaSolicitud = new DateTime(2026, 10, 2),
-                EstadoSolicitudId = 2
-            },
-            new Solicitud
-            {
-                Id = 3,
-                ClienteId = 3,
-                ServicioId = 3,
-                Contacto = "Farmacia El Sol",
-                Direccion = "Calle 16 #7, La Vega",
-                FechaSolicitud = new DateTime(2026, 10, 3),
-                EstadoSolicitudId = 1
-            },
-            new Solicitud
-            {
-                Id = 4,
-                ClienteId = 4,
-                ServicioId = 4,
-                Contacto = "Colmado Hernández",
-                Direccion = "Calle Principal #58, Moca",
-                FechaSolicitud = new DateTime(2026, 9, 29),
-                EstadoSolicitudId = 3
-            },
-            new Solicitud
-            {
-                Id = 5,
-                ClienteId = 5,
-                ServicioId = 5,
-                Contacto = "Taller Mecánico RD",
-                Direccion = "Carretera Luperón km 5, Santiago",
-                FechaSolicitud = new DateTime(2026, 10, 4),
-                EstadoSolicitudId = 2
-            },
-            new Solicitud
-            {
-                Id = 6,
-                ClienteId = 1,
-                ServicioId = 3,
-                Contacto = "Melody Santos",
-                Direccion = "Calle Duarte #24, Santiago",
-                FechaSolicitud = new DateTime(2026, 9, 20),
-                EstadoSolicitudId = 3
-            },
-            new Solicitud
-            {
-                Id = 7,
-                ClienteId = 2,
-                ServicioId = 4,
-                Contacto = "Constructora López",
-                Direccion = "Av. Estrella Sadhalá #102, Santiago",
-                FechaSolicitud = new DateTime(2026, 9, 25),
-                EstadoSolicitudId = 4
-            },
-            new Solicitud
-            {
-                Id = 8,
-                ClienteId = 3,
-                ServicioId = 2,
-                Contacto = "Farmacia El Sol",
-                Direccion = "Calle 16 #7, La Vega",
-                FechaSolicitud = new DateTime(2026, 10, 6),
-                EstadoSolicitudId = 1
-            }
-        );
-    }
 }
 </file>
 
