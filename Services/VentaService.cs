@@ -121,7 +121,15 @@ public class VentaService(IDbContextFactory<Contexto> factory, AppStateService a
         }
     }
 
-    public async Task<List<MesVentas>> UltimosTresMesesAsync()
+    public async Task<List<string>> CategoriasInventarioAsync()
+    {
+        if (!appState.EsGerente) return [];
+        await using var db = await factory.CreateDbContextAsync();
+        return await db.ArticulosInventario.AsNoTracking().Where(a => a.Categoria != "")
+            .Select(a => a.Categoria).Distinct().OrderBy(c => c).ToListAsync();
+    }
+
+    public async Task<List<MesVentas>> UltimosTresMesesAsync(string? categoria = null)
     {
         if (!appState.EsGerente) return [];
         var hoy = AhoraDominicana;
@@ -129,8 +137,11 @@ public class VentaService(IDbContextFactory<Contexto> factory, AppStateService a
         var inicio = actual.AddMonths(-2);
         var fin = actual.AddMonths(1);
         await using var db = await factory.CreateDbContextAsync();
+        var articulosCategoria = db.ArticulosInventario.AsNoTracking()
+            .Where(a => string.IsNullOrEmpty(categoria) || a.Categoria == categoria)
+            .Select(a => a.Id);
         var ventas = await db.Ventas.AsNoTracking()
-            .Where(v => v.Estado == Venta.Registrada && v.FechaVenta >= inicio && v.FechaVenta < fin)
+            .Where(v => v.Estado == Venta.Registrada && v.FechaVenta >= inicio && v.FechaVenta < fin && articulosCategoria.Contains(v.ArticuloInventarioId))
             .ToListAsync();
         return Enumerable.Range(0, 3).Select(i =>
         {
