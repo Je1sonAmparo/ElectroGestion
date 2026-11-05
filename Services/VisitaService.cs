@@ -194,6 +194,7 @@ public class VisitaService(IDbContextFactory<Contexto> contextFactory)
             }
 
             var solicitud = await contexto.Solicitudes.FirstOrDefaultAsync(s => s.Id == visita.SolicitudId);
+            if (solicitud is null || await SolicitudFinalizadaAsync(contexto, solicitud.Id)) return false;
             if (solicitud != null)
             {
                 if (solicitud.EstadoSolicitudId == 1) // Pendiente -> En proceso
@@ -217,6 +218,8 @@ public class VisitaService(IDbContextFactory<Contexto> contextFactory)
             {
                 return false;
             }
+            if (await SolicitudFinalizadaAsync(contexto, existente.SolicitudId) ||
+                await SolicitudFinalizadaAsync(contexto, visita.SolicitudId)) return false;
 
             if (existente.SolicitudId != visita.SolicitudId &&
                 await contexto.Visitas.AnyAsync(v =>
@@ -268,7 +271,8 @@ public class VisitaService(IDbContextFactory<Contexto> contextFactory)
             .FirstOrDefaultAsync(v => v.Id == id);
         if (visita is null ||
             visita.Estado is "En proceso" or "En Espera Administración" ||
-            visita.Solicitud?.EstadoSolicitudId is 2 or 5)
+            visita.Solicitud?.EstadoSolicitudId is 2 or 5 ||
+            (visita.Solicitud is not null && await SolicitudFinalizadaAsync(contexto, visita.SolicitudId)))
         {
             return false;
         }
@@ -285,7 +289,7 @@ public class VisitaService(IDbContextFactory<Contexto> contextFactory)
         var visita = await contexto.Visitas
             .Include(v => v.Solicitud)
             .FirstOrDefaultAsync(v => v.Id == id);
-        if (visita is null)
+        if (visita is null || await SolicitudFinalizadaAsync(contexto, visita.SolicitudId))
         {
             return false;
         }
@@ -333,4 +337,8 @@ public class VisitaService(IDbContextFactory<Contexto> contextFactory)
 
         return await contexto.SaveChangesAsync() > 0;
     }
+
+    private static Task<bool> SolicitudFinalizadaAsync(Contexto contexto, int solicitudId) =>
+        contexto.Solicitudes.Where(s => s.Id == solicitudId)
+            .AnyAsync(s => s.EstadoSolicitud != null && s.EstadoSolicitud.Nombre == "Finalizada");
 }
