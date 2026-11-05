@@ -67,6 +67,9 @@ public class OrdenTrabajoService(IDbContextFactory<Contexto> contextFactory, App
         solicitud.EstadoSolicitudId = await db.EstadosSolicitud.Where(e => e.Nombre == "En proceso").Select(e => e.Id).FirstAsync();
         await db.SaveChangesAsync();
         orden.Code = $"OT-{orden.Id:D4}";
+        var cobroExistente = await db.Cobros.FirstOrDefaultAsync(c => c.CotizacionId == cotizacionId);
+        if (cobroExistente is not null)
+            cobroExistente.OrdenTrabajoId = orden.Id;
         RegistroEventosSolicitud.Agregar(db, orden.SolicitudId, "Orden de trabajo creada", $"Se creó {orden.Code} en estado En proceso.");
         await db.SaveChangesAsync();
         return true;
@@ -77,8 +80,7 @@ public class OrdenTrabajoService(IDbContextFactory<Contexto> contextFactory, App
         if (!appState.EsGerente) return false;
         await using var db = await contextFactory.CreateDbContextAsync();
         var orden = await db.OrdenesTrabajo.FindAsync(id);
-        if (orden is null || await SolicitudFinalizadaAsync(db, orden.SolicitudId) ||
-            await db.Cobros.AnyAsync(c => c.OrdenTrabajoId == id)) return false;
+        if (orden is null || await SolicitudFinalizadaAsync(db, orden.SolicitudId)) return false;
         orden.Trabajos = LimpiarLista(trabajos);
         orden.Herramientas = LimpiarLista(herramientas);
         orden.Observaciones = observaciones.Trim();
@@ -96,11 +98,23 @@ public class OrdenTrabajoService(IDbContextFactory<Contexto> contextFactory, App
         if (orden is null || orden.Estado == estado) return false;
         if (estado == "En proceso" && await db.Cobros.AnyAsync(c => c.OrdenTrabajoId == id)) return false;
         if (await SolicitudFinalizadaAsync(db, orden.SolicitudId)) return false;
-        orden.Estado = estado;
-        var estadoSolicitud = await db.EstadosSolicitud.FirstOrDefaultAsync(e => e.Nombre == estado);
+        var estadoReal = estado;
+        if (estado == "Pendiente de cobro")
+        {
+            var cotizacionId = orden.CotizacionId;
+            var cobro = await db.Cobros.Include(c => c.Abonos).FirstOrDefaultAsync(c => c.CotizacionId == cotizacionId);
+            if (cobro?.Estado == "Finalizada" && cobro.MontoPagado >= cobro.Monto)
+                estadoReal = "Finalizada";
+        }
+        orden.Estado = estadoReal;
+        var estadoSolicitud = await db.EstadosSolicitud.FirstOrDefaultAsync(e => e.Nombre == estadoReal);
         var solicitud = await db.Solicitudes.FirstOrDefaultAsync(s => s.Id == orden.SolicitudId);
-        if (estadoSolicitud is not null && solicitud is not null) solicitud.EstadoSolicitudId = estadoSolicitud.Id;
-        RegistroEventosSolicitud.Agregar(db, orden.SolicitudId, "Estado de orden actualizado", $"La orden pasó a {estado}.");
+        if (estadoSolicitud is not null && solicitud is not null)
+        {
+            solicitud.EstadoSolicitudId = estadoSolicitud.Id;
+            if (estadoReal == "Finalizada") solicitud.FechaFin = DateTime.Today;
+        }
+        RegistroEventosSolicitud.Agregar(db, orden.SolicitudId, "Estado de orden actualizado", $"La orden pasó a {estadoReal}.");
         await db.SaveChangesAsync();
         return true;
     }
@@ -130,8 +144,7 @@ public class OrdenTrabajoService(IDbContextFactory<Contexto> contextFactory, App
         if (!appState.EsGerente) return false;
         await using var db = await contextFactory.CreateDbContextAsync();
         var orden = await db.OrdenesTrabajo.AsNoTracking().FirstOrDefaultAsync(o => o.Id == id);
-        return orden is not null && !await SolicitudFinalizadaAsync(db, orden.SolicitudId) &&
-            !await db.Cobros.AnyAsync(c => c.OrdenTrabajoId == id);
+        return orden is not null && !await SolicitudFinalizadaAsync(db, orden.SolicitudId);
     }
 
     private static Task<bool> SolicitudFinalizadaAsync(Contexto db, int solicitudId) =>
