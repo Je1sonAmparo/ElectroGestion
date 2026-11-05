@@ -24,7 +24,8 @@ public class CobroService(IDbContextFactory<Contexto> factory, AppStateService a
         await using var db = await factory.CreateDbContextAsync();
         return await db.Cotizaciones.AsNoTracking()
             .Where(q => q.Estado == "Aprobada" && q.SolicitudDbId.HasValue &&
-                !db.Cobros.Any(c => c.CotizacionId == q.Id))
+                q.Solicitud != null && q.Solicitud.EstadoSolicitud != null &&
+                q.Solicitud.EstadoSolicitud.Nombre != "Finalizada")
             .Include(q => q.Detalles)
             .Include(q => q.Solicitud).ThenInclude(s => s!.Cliente)
             .Include(q => q.Solicitud).ThenInclude(s => s!.Servicio)
@@ -41,6 +42,24 @@ public class CobroService(IDbContextFactory<Contexto> factory, AppStateService a
             .FirstOrDefaultAsync(q => q.Id == cotizacionId && q.Estado == "Aprobada" && q.SolicitudDbId.HasValue);
         if (cotizacion is null || cotizacion.Solicitud is null || cotizacion.Solicitud.EstadoSolicitud?.Nombre == "Finalizada" ||
             abonoInicial > cotizacion.MontoTotal || await db.Cobros.AnyAsync(c => c.CotizacionId == cotizacionId)) return false;
+
+        var cobroExistente = await db.Cobros.Include(c => c.Abonos).Include(c => c.OrdenTrabajo)
+            .FirstOrDefaultAsync(c => c.CotizacionId == cotizacionId);
+        if (cobroExistente is not null)
+        {
+            if (abonoInicial <= 0 || cobroExistente.Estado == "Finalizada" || abonoInicial > cobroExistente.SaldoPendiente)
+                return false;
+
+            cobroExistente.Abonos.Add(new AbonoCobro { Fecha = DateTime.Now, Monto = abonoInicial, MetodoPago = metodoPago.Trim() });
+            cobroExistente.MetodoPago = metodoPago.Trim();
+            cobroExistente.Estado = cobroExistente.MontoPagado >= cobroExistente.Monto ? "Finalizada" : "Pendiente de cobro";
+            RegistroEventosSolicitud.Agregar(db, cotizacion.SolicitudDbId.GetValueOrDefault(), "Abono recibido", $"Se registró un abono de RD$ {abonoInicial:N2}; saldo pendiente RD$ {cobroExistente.SaldoPendiente:N2}.");
+            if (cobroExistente.Estado == "Finalizada")
+                RegistroEventosSolicitud.Agregar(db, cotizacion.SolicitudDbId.GetValueOrDefault(), "Cobro completado", "La cotización quedó pagada en su totalidad.");
+            await db.SaveChangesAsync();
+            await CompletarOrdenSiCorrespondeAsync(db, cobroExistente);
+            return true;
+        }
 
         var orden = await db.OrdenesTrabajo.FirstOrDefaultAsync(o => o.CotizacionId == cotizacionId);
         var cobro = new Cobro
