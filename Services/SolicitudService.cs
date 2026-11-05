@@ -34,6 +34,8 @@ public class SolicitudService(IDbContextFactory<Contexto> contextFactory) : Apli
             solicitud.Servicio = null;
             solicitud.EstadoSolicitud = null;
             contexto.Solicitudes.Add(solicitud);
+            await contexto.SaveChangesAsync();
+            RegistroEventosSolicitud.Agregar(contexto, solicitud.Id, "Solicitud creada", "Se registró la solicitud del servicio.");
             return await contexto.SaveChangesAsync() > 0;
         }
         catch
@@ -56,6 +58,7 @@ public class SolicitudService(IDbContextFactory<Contexto> contextFactory) : Apli
             existente.Contacto = solicitud.Contacto;
             existente.Direccion = solicitud.Direccion;
             existente.EstadoSolicitudId = solicitud.EstadoSolicitudId;
+            RegistroEventosSolicitud.Agregar(contexto, existente.Id, "Solicitud actualizada", "Se actualizaron los datos principales de la solicitud.");
 
             return await contexto.SaveChangesAsync() > 0;
         }
@@ -149,6 +152,7 @@ public class SolicitudService(IDbContextFactory<Contexto> contextFactory) : Apli
         }
 
         solicitud.IsDeleted = false;
+        RegistroEventosSolicitud.Agregar(contexto, solicitud.Id, "Solicitud restaurada", "La solicitud fue restaurada desde eliminadas.");
         var visitasEliminadasEnCascada = await contexto.Visitas
             .IgnoreQueryFilters()
             .Where(v => v.SolicitudId == id && v.EliminadaPorSolicitud)
