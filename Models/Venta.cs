@@ -25,7 +25,21 @@ public class Venta
     public int Cantidad { get; set; } = 1;
     public decimal PrecioUnitario { get; set; }
     public decimal TasaItbis { get; set; } = 18m;
-    public decimal Subtotal => Cantidad * PrecioUnitario;
+    public List<DetalleVenta> Detalles { get; set; } = [];
+    public decimal Subtotal => Detalles.Count > 0 ? Detalles.Sum(d => d.Subtotal) : Cantidad * PrecioUnitario;
     public decimal Itbis => Math.Round(Subtotal * TasaItbis / 100m, 2, MidpointRounding.AwayFromZero);
     public decimal Total => Subtotal + Itbis;
+}
+
+public class DetalleVenta
+{
+    public int Id { get; set; }
+    public int VentaId { get; set; }
+    public Venta? Venta { get; set; }
+    public int ArticuloInventarioId { get; set; }
+    [MaxLength(40)] public string CodigoArticulo { get; set; } = "";
+    [MaxLength(200)] public string NombreArticulo { get; set; } = "";
+    public int Cantidad { get; set; }
+    public decimal PrecioUnitario { get; set; }
+    public decimal Subtotal => Cantidad * PrecioUnitario;
 }
