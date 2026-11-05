@@ -4,6 +4,8 @@ using Microsoft.EntityFrameworkCore;
 
 namespace ElectroGestion.Services;
 
+public enum ResultadoEliminarCotizacion { Eliminada, VinculadaAOrden, NoEncontrada }
+
 public class CotizacionService(IDbContextFactory<Contexto> contextFactory)
 {
     public const string EnRevision = "En revisión";
@@ -134,5 +136,18 @@ public class CotizacionService(IDbContextFactory<Contexto> contextFactory)
         cotizacion.Estado = nuevoEstado;
         await db.SaveChangesAsync();
         return true;
+    }
+
+    public async Task<ResultadoEliminarCotizacion> EliminarAsync(int id)
+    {
+        await using var db = await contextFactory.CreateDbContextAsync();
+        var cotizacion = await db.Cotizaciones.FindAsync(id);
+        if (cotizacion is null) return ResultadoEliminarCotizacion.NoEncontrada;
+        if (await db.OrdenesTrabajo.AnyAsync(o => o.CotizacionId == id))
+            return ResultadoEliminarCotizacion.VinculadaAOrden;
+
+        db.Cotizaciones.Remove(cotizacion);
+        await db.SaveChangesAsync();
+        return ResultadoEliminarCotizacion.Eliminada;
     }
 }
