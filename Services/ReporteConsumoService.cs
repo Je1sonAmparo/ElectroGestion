@@ -18,7 +18,7 @@ public class ReporteConsumoService(IDbContextFactory<Contexto> contextFactory)
     {
         await using var db = await contextFactory.CreateDbContextAsync();
         var ordenes = await db.OrdenesTrabajo.AsNoTracking()
-            .Where(o => o.Estado == "Finalizada")
+            .Where(o => o.Estado == "Pendiente de cobro" || o.Estado == "Finalizada")
             .Include(o => o.Cotizacion).ThenInclude(c => c!.Detalles)
             .Include(o => o.Cotizacion).ThenInclude(c => c!.Solicitud).ThenInclude(s => s!.Servicio)
             .ToListAsync();
@@ -28,6 +28,8 @@ public class ReporteConsumoService(IDbContextFactory<Contexto> contextFactory)
             {
                 Orden = o,
                 Servicio = o.Cotizacion?.Solicitud?.Servicio?.Nombre ?? o.TipoServicio,
+                // Pendiente de cobro indica que el trabajo terminó; la solicitud se
+                // finaliza después del cobro, así que mientras tanto usamos la fecha de la orden.
                 Fecha = o.Cotizacion?.Solicitud?.FechaFin ?? o.FechaCreacion,
                 Materiales = o.Cotizacion?.Detalles.Sum(d => d.Cantidad * d.PrecioUnitario) ?? 0m
             })
