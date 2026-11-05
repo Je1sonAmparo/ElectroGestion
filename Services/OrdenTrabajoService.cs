@@ -62,6 +62,8 @@ public class OrdenTrabajoService(IDbContextFactory<Contexto> contextFactory, App
             Observaciones = observaciones.Trim()
         };
         db.OrdenesTrabajo.Add(orden);
+        var solicitud = await db.Solicitudes.FirstAsync(s => s.Id == orden.SolicitudId);
+        solicitud.EstadoSolicitudId = await db.EstadosSolicitud.Where(e => e.Nombre == "En proceso").Select(e => e.Id).FirstAsync();
         await db.SaveChangesAsync();
         orden.Code = $"OT-{orden.Id:D4}";
         await db.SaveChangesAsync();
@@ -83,12 +85,15 @@ public class OrdenTrabajoService(IDbContextFactory<Contexto> contextFactory, App
 
     public async Task<bool> CambiarEstadoAsync(int id, string estado)
     {
-        if (!appState.IsAuthenticated || estado is not ("En proceso" or "Finalizada")) return false;
-        if (!appState.EsGerente && estado != "Finalizada") return false;
+        if (!appState.IsAuthenticated || estado is not ("En proceso" or "Pendiente de cobro" or "Finalizada")) return false;
+        if (!appState.EsGerente && estado != "Pendiente de cobro") return false;
         await using var db = await contextFactory.CreateDbContextAsync();
         var orden = await db.OrdenesTrabajo.FindAsync(id);
         if (orden is null || orden.Estado == estado) return false;
         orden.Estado = estado;
+        var estadoSolicitud = await db.EstadosSolicitud.FirstOrDefaultAsync(e => e.Nombre == estado);
+        var solicitud = await db.Solicitudes.FirstOrDefaultAsync(s => s.Id == orden.SolicitudId);
+        if (estadoSolicitud is not null && solicitud is not null) solicitud.EstadoSolicitudId = estadoSolicitud.Id;
         await db.SaveChangesAsync();
         return true;
     }
