@@ -132,7 +132,7 @@ public class AppStateService
 
         Cobros = new List<Cobro>
         {
-            new() { Id = 1, Cliente = "Acme Corp", FacturaId = 1001, Fecha = DateTime.Today.AddDays(-1), Monto = 7500.00m, MetodoPago = "Transferencia", Estado = "Completado" },
+            new() { Id = 1, Cliente = "Acme Corp", FacturaId = 1001, Fecha = DateTime.Today.AddDays(-1), Monto = 7500.00m, MetodoPago = "Transferencia", Estado = "Finalizada" },
             new() { Id = 2, Cliente = "Globex S.A.", FacturaId = 1002, Fecha = DateTime.Today, Monto = 4000.00m, MetodoPago = "Cheque", Estado = "Pendiente" }
         };
 
@@ -216,3 +216,4 @@ public class AppStateService
         _ => ("#F3F4F6", "#374151")
     };
 }
+
