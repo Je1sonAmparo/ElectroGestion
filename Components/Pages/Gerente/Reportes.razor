@@ -158,12 +158,14 @@
                                 }
                             </g>
                             <circle cx="100" cy="110" r="40" fill="#fff" stroke="#E3E5EE" stroke-width="1.5" />
+                            <text class="donut-total-label" x="100" y="106">TOTAL</text>
+                            <text class="donut-total-value" x="100" y="122">RD$ @FormatChartMoney(TotalMaterials)</text>
                         </g>
                     </svg>
                     <div class="report-legend">
                         @foreach (var segment in DonutSegments)
                         {
-                            <div><span class="legend-swatch" style="background:@segment.Color"></span>@segment.Servicio (@FormatPercent(segment.Porcentaje))%</div>
+                            <div><span class="legend-swatch" style="background:@segment.Color"></span><span>@segment.Servicio</span><strong>@FormatPercent(segment.Porcentaje)%</strong></div>
                         }
                         @if (DonutSegments.Count == 0)
                         {
@@ -216,13 +218,13 @@
                 <div class="report-bar-chart" role="img" aria-label="Tendencia mensual de consumo de materiales en @AppliedYear">
                     <div class="report-y-axis">@foreach(var mark in AxisMarks){<span>@FormatAxis(mark)</span>}</div>
                     <div class="report-bars">
-                        @foreach(var mes in VisibleMonths){<div class="report-bar-column"><strong>@FormatMoney(mes.Total)</strong><span class="report-bar" style="--bar-height:@BarHeight(mes.Total)%"></span><span class="report-month">@mes.Etiqueta</span></div>}
+                        @foreach(var mes in VisibleMonths){<div class="report-bar-column" title="@mes.Etiqueta: RD$ @FormatMoney(mes.Total)"><strong>@FormatChartMoney(mes.Total)</strong><span class="report-bar" style="--bar-height:@BarHeight(mes.Total)%"></span><span class="report-month">@mes.Etiqueta</span></div>}
                     </div>
                 </div>
                 <div class="report-chart-caption"><span class="legend-swatch swatch-blue-2"></span>Consumo Total (RD$)</div>
             </article>
         </section>
-        <p style="margin:10px 2px;color:#6B7085;font-size:12px">El consumo se calcula con los materiales registrados en órdenes finalizadas durante el año seleccionado. Los consumibles no se registran por separado en el sistema.</p>
+        <p style="margin:10px 2px;color:#6B7085;font-size:12px">El consumo incluye materiales de órdenes listas para cobro o finalizadas durante el año seleccionado. Los consumibles no se registran por separado en el sistema.</p>
     }
 </div>
 
@@ -327,7 +329,10 @@
     private static string FormatMoney(decimal value) => value.ToString("#,##0.00", System.Globalization.CultureInfo.InvariantCulture);
     private static string FormatNumber(double value) => value.ToString("0.##", System.Globalization.CultureInfo.InvariantCulture);
     private static string FormatPercent(double value) => value.ToString("0.#", System.Globalization.CultureInfo.InvariantCulture);
-    private string FormatAxis(decimal value) => value.ToString("#,##0", System.Globalization.CultureInfo.InvariantCulture);
-    private string BarHeight(decimal value) => Math.Max(1, (double)(value / MonthlyMax * 100m)).ToString("0.#", System.Globalization.CultureInfo.InvariantCulture);
+    private string FormatAxis(decimal value) => FormatChartMoney(value);
+    private string FormatChartMoney(decimal value) => value >= 1000m
+        ? $"{decimal.Round(value / 1000m, 1).ToString("0.#", System.Globalization.CultureInfo.InvariantCulture)}k"
+        : value.ToString("0.##", System.Globalization.CultureInfo.InvariantCulture);
+    private string BarHeight(decimal value) => Math.Max(0, (double)(value / MonthlyMax * 100m)).ToString("0.##", System.Globalization.CultureInfo.InvariantCulture);
     private sealed record DonutSegment(string Servicio, double Porcentaje, double Length, double Offset, string Color);
 }
