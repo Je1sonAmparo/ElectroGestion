@@ -109,6 +109,17 @@ public class CotizacionService(IDbContextFactory<Contexto> contextFactory)
             cotizacion.FechaRespuesta = DateTime.Now;
             cotizacion.MotivoRechazo = nuevoEstado == "Rechazada" ? motivoRechazo.Trim() : "";
         }
+        else if (cotizacion.Estado == "Enviada al cliente" && nuevoEstado == EnRevision)
+        {
+            cotizacion.FechaEnvio = null;
+            cotizacion.FechaRespuesta = null;
+            cotizacion.MotivoRechazo = "";
+        }
+        else if (cotizacion.Estado is "Aprobada" or "Rechazada" && nuevoEstado == "Enviada al cliente")
+        {
+            cotizacion.FechaRespuesta = null;
+            cotizacion.MotivoRechazo = "";
+        }
         else
         {
             return false;
