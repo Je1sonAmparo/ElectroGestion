@@ -194,6 +194,105 @@ namespace ElectroGestion.Migrations
                         });
                 });
 
+            modelBuilder.Entity("ElectroGestion.Models.Cotizacion", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Cliente")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
+
+                    b.Property<string>("Estado")
+                        .IsRequired()
+                        .HasMaxLength(40)
+                        .HasColumnType("nvarchar(40)");
+
+                    b.Property<DateTime>("Fecha")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime?>("FechaEnvio")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime?>("FechaRespuesta")
+                        .HasColumnType("datetime2");
+
+                    b.Property<decimal>("MontoManoObra")
+                        .HasPrecision(18, 2)
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<decimal>("MontoTotal")
+                        .HasPrecision(18, 2)
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<string>("MotivoRechazo")
+                        .IsRequired()
+                        .HasMaxLength(1000)
+                        .HasColumnType("nvarchar(1000)");
+
+                    b.Property<decimal>("PorcentajeItbis")
+                        .HasPrecision(5, 2)
+                        .HasColumnType("decimal(5,2)");
+
+                    b.Property<int?>("SolicitudDbId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("SolicitudId")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("SolicitudDbId")
+                        .IsUnique()
+                        .HasFilter("[SolicitudDbId] IS NOT NULL");
+
+                    b.ToTable("Cotizaciones");
+                });
+
+            modelBuilder.Entity("ElectroGestion.Models.DetalleCotizacion", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("ArticuloInventarioId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("Cantidad")
+                        .HasColumnType("int");
+
+                    b.Property<string>("CodigoArticulo")
+                        .IsRequired()
+                        .HasMaxLength(40)
+                        .HasColumnType("nvarchar(40)");
+
+                    b.Property<int>("CotizacionId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("NombreArticulo")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
+
+                    b.Property<decimal>("PrecioUnitario")
+                        .HasPrecision(18, 2)
+                        .HasColumnType("decimal(18,2)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CotizacionId");
+
+                    b.ToTable("DetallesCotizacion");
+                });
+
             modelBuilder.Entity("ElectroGestion.Models.DetalleSolicitud", b =>
                 {
                     b.Property<int>("Id")
@@ -690,6 +789,27 @@ namespace ElectroGestion.Migrations
                     b.Navigation("Cliente");
                 });
 
+            modelBuilder.Entity("ElectroGestion.Models.Cotizacion", b =>
+                {
+                    b.HasOne("ElectroGestion.Models.Solicitud", "Solicitud")
+                        .WithMany()
+                        .HasForeignKey("SolicitudDbId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.Navigation("Solicitud");
+                });
+
+            modelBuilder.Entity("ElectroGestion.Models.DetalleCotizacion", b =>
+                {
+                    b.HasOne("ElectroGestion.Models.Cotizacion", "Cotizacion")
+                        .WithMany("Detalles")
+                        .HasForeignKey("CotizacionId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Cotizacion");
+                });
+
             modelBuilder.Entity("ElectroGestion.Models.DetalleSolicitud", b =>
                 {
                     b.HasOne("ElectroGestion.Models.Servicio", "Servicio")
@@ -770,6 +890,11 @@ namespace ElectroGestion.Migrations
                     b.Navigation("Solicitudes");
 
                     b.Navigation("Telefonos");
+                });
+
+            modelBuilder.Entity("ElectroGestion.Models.Cotizacion", b =>
+                {
+                    b.Navigation("Detalles");
                 });
 
             modelBuilder.Entity("ElectroGestion.Models.EstadoSolicitud", b =>
