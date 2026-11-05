@@ -3,6 +3,7 @@
 @inject ElectroGestion.Services.AppStateService AppState
 @inject BlazorBootstrap.ToastService ToastService
 @inject IJSRuntime JS
+@inject NavigationManager Nav
 
 <style>
     @@media print {
@@ -197,7 +198,18 @@
                 <div style="text-align:center"><div style="height:45px"></div><div style="border-top:1px solid #555;padding-top:6px"><b>Firma del cliente</b></div></div>
                 <div style="text-align:center"><div style="height:45px"><svg width="180" height="40" viewBox="0 0 180 40" aria-hidden="true" style="display:block;margin:0 auto"><path d="M12 30c10-14 13-17 15-13 2 4-7 15-3 15 3 0 12-14 15-14 3 0-4 13-1 14 3 1 11-9 15-10 4-1 0 8 3 10 4 2 13-8 18-8 3 0 0 7 2 9 3 2 14-8 19-9 4-1 2 7 5 9 4 2 13-5 18-7 5-2 6 3 3 6 11-3 20-3 31-2" fill="none" stroke="#222" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div style="border-top:1px solid #555;padding-top:6px"><b>Representante</b></div></div>
             </div>
-            <div class="no-print" style="display:flex;justify-content:flex-end;gap:10px;margin-top:28px;border-top:1px solid #E2E8F0;padding-top:16px"><button @onclick="Imprimir" style="padding:10px 16px;border:0;background:#173B75;color:#fff;border-radius:8px;font-weight:700;cursor:pointer">Imprimir / Guardar como PDF</button><button @onclick="() => CotizacionDetalleSeleccionada = null" style="padding:10px 16px;border:1px solid #D5D8E6;background:#fff;border-radius:8px;cursor:pointer">Cerrar</button></div>
+            <div class="no-print" style="display:flex;justify-content:flex-end;gap:10px;margin-top:28px;border-top:1px solid #E2E8F0;padding-top:16px;flex-wrap:wrap"><button @onclick="() => CotizacionAEliminar = cot.Id" style="padding:10px 16px;border:1px solid #F5C2C4;background:#fff;color:#C4141B;border-radius:8px;font-weight:700;cursor:pointer">Eliminar</button><button @onclick="Imprimir" style="padding:10px 16px;border:0;background:#173B75;color:#fff;border-radius:8px;font-weight:700;cursor:pointer">Imprimir / Guardar como PDF</button><button @onclick="() => CotizacionDetalleSeleccionada = null" style="padding:10px 16px;border:1px solid #D5D8E6;background:#fff;border-radius:8px;cursor:pointer">Cerrar</button></div>
+        </div>
+    </div>
+}
+
+@if (CotizacionAEliminar.HasValue)
+{
+    <div style="position:fixed;inset:0;background:rgba(20,22,43,.55);display:flex;align-items:center;justify-content:center;z-index:10003;padding:20px" @onclick="() => CotizacionAEliminar = null">
+        <div style="background:#fff;width:100%;max-width:430px;border-radius:14px;padding:24px" @onclick:stopPropagation>
+            <h3 style="margin:0 0 10px">Eliminar cotización</h3>
+            <p style="color:#4A4E63">¿Desea eliminar la cotización COT-@CotizacionAEliminar.Value.ToString("D5")? Esta acción no se puede deshacer.</p>
+            <div style="display:flex;justify-content:flex-end;gap:10px"><button @onclick="() => CotizacionAEliminar = null" style="padding:9px 14px;border:1px solid #D5D8E6;background:#fff;border-radius:8px;cursor:pointer">Cancelar</button><button @onclick="ConfirmarEliminacion" style="padding:9px 14px;border:0;background:#C4141B;color:#fff;border-radius:8px;cursor:pointer">Eliminar cotización</button></div>
         </div>
     </div>
 }
@@ -276,6 +288,7 @@
     private int? CambioPendienteId;
     private string EstadoPendiente = "";
     private Cotizacion? CotizacionDetalleSeleccionada;
+    private int? CotizacionAEliminar;
     private Solicitud? SolicitudActual => LevantamientosPendientes.FirstOrDefault(s => s.Id == SolicitudSeleccionada);
     private IEnumerable<Cotizacion> CotizacionesFiltradas => CotizacionRows.Where(c =>
         (string.IsNullOrWhiteSpace(FiltroId) || c.Id.ToString().Contains(FiltroId.Trim(), StringComparison.OrdinalIgnoreCase)) &&
@@ -402,6 +415,27 @@
         catch (System.Text.Json.JsonException) { FotosLevantamiento = []; }
     }
     private void VerCotizacion(Cotizacion cotizacion) => CotizacionDetalleSeleccionada = cotizacion;
+    private async Task ConfirmarEliminacion()
+    {
+        if (!CotizacionAEliminar.HasValue) return;
+        var id = CotizacionAEliminar.Value;
+        CotizacionAEliminar = null;
+        var resultado = await CotizacionService.EliminarAsync(id);
+        if (resultado == ElectroGestion.Services.ResultadoEliminarCotizacion.VinculadaAOrden)
+        {
+            ToastService.Notify(new ToastMessage(ToastType.Warning, "No se puede eliminar: la cotización tiene una orden de trabajo vinculada."));
+            return;
+        }
+        if (resultado != ElectroGestion.Services.ResultadoEliminarCotizacion.Eliminada)
+        {
+            ToastService.Notify(new ToastMessage(ToastType.Warning, "La cotización ya no existe."));
+            return;
+        }
+        CotizacionDetalleSeleccionada = null;
+        ToastService.Notify(new ToastMessage(ToastType.Success, "Cotización eliminada."));
+        await Recargar();
+        if (DetalleId == id) Nav.NavigateTo("/cotizaciones", replace: true);
+    }
     private async Task Imprimir() => await JS.InvokeVoidAsync("window.print");
     private static DetalleCotizacion CopiarLinea(DetalleCotizacion d) => new() { ArticuloInventarioId = d.ArticuloInventarioId, CodigoArticulo = d.CodigoArticulo, NombreArticulo = d.NombreArticulo, Cantidad = d.Cantidad, PrecioUnitario = d.PrecioUnitario };
     private void CerrarModal() => ModalAbierto = false;
