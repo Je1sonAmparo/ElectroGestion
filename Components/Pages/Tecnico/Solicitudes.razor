@@ -186,7 +186,16 @@
             </div>
             <div style="display:flex;flex-direction:column;gap:16px">
                 <div><label style="display:block;font-size:13px;font-weight:700;color:#14162B;margin-bottom:6px">Cliente *</label><select @bind="FormCliente" disabled="@FormId.HasValue" style="width:100%;padding:10px 14px;border:1px solid #D5D8E6;border-radius:8px;font-size:14px;background:@(FormId.HasValue ? "#F7F8FC" : "#fff");color:@(FormId.HasValue ? "#6B7085" : "#14162B");cursor:@(FormId.HasValue ? "not-allowed" : "pointer");opacity:1"><option value="">Seleccione un cliente registrado</option>@foreach (var cliente in clientes) { <option value="@cliente.Nombre">@cliente.Nombre</option> }</select></div>
-                <div><label style="display:block;font-size:13px;font-weight:700;color:#14162B;margin-bottom:6px">Tipo de Servicio *</label><select @bind="FormTipo" style="width:100%;padding:10px 14px;border:1px solid #D5D8E6;border-radius:8px;font-size:14px;background:#fff"><option value="">Seleccione el tipo de servicio</option>@foreach (var tipo in TiposServicio) { <option value="@tipo">@tipo</option> }</select></div>
+                <div>
+                    <label style="display:block;font-size:13px;font-weight:700;color:#14162B;margin-bottom:6px">Tipo de Servicio *</label>
+                    <select @bind="FormServicioId" style="width:100%;padding:10px 14px;border:1px solid #D5D8E6;border-radius:8px;font-size:14px;background:#fff">
+                        <option value="0">Seleccione el tipo de servicio</option>
+                        @foreach (var servicio in ServiciosDelFormulario)
+                        {
+                            <option value="@servicio.Id">@servicio.Nombre@(servicio.Estado == "Inactivo" ? " (inactivo)" : "")</option>
+                        }
+                    </select>
+                </div>
                 <div><label style="display:block;font-size:13px;font-weight:700;color:#14162B;margin-bottom:6px">Dirección del Servicio *</label><input @bind="FormDireccion" placeholder="ej. Calle Principal #12, Santiago" style="width:100%;padding:10px 14px;border:1px solid #D5D8E6;border-radius:8px;font-size:14px" /></div>
             </div>
             <div style="display:flex;justify-content:flex-end;gap:12px;margin-top:28px">
@@ -208,7 +217,7 @@
     private string ModalSub = "";
     private int? FormId;
     private string FormCliente = "";
-    private string FormTipo = "";
+    private int FormServicioId;
     private string FormDireccion = "";
     private List<string> TiposServicio = new();
 
@@ -218,6 +227,8 @@
     private List<ElectroGestion.Models.Solicitud> solicitudes = new();
     private List<ElectroGestion.Models.Cliente> clientes = new();
     private List<ElectroGestion.Models.Servicio> servicios = new();
+    private IEnumerable<ElectroGestion.Models.Servicio> ServiciosDelFormulario => servicios.Where(s =>
+        s.Estado == "Activo" || solicitudes.Any(sol => sol.Id == FormId && sol.ServicioId == s.Id));
     private List<ElectroGestion.Models.Solicitud> FilteredSolicitudes = new();
 
     protected override async Task OnInitializedAsync()
@@ -295,7 +306,8 @@
         ModalTitle = "Nueva Solicitud";
         ModalSub = "Complete los datos para registrar una nueva solicitud de servicio.";
         FormId = null;
-        FormCliente = FormTipo = FormDireccion = "";
+        FormCliente = FormDireccion = "";
+        FormServicioId = 0;
         IsFormModalOpen = true;
     }
 
@@ -309,21 +321,21 @@
         ModalSub = "Modifique los datos de la solicitud.";
         FormId = solicitud.Id;
         FormCliente = solicitud.Cliente?.Nombre ?? "";
-        FormTipo = solicitud.Servicio?.Nombre ?? "";
+        FormServicioId = solicitud.ServicioId;
         FormDireccion = solicitud.Direccion;
         IsFormModalOpen = true;
     }
 
     private async Task SaveModal()
     {
-        if (string.IsNullOrWhiteSpace(FormCliente) || string.IsNullOrWhiteSpace(FormTipo) || string.IsNullOrWhiteSpace(FormDireccion))
+        if (string.IsNullOrWhiteSpace(FormCliente) || FormServicioId <= 0 || string.IsNullOrWhiteSpace(FormDireccion))
         {
             ToastService.ShowWarning("Por favor complete los campos requeridos.", "Atención");
             return;
         }
 
         var clienteEntity = clientes.FirstOrDefault(c => c.Nombre == FormCliente);
-        var servicioEntity = servicios.FirstOrDefault(serv => serv.Nombre == FormTipo);
+        var servicioEntity = ServiciosDelFormulario.FirstOrDefault(serv => serv.Id == FormServicioId);
 
         if (clienteEntity == null || servicioEntity == null)
         {

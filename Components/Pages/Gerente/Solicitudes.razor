@@ -215,11 +215,11 @@
 
                 <div>
                     <label style="display:block;font-size:13px;font-weight:700;color:#14162B;margin-bottom:6px">Tipo de Servicio *</label>
-                    <select @bind="FormTipo" style="width:100%;padding:10px 14px;border:1px solid #D5D8E6;border-radius:8px;font-size:14px;background:#fff">
-                        <option value="">Seleccione el tipo de servicio</option>
-                        @foreach (var t in TiposServicio)
+                    <select @bind="FormServicioId" style="width:100%;padding:10px 14px;border:1px solid #D5D8E6;border-radius:8px;font-size:14px;background:#fff">
+                        <option value="0">Seleccione el tipo de servicio</option>
+                        @foreach (var servicio in ServiciosDelFormulario)
                         {
-                            <option value="@t">@t</option>
+                            <option value="@servicio.Id">@servicio.Nombre@(servicio.Estado == "Inactivo" ? " (inactivo)" : "")</option>
                         }
                     </select>
                 </div>
@@ -293,7 +293,7 @@
     private string ModalSub = "";
     private int? FormId;
     private string FormCliente = "";
-    private string FormTipo = "";
+    private int FormServicioId;
     private string FormDireccion = "";
     private List<string> TiposServicio = new() {
         "Instalación Solar", "Instalación de Sistema UPS", "Mantenimiento Eléctrico",
@@ -302,6 +302,8 @@
     private List<ElectroGestion.Models.Solicitud> solicitudes = new();
     private List<ElectroGestion.Models.Cliente> clientes = new();
     private List<ElectroGestion.Models.Servicio> servicios = new();
+    private IEnumerable<ElectroGestion.Models.Servicio> ServiciosDelFormulario => servicios.Where(s =>
+        s.Estado == "Activo" || solicitudes.Any(sol => sol.Id == FormId && sol.ServicioId == s.Id));
 
     protected override async Task OnInitializedAsync()
     {
@@ -380,7 +382,7 @@
         ModalTitle = "Nueva Solicitud";
         ModalSub = "Complete los datos para registrar una nueva solicitud de servicio.";
         FormCliente = "";
-        FormTipo = "";
+        FormServicioId = 0;
         FormDireccion = "";
         FormId = null;
     }
@@ -400,7 +402,7 @@
             ModalTitle = "Editar Solicitud";
             ModalSub = "Modifique los datos de la solicitud.";
             FormCliente = s.Cliente?.Nombre ?? "";
-            FormTipo = s.Servicio?.Nombre ?? "";
+            FormServicioId = s.ServicioId;
             FormDireccion = s.Direccion;
             FormId = s.Id;
         }
@@ -467,14 +469,14 @@
 
     private async Task SaveModal()
     {
-        if (string.IsNullOrWhiteSpace(FormCliente) || string.IsNullOrWhiteSpace(FormTipo) || string.IsNullOrWhiteSpace(FormDireccion))
+        if (string.IsNullOrWhiteSpace(FormCliente) || FormServicioId <= 0 || string.IsNullOrWhiteSpace(FormDireccion))
         {
             ToastService.ShowWarning("Por favor complete los campos requeridos.", "Atención");
             return;
         }
 
         var clienteEntity = clientes.FirstOrDefault(c => c.Nombre == FormCliente);
-        var servicioEntity = servicios.FirstOrDefault(serv => serv.Nombre == FormTipo);
+        var servicioEntity = ServiciosDelFormulario.FirstOrDefault(serv => serv.Id == FormServicioId);
 
         if (clienteEntity == null || servicioEntity == null)
         {

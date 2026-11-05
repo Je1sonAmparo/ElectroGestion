@@ -30,13 +30,18 @@ public class SolicitudService(IDbContextFactory<Contexto> contextFactory) : Apli
         try
         {
             await using var contexto = await contextFactory.CreateDbContextAsync();
+            await using var transaccion = await contexto.Database.BeginTransactionAsync(System.Data.IsolationLevel.Serializable);
+            if (!await contexto.Servicios.AnyAsync(s => s.Id == solicitud.ServicioId && s.Estado == "Activo"))
+                return false;
             solicitud.Cliente = null;
             solicitud.Servicio = null;
             solicitud.EstadoSolicitud = null;
             contexto.Solicitudes.Add(solicitud);
             await contexto.SaveChangesAsync();
             RegistroEventosSolicitud.Agregar(contexto, solicitud.Id, "Solicitud creada", "Se registró la solicitud del servicio.");
-            return await contexto.SaveChangesAsync() > 0;
+            await contexto.SaveChangesAsync();
+            await transaccion.CommitAsync();
+            return true;
         }
         catch
         {
@@ -49,9 +54,13 @@ public class SolicitudService(IDbContextFactory<Contexto> contextFactory) : Apli
         try
         {
             await using var contexto = await contextFactory.CreateDbContextAsync();
+            await using var transaccion = await contexto.Database.BeginTransactionAsync(System.Data.IsolationLevel.Serializable);
             var existente = await contexto.Solicitudes.FirstOrDefaultAsync(s => s.Id == solicitud.Id);
             if (existente == null) return false;
             if (await contexto.EstadosSolicitud.AnyAsync(e => e.Id == existente.EstadoSolicitudId && e.Nombre == "Finalizada")) return false;
+            if (existente.ServicioId != solicitud.ServicioId &&
+                !await contexto.Servicios.AnyAsync(s => s.Id == solicitud.ServicioId && s.Estado == "Activo"))
+                return false;
 
             existente.ClienteId = solicitud.ClienteId;
             existente.ServicioId = solicitud.ServicioId;
@@ -60,7 +69,9 @@ public class SolicitudService(IDbContextFactory<Contexto> contextFactory) : Apli
             existente.EstadoSolicitudId = solicitud.EstadoSolicitudId;
             RegistroEventosSolicitud.Agregar(contexto, existente.Id, "Solicitud actualizada", "Se actualizaron los datos principales de la solicitud.");
 
-            return await contexto.SaveChangesAsync() > 0;
+            await contexto.SaveChangesAsync();
+            await transaccion.CommitAsync();
+            return true;
         }
         catch
         {
