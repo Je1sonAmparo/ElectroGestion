@@ -71,11 +71,16 @@ else
                             <option value="0">Seleccione un producto</option>
                             @foreach (var articulo in Articulos)
                             {
-                                <option value="@articulo.Id">@articulo.Codigo · @articulo.Nombre (@articulo.Cantidad disponibles)</option>
+                                <option value="@articulo.Id">@articulo.Codigo · @articulo.Nombre</option>
                             }
                         </select>
                     </label>
-                    <label>Cantidad <input type="number" min="1" step="1" @bind="form.Cantidad" /></label>
+                    <label>Cantidad <input type="number" min="1" step="1" @bind="form.Cantidad" />
+                        @if (ArticuloSeleccionado is { } productoDisponible)
+                        {
+                            <small class="ventas-disponibilidad">Hay @productoDisponible.Cantidad unidades en stock.</small>
+                        }
+                    </label>
                     <label>Tipo de comprobante <select @bind="form.TipoComprobante" @bind:after="CambiarTipoComprobante"><option value="@Venta.Consumo">Factura de consumo (B02 / E32)</option><option value="@Venta.CreditoFiscal">Comprobante de Crédito Fiscal (B01 / E31)</option></select></label>
                     @if (form.TipoComprobante == Venta.CreditoFiscal)
                     {
@@ -112,22 +117,22 @@ else
     {
         <style>
             @@media print {
-                @@page { size:A4; margin:14mm; }
-                body * { visibility:hidden; }
-                .venta-documento, .venta-documento * { visibility:visible; }
-                .ventas-overlay { position:absolute; inset:0; display:block; padding:0; margin:0; background:white; }
-                .venta-documento { width:100%; max-width:none; min-height:265mm; max-height:none; overflow:visible; border-radius:0; box-shadow:none; padding:0; }
+                @@page { size:A4; margin:0; }
+                html, body { margin:0 !important; padding:0 !important; }
+                body * { visibility:hidden !important; }
+                .venta-documento, .venta-documento * { visibility:visible !important; }
+                .ventas-overlay { position:absolute !important; inset:0 auto auto 0 !important; display:block !important; padding:0 !important; margin:0 !important; background:white !important; }
+                .venta-documento { position:absolute !important; inset:0 auto auto 0 !important; box-sizing:border-box !important; width:100% !important; max-width:none !important; min-height:297mm !important; max-height:none !important; overflow:visible !important; border:0 !important; border-radius:0 !important; box-shadow:none !important; padding:14mm !important; }
                 .venta-documento .ventas-pie { display:none; }
                 .venta-documento .ventas-tabla { overflow:visible; }
                 .venta-documento table { width:100%; }
                 .venta-documento th, .venta-documento td { white-space:normal; }
+                .venta-documento thead { display:table-header-group; }
             }
         </style>
         <div class="ventas-overlay" @onclick="() => Detalle = null">
             <section class="ventas-modal venta-documento" role="dialog" aria-modal="true" aria-labelledby="detalle-venta" @onclick:stopPropagation>
-                <div class="factura-encabezado"><img src="images/electrogestion-logo.png" alt="ElectroGestión" /><div><h2 id="detalle-venta">@(detalle.TipoComprobante == Venta.CreditoFiscal ? "Factura de Crédito Fiscal" : "Factura de consumo")</h2><p>Venta N.º @detalle.Id</p><p>Fecha: @((detalle.FechaVenta ?? detalle.FechaCreacion).ToString("dd/MM/yyyy HH:mm"))</p><p>NCF de ejemplo: @(detalle.Ncf ?? "Pendiente de asignar")</p></div></div>
-                <p class="factura-demo">DOCUMENTO DE PRUEBA · SIN VALIDEZ FISCAL</p>
-                <hr />
+                <div class="factura-encabezado"><img src="/images/electrogestion-logo.png" alt="ElectroGestión" /><div><h2 id="detalle-venta">@(detalle.TipoComprobante == Venta.CreditoFiscal ? "Factura de Crédito Fiscal" : "Factura de consumo")</h2><p>N.º @detalle.Id</p><p>Fecha: @((detalle.FechaVenta ?? detalle.FechaCreacion).ToString("dd/MM/yyyy HH:mm"))</p><p>NCF: @(detalle.Ncf ?? "Pendiente de asignar")</p></div></div>
                 <div class="factura-cliente"><strong>Cliente</strong><span>@Comprador(detalle)</span>@if (!string.IsNullOrWhiteSpace(detalle.DocumentoCliente)){<span>RNC/Cédula: @detalle.DocumentoCliente</span>}</div>
                 <div class="ventas-tabla">
                     <table><thead><tr><th>Código</th><th>Descripción</th><th>Precio unitario</th><th>Cantidad</th><th>Importe</th></tr></thead>
