@@ -53,7 +53,11 @@ public class CobroService(IDbContextFactory<Contexto> factory, AppStateService a
             cobro.OrdenTrabajo.Estado = "Finalizada";
             var solicitud = await db.Solicitudes.FirstOrDefaultAsync(s => s.Id == cobro.OrdenTrabajo.SolicitudId);
             var estadoFinal = await db.EstadosSolicitud.FirstOrDefaultAsync(e => e.Nombre == "Finalizada");
-            if (solicitud is not null && estadoFinal is not null) solicitud.EstadoSolicitudId = estadoFinal.Id;
+            if (solicitud is not null && estadoFinal is not null)
+            {
+                solicitud.EstadoSolicitudId = estadoFinal.Id;
+                solicitud.FechaFin = DateTime.Today;
+            }
             RegistroEventosSolicitud.Agregar(db, cobro.OrdenTrabajo.SolicitudId, "Cobro finalizado", $"Se registró el pago final de la orden por RD$ {cobro.Monto:N2}.");
         }
         await db.SaveChangesAsync();
@@ -75,6 +79,7 @@ public class CobroService(IDbContextFactory<Contexto> factory, AppStateService a
         cobro.Estado = "Pendiente de cobro";
         cobro.OrdenTrabajo.Estado = "Pendiente de cobro";
         solicitud.EstadoSolicitudId = estadoPendiente.Id;
+        solicitud.FechaFin = null;
         RegistroEventosSolicitud.Agregar(db, solicitud.Id, "Cobro reabierto", "El cobro, la orden y la solicitud volvieron a Pendiente de cobro.");
         await db.SaveChangesAsync();
         return true;
@@ -94,6 +99,7 @@ public class CobroService(IDbContextFactory<Contexto> factory, AppStateService a
             if (estadoPendiente is null || solicitud is null) return false;
             cobro.OrdenTrabajo.Estado = "Pendiente de cobro";
             solicitud.EstadoSolicitudId = estadoPendiente.Id;
+            solicitud.FechaFin = null;
         }
 
         if (cobro.OrdenTrabajo is not null)
