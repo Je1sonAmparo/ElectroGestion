@@ -68,6 +68,12 @@ public class CotizacionService(IDbContextFactory<Contexto> contextFactory)
         cotizacion.PorcentajeItbis = TasaItbis;
         cotizacion.MontoManoObra = montoManoObra;
         cotizacion.MontoTotal = CalcularTotal(detalles, montoManoObra);
+        var ordenVinculada = await db.OrdenesTrabajo.FirstOrDefaultAsync(o => o.CotizacionId == id);
+        if (ordenVinculada is not null)
+            ordenVinculada.MaterialesCotizados = detalles.Select(d => new MaterialOrden
+            {
+                Codigo = d.CodigoArticulo, Nombre = d.NombreArticulo, Cantidad = d.Cantidad
+            }).ToList();
         await db.SaveChangesAsync();
         return true;
     }
