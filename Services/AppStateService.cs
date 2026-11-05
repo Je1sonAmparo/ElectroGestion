@@ -78,10 +78,10 @@ public class AppStateService
         Clientes = new List<Cliente>
         {
             new() { Id = 1, Nombre = "Melody Santos", Correo = "melody@email.com", Telefono = "809-000-0000", Telefono2 = "829-111-2222", Rnc = "402-1234567-1", Direccion = "Calle Duarte #24, Santiago", Servicios = 8, Ultimo = "Instalación de Sistema UPS" },
-            new() { Id = 2, Nombre = "Constructora López", Correo = "info@clopez.com", Telefono = "809-555-1212", Telefono2 = "", Rnc = "101-987654-2", Direccion = "Av. Estrella Sadhalá #102, Santiago", Servicios = 5, Ultimo = "Instalación Solar" },
-            new() { Id = 3, Nombre = "Farmacia El Sol", Correo = "farmacia@elsol.do", Telefono = "829-441-8890", Telefono2 = "", Rnc = "130-334455-3", Direccion = "Calle 16 #7, La Vega", Servicios = 6, Ultimo = "Mantenimiento Eléctrico" },
-            new() { Id = 4, Nombre = "Colmado Hernández", Correo = "hernandez@colmado.com", Telefono = "849-220-3311", Telefono2 = "", Rnc = "402-667788-4", Direccion = "Calle Principal #58, Moca", Servicios = 3, Ultimo = "Cableado Estructurado" },
-            new() { Id = 5, Nombre = "Taller Mecánico RD", Correo = "taller@mecanicord.com", Telefono = "809-778-4402", Telefono2 = "809-999-0000", Rnc = "130-112233-5", Direccion = "Carretera Luperón km 5, Santiago", Servicios = 1, Ultimo = "Instalación de Planta Eléctrica" }
+            new() { Id = 2, Nombre = "Constructora López", Correo = "info@clopez.com", Telefono = "809-555-1212", Telefono2 = "", Rnc = "101-98765-2", Direccion = "Av. Estrella Sadhalá #102, Santiago", Servicios = 5, Ultimo = "Instalación Solar" },
+            new() { Id = 3, Nombre = "Farmacia El Sol", Correo = "farmacia@elsol.do", Telefono = "829-441-8890", Telefono2 = "", Rnc = "130-33445-3", Direccion = "Calle 16 #7, La Vega", Servicios = 6, Ultimo = "Mantenimiento Eléctrico" },
+            new() { Id = 4, Nombre = "Colmado Hernández", Correo = "hernandez@colmado.com", Telefono = "849-220-3311", Telefono2 = "", Rnc = "402-6677884-1", Direccion = "Calle Principal #58, Moca", Servicios = 3, Ultimo = "Cableado Estructurado" },
+            new() { Id = 5, Nombre = "Taller Mecánico RD", Correo = "taller@mecanicord.com", Telefono = "809-778-4402", Telefono2 = "809-999-0000", Rnc = "130-11223-5", Direccion = "Carretera Luperón km 5, Santiago", Servicios = 1, Ultimo = "Instalación de Planta Eléctrica" }
         };
 
         EstadosSolicitud = new List<EstadoSolicitud>
