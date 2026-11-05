@@ -125,11 +125,16 @@ public class CobroService(IDbContextFactory<Contexto> factory, AppStateService a
         var abono = cobro?.Abonos.FirstOrDefault(a => a.Id == abonoId && !a.Anulado);
         if (cobro is null || abono is null) return false;
 
-        abono.Anulado = true;
+        var montoEliminado = abono.Monto;
+        cobro.Abonos.Remove(abono);
+        db.AbonosCobro.Remove(abono);
+        cobro.MetodoPago = cobro.Abonos.Where(a => !a.Anulado)
+            .OrderByDescending(a => a.Fecha).ThenByDescending(a => a.Id)
+            .Select(a => a.MetodoPago).FirstOrDefault() ?? "";
         var solicitudId = await db.Cotizaciones.Where(q => q.Id == cobro.CotizacionId)
             .Select(q => q.SolicitudDbId).FirstOrDefaultAsync();
         if (solicitudId.HasValue)
-            RegistroEventosSolicitud.Agregar(db, solicitudId.Value, "Abono eliminado", $"Se eliminó un abono de RD$ {abono.Monto:N2}; saldo pendiente RD$ {cobro.SaldoPendiente:N2}.");
+            RegistroEventosSolicitud.Agregar(db, solicitudId.Value, "Abono eliminado", $"Se eliminó un abono de RD$ {montoEliminado:N2}; saldo pendiente RD$ {Math.Max(0, cobro.Monto - cobro.MontoPagado):N2}.");
         await db.SaveChangesAsync();
         return true;
     }
