@@ -794,6 +794,37 @@ namespace ElectroGestion.Migrations
                         });
                 });
 
+            modelBuilder.Entity("ElectroGestion.Models.SolicitudEvento", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Detalle")
+                        .IsRequired()
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
+
+                    b.Property<DateTime>("Fecha")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("SolicitudId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Titulo")
+                        .IsRequired()
+                        .HasMaxLength(120)
+                        .HasColumnType("nvarchar(120)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("SolicitudId", "Fecha");
+
+                    b.ToTable("SolicitudesEventos");
+                });
+
             modelBuilder.Entity("ElectroGestion.Models.Usuario", b =>
                 {
                     b.Property<int>("Id")
@@ -1028,6 +1059,17 @@ namespace ElectroGestion.Migrations
                     b.Navigation("Servicio");
                 });
 
+            modelBuilder.Entity("ElectroGestion.Models.SolicitudEvento", b =>
+                {
+                    b.HasOne("ElectroGestion.Models.Solicitud", "Solicitud")
+                        .WithMany("Eventos")
+                        .HasForeignKey("SolicitudId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Solicitud");
+                });
+
             modelBuilder.Entity("ElectroGestion.Models.Visita", b =>
                 {
                     b.HasOne("ElectroGestion.Models.Solicitud", "Solicitud")
@@ -1073,6 +1115,8 @@ namespace ElectroGestion.Migrations
             modelBuilder.Entity("ElectroGestion.Models.Solicitud", b =>
                 {
                     b.Navigation("Detalles");
+
+                    b.Navigation("Eventos");
 
                     b.Navigation("Levantamiento");
                 });
