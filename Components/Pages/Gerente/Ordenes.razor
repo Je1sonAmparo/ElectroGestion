@@ -66,9 +66,9 @@ else
             </div>
             @if (!string.IsNullOrWhiteSpace(orden.Observaciones)) { <div style="margin-top:18px;font-size:12px;color:#8B90A3;font-weight:800;text-transform:uppercase;letter-spacing:.06em">Instrucciones de campo</div><div style="font-size:14px;margin-top:7px;color:#4A4E63;line-height:1.55;background:#FAFAFC;padding:10px 14px;border-radius:8px;border:1px solid #EFF0F6">@orden.Observaciones</div> }
             <div style="margin-top:auto;padding-top:20px;display:flex;gap:10px">
-                <button @onclick="() => Editar(orden)" style="width:33%;padding:12px;border:1px solid #E3E5EE;background:#fff;color:#4A4E63;border-radius:9px;font-weight:700;font-size:14px;cursor:pointer;font-family:'Manrope'">Editar</button>
-                <button @onclick="() => OrdenAEliminar = orden.Id" style="width:33%;padding:12px;border:1px solid #F5C2C4;background:#fff;color:#C4141B;border-radius:9px;font-weight:700;font-size:14px;cursor:pointer;font-family:'Manrope'">Eliminar</button>
-                @if (orden.Estado != "Finalizada") { <button @onclick="() => SolicitarCambioEstado(orden)" style="width:34%;padding:12px;border:1px solid #1D4ED8;background:#1D4ED8;color:#fff;border-radius:9px;font-weight:700;font-size:14px;cursor:pointer;font-family:'Manrope'">@(orden.Estado == "Pendiente de cobro" ? "Reabrir orden" : "Marcar lista para cobro")</button> }
+                <button @onclick="() => Editar(orden)" style="flex:1;min-width:0;padding:12px;border:1px solid #E3E5EE;background:#fff;color:#4A4E63;border-radius:9px;font-weight:700;font-size:14px;cursor:pointer;font-family:'Manrope'">Editar</button>
+                <button @onclick="() => OrdenAEliminar = orden.Id" style="flex:1;min-width:0;padding:12px;border:1px solid #F5C2C4;background:#fff;color:#C4141B;border-radius:9px;font-weight:700;font-size:14px;cursor:pointer;font-family:'Manrope'">Eliminar</button>
+                @if (orden.Estado != "Finalizada") { <button @onclick="() => SolicitarCambioEstado(orden)" style="flex:1;min-width:0;padding:12px;border:1px solid #1D4ED8;background:#1D4ED8;color:#fff;border-radius:9px;font-weight:700;font-size:14px;cursor:pointer;font-family:'Manrope'">@(orden.Estado == "Pendiente de cobro" ? "Reabrir orden" : "Marcar lista para cobro")</button> }
             </div>
         </article>
     }
