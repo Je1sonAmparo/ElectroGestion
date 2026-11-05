@@ -11,7 +11,7 @@ public class CotizacionService(IDbContextFactory<Contexto> contextFactory)
     public const string EnRevision = "En revisión";
     public const decimal TasaItbis = 18m;
     public static readonly string[] Estados = [EnRevision, "Enviada al cliente", "Aprobada", "Rechazada"];
-    private const int EnEsperaAdministracionId = 5;
+    private const string EnEsperaAdministracion = "En Espera Administración";
 
     public async Task<List<Cotizacion>> ObtenerTodasAsync()
     {
@@ -28,7 +28,10 @@ public class CotizacionService(IDbContextFactory<Contexto> contextFactory)
     {
         await using var db = await contextFactory.CreateDbContextAsync();
         return await db.Solicitudes.AsNoTracking()
-            .Where(s => s.EstadoSolicitudId == EnEsperaAdministracionId && s.Levantamiento != null &&
+            .Where(s => s.EstadoSolicitud != null &&
+                (s.EstadoSolicitud.Nombre == EnEsperaAdministracion ||
+                    db.Visitas.Any(v => v.SolicitudId == s.Id && !v.IsDeleted && v.Estado == EnEsperaAdministracion)) &&
+                s.Levantamiento != null &&
                 !db.Cotizaciones.Any(c => c.SolicitudDbId == s.Id))
             .Include(s => s.Cliente).Include(s => s.Servicio).Include(s => s.Levantamiento)
             .OrderBy(s => s.FechaSolicitud).ToListAsync();
@@ -39,7 +42,9 @@ public class CotizacionService(IDbContextFactory<Contexto> contextFactory)
         if (!DetallesValidos(detalles, montoManoObra)) return false;
         await using var db = await contextFactory.CreateDbContextAsync();
         var solicitud = await db.Solicitudes.Include(s => s.Cliente)
-            .FirstOrDefaultAsync(s => s.Id == solicitudId && s.EstadoSolicitudId == EnEsperaAdministracionId && s.Levantamiento != null);
+            .FirstOrDefaultAsync(s => s.Id == solicitudId && s.Levantamiento != null && s.EstadoSolicitud != null &&
+                (s.EstadoSolicitud.Nombre == EnEsperaAdministracion ||
+                    db.Visitas.Any(v => v.SolicitudId == s.Id && !v.IsDeleted && v.Estado == EnEsperaAdministracion)));
         if (solicitud is null || await db.Cotizaciones.AnyAsync(c => c.SolicitudDbId == solicitudId))
             return false;
 
