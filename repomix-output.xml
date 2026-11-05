@@ -3116,267 +3116,6 @@ jobs:
 {"ContentRoots":["C:\\Users\\jeiso\\Files\\Universidad\\ISC - Periodos Académicos\\7mo - Periodo Acedémico (3-2026)\\Proyecto Aplicado\\Proyecto\\Pagina Web Blazor\\wwwroot\\","C:\\Users\\jeiso\\Files\\Universidad\\ISC - Periodos Académicos\\7mo - Periodo Acedémico (3-2026)\\Proyecto Aplicado\\Proyecto\\Pagina Web Blazor\\obj\\Debug\\net10.0\\compressed\\","C:\\Users\\jeiso\\Files\\Universidad\\ISC - Periodos Académicos\\7mo - Periodo Acedémico (3-2026)\\Proyecto Aplicado\\Proyecto\\Pagina Web Blazor\\obj\\Debug\\net10.0\\scopedcss\\bundle\\","C:\\Users\\jeiso\\.nuget\\packages\\microsoft.aspnetcore.app.internal.assets\\10.0.12\\_framework\\","C:\\Users\\jeiso\\.nuget\\packages\\blazor.bootstrap\\4.0.0\\staticwebassets\\","C:\\Users\\jeiso\\.nuget\\packages\\microsoft.aspnetcore.components.quickgrid\\10.0.12\\staticwebassets\\","C:\\Users\\jeiso\\Files\\Universidad\\ISC - Periodos Académicos\\7mo - Periodo Acedémico (3-2026)\\Proyecto Aplicado\\Proyecto\\Pagina Web Blazor\\"],"Root":{"Children":{"app.css":{"Children":null,"Asset":{"ContentRootIndex":0,"SubPath":"app.css"},"Patterns":null},"app.css.gz":{"Children":null,"Asset":{"ContentRootIndex":1,"SubPath":"ko4d9pwrfk-{0}-fhbzu181gn-fhbzu181gn.gz"},"Patterns":null},"ElectroGestion.styles.css":{"Children":null,"Asset":{"ContentRootIndex":2,"SubPath":"ElectroGestion.styles.css"},"Patterns":null},"ElectroGestion.styles.css.gz":{"Children":null,"Asset":{"ContentRootIndex":1,"SubPath":"c0age0a4u9-{0}-ow9vxax96o-ow9vxax96o.gz"},"Patterns":null},"favicon.png":{"Children":null,"Asset":{"ContentRootIndex":0,"SubPath":"favicon.png"},"Patterns":null},"_framework":{"Children":{"blazor.server.js":{"Children":null,"Asset":{"ContentRootIndex":3,"SubPath":"blazor.server.js"},"Patterns":null},"blazor.server.js.gz":{"Children":null,"Asset":{"ContentRootIndex":1,"SubPath":"ugd9gqx744-{0}-dwu72t6gfx-dwu72t6gfx.gz"},"Patterns":null},"blazor.web.js":{"Children":null,"Asset":{"ContentRootIndex":3,"SubPath":"blazor.web.js"},"Patterns":null},"blazor.web.js.gz":{"Children":null,"Asset":{"ContentRootIndex":1,"SubPath":"c6ygzocxyv-{0}-9hsif5t8mt-9hsif5t8mt.gz"},"Patterns":null}},"Asset":null,"Patterns":null},"images":{"Children":{"electrogestion-logo.png":{"Children":null,"Asset":{"ContentRootIndex":0,"SubPath":"images/electrogestion-logo.png"},"Patterns":null}},"Asset":null,"Patterns":null},"_content":{"Children":{"Blazor.Bootstrap":{"Children":{"blazor.bootstrap.css":{"Children":null,"Asset":{"ContentRootIndex":4,"SubPath":"blazor.bootstrap.css"},"Patterns":null},"blazor.bootstrap.css.gz":{"Children":null,"Asset":{"ContentRootIndex":1,"SubPath":"yxfdm33bor-{0}-bwxarsy01x-bwxarsy01x.gz"},"Patterns":null},"blazor.bootstrap.js":{"Children":null,"Asset":{"ContentRootIndex":4,"SubPath":"blazor.bootstrap.js"},"Patterns":null},"blazor.bootstrap.js.gz":{"Children":null,"Asset":{"ContentRootIndex":1,"SubPath":"refgsao5tb-{0}-jbj5vv28m9-jbj5vv28m9.gz"},"Patterns":null},"Blazor.Bootstrap.mnccjmrpdk.bundle.scp.css":{"Children":null,"Asset":{"ContentRootIndex":4,"SubPath":"Blazor.Bootstrap.mnccjmrpdk.bundle.scp.css"},"Patterns":null},"Blazor.Bootstrap.mnccjmrpdk.bundle.scp.css.gz":{"Children":null,"Asset":{"ContentRootIndex":1,"SubPath":"8bn3000fm7-{0}-mnccjmrpdk-mnccjmrpdk.gz"},"Patterns":null},"blazor.bootstrap.pdf.js":{"Children":null,"Asset":{"ContentRootIndex":4,"SubPath":"blazor.bootstrap.pdf.js"},"Patterns":null},"blazor.bootstrap.pdf.js.gz":{"Children":null,"Asset":{"ContentRootIndex":1,"SubPath":"d5o4a4wkq9-{0}-30xw9wihir-30xw9wihir.gz"},"Patterns":null},"blazor.bootstrap.rich-text-editor.js":{"Children":null,"Asset":{"ContentRootIndex":4,"SubPath":"blazor.bootstrap.rich-text-editor.js"},"Patterns":null},"blazor.bootstrap.rich-text-editor.js.gz":{"Children":null,"Asset":{"ContentRootIndex":1,"SubPath":"bpxuy9ryfl-{0}-f6r6spnkpf-f6r6spnkpf.gz"},"Patterns":null},"blazor.bootstrap.sortable-list.js":{"Children":null,"Asset":{"ContentRootIndex":4,"SubPath":"blazor.bootstrap.sortable-list.js"},"Patterns":null},"blazor.bootstrap.sortable-list.js.gz":{"Children":null,"Asset":{"ContentRootIndex":1,"SubPath":"sismm8xg1l-{0}-ezlxc6gzv3-ezlxc6gzv3.gz"},"Patterns":null},"blazor.bootstrap.theme-switcher.js":{"Children":null,"Asset":{"ContentRootIndex":4,"SubPath":"blazor.bootstrap.theme-switcher.js"},"Patterns":null},"blazor.bootstrap.theme-switcher.js.gz":{"Children":null,"Asset":{"ContentRootIndex":1,"SubPath":"q8v6i1uv3e-{0}-pisakkcwob-pisakkcwob.gz"},"Patterns":null},"pdfjs-4.0.379.min.js":{"Children":null,"Asset":{"ContentRootIndex":4,"SubPath":"pdfjs-4.0.379.min.js"},"Patterns":null},"pdfjs-4.0.379.min.js.gz":{"Children":null,"Asset":{"ContentRootIndex":1,"SubPath":"36w3eu0hkb-{0}-j8zp7bt7w3-j8zp7bt7w3.gz"},"Patterns":null},"pdfjs-4.0.379.worker.min.js":{"Children":null,"Asset":{"ContentRootIndex":4,"SubPath":"pdfjs-4.0.379.worker.min.js"},"Patterns":null},"pdfjs-4.0.379.worker.min.js.gz":{"Children":null,"Asset":{"ContentRootIndex":1,"SubPath":"mfzx4sb2rv-{0}-79hai7knhw-79hai7knhw.gz"},"Patterns":null},"icon":{"Children":{"128X128.png":{"Children":null,"Asset":{"ContentRootIndex":4,"SubPath":"icon/128X128.png"},"Patterns":null}},"Asset":null,"Patterns":null}},"Asset":null,"Patterns":null},"Microsoft.AspNetCore.Components.QuickGrid":{"Children":{"Microsoft.AspNetCore.Components.QuickGrid.boiwgh0w5b.bundle.scp.css":{"Children":null,"Asset":{"ContentRootIndex":5,"SubPath":"Microsoft.AspNetCore.Components.QuickGrid.boiwgh0w5b.bundle.scp.css"},"Patterns":null},"Microsoft.AspNetCore.Components.QuickGrid.boiwgh0w5b.bundle.scp.css.gz":{"Children":null,"Asset":{"ContentRootIndex":1,"SubPath":"1x45lb54o8-{0}-boiwgh0w5b-boiwgh0w5b.gz"},"Patterns":null},"QuickGrid.razor.js":{"Children":null,"Asset":{"ContentRootIndex":5,"SubPath":"QuickGrid.razor.js"},"Patterns":null},"QuickGrid.razor.js.gz":{"Children":null,"Asset":{"ContentRootIndex":1,"SubPath":"unlu0xluo6-{0}-eu7w3d5g1a-eu7w3d5g1a.gz"},"Patterns":null}},"Asset":null,"Patterns":null}},"Asset":null,"Patterns":null},"Components":{"Children":{"Layout":{"Children":{"ReconnectModal.razor.js":{"Children":null,"Asset":{"ContentRootIndex":6,"SubPath":"Components/Layout/ReconnectModal.razor.js"},"Patterns":null},"ReconnectModal.razor.js.gz":{"Children":null,"Asset":{"ContentRootIndex":1,"SubPath":"nbc1vdyd0c-{0}-abdmv1u4y3-abdmv1u4y3.gz"},"Patterns":null}},"Asset":null,"Patterns":null}},"Asset":null,"Patterns":null},"lib":{"Children":{"bootstrap":{"Children":{"dist":{"Children":{"css":{"Children":{"bootstrap-grid.css":{"Children":null,"Asset":{"ContentRootIndex":0,"SubPath":"lib/bootstrap/dist/css/bootstrap-grid.css"},"Patterns":null},"bootstrap-grid.css.gz":{"Children":null,"Asset":{"ContentRootIndex":1,"SubPath":"86lwr1wp3z-{0}-t1cqhe9u97-t1cqhe9u97.gz"},"Patterns":null},"bootstrap-grid.css.map":{"Children":null,"Asset":{"ContentRootIndex":0,"SubPath":"lib/bootstrap/dist/css/bootstrap-grid.css.map"},"Patterns":null},"bootstrap-grid.css.map.gz":{"Children":null,"Asset":{"ContentRootIndex":1,"SubPath":"50tq1b2yrr-{0}-c2jlpeoesf-c2jlpeoesf.gz"},"Patterns":null},"bootstrap-grid.min.css":{"Children":null,"Asset":{"ContentRootIndex":0,"SubPath":"lib/bootstrap/dist/css/bootstrap-grid.min.css"},"Patterns":null},"bootstrap-grid.min.css.gz":{"Children":null,"Asset":{"ContentRootIndex":1,"SubPath":"d3d9n60x11-{0}-sejl45xvog-sejl45xvog.gz"},"Patterns":null},"bootstrap-grid.min.css.map":{"Children":null,"Asset":{"ContentRootIndex":0,"SubPath":"lib/bootstrap/dist/css/bootstrap-grid.min.css.map"},"Patterns":null},"bootstrap-grid.min.css.map.gz":{"Children":null,"Asset":{"ContentRootIndex":1,"SubPath":"th7yjnxd3s-{0}-aexeepp0ev-aexeepp0ev.gz"},"Patterns":null},"bootstrap-grid.rtl.css":{"Children":null,"Asset":{"ContentRootIndex":0,"SubPath":"lib/bootstrap/dist/css/bootstrap-grid.rtl.css"},"Patterns":null},"bootstrap-grid.rtl.css.gz":{"Children":null,"Asset":{"ContentRootIndex":1,"SubPath":"isx79oapck-{0}-xvp3kq03qx-xvp3kq03qx.gz"},"Patterns":null},"bootstrap-grid.rtl.css.map":{"Children":null,"Asset":{"ContentRootIndex":0,"SubPath":"lib/bootstrap/dist/css/bootstrap-grid.rtl.css.map"},"Patterns":null},"bootstrap-grid.rtl.css.map.gz":{"Children":null,"Asset":{"ContentRootIndex":1,"SubPath":"karxkdefvr-{0}-ausgxo2sd3-ausgxo2sd3.gz"},"Patterns":null},"bootstrap-grid.rtl.min.css":{"Children":null,"Asset":{"ContentRootIndex":0,"SubPath":"lib/bootstrap/dist/css/bootstrap-grid.rtl.min.css"},"Patterns":null},"bootstrap-grid.rtl.min.css.gz":{"Children":null,"Asset":{"ContentRootIndex":1,"SubPath":"bp9hm5fd2k-{0}-22vffe00uq-22vffe00uq.gz"},"Patterns":null},"bootstrap-grid.rtl.min.css.map":{"Children":null,"Asset":{"ContentRootIndex":0,"SubPath":"lib/bootstrap/dist/css/bootstrap-grid.rtl.min.css.map"},"Patterns":null},"bootstrap-grid.rtl.min.css.map.gz":{"Children":null,"Asset":{"ContentRootIndex":1,"SubPath":"ttgrre6je0-{0}-cosvhxvwiu-cosvhxvwiu.gz"},"Patterns":null},"bootstrap-reboot.css":{"Children":null,"Asset":{"ContentRootIndex":0,"SubPath":"lib/bootstrap/dist/css/bootstrap-reboot.css"},"Patterns":null},"bootstrap-reboot.css.gz":{"Children":null,"Asset":{"ContentRootIndex":1,"SubPath":"2f6xmg6en4-{0}-qesaa3a1fm-qesaa3a1fm.gz"},"Patterns":null},"bootstrap-reboot.css.map":{"Children":null,"Asset":{"ContentRootIndex":0,"SubPath":"lib/bootstrap/dist/css/bootstrap-reboot.css.map"},"Patterns":null},"bootstrap-reboot.css.map.gz":{"Children":null,"Asset":{"ContentRootIndex":1,"SubPath":"4363bqfchy-{0}-fvhpjtyr6v-fvhpjtyr6v.gz"},"Patterns":null},"bootstrap-reboot.min.css":{"Children":null,"Asset":{"ContentRootIndex":0,"SubPath":"lib/bootstrap/dist/css/bootstrap-reboot.min.css"},"Patterns":null},"bootstrap-reboot.min.css.gz":{"Children":null,"Asset":{"ContentRootIndex":1,"SubPath":"4iu4q6ez9r-{0}-tmc1g35s3z-tmc1g35s3z.gz"},"Patterns":null},"bootstrap-reboot.min.css.map":{"Children":null,"Asset":{"ContentRootIndex":0,"SubPath":"lib/bootstrap/dist/css/bootstrap-reboot.min.css.map"},"Patterns":null},"bootstrap-reboot.min.css.map.gz":{"Children":null,"Asset":{"ContentRootIndex":1,"SubPath":"7mceusgnrt-{0}-fsbi9cje9m-fsbi9cje9m.gz"},"Patterns":null},"bootstrap-reboot.rtl.css":{"Children":null,"Asset":{"ContentRootIndex":0,"SubPath":"lib/bootstrap/dist/css/bootstrap-reboot.rtl.css"},"Patterns":null},"bootstrap-reboot.rtl.css.gz":{"Children":null,"Asset":{"ContentRootIndex":1,"SubPath":"fb92wsgmaq-{0}-rxsg74s51o-rxsg74s51o.gz"},"Patterns":null},"bootstrap-reboot.rtl.css.map":{"Children":null,"Asset":{"ContentRootIndex":0,"SubPath":"lib/bootstrap/dist/css/bootstrap-reboot.rtl.css.map"},"Patterns":null},"bootstrap-reboot.rtl.css.map.gz":{"Children":null,"Asset":{"ContentRootIndex":1,"SubPath":"s8xkcfvmew-{0}-ee0r1s7dh0-ee0r1s7dh0.gz"},"Patterns":null},"bootstrap-reboot.rtl.min.css":{"Children":null,"Asset":{"ContentRootIndex":0,"SubPath":"lib/bootstrap/dist/css/bootstrap-reboot.rtl.min.css"},"Patterns":null},"bootstrap-reboot.rtl.min.css.gz":{"Children":null,"Asset":{"ContentRootIndex":1,"SubPath":"ncpz0jf5fm-{0}-q9ht133ko3-q9ht133ko3.gz"},"Patterns":null},"bootstrap-reboot.rtl.min.css.map":{"Children":null,"Asset":{"ContentRootIndex":0,"SubPath":"lib/bootstrap/dist/css/bootstrap-reboot.rtl.min.css.map"},"Patterns":null},"bootstrap-reboot.rtl.min.css.map.gz":{"Children":null,"Asset":{"ContentRootIndex":1,"SubPath":"t3mpm655fy-{0}-jd9uben2k1-jd9uben2k1.gz"},"Patterns":null},"bootstrap-utilities.css":{"Children":null,"Asset":{"ContentRootIndex":0,"SubPath":"lib/bootstrap/dist/css/bootstrap-utilities.css"},"Patterns":null},"bootstrap-utilities.css.gz":{"Children":null,"Asset":{"ContentRootIndex":1,"SubPath":"cpz2em12or-{0}-gye83jo8yx-gye83jo8yx.gz"},"Patterns":null},"bootstrap-utilities.css.map":{"Children":null,"Asset":{"ContentRootIndex":0,"SubPath":"lib/bootstrap/dist/css/bootstrap-utilities.css.map"},"Patterns":null},"bootstrap-utilities.css.map.gz":{"Children":null,"Asset":{"ContentRootIndex":1,"SubPath":"6emjgguows-{0}-r4e9w2rdcm-r4e9w2rdcm.gz"},"Patterns":null},"bootstrap-utilities.min.css":{"Children":null,"Asset":{"ContentRootIndex":0,"SubPath":"lib/bootstrap/dist/css/bootstrap-utilities.min.css"},"Patterns":null},"bootstrap-utilities.min.css.gz":{"Children":null,"Asset":{"ContentRootIndex":1,"SubPath":"6txjogtntl-{0}-wl58j5mj3v-wl58j5mj3v.gz"},"Patterns":null},"bootstrap-utilities.min.css.map":{"Children":null,"Asset":{"ContentRootIndex":0,"SubPath":"lib/bootstrap/dist/css/bootstrap-utilities.min.css.map"},"Patterns":null},"bootstrap-utilities.min.css.map.gz":{"Children":null,"Asset":{"ContentRootIndex":1,"SubPath":"ja6e73z265-{0}-c2oey78nd0-c2oey78nd0.gz"},"Patterns":null},"bootstrap-utilities.rtl.css":{"Children":null,"Asset":{"ContentRootIndex":0,"SubPath":"lib/bootstrap/dist/css/bootstrap-utilities.rtl.css"},"Patterns":null},"bootstrap-utilities.rtl.css.gz":{"Children":null,"Asset":{"ContentRootIndex":1,"SubPath":"tkdrwlm4ra-{0}-d4r6k3f320-d4r6k3f320.gz"},"Patterns":null},"bootstrap-utilities.rtl.css.map":{"Children":null,"Asset":{"ContentRootIndex":0,"SubPath":"lib/bootstrap/dist/css/bootstrap-utilities.rtl.css.map"},"Patterns":null},"bootstrap-utilities.rtl.css.map.gz":{"Children":null,"Asset":{"ContentRootIndex":1,"SubPath":"db42fqjihi-{0}-j5mq2jizvt-j5mq2jizvt.gz"},"Patterns":null},"bootstrap-utilities.rtl.min.css":{"Children":null,"Asset":{"ContentRootIndex":0,"SubPath":"lib/bootstrap/dist/css/bootstrap-utilities.rtl.min.css"},"Patterns":null},"bootstrap-utilities.rtl.min.css.gz":{"Children":null,"Asset":{"ContentRootIndex":1,"SubPath":"ki8v2yzymp-{0}-keugtjm085-keugtjm085.gz"},"Patterns":null},"bootstrap-utilities.rtl.min.css.map":{"Children":null,"Asset":{"ContentRootIndex":0,"SubPath":"lib/bootstrap/dist/css/bootstrap-utilities.rtl.min.css.map"},"Patterns":null},"bootstrap-utilities.rtl.min.css.map.gz":{"Children":null,"Asset":{"ContentRootIndex":1,"SubPath":"swo7t2r69i-{0}-nvvlpmu67g-nvvlpmu67g.gz"},"Patterns":null},"bootstrap.css":{"Children":null,"Asset":{"ContentRootIndex":0,"SubPath":"lib/bootstrap/dist/css/bootstrap.css"},"Patterns":null},"bootstrap.css.gz":{"Children":null,"Asset":{"ContentRootIndex":1,"SubPath":"lynb61c5ff-{0}-zub09dkrxp-zub09dkrxp.gz"},"Patterns":null},"bootstrap.css.map":{"Children":null,"Asset":{"ContentRootIndex":0,"SubPath":"lib/bootstrap/dist/css/bootstrap.css.map"},"Patterns":null},"bootstrap.css.map.gz":{"Children":null,"Asset":{"ContentRootIndex":1,"SubPath":"g78kf2esrj-{0}-pj5nd1wqec-pj5nd1wqec.gz"},"Patterns":null},"bootstrap.min.css":{"Children":null,"Asset":{"ContentRootIndex":0,"SubPath":"lib/bootstrap/dist/css/bootstrap.min.css"},"Patterns":null},"bootstrap.min.css.gz":{"Children":null,"Asset":{"ContentRootIndex":1,"SubPath":"f3flxoqwag-{0}-43atpzeawx-43atpzeawx.gz"},"Patterns":null},"bootstrap.min.css.map":{"Children":null,"Asset":{"ContentRootIndex":0,"SubPath":"lib/bootstrap/dist/css/bootstrap.min.css.map"},"Patterns":null},"bootstrap.min.css.map.gz":{"Children":null,"Asset":{"ContentRootIndex":1,"SubPath":"futyuuewxo-{0}-v0zj4ognzu-v0zj4ognzu.gz"},"Patterns":null},"bootstrap.rtl.css":{"Children":null,"Asset":{"ContentRootIndex":0,"SubPath":"lib/bootstrap/dist/css/bootstrap.rtl.css"},"Patterns":null},"bootstrap.rtl.css.gz":{"Children":null,"Asset":{"ContentRootIndex":1,"SubPath":"eah1j6dway-{0}-ynyaa8k90p-ynyaa8k90p.gz"},"Patterns":null},"bootstrap.rtl.css.map":{"Children":null,"Asset":{"ContentRootIndex":0,"SubPath":"lib/bootstrap/dist/css/bootstrap.rtl.css.map"},"Patterns":null},"bootstrap.rtl.css.map.gz":{"Children":null,"Asset":{"ContentRootIndex":1,"SubPath":"uw5fm49umv-{0}-hrwsygsryq-hrwsygsryq.gz"},"Patterns":null},"bootstrap.rtl.min.css":{"Children":null,"Asset":{"ContentRootIndex":0,"SubPath":"lib/bootstrap/dist/css/bootstrap.rtl.min.css"},"Patterns":null},"bootstrap.rtl.min.css.gz":{"Children":null,"Asset":{"ContentRootIndex":1,"SubPath":"lf7cq5ig2x-{0}-c63t5i9ira-c63t5i9ira.gz"},"Patterns":null},"bootstrap.rtl.min.css.map":{"Children":null,"Asset":{"ContentRootIndex":0,"SubPath":"lib/bootstrap/dist/css/bootstrap.rtl.min.css.map"},"Patterns":null},"bootstrap.rtl.min.css.map.gz":{"Children":null,"Asset":{"ContentRootIndex":1,"SubPath":"hzjoif3qju-{0}-ft3s53vfgj-ft3s53vfgj.gz"},"Patterns":null}},"Asset":null,"Patterns":null},"js":{"Children":{"bootstrap.bundle.js":{"Children":null,"Asset":{"ContentRootIndex":0,"SubPath":"lib/bootstrap/dist/js/bootstrap.bundle.js"},"Patterns":null},"bootstrap.bundle.js.gz":{"Children":null,"Asset":{"ContentRootIndex":1,"SubPath":"6es1zt9ion-{0}-4094rpi4f9-4094rpi4f9.gz"},"Patterns":null},"bootstrap.bundle.js.map":{"Children":null,"Asset":{"ContentRootIndex":0,"SubPath":"lib/bootstrap/dist/js/bootstrap.bundle.js.map"},"Patterns":null},"bootstrap.bundle.js.map.gz":{"Children":null,"Asset":{"ContentRootIndex":1,"SubPath":"65j0oteurl-{0}-6pdc2jztkx-6pdc2jztkx.gz"},"Patterns":null},"bootstrap.bundle.min.js":{"Children":null,"Asset":{"ContentRootIndex":0,"SubPath":"lib/bootstrap/dist/js/bootstrap.bundle.min.js"},"Patterns":null},"bootstrap.bundle.min.js.gz":{"Children":null,"Asset":{"ContentRootIndex":1,"SubPath":"5xmt72pj4l-{0}-hd3gran6i8-hd3gran6i8.gz"},"Patterns":null},"bootstrap.bundle.min.js.map":{"Children":null,"Asset":{"ContentRootIndex":0,"SubPath":"lib/bootstrap/dist/js/bootstrap.bundle.min.js.map"},"Patterns":null},"bootstrap.bundle.min.js.map.gz":{"Children":null,"Asset":{"ContentRootIndex":1,"SubPath":"e58au9ed4f-{0}-iovd86k7lj-iovd86k7lj.gz"},"Patterns":null},"bootstrap.esm.js":{"Children":null,"Asset":{"ContentRootIndex":0,"SubPath":"lib/bootstrap/dist/js/bootstrap.esm.js"},"Patterns":null},"bootstrap.esm.js.gz":{"Children":null,"Asset":{"ContentRootIndex":1,"SubPath":"rxtrlcep6r-{0}-ltid2c489k-ltid2c489k.gz"},"Patterns":null},"bootstrap.esm.js.map":{"Children":null,"Asset":{"ContentRootIndex":0,"SubPath":"lib/bootstrap/dist/js/bootstrap.esm.js.map"},"Patterns":null},"bootstrap.esm.js.map.gz":{"Children":null,"Asset":{"ContentRootIndex":1,"SubPath":"jao59j0d80-{0}-kbrnm935zg-kbrnm935zg.gz"},"Patterns":null},"bootstrap.esm.min.js":{"Children":null,"Asset":{"ContentRootIndex":0,"SubPath":"lib/bootstrap/dist/js/bootstrap.esm.min.js"},"Patterns":null},"bootstrap.esm.min.js.gz":{"Children":null,"Asset":{"ContentRootIndex":1,"SubPath":"u8j981fo1a-{0}-8vyfqsqgz1-8vyfqsqgz1.gz"},"Patterns":null},"bootstrap.esm.min.js.map":{"Children":null,"Asset":{"ContentRootIndex":0,"SubPath":"lib/bootstrap/dist/js/bootstrap.esm.min.js.map"},"Patterns":null},"bootstrap.esm.min.js.map.gz":{"Children":null,"Asset":{"ContentRootIndex":1,"SubPath":"0dbnd0lgjv-{0}-y7v9cxd14o-y7v9cxd14o.gz"},"Patterns":null},"bootstrap.js":{"Children":null,"Asset":{"ContentRootIndex":0,"SubPath":"lib/bootstrap/dist/js/bootstrap.js"},"Patterns":null},"bootstrap.js.gz":{"Children":null,"Asset":{"ContentRootIndex":1,"SubPath":"zntl1o2002-{0}-u9q1upor1n-u9q1upor1n.gz"},"Patterns":null},"bootstrap.js.map":{"Children":null,"Asset":{"ContentRootIndex":0,"SubPath":"lib/bootstrap/dist/js/bootstrap.js.map"},"Patterns":null},"bootstrap.js.map.gz":{"Children":null,"Asset":{"ContentRootIndex":1,"SubPath":"5803mqf4gx-{0}-h1s4sie4z3-h1s4sie4z3.gz"},"Patterns":null},"bootstrap.min.js":{"Children":null,"Asset":{"ContentRootIndex":0,"SubPath":"lib/bootstrap/dist/js/bootstrap.min.js"},"Patterns":null},"bootstrap.min.js.gz":{"Children":null,"Asset":{"ContentRootIndex":1,"SubPath":"364zkc6izp-{0}-4d85u1mtcx-4d85u1mtcx.gz"},"Patterns":null},"bootstrap.min.js.map":{"Children":null,"Asset":{"ContentRootIndex":0,"SubPath":"lib/bootstrap/dist/js/bootstrap.min.js.map"},"Patterns":null},"bootstrap.min.js.map.gz":{"Children":null,"Asset":{"ContentRootIndex":1,"SubPath":"brouhuk3za-{0}-0j3bgjxly4-0j3bgjxly4.gz"},"Patterns":null}},"Asset":null,"Patterns":null}},"Asset":null,"Patterns":null}},"Asset":null,"Patterns":null}},"Asset":null,"Patterns":null}},"Asset":null,"Patterns":[{"ContentRootIndex":0,"Pattern":"**","Depth":0}]}}
 </file>
 
-<file path="Components/Layout/MainLayout.razor">
-@inherits LayoutComponentBase
-@implements IDisposable
-@inject ElectroGestion.Services.AppStateService AppState
-@inject NavigationManager NavManager
-@inject BlazorBootstrap.ToastService ToastService
-
-@if (!AppState.IsAuthenticated)
-{
-    <ElectroGestion.Components.Pages.Compartidas.Login />
-}
-else
-{
-    <div style="min-height:100vh;display:flex">
-        <aside class="@(SidebarCollapsed ? "is-collapsed" : "is-open")"
-          style="width:@(SidebarCollapsed ? "80px" : "250px");flex:0 0 @(SidebarCollapsed ? "80px" : "250px");background:#fff;border-right:1px solid #E3E5EE;display:flex;flex-direction:column;padding:24px 0;position:sticky;top:0;height:100vh;transition:width 0.3s cubic-bezier(0.4, 0, 0.2, 1)">
-          <button @onclick="ToggleSidebar" class="sidebar-toggle-btn"
-            style="position:absolute;top:28px;right:-14px;width:28px;height:28px;border:1px solid #E3E5EE;background:#fff;border-radius:50%;cursor:pointer;display:flex;align-items:center;justify-content:center;color:#6B7085;z-index:10;box-shadow:0 2px 5px rgba(0,0,0,0.05)">
-            @if (SidebarCollapsed)
-            {
-              <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.3"
-                stroke-linecap="round" stroke-linejoin="round">
-                <path d="M9 18l6-6-6-6" />
-              </svg>
-            }
-            else
-            {
-              <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.3"
-                stroke-linecap="round" stroke-linejoin="round">
-                <path d="M15 18l-6-6 6-6" />
-              </svg>
-            }
-          </button>
-          
-          <div style="padding:32px 0 28px;display:flex;flex-direction:row;align-items:center;justify-content:center;gap:3px;overflow:hidden;width:100%;cursor:pointer" @onclick='() => NavManager.NavigateTo("/")'>
-            @if (!SidebarCollapsed)
-            {
-              <div style="display:flex;align-items:center;justify-content:center;width:100%;padding-left:14px;padding-right:14px">
-                <svg viewBox="10 0 74 60" width="42" height="34" style="flex:0 0 auto">
-                  <defs>
-                    <mask id="bolt-mask-sidebar-row">
-                      <rect width="100" height="60" fill="white" />
-                      <path d="M46 5 L34 32 H46 L38 58 L54 28 H42 Z" fill="black" stroke="black" stroke-width="2.5"
-                        stroke-linejoin="round" />
-                    </mask>
-                  </defs>
-                  <text x="10" y="48" font-family="'Manrope', sans-serif" font-weight="900" font-size="52" fill="#1D4ED8" letter-spacing="-1.5">E</text>
-                  <text x="44" y="48" font-family="'Manrope', sans-serif" font-weight="900" font-size="52" fill="#F59E0B" mask="url(#bolt-mask-sidebar-row)" letter-spacing="-1.5">G</text>
-                  <path d="M46 5 L34 32 H46 L38 58 L54 28 H42 Z" fill="#F59E0B" stroke="#F59E0B" stroke-width="0" stroke-linejoin="round" />
-                </svg>
-                <div style="font-family:'Manrope';font-weight:900;font-size:20px;letter-spacing:-0.5px;white-space:nowrap;line-height:1;margin-top:2px;margin-left:4px">
-                  <span style="color:#1D4ED8">ELECTRO</span><span style="color:#334155">GESTIÓN</span>
-                </div>
-              </div>
-            }
-            else
-            {
-              <div style="display:flex;align-items:center;justify-content:center;width:100%">
-                <svg viewBox="10 0 74 60" width="52" height="42">
-                  <defs>
-                    <mask id="bolt-mask-sidebar-col">
-                      <rect width="100" height="60" fill="white" />
-                      <path d="M46 5 L34 32 H46 L38 58 L54 28 H42 Z" fill="black" stroke="black" stroke-width="2.5" stroke-linejoin="round" />
-                    </mask>
-                  </defs>
-                  <text x="10" y="48" font-family="'Manrope', sans-serif" font-weight="900" font-size="52" fill="#1D4ED8" letter-spacing="-1.5">E</text>
-                  <text x="44" y="48" font-family="'Manrope', sans-serif" font-weight="900" font-size="52" fill="#F59E0B" mask="url(#bolt-mask-sidebar-col)" letter-spacing="-1.5">G</text>
-                  <path d="M46 5 L34 32 H46 L38 58 L54 28 H42 Z" fill="#F59E0B" stroke="#F59E0B" stroke-width="0" stroke-linejoin="round" />
-                </svg>
-              </div>
-            }
-          </div>
-
-          <nav style="display:flex;flex-direction:column;gap:4px;padding:0 12px;overflow-y:auto">
-            @foreach (var item in GetNavItems())
-            {
-                var isActive = IsActiveRoute(item.Href);
-                <NavLink class="@($"nav-item-btn {(isActive ? "active" : "")}")" 
-                         href="@item.Href" 
-                         Match="@(item.Href == "/" ? NavLinkMatch.All : NavLinkMatch.Prefix)" 
-                         style="@($"position:relative;display:flex;align-items:center;gap:12px;width:100%;text-align:left;border:0;cursor:pointer;padding:12px {(SidebarCollapsed ? "16px" : "14px")};border-radius:10px;font-size:14.5px;font-weight:{(isActive ? "800" : "600")};background:{(isActive ? "#EDEBFF" : "transparent")};color:{(isActive ? "#1D4ED8" : "#4A4E63")};transition:all 0.2s;text-decoration:none;")"
-                         title="@(SidebarCollapsed ? item.Label : "")">
-                    <div style="position:relative;display:flex;align-items:center;justify-content:center;width:24px;height:24px;flex:0 0 24px">
-                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="22" height="22" fill="none" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="position:relative;z-index:1;display:block;stroke: @(isActive ? "#1D4ED8" : "#6B7085")">
-                            <path class="path-d1" d="@item.D1" stroke="@(isActive ? "#1D4ED8" : "#6B7085")" fill="none"></path>
-                            @if (!string.IsNullOrEmpty(item.D2))
-                            {
-                                <path class="path-d2" d="@item.D2" stroke="@(isActive ? "#F59E0B" : "#A1A5B7")" fill="none"></path>
-                            }
-                        </svg>
-                    </div>
-                    @if (!SidebarCollapsed)
-                    {
-                        <span style="white-space:nowrap">@item.Label</span>
-                    }
-                </NavLink>
-            }
-          </nav>
-
-          <div style="margin-top:auto;border-top:1px solid #EFF0F6;padding-top:18px;width:100%">
-            @if (!SidebarCollapsed)
-            {
-              <div style="display:flex;align-items:center;gap:11px;padding-left:26px;padding-right:20px;width:100%;box-sizing:border-box">
-                <div style="width:38px;height:38px;border-radius:50%;background:#1D4ED8;color:#fff;display:flex;align-items:center;justify-content:center;font-weight:800;font-family:'Manrope';flex:0 0 38px">
-                  @(AppState.Session?.Inicial ?? "U")</div>
-                <div style="min-width:0">
-                  <div style="font-weight:700;font-size:14px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">
-                    @(AppState.Session?.Nombre ?? "Usuario")</div>
-                  <div style="font-size:12px;color:#8B90A3">@(AppState.Session?.Rol ?? "Rol")</div>
-                </div>
-              </div>
-              <button @onclick="() => showLogoutConfirm = true" class="logout-btn" style="margin:12px 20px 0;width:calc(100% - 40px);padding:9px;border:1px solid #E3E5EE;background:#fff;border-radius:9px;font-size:13px;font-weight:700;color:#C4141B;cursor:pointer">Cerrar sesión</button>
-            }
-            else
-            {
-              <div style="display:flex;align-items:center;justify-content:center;width:100%">
-                <div style="width:38px;height:38px;border-radius:50%;background:#1D4ED8;color:#fff;display:flex;align-items:center;justify-content:center;font-weight:800;font-family:'Manrope';flex:0 0 38px"
-                  title="@(AppState.Session?.Nombre ?? "Usuario")">@(AppState.Session?.Inicial ?? "U")</div>
-              </div>
-              <button @onclick="() => showLogoutConfirm = true" class="logout-btn" title="Cerrar sesión"
-                style="margin:12px 12px 0;padding:9px;border:1px solid #E3E5EE;background:#fff;border-radius:9px;font-size:13px;font-weight:700;color:#C4141B;cursor:pointer;display:flex;align-items:center;justify-content:center">
-                <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                  <path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4"></path>
-                  <path d="M16 17l5-5-5-5"></path>
-                  <path d="M21 12H9"></path>
-                </svg>
-              </button>
-            }
-          </div>
-        </aside>
-        
-        <div class="sidebar-backdrop" @onclick="ToggleSidebar"></div>
-
-        <main style="flex:1;min-width:0;padding:32px 38px 60px" class="resp-main">
-          <CascadingValue Value="this">
-            @Body
-          </CascadingValue>
-        </main>
-    </div>
-
-    @* Confirmation Modal for Logout *@
-    @if (showLogoutConfirm)
-    {
-        <div style="position:fixed;inset:0;background:rgba(14,16,40,.5);display:flex;align-items:center;justify-content:center;padding:20px;z-index:9999">
-            <div style="background:#fff;border-radius:16px;max-width:420px;width:100%;padding:26px;animation:tin .18s ease-out;box-shadow:0 20px 40px rgba(0,0,0,0.15)">
-                <div style="font-family:'Manrope';font-weight:800;font-size:20px;color:#14162B">Cerrar sesión</div>
-                <div style="color:#4A4E63;font-size:14.5px;margin-top:10px;line-height:1.55">¿Deseas cerrar la sesión actual? Los cambios guardados se mantienen.</div>
-                <div style="display:flex;justify-content:flex-end;gap:11px;margin-top:22px">
-                    <button @onclick="() => showLogoutConfirm = false"
-                        style="padding:11px 18px;border:1px solid #D5D8E6;background:#fff;border-radius:9px;font-weight:700;font-size:14px;cursor:pointer;color:#4A4E63">Cancelar</button>
-                    <button @onclick="ConfirmLogout"
-                        style="padding:11px 20px;border:0;background:#C4141B;color:#fff;border-radius:9px;font-weight:700;font-size:14px;cursor:pointer;font-family:'Manrope'">Cerrar sesión</button>
-                </div>
-            </div>
-        </div>
-    }
-
-}
-
-@* BlazorBootstrap Toasts Container Matching XML *@
-<Toasts class="toast-container p-0 m-0" AutoHide="true" Delay="6000" Placement="ToastsPlacement.TopRight" />
-
-@code {
-    private bool SidebarCollapsed { get; set; } = false;
-    private bool showLogoutConfirm = false;
-
-    public record NavItem(string Href, string Label, string D1, string D2);
-
-    protected override void OnInitialized()
-    {
-        AppState.OnChange += OnAppStateChanged;
-        NavManager.LocationChanged += OnLocationChanged;
-    }
-
-    public void Dispose()
-    {
-        AppState.OnChange -= OnAppStateChanged;
-        NavManager.LocationChanged -= OnLocationChanged;
-    }
-
-    private async void OnAppStateChanged()
-    {
-        await InvokeAsync(StateHasChanged);
-    }
-
-    private async void OnLocationChanged(object? sender, LocationChangedEventArgs e)
-    {
-        await InvokeAsync(StateHasChanged);
-    }
-
-    private bool IsActiveRoute(string href)
-    {
-        var rel = NavManager.ToBaseRelativePath(NavManager.Uri);
-        var path = rel.Split('?')[0].Trim('/');
-        if (string.IsNullOrEmpty(path)) path = "/";
-        else path = "/" + path;
-
-        if (href == "/") return path == "/";
-        return path.StartsWith(href, StringComparison.OrdinalIgnoreCase);
-    }
-
-    private IEnumerable<NavItem> GetNavItems()
-    {
-        if (AppState.EsAdministrador)
-        {
-            return new List<NavItem>
-            {
-                new("/recuperacion", "Recuperación", "M4 4h16v16H4z", "M9 14l-3 3 3 3 M6 17h7a5 5 0 1 0-5-5")
-            };
-        }
-
-        if (AppState.EsGerente)
-        {
-            return new List<NavItem>
-            {
-                new("/", "Inicio", "M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z", "M9 22V12h6v10"),
-                new("/solicitudes", "Solicitudes", "M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z M14 2v6h6", "M9 9a2 2 0 1 1 4 0 2 2 0 0 1-4 0 M8 13h8 M8 17h8"),
-                new("/agenda", "Agenda", "M19 4H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6a2 2 0 0 0-2-2z M3 10h18", "M16 2v4 M8 2v4 M8 14h2 M14 14h2 M8 18h2 M14 18h2"),
-                new("/levantamientos", "Levantamientos", "M12 21a9 9 0 1 0 0-18 9 9 0 0 0 0 18z M12 21v2", "M9.5 14.5l2-5 4-1-2 5z"),
-                new("/cotizaciones", "Cotizaciones", "M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z", "M14 2v6h6 M8 10h8 M8 14h8 M8 18h5"),
-                new("/ordenes", "Órdenes", "M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2 M15 2H9a1 1 0 0 0-1 1v2a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1V3a1 1 0 0 0-1-1z", "M11 11h5 M11 15h5 M11 19h5 M7 11l1.5 1.5 2-2 M7 15l1.5 1.5 2-2 M7 19l1.5 1.5 2-2"),
-                new("/clientes", "Clientes", "M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2 M7.5 7a4 4 0 1 1 8 0 4 4 0 0 1-8 0", "M22 21v-2a4 4 0 0 0-3-3.87 M15 3.13a4 4 0 0 1 0 7.75"),
-                new("/cobros", "Cobros", "M12 21a9 9 0 1 0 0-18 9 9 0 0 0 0 18", "M12 7v10 M8.5 13.5h7"),
-                new("/servicios", "Servicios", "M12 3.5L3.5 8v12.5h17V8z M12 3.5v5", "M9 14.5h6 M9 17.5h6"),
-                new("/inventario", "Inventario", "M6 4h12a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2z M9 4v4h6V4", "M15 15h5v5h-5z M16 15v-2h3v2"),
-                new("/proveedores", "Proveedores", "M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2 M7.5 7a4 4 0 1 1 8 0 4 4 0 0 1-8 0 M22 21v-2a4 4 0 0 0-3-3.87", "M16 16a4 4 0 1 1 8 0 4 4 0 0 1-8 0 M20 14.5a1.5 1.5 0 0 0-3 0v.5l1.5.5v1 M20 18h0"),
-                new("/reportes", "Reportes", "M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z M14 2v6h6", "M8 18v-4 M12 18v-8 M16 18v-6 M7 12l4-4 3 3 4-4"),
-                new("/historial", "Historial", "M12 20.5a8.5 8.5 0 1 0 0-17 8.5 8.5 0 0 0 0 17", "M12 7.6V12l3.4 2.1")
-            };
-        }
-        else
-        {
-            return new List<NavItem>
-            {
-                new("/", "Inicio", "M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z", "M9 22V12h6v10"),
-                new("/solicitudes", "Solicitudes", "M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z M14 2v6h6", "M9 9a2 2 0 1 1 4 0 2 2 0 0 1-4 0 M8 13h8 M8 17h8"),
-                new("/agenda", "Agenda", "M19 4H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6a2 2 0 0 0-2-2z M3 10h18", "M16 2v4 M8 2v4 M8 14h2 M14 14h2 M8 18h2 M14 18h2"),
-                new("/levantamientos", "Levantamientos", "M12 21a9 9 0 1 0 0-18 9 9 0 0 0 0 18z M12 21v2", "M9.5 14.5l2-5 4-1-2 5z"),
-                new("/ordenes", "Órdenes de trabajo", "M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2 M15 2H9a1 1 0 0 0-1 1v2a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1V3a1 1 0 0 0-1-1z", "M11 11h5 M11 15h5 M11 19h5 M7 11l1.5 1.5 2-2 M7 15l1.5 1.5 2-2 M7 19l1.5 1.5 2-2"),
-                new("/clientes", "Clientes", "M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2 M7.5 7a4 4 0 1 1 8 0 4 4 0 0 1-8 0", "M22 21v-2a4 4 0 0 0-3-3.87 M15 3.13a4 4 0 0 1 0 7.75"),
-                new("/historial", "Historial", "M12 20.5a8.5 8.5 0 1 0 0-17 8.5 8.5 0 0 0 0 17", "M12 7.6V12l3.4 2.1")
-            };
-        }
-    }
-
-    public void ToggleSidebar()
-    {
-        SidebarCollapsed = !SidebarCollapsed;
-        StateHasChanged();
-    }
-
-    private void ConfirmLogout()
-    {
-        showLogoutConfirm = false;
-        AppState.Logout();
-        ToastService.ShowSuccess("Sesión cerrada correctamente.", "Éxito");
-        NavManager.NavigateTo("/");
-    }
-}
-</file>
-
 <file path="Components/Layout/MainLayout.razor.css">
 .nav-item-btn {
     position: relative;
@@ -31396,6 +31135,275 @@ La aplicación iniciará en `https://localhost:7198` (o el puerto configurado en
 No toast
 </file>
 
+<file path="Components/Layout/MainLayout.razor">
+@inherits LayoutComponentBase
+@implements IDisposable
+@inject ElectroGestion.Services.AppStateService AppState
+@inject NavigationManager NavManager
+@inject BlazorBootstrap.ToastService ToastService
+
+@if (!AppState.IsAuthenticated)
+{
+    <ElectroGestion.Components.Pages.Compartidas.Login />
+}
+else
+{
+    <div style="min-height:100vh;display:flex">
+        <aside class="@(SidebarCollapsed ? "is-collapsed" : "is-open")"
+          style="width:@(SidebarCollapsed ? "80px" : "250px");flex:0 0 @(SidebarCollapsed ? "80px" : "250px");background:#fff;border-right:1px solid #E3E5EE;display:flex;flex-direction:column;padding:24px 0;position:sticky;top:0;height:100vh;transition:width 0.3s cubic-bezier(0.4, 0, 0.2, 1)">
+          <button @onclick="ToggleSidebar" class="sidebar-toggle-btn"
+            style="position:absolute;top:28px;right:-14px;width:28px;height:28px;border:1px solid #E3E5EE;background:#fff;border-radius:50%;cursor:pointer;display:flex;align-items:center;justify-content:center;color:#6B7085;z-index:10;box-shadow:0 2px 5px rgba(0,0,0,0.05)">
+            @if (SidebarCollapsed)
+            {
+              <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.3"
+                stroke-linecap="round" stroke-linejoin="round">
+                <path d="M9 18l6-6-6-6" />
+              </svg>
+            }
+            else
+            {
+              <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.3"
+                stroke-linecap="round" stroke-linejoin="round">
+                <path d="M15 18l-6-6 6-6" />
+              </svg>
+            }
+          </button>
+          
+          <div style="padding:32px 0 28px;display:flex;flex-direction:row;align-items:center;justify-content:center;gap:3px;overflow:hidden;width:100%;cursor:pointer" @onclick='() => NavManager.NavigateTo("/")'>
+            @if (!SidebarCollapsed)
+            {
+              <div style="display:flex;align-items:center;justify-content:center;width:100%;padding-left:14px;padding-right:14px">
+                <svg viewBox="10 0 74 60" width="42" height="34" style="flex:0 0 auto">
+                  <defs>
+                    <mask id="bolt-mask-sidebar-row">
+                      <rect width="100" height="60" fill="white" />
+                      <path d="M46 5 L34 32 H46 L38 58 L54 28 H42 Z" fill="black" stroke="black" stroke-width="2.5"
+                        stroke-linejoin="round" />
+                    </mask>
+                  </defs>
+                  <text x="10" y="48" font-family="'Manrope', sans-serif" font-weight="900" font-size="52" fill="#1D4ED8" letter-spacing="-1.5">E</text>
+                  <text x="44" y="48" font-family="'Manrope', sans-serif" font-weight="900" font-size="52" fill="#F59E0B" mask="url(#bolt-mask-sidebar-row)" letter-spacing="-1.5">G</text>
+                  <path d="M46 5 L34 32 H46 L38 58 L54 28 H42 Z" fill="#F59E0B" stroke="#F59E0B" stroke-width="0" stroke-linejoin="round" />
+                </svg>
+                <div style="font-family:'Manrope';font-weight:900;font-size:20px;letter-spacing:-0.5px;white-space:nowrap;line-height:1;margin-top:2px;margin-left:4px">
+                  <span style="color:#1D4ED8">ELECTRO</span><span style="color:#334155">GESTIÓN</span>
+                </div>
+              </div>
+            }
+            else
+            {
+              <div style="display:flex;align-items:center;justify-content:center;width:100%">
+                <svg viewBox="10 0 74 60" width="52" height="42">
+                  <defs>
+                    <mask id="bolt-mask-sidebar-col">
+                      <rect width="100" height="60" fill="white" />
+                      <path d="M46 5 L34 32 H46 L38 58 L54 28 H42 Z" fill="black" stroke="black" stroke-width="2.5" stroke-linejoin="round" />
+                    </mask>
+                  </defs>
+                  <text x="10" y="48" font-family="'Manrope', sans-serif" font-weight="900" font-size="52" fill="#1D4ED8" letter-spacing="-1.5">E</text>
+                  <text x="44" y="48" font-family="'Manrope', sans-serif" font-weight="900" font-size="52" fill="#F59E0B" mask="url(#bolt-mask-sidebar-col)" letter-spacing="-1.5">G</text>
+                  <path d="M46 5 L34 32 H46 L38 58 L54 28 H42 Z" fill="#F59E0B" stroke="#F59E0B" stroke-width="0" stroke-linejoin="round" />
+                </svg>
+              </div>
+            }
+          </div>
+
+          <nav style="display:flex;flex-direction:column;gap:4px;padding:0 12px;overflow-y:auto">
+            @foreach (var item in GetNavItems())
+            {
+                @if (item.IsSeparator)
+                {
+                    <div role="separator" aria-orientation="horizontal" aria-hidden="true" style="height:1px;background:#E3E5EE;margin:9px 4px"></div>
+                }
+                else
+                {
+                    var isActive = IsActiveRoute(item.Href);
+                    <NavLink class="@($"nav-item-btn {(isActive ? "active" : "")}")" 
+                             href="@item.Href" 
+                             Match="@(item.Href == "/" ? NavLinkMatch.All : NavLinkMatch.Prefix)" 
+                             style="@($"position:relative;display:flex;align-items:center;gap:12px;width:100%;text-align:left;border:0;cursor:pointer;padding:12px {(SidebarCollapsed ? "16px" : "14px")};border-radius:10px;font-size:14.5px;font-weight:{(isActive ? "800" : "600")};background:{(isActive ? "#EDEBFF" : "transparent")};color:{(isActive ? "#1D4ED8" : "#4A4E63")};transition:all 0.2s;text-decoration:none;")"
+                             title="@(SidebarCollapsed ? item.Label : "")">
+                        <div style="position:relative;display:flex;align-items:center;justify-content:center;width:24px;height:24px;flex:0 0 24px">
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="22" height="22" fill="none" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="position:relative;z-index:1;display:block;stroke: @(isActive ? "#1D4ED8" : "#6B7085")">
+                                <path class="path-d1" d="@item.D1" stroke="@(isActive ? "#1D4ED8" : "#6B7085")" fill="none"></path>
+                                @if (!string.IsNullOrEmpty(item.D2))
+                                {
+                                    <path class="path-d2" d="@item.D2" stroke="@(isActive ? "#F59E0B" : "#A1A5B7")" fill="none"></path>
+                                }
+                            </svg>
+                        </div>
+                        @if (!SidebarCollapsed)
+                        {
+                            <span style="white-space:nowrap">@item.Label</span>
+                        }
+                    </NavLink>
+                }
+            }
+          </nav>
+
+          <div style="margin-top:auto;border-top:1px solid #EFF0F6;padding-top:18px;width:100%">
+            @if (!SidebarCollapsed)
+            {
+              <div style="display:flex;align-items:center;gap:11px;padding-left:26px;padding-right:20px;width:100%;box-sizing:border-box">
+                <div style="width:38px;height:38px;border-radius:50%;background:#1D4ED8;color:#fff;display:flex;align-items:center;justify-content:center;font-weight:800;font-family:'Manrope';flex:0 0 38px">
+                  @(AppState.Session?.Inicial ?? "U")</div>
+                <div style="min-width:0">
+                  <div style="font-weight:700;font-size:14px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">
+                    @(AppState.Session?.Nombre ?? "Usuario")</div>
+                  <div style="font-size:12px;color:#8B90A3">@(AppState.Session?.Rol ?? "Rol")</div>
+                </div>
+              </div>
+              <button @onclick="() => showLogoutConfirm = true" class="logout-btn" style="margin:12px 20px 0;width:calc(100% - 40px);padding:9px;border:1px solid #E3E5EE;background:#fff;border-radius:9px;font-size:13px;font-weight:700;color:#C4141B;cursor:pointer">Cerrar sesión</button>
+            }
+            else
+            {
+              <div style="display:flex;align-items:center;justify-content:center;width:100%">
+                <div style="width:38px;height:38px;border-radius:50%;background:#1D4ED8;color:#fff;display:flex;align-items:center;justify-content:center;font-weight:800;font-family:'Manrope';flex:0 0 38px"
+                  title="@(AppState.Session?.Nombre ?? "Usuario")">@(AppState.Session?.Inicial ?? "U")</div>
+              </div>
+              <button @onclick="() => showLogoutConfirm = true" class="logout-btn" title="Cerrar sesión"
+                style="margin:12px 12px 0;padding:9px;border:1px solid #E3E5EE;background:#fff;border-radius:9px;font-size:13px;font-weight:700;color:#C4141B;cursor:pointer;display:flex;align-items:center;justify-content:center">
+                <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4"></path>
+                  <path d="M16 17l5-5-5-5"></path>
+                  <path d="M21 12H9"></path>
+                </svg>
+              </button>
+            }
+          </div>
+        </aside>
+        
+        <div class="sidebar-backdrop" @onclick="ToggleSidebar"></div>
+
+        <main style="flex:1;min-width:0;padding:32px 38px 60px" class="resp-main">
+          <CascadingValue Value="this">
+            @Body
+          </CascadingValue>
+        </main>
+    </div>
+
+    @* Confirmation Modal for Logout *@
+    @if (showLogoutConfirm)
+    {
+        <div style="position:fixed;inset:0;background:rgba(14,16,40,.5);display:flex;align-items:center;justify-content:center;padding:20px;z-index:9999">
+            <div style="background:#fff;border-radius:16px;max-width:420px;width:100%;padding:26px;animation:tin .18s ease-out;box-shadow:0 20px 40px rgba(0,0,0,0.15)">
+                <div style="font-family:'Manrope';font-weight:800;font-size:20px;color:#14162B">Cerrar sesión</div>
+                <div style="color:#4A4E63;font-size:14.5px;margin-top:10px;line-height:1.55">¿Deseas cerrar la sesión actual? Los cambios guardados se mantienen.</div>
+                <div style="display:flex;justify-content:flex-end;gap:11px;margin-top:22px">
+                    <button @onclick="() => showLogoutConfirm = false"
+                        style="padding:11px 18px;border:1px solid #D5D8E6;background:#fff;border-radius:9px;font-weight:700;font-size:14px;cursor:pointer;color:#4A4E63">Cancelar</button>
+                    <button @onclick="ConfirmLogout"
+                        style="padding:11px 20px;border:0;background:#C4141B;color:#fff;border-radius:9px;font-weight:700;font-size:14px;cursor:pointer;font-family:'Manrope'">Cerrar sesión</button>
+                </div>
+            </div>
+        </div>
+    }
+
+}
+
+@* BlazorBootstrap Toasts Container Matching XML *@
+<Toasts class="toast-container p-0 m-0" AutoHide="true" Delay="6000" Placement="ToastsPlacement.TopRight" />
+
+@code {
+    private bool SidebarCollapsed { get; set; } = false;
+    private bool showLogoutConfirm = false;
+
+    public record NavItem(string Href, string Label, string D1, string D2, bool IsSeparator = false);
+
+    protected override void OnInitialized()
+    {
+        AppState.OnChange += OnAppStateChanged;
+        NavManager.LocationChanged += OnLocationChanged;
+    }
+
+    public void Dispose()
+    {
+        AppState.OnChange -= OnAppStateChanged;
+        NavManager.LocationChanged -= OnLocationChanged;
+    }
+
+    private async void OnAppStateChanged()
+    {
+        await InvokeAsync(StateHasChanged);
+    }
+
+    private async void OnLocationChanged(object? sender, LocationChangedEventArgs e)
+    {
+        await InvokeAsync(StateHasChanged);
+    }
+
+    private bool IsActiveRoute(string href)
+    {
+        var rel = NavManager.ToBaseRelativePath(NavManager.Uri);
+        var path = rel.Split('?')[0].Trim('/');
+        if (string.IsNullOrEmpty(path)) path = "/";
+        else path = "/" + path;
+
+        if (href == "/") return path == "/";
+        return path.StartsWith(href, StringComparison.OrdinalIgnoreCase);
+    }
+
+    private IEnumerable<NavItem> GetNavItems()
+    {
+        if (AppState.EsAdministrador)
+        {
+            return new List<NavItem>
+            {
+                new("/recuperacion", "Recuperación", "M4 4h16v16H4z", "M9 14l-3 3 3 3 M6 17h7a5 5 0 1 0-5-5")
+            };
+        }
+
+        if (AppState.EsGerente)
+        {
+            return new List<NavItem>
+            {
+                new("/", "Inicio", "M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z", "M9 22V12h6v10"),
+                new("/solicitudes", "Solicitudes", "M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z M14 2v6h6", "M9 9a2 2 0 1 1 4 0 2 2 0 0 1-4 0 M8 13h8 M8 17h8"),
+                new("/agenda", "Agenda", "M19 4H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6a2 2 0 0 0-2-2z M3 10h18", "M16 2v4 M8 2v4 M8 14h2 M14 14h2 M8 18h2 M14 18h2"),
+                new("/levantamientos", "Levantamientos", "M12 21a9 9 0 1 0 0-18 9 9 0 0 0 0 18z M12 21v2", "M9.5 14.5l2-5 4-1-2 5z"),
+                new("/cotizaciones", "Cotizaciones", "M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z", "M14 2v6h6 M8 10h8 M8 14h8 M8 18h5"),
+                new("/ordenes", "Órdenes", "M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2 M15 2H9a1 1 0 0 0-1 1v2a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1V3a1 1 0 0 0-1-1z", "M11 11h5 M11 15h5 M11 19h5 M7 11l1.5 1.5 2-2 M7 15l1.5 1.5 2-2 M7 19l1.5 1.5 2-2"),
+                new("/clientes", "Clientes", "M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2 M7.5 7a4 4 0 1 1 8 0 4 4 0 0 1-8 0", "M22 21v-2a4 4 0 0 0-3-3.87 M15 3.13a4 4 0 0 1 0 7.75"),
+                new("/cobros", "Cobros", "M12 21a9 9 0 1 0 0-18 9 9 0 0 0 0 18", "M12 7v10 M8.5 13.5h7"),
+                new("", "", "", "", true),
+                new("/servicios", "Servicios", "M12 3.5L3.5 8v12.5h17V8z M12 3.5v5", "M9 14.5h6 M9 17.5h6"),
+                new("/inventario", "Inventario", "M6 4h12a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2z M9 4v4h6V4", "M15 15h5v5h-5z M16 15v-2h3v2"),
+                new("/proveedores", "Proveedores", "M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2 M7.5 7a4 4 0 1 1 8 0 4 4 0 0 1-8 0 M22 21v-2a4 4 0 0 0-3-3.87", "M16 16a4 4 0 1 1 8 0 4 4 0 0 1-8 0 M20 14.5a1.5 1.5 0 0 0-3 0v.5l1.5.5v1 M20 18h0"),
+                new("/reportes", "Reportes", "M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z M14 2v6h6", "M8 18v-4 M12 18v-8 M16 18v-6 M7 12l4-4 3 3 4-4"),
+                new("/historial", "Historial", "M12 20.5a8.5 8.5 0 1 0 0-17 8.5 8.5 0 0 0 0 17", "M12 7.6V12l3.4 2.1")
+            };
+        }
+        else
+        {
+            return new List<NavItem>
+            {
+                new("/", "Inicio", "M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z", "M9 22V12h6v10"),
+                new("/solicitudes", "Solicitudes", "M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z M14 2v6h6", "M9 9a2 2 0 1 1 4 0 2 2 0 0 1-4 0 M8 13h8 M8 17h8"),
+                new("/agenda", "Agenda", "M19 4H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6a2 2 0 0 0-2-2z M3 10h18", "M16 2v4 M8 2v4 M8 14h2 M14 14h2 M8 18h2 M14 18h2"),
+                new("/levantamientos", "Levantamientos", "M12 21a9 9 0 1 0 0-18 9 9 0 0 0 0 18z M12 21v2", "M9.5 14.5l2-5 4-1-2 5z"),
+                new("/ordenes", "Órdenes de trabajo", "M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2 M15 2H9a1 1 0 0 0-1 1v2a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1V3a1 1 0 0 0-1-1z", "M11 11h5 M11 15h5 M11 19h5 M7 11l1.5 1.5 2-2 M7 15l1.5 1.5 2-2 M7 19l1.5 1.5 2-2"),
+                new("/clientes", "Clientes", "M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2 M7.5 7a4 4 0 1 1 8 0 4 4 0 0 1-8 0", "M22 21v-2a4 4 0 0 0-3-3.87 M15 3.13a4 4 0 0 1 0 7.75"),
+                new("/historial", "Historial", "M12 20.5a8.5 8.5 0 1 0 0-17 8.5 8.5 0 0 0 0 17", "M12 7.6V12l3.4 2.1")
+            };
+        }
+    }
+
+    public void ToggleSidebar()
+    {
+        SidebarCollapsed = !SidebarCollapsed;
+        StateHasChanged();
+    }
+
+    private void ConfirmLogout()
+    {
+        showLogoutConfirm = false;
+        AppState.Logout();
+        ToastService.ShowSuccess("Sesión cerrada correctamente.", "Éxito");
+        NavManager.NavigateTo("/");
+    }
+}
+</file>
+
 <file path="Components/Pages/Compartidas/SolicitudTimeline.razor">
 @inject ElectroGestion.Services.SolicitudEventoService EventoService
 
@@ -37794,6 +37802,129 @@ public class SolicitudEventoService(IDbContextFactory<Contexto> factory, AppStat
 }
 </file>
 
+<file path="Components/Pages/Tecnico/Ordenes.razor">
+@inject ElectroGestion.Services.AppStateService AppState
+@inject ElectroGestion.Services.OrdenTrabajoService OrdenService
+@inject BlazorBootstrap.ToastService ToastService
+
+<PageTitle>Órdenes de Trabajo | ElectroGestion</PageTitle>
+
+<style>
+    .orden-filtros { display:flex; flex-direction:column; gap:18px; padding:18px; }
+    .orden-filtros-fila { display:flex; align-items:center; gap:18px; flex-wrap:wrap; }
+    .orden-filtro { display:flex; align-items:center; gap:9px; min-width:0; }
+    .orden-filtro label { font-family:'Manrope'; font-size:14px; font-weight:800; color:#14162B; white-space:nowrap; }
+    .orden-filtro input, .orden-filtro select { min-width:0; padding:9px 11px; border:1px solid #D5D8E6; border-radius:7px; background:#fff; color:#4A4E63; }
+</style>
+
+<div style="margin-bottom:24px"><div class="page-title" style="font-family:'Manrope';font-weight:800;font-size:31px;letter-spacing:-.6px">Órdenes de trabajo</div><p style="color:#6B7085;margin:5px 0 0">Tareas, materiales y herramientas para la ejecución en campo.</p></div>
+
+<div style="background:#fff;border:1px solid #E3E5EE;border-radius:12px;margin-bottom:18px">
+    <div class="orden-filtros">
+        <div class="orden-filtros-fila">
+            <div class="orden-filtro"><label for="orden-id-tec">ID:</label><input id="orden-id-tec" @bind="FiltroId" @bind:event="oninput" placeholder="ID" style="width:125px" /></div>
+            <div class="orden-filtro"><label for="orden-cliente-tec">Cliente:</label><input id="orden-cliente-tec" @bind="FiltroCliente" @bind:event="oninput" placeholder="Nombre del cliente" style="width:220px" /></div>
+            <div class="orden-filtro"><label for="orden-servicio-tec">Tipo de servicio:</label><select id="orden-servicio-tec" @bind="FiltroServicio" style="width:220px"><option value="">Todos</option>@foreach (var servicio in OrdenesRows.Select(o => o.TipoServicio).Where(s => !string.IsNullOrWhiteSpace(s)).Distinct().OrderBy(s => s)) { <option value="@servicio">@servicio</option> }</select></div>
+        </div>
+        <div class="orden-filtros-fila">
+            <div class="orden-filtro"><label for="orden-desde-tec">Desde:</label><input id="orden-desde-tec" type="date" @bind="FiltroDesde" /></div>
+            <div class="orden-filtro"><label for="orden-hasta-tec">Hasta:</label><input id="orden-hasta-tec" type="date" @bind="FiltroHasta" /></div>
+            <div class="orden-filtro"><label for="orden-estado-tec">Estado:</label><select id="orden-estado-tec" @bind="FiltroEstado" style="width:210px"><option value="">Todos</option><option>En proceso</option><option>Pendiente de cobro</option><option>Finalizada</option></select></div>
+            <div style="margin-left:auto"><button @onclick="() => StateHasChanged()" style="padding:9px 20px;border:0;border-radius:7px;background:#1D4ED8;color:#fff;font-weight:700;cursor:pointer">Buscar</button></div>
+        </div>
+    </div>
+</div>
+
+@if (Cargando)
+{ <p>Cargando órdenes...</p> }
+else if (!OrdenesFiltradas.Any())
+{ <div style="background:white;border:1px solid #E3E5EE;border-radius:12px;padding:28px;color:#6B7085">No hay órdenes con los filtros seleccionados.</div> }
+else
+{
+    <div style="display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px" class="resp-grid-2">
+    @foreach (var orden in OrdenesFiltradas)
+    {
+        <article style="background:#fff;border:1px solid #E3E5EE;border-radius:14px;padding:22px;display:flex;flex-direction:column">
+            <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:12px">
+                <div><div style="font-family:ui-monospace,monospace;font-size:12px;color:#8B90A3;font-weight:700">ORDEN @orden.Code</div><div style="font-family:'Manrope';font-weight:800;font-size:19px;margin-top:4px">@orden.Cliente</div><div style="color:#6B7085;font-size:14px;margin-top:2px">@orden.TipoServicio</div></div>
+                @{ var colors = ElectroGestion.Services.AppStateService.GetBadgeColors(orden.Estado); }
+                <span style="display:inline-block;padding:5px 11px;border-radius:20px;font-size:12px;font-weight:800;background:@colors.Bg;color:@colors.Fg;white-space:nowrap">@orden.Estado</span>
+            </div>
+            <div style="margin-top:18px;font-size:12px;color:#8B90A3;font-weight:800;text-transform:uppercase;letter-spacing:.06em">Tareas a realizar (Checklist Técnico)</div>
+            <div style="display:flex;flex-direction:column;gap:8px;margin-top:10px">
+                @for (var i = 0; i < orden.Trabajos.Count; i++)
+                { <div style="display:flex;gap:10px;align-items:flex-start;font-size:14px"><span style="flex:0 0 22px;height:22px;border-radius:6px;background:#EDEBFF;color:#1D4ED8;font-weight:800;font-size:12px;display:flex;align-items:center;justify-content:center">@(i + 1)</span><span style="color:#4A4E63">@orden.Trabajos[i]</span></div> }
+            </div>
+            <div style="margin-top:18px;font-size:12px;color:#8B90A3;font-weight:800;text-transform:uppercase;letter-spacing:.06em">Materiales de la cotización</div>
+            <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:10px">
+                @foreach (var material in orden.MaterialesCotizados) { <span style="padding:5px 11px;border:1px solid #E3E5EE;border-radius:20px;font-size:12.5px;background:#F7F8FC;color:#14162B">@material.Nombre × @material.Cantidad</span> }
+                @if (orden.MaterialesCotizados.Count == 0) { <span style="color:#8B90A3;font-size:13px">Sin materiales cotizados.</span> }
+            </div>
+            <div style="margin-top:18px;font-size:12px;color:#8B90A3;font-weight:800;text-transform:uppercase;letter-spacing:.06em">Herramientas asignadas</div>
+            <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:10px">
+                @foreach (var herramienta in orden.Herramientas) { <span style="padding:5px 11px;border:1px solid #E3E5EE;border-radius:20px;font-size:12.5px;background:#F7F8FC;color:#14162B">@herramienta</span> }
+                @if (orden.Herramientas.Count == 0) { <span style="color:#8B90A3;font-size:13px">Sin herramientas asignadas.</span> }
+            </div>
+            @if (!string.IsNullOrWhiteSpace(orden.Observaciones)) { <div style="margin-top:18px;font-size:12px;color:#8B90A3;font-weight:800;text-transform:uppercase;letter-spacing:.06em">Instrucciones de campo</div><div style="font-size:14px;margin-top:7px;color:#4A4E63;line-height:1.55;background:#FAFAFC;padding:10px 14px;border-radius:8px;border:1px solid #EFF0F6">@orden.Observaciones</div> }
+            <div style="margin-top:auto;padding-top:20px">
+                @if (orden.Estado == "Pendiente de cobro") { <div style="text-align:center;color:#047857;font-weight:700;font-size:13.5px;padding:8px">✓ Trabajo terminado · Pendiente de cobro</div> }
+                else if (orden.Estado == "Finalizada") { <div style="text-align:center;color:#10B981;font-weight:700;font-size:13.5px;padding:8px">✓ Orden finalizada</div> }
+                else { <button @onclick="() => SolicitarFinalizacion(orden.Id)" style="width:100%;padding:12px;border:0;border-radius:9px;background:#1D4ED8;color:#fff;font-weight:700;font-size:14px;cursor:pointer;font-family:'Manrope'">✓ Marcar lista para cobro</button> }
+            </div>
+        </article>
+    }
+    </div>
+}
+
+@if (OrdenPendienteFinalizar.HasValue)
+{
+    <div style="position:fixed;inset:0;background:rgba(14,16,40,.5);display:flex;align-items:center;justify-content:center;z-index:10000;padding:20px" @onclick="CancelarFinalizacion">
+        <div style="background:#fff;border-radius:16px;width:100%;max-width:400px;padding:32px;box-shadow:0 20px 40px rgba(0,0,0,.2)" @onclick:stopPropagation>
+            <div style="font-family:'Manrope';font-weight:800;font-size:22px;color:#14162B;margin-bottom:10px">Marcar orden como finalizada</div>
+            <div style="color:#4A4E63;font-size:14px;margin-bottom:24px">¿Confirma que terminó el trabajo de esta orden?</div>
+            <div style="display:flex;justify-content:flex-end;gap:12px"><button @onclick="CancelarFinalizacion" style="padding:10px 20px;border:1px solid #D5D8E6;background:#fff;border-radius:8px;font-weight:700;cursor:pointer;color:#4A4E63">Cancelar</button><button @onclick="ConfirmarFinalizacion" style="padding:10px 24px;border:0;background:#1D4ED8;color:#fff;border-radius:8px;font-weight:700;cursor:pointer">Confirmar</button></div>
+        </div>
+    </div>
+}
+
+@code {
+    private List<ElectroGestion.Models.OrdenTrabajo> OrdenesRows = [];
+    private bool Cargando;
+    private int? OrdenPendienteFinalizar;
+    private string FiltroId = "", FiltroCliente = "", FiltroServicio = "", FiltroEstado = "";
+    private DateTime? FiltroDesde, FiltroHasta;
+    private IEnumerable<ElectroGestion.Models.OrdenTrabajo> OrdenesFiltradas => OrdenesRows.Where(o =>
+        (string.IsNullOrWhiteSpace(FiltroId) || o.Id.ToString().Contains(FiltroId) || o.Code.Contains(FiltroId, StringComparison.OrdinalIgnoreCase)) &&
+        (string.IsNullOrWhiteSpace(FiltroCliente) || o.Cliente.Contains(FiltroCliente, StringComparison.OrdinalIgnoreCase)) &&
+        (string.IsNullOrWhiteSpace(FiltroServicio) || o.TipoServicio == FiltroServicio) &&
+        (!FiltroDesde.HasValue || o.FechaCreacion.Date >= FiltroDesde.Value.Date) &&
+        (!FiltroHasta.HasValue || o.FechaCreacion.Date <= FiltroHasta.Value.Date) &&
+        (string.IsNullOrWhiteSpace(FiltroEstado) || o.Estado == FiltroEstado));
+
+    protected override async Task OnInitializedAsync() => await Recargar();
+
+    private async Task Recargar()
+    {
+        Cargando = true;
+        try { OrdenesRows = await OrdenService.ObtenerTodasAsync(); }
+        catch { ToastService.Notify(new ToastMessage(ToastType.Danger, "No se pudieron cargar las órdenes.")); }
+        finally { Cargando = false; }
+    }
+
+    private void SolicitarFinalizacion(int id) => OrdenPendienteFinalizar = id;
+    private void CancelarFinalizacion() => OrdenPendienteFinalizar = null;
+
+    private async Task ConfirmarFinalizacion()
+    {
+        if (!OrdenPendienteFinalizar.HasValue) return;
+        var id = OrdenPendienteFinalizar.Value;
+        OrdenPendienteFinalizar = null;
+        if (await OrdenService.CambiarEstadoAsync(id, "Pendiente de cobro")) { ToastService.Notify(new ToastMessage(ToastType.Success, "Orden lista para cobro.")); await Recargar(); }
+        else ToastService.Notify(new ToastMessage(ToastType.Warning, "No se pudo finalizar la orden."));
+    }
+}
+</file>
+
 <file path="Services/SolicitudService.cs">
 using Microsoft.EntityFrameworkCore;
 using ElectroGestion.Context;
@@ -39192,129 +39323,6 @@ app.Run();
         
         IsFormModalOpen = false;
         await CargarDatos();
-    }
-}
-</file>
-
-<file path="Components/Pages/Tecnico/Ordenes.razor">
-@inject ElectroGestion.Services.AppStateService AppState
-@inject ElectroGestion.Services.OrdenTrabajoService OrdenService
-@inject BlazorBootstrap.ToastService ToastService
-
-<PageTitle>Órdenes de Trabajo | ElectroGestion</PageTitle>
-
-<style>
-    .orden-filtros { display:flex; flex-direction:column; gap:18px; padding:18px; }
-    .orden-filtros-fila { display:flex; align-items:center; gap:18px; flex-wrap:wrap; }
-    .orden-filtro { display:flex; align-items:center; gap:9px; min-width:0; }
-    .orden-filtro label { font-family:'Manrope'; font-size:14px; font-weight:800; color:#14162B; white-space:nowrap; }
-    .orden-filtro input, .orden-filtro select { min-width:0; padding:9px 11px; border:1px solid #D5D8E6; border-radius:7px; background:#fff; color:#4A4E63; }
-</style>
-
-<div style="margin-bottom:24px"><div class="page-title" style="font-family:'Manrope';font-weight:800;font-size:31px;letter-spacing:-.6px">Órdenes de trabajo</div><p style="color:#6B7085;margin:5px 0 0">Tareas, materiales y herramientas para la ejecución en campo.</p></div>
-
-<div style="background:#fff;border:1px solid #E3E5EE;border-radius:12px;margin-bottom:18px">
-    <div class="orden-filtros">
-        <div class="orden-filtros-fila">
-            <div class="orden-filtro"><label for="orden-id-tec">ID:</label><input id="orden-id-tec" @bind="FiltroId" @bind:event="oninput" placeholder="ID" style="width:125px" /></div>
-            <div class="orden-filtro"><label for="orden-cliente-tec">Cliente:</label><input id="orden-cliente-tec" @bind="FiltroCliente" @bind:event="oninput" placeholder="Nombre del cliente" style="width:220px" /></div>
-            <div class="orden-filtro"><label for="orden-servicio-tec">Tipo de servicio:</label><select id="orden-servicio-tec" @bind="FiltroServicio" style="width:220px"><option value="">Todos</option>@foreach (var servicio in OrdenesRows.Select(o => o.TipoServicio).Where(s => !string.IsNullOrWhiteSpace(s)).Distinct().OrderBy(s => s)) { <option value="@servicio">@servicio</option> }</select></div>
-        </div>
-        <div class="orden-filtros-fila">
-            <div class="orden-filtro"><label for="orden-desde-tec">Desde:</label><input id="orden-desde-tec" type="date" @bind="FiltroDesde" /></div>
-            <div class="orden-filtro"><label for="orden-hasta-tec">Hasta:</label><input id="orden-hasta-tec" type="date" @bind="FiltroHasta" /></div>
-            <div class="orden-filtro"><label for="orden-estado-tec">Estado:</label><select id="orden-estado-tec" @bind="FiltroEstado" style="width:210px"><option value="">Todos</option><option>En proceso</option><option>Pendiente de cobro</option><option>Finalizada</option></select></div>
-            <div style="margin-left:auto"><button @onclick="() => StateHasChanged()" style="padding:9px 20px;border:0;border-radius:7px;background:#1D4ED8;color:#fff;font-weight:700;cursor:pointer">Buscar</button></div>
-        </div>
-    </div>
-</div>
-
-@if (Cargando)
-{ <p>Cargando órdenes...</p> }
-else if (!OrdenesFiltradas.Any())
-{ <div style="background:white;border:1px solid #E3E5EE;border-radius:12px;padding:28px;color:#6B7085">No hay órdenes con los filtros seleccionados.</div> }
-else
-{
-    <div style="display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px" class="resp-grid-2">
-    @foreach (var orden in OrdenesFiltradas)
-    {
-        <article style="background:#fff;border:1px solid #E3E5EE;border-radius:14px;padding:22px;display:flex;flex-direction:column">
-            <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:12px">
-                <div><div style="font-family:ui-monospace,monospace;font-size:12px;color:#8B90A3;font-weight:700">ORDEN @orden.Code</div><div style="font-family:'Manrope';font-weight:800;font-size:19px;margin-top:4px">@orden.Cliente</div><div style="color:#6B7085;font-size:14px;margin-top:2px">@orden.TipoServicio</div></div>
-                @{ var colors = ElectroGestion.Services.AppStateService.GetBadgeColors(orden.Estado); }
-                <span style="display:inline-block;padding:5px 11px;border-radius:20px;font-size:12px;font-weight:800;background:@colors.Bg;color:@colors.Fg;white-space:nowrap">@orden.Estado</span>
-            </div>
-            <div style="margin-top:18px;font-size:12px;color:#8B90A3;font-weight:800;text-transform:uppercase;letter-spacing:.06em">Tareas a realizar (Checklist Técnico)</div>
-            <div style="display:flex;flex-direction:column;gap:8px;margin-top:10px">
-                @for (var i = 0; i < orden.Trabajos.Count; i++)
-                { <div style="display:flex;gap:10px;align-items:flex-start;font-size:14px"><span style="flex:0 0 22px;height:22px;border-radius:6px;background:#EDEBFF;color:#1D4ED8;font-weight:800;font-size:12px;display:flex;align-items:center;justify-content:center">@(i + 1)</span><span style="color:#4A4E63">@orden.Trabajos[i]</span></div> }
-            </div>
-            <div style="margin-top:18px;font-size:12px;color:#8B90A3;font-weight:800;text-transform:uppercase;letter-spacing:.06em">Materiales de la cotización</div>
-            <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:10px">
-                @foreach (var material in orden.MaterialesCotizados) { <span style="padding:5px 11px;border:1px solid #E3E5EE;border-radius:20px;font-size:12.5px;background:#F7F8FC;color:#14162B">@material.Nombre × @material.Cantidad</span> }
-                @if (orden.MaterialesCotizados.Count == 0) { <span style="color:#8B90A3;font-size:13px">Sin materiales cotizados.</span> }
-            </div>
-            <div style="margin-top:18px;font-size:12px;color:#8B90A3;font-weight:800;text-transform:uppercase;letter-spacing:.06em">Herramientas asignadas</div>
-            <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:10px">
-                @foreach (var herramienta in orden.Herramientas) { <span style="padding:5px 11px;border:1px solid #E3E5EE;border-radius:20px;font-size:12.5px;background:#F7F8FC;color:#14162B">@herramienta</span> }
-                @if (orden.Herramientas.Count == 0) { <span style="color:#8B90A3;font-size:13px">Sin herramientas asignadas.</span> }
-            </div>
-            @if (!string.IsNullOrWhiteSpace(orden.Observaciones)) { <div style="margin-top:18px;font-size:12px;color:#8B90A3;font-weight:800;text-transform:uppercase;letter-spacing:.06em">Instrucciones de campo</div><div style="font-size:14px;margin-top:7px;color:#4A4E63;line-height:1.55;background:#FAFAFC;padding:10px 14px;border-radius:8px;border:1px solid #EFF0F6">@orden.Observaciones</div> }
-            <div style="margin-top:auto;padding-top:20px">
-                @if (orden.Estado == "Pendiente de cobro") { <div style="text-align:center;color:#047857;font-weight:700;font-size:13.5px;padding:8px">✓ Trabajo terminado · Pendiente de cobro</div> }
-                else if (orden.Estado == "Finalizada") { <div style="text-align:center;color:#10B981;font-weight:700;font-size:13.5px;padding:8px">✓ Orden finalizada</div> }
-                else { <button @onclick="() => SolicitarFinalizacion(orden.Id)" style="width:100%;padding:12px;border:0;border-radius:9px;background:#1D4ED8;color:#fff;font-weight:700;font-size:14px;cursor:pointer;font-family:'Manrope'">✓ Marcar lista para cobro</button> }
-            </div>
-        </article>
-    }
-    </div>
-}
-
-@if (OrdenPendienteFinalizar.HasValue)
-{
-    <div style="position:fixed;inset:0;background:rgba(14,16,40,.5);display:flex;align-items:center;justify-content:center;z-index:10000;padding:20px" @onclick="CancelarFinalizacion">
-        <div style="background:#fff;border-radius:16px;width:100%;max-width:400px;padding:32px;box-shadow:0 20px 40px rgba(0,0,0,.2)" @onclick:stopPropagation>
-            <div style="font-family:'Manrope';font-weight:800;font-size:22px;color:#14162B;margin-bottom:10px">Marcar orden como finalizada</div>
-            <div style="color:#4A4E63;font-size:14px;margin-bottom:24px">¿Confirma que terminó el trabajo de esta orden?</div>
-            <div style="display:flex;justify-content:flex-end;gap:12px"><button @onclick="CancelarFinalizacion" style="padding:10px 20px;border:1px solid #D5D8E6;background:#fff;border-radius:8px;font-weight:700;cursor:pointer;color:#4A4E63">Cancelar</button><button @onclick="ConfirmarFinalizacion" style="padding:10px 24px;border:0;background:#1D4ED8;color:#fff;border-radius:8px;font-weight:700;cursor:pointer">Confirmar</button></div>
-        </div>
-    </div>
-}
-
-@code {
-    private List<ElectroGestion.Models.OrdenTrabajo> OrdenesRows = [];
-    private bool Cargando;
-    private int? OrdenPendienteFinalizar;
-    private string FiltroId = "", FiltroCliente = "", FiltroServicio = "", FiltroEstado = "";
-    private DateTime? FiltroDesde, FiltroHasta;
-    private IEnumerable<ElectroGestion.Models.OrdenTrabajo> OrdenesFiltradas => OrdenesRows.Where(o =>
-        (string.IsNullOrWhiteSpace(FiltroId) || o.Id.ToString().Contains(FiltroId) || o.Code.Contains(FiltroId, StringComparison.OrdinalIgnoreCase)) &&
-        (string.IsNullOrWhiteSpace(FiltroCliente) || o.Cliente.Contains(FiltroCliente, StringComparison.OrdinalIgnoreCase)) &&
-        (string.IsNullOrWhiteSpace(FiltroServicio) || o.TipoServicio == FiltroServicio) &&
-        (!FiltroDesde.HasValue || o.FechaCreacion.Date >= FiltroDesde.Value.Date) &&
-        (!FiltroHasta.HasValue || o.FechaCreacion.Date <= FiltroHasta.Value.Date) &&
-        (string.IsNullOrWhiteSpace(FiltroEstado) || o.Estado == FiltroEstado));
-
-    protected override async Task OnInitializedAsync() => await Recargar();
-
-    private async Task Recargar()
-    {
-        Cargando = true;
-        try { OrdenesRows = await OrdenService.ObtenerTodasAsync(); }
-        catch { ToastService.Notify(new ToastMessage(ToastType.Danger, "No se pudieron cargar las órdenes.")); }
-        finally { Cargando = false; }
-    }
-
-    private void SolicitarFinalizacion(int id) => OrdenPendienteFinalizar = id;
-    private void CancelarFinalizacion() => OrdenPendienteFinalizar = null;
-
-    private async Task ConfirmarFinalizacion()
-    {
-        if (!OrdenPendienteFinalizar.HasValue) return;
-        var id = OrdenPendienteFinalizar.Value;
-        OrdenPendienteFinalizar = null;
-        if (await OrdenService.CambiarEstadoAsync(id, "Pendiente de cobro")) { ToastService.Notify(new ToastMessage(ToastType.Success, "Orden lista para cobro.")); await Recargar(); }
-        else ToastService.Notify(new ToastMessage(ToastType.Warning, "No se pudo finalizar la orden."));
     }
 }
 </file>
@@ -41337,6 +41345,221 @@ public class LevantamientoService(IDbContextFactory<Contexto> contextFactory)
 }
 </file>
 
+<file path="Components/Pages/Gerente/Ordenes.razor">
+@inject ElectroGestion.Services.AppStateService AppState
+@inject ElectroGestion.Services.OrdenTrabajoService OrdenService
+@inject BlazorBootstrap.ToastService ToastService
+
+<PageTitle>Órdenes de Trabajo | ElectroGestion</PageTitle>
+
+<style>
+    .orden-filtros { display:flex; flex-direction:column; gap:18px; padding:18px; }
+    .orden-filtros-fila { display:flex; align-items:center; gap:18px; flex-wrap:wrap; }
+    .orden-filtro { display:flex; align-items:center; gap:9px; min-width:0; }
+    .orden-filtro label { font-family:'Manrope'; font-size:14px; font-weight:800; color:#14162B; white-space:nowrap; }
+    .orden-filtro input, .orden-filtro select { min-width:0; padding:9px 11px; border:1px solid #D5D8E6; border-radius:7px; background:#fff; color:#4A4E63; }
+</style>
+
+<div style="display:flex;justify-content:space-between;align-items:center;gap:16px;margin-bottom:24px;flex-wrap:wrap">
+    <div><div class="page-title" style="font-family:'Manrope';font-weight:800;font-size:31px;letter-spacing:-.6px">Órdenes de trabajo</div><p style="color:#6B7085;margin:5px 0 0">Materiales de la cotización y herramientas para el trabajo en campo.</p></div>
+    <button @onclick="AbrirNueva" style="padding:11px 18px;background:#1D4ED8;color:white;border:0;border-radius:9px;font-weight:700;cursor:pointer">+ Nueva orden</button>
+</div>
+
+<div style="background:#fff;border:1px solid #E3E5EE;border-radius:12px;margin-bottom:18px">
+    <div class="orden-filtros">
+        <div class="orden-filtros-fila">
+            <div class="orden-filtro"><label for="orden-id">ID:</label><input id="orden-id" @bind="FiltroId" @bind:event="oninput" placeholder="ID" style="width:125px" /></div>
+            <div class="orden-filtro"><label for="orden-cliente">Cliente:</label><input id="orden-cliente" @bind="FiltroCliente" @bind:event="oninput" placeholder="Nombre del cliente" style="width:220px" /></div>
+            <div class="orden-filtro"><label for="orden-servicio">Tipo de servicio:</label><select id="orden-servicio" @bind="FiltroServicio" style="width:220px"><option value="">Todos</option>@foreach (var servicio in OrdenesRows.Select(o => o.TipoServicio).Where(s => !string.IsNullOrWhiteSpace(s)).Distinct().OrderBy(s => s)) { <option value="@servicio">@servicio</option> }</select></div>
+        </div>
+        <div class="orden-filtros-fila">
+            <div class="orden-filtro"><label for="orden-desde">Desde:</label><input id="orden-desde" type="date" @bind="FiltroDesde" /></div>
+            <div class="orden-filtro"><label for="orden-hasta">Hasta:</label><input id="orden-hasta" type="date" @bind="FiltroHasta" /></div>
+            <div class="orden-filtro"><label for="orden-estado">Estado:</label><select id="orden-estado" @bind="FiltroEstado" style="width:210px"><option value="">Todos</option><option>En proceso</option><option>Pendiente de cobro</option><option>Finalizada</option></select></div>
+            <div style="margin-left:auto"><button @onclick="() => StateHasChanged()" style="padding:9px 20px;border:0;border-radius:7px;background:#1D4ED8;color:#fff;font-weight:700;cursor:pointer">Buscar</button></div>
+        </div>
+    </div>
+</div>
+
+@if (Cargando)
+{ <p>Cargando órdenes...</p> }
+else if (!OrdenesFiltradas.Any())
+{ <div style="background:white;border:1px solid #E3E5EE;border-radius:12px;padding:28px;color:#6B7085">No hay órdenes con los filtros seleccionados.</div> }
+else
+{
+    <div style="display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px" class="resp-grid-2">
+    @foreach (var orden in OrdenesFiltradas)
+    {
+        <article style="background:#fff;border:1px solid #E3E5EE;border-radius:14px;padding:22px;display:flex;flex-direction:column">
+            <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:12px">
+                <div><div style="font-family:ui-monospace,monospace;font-size:12px;color:#8B90A3;font-weight:700">ORDEN @orden.Code</div><div style="font-family:'Manrope';font-weight:800;font-size:19px;margin-top:4px">@orden.Cliente</div><div style="color:#6B7085;font-size:14px;margin-top:2px">@orden.TipoServicio</div></div>
+                @{ var colors = ElectroGestion.Services.AppStateService.GetBadgeColors(orden.Estado); }
+                <span style="display:inline-block;padding:5px 11px;border-radius:20px;font-size:12px;font-weight:800;background:@colors.Bg;color:@colors.Fg;white-space:nowrap">@orden.Estado</span>
+            </div>
+            <button @onclick="() => VerCotizacion(orden.Id)" style="align-self:flex-start;margin-top:12px;padding:0;border:0;background:none;color:#1D4ED8;font-weight:700;cursor:pointer">Ver cotización COT-@orden.CotizacionId.ToString("D5")</button>
+            <div style="margin-top:18px;font-size:12px;color:#8B90A3;font-weight:800;text-transform:uppercase;letter-spacing:.06em">Tareas a realizar (Checklist Técnico)</div>
+            <div style="display:flex;flex-direction:column;gap:8px;margin-top:10px">
+                @for (var i = 0; i < orden.Trabajos.Count; i++)
+                { <div style="display:flex;gap:10px;align-items:flex-start;font-size:14px"><span style="flex:0 0 22px;height:22px;border-radius:6px;background:#EDEBFF;color:#1D4ED8;font-weight:800;font-size:12px;display:flex;align-items:center;justify-content:center">@(i + 1)</span><span style="color:#4A4E63">@orden.Trabajos[i]</span></div> }
+            </div>
+            <div style="margin-top:18px;font-size:12px;color:#8B90A3;font-weight:800;text-transform:uppercase;letter-spacing:.06em">Materiales de la cotización</div>
+            <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:10px">
+                @foreach (var material in orden.MaterialesCotizados) { <span style="padding:5px 11px;border:1px solid #E3E5EE;border-radius:20px;font-size:12.5px;background:#F7F8FC;color:#14162B">@material.Nombre × @material.Cantidad</span> }
+                @if (orden.MaterialesCotizados.Count == 0) { <span style="color:#8B90A3;font-size:13px">Sin materiales cotizados.</span> }
+            </div>
+            <div style="margin-top:18px;font-size:12px;color:#8B90A3;font-weight:800;text-transform:uppercase;letter-spacing:.06em">Herramientas asignadas</div>
+            <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:10px">
+                @foreach (var herramienta in orden.Herramientas) { <span style="padding:5px 11px;border:1px solid #E3E5EE;border-radius:20px;font-size:12.5px;background:#F7F8FC;color:#14162B">@herramienta</span> }
+                @if (orden.Herramientas.Count == 0) { <span style="color:#8B90A3;font-size:13px">Sin herramientas asignadas.</span> }
+            </div>
+            @if (!string.IsNullOrWhiteSpace(orden.Observaciones)) { <div style="margin-top:18px;font-size:12px;color:#8B90A3;font-weight:800;text-transform:uppercase;letter-spacing:.06em">Instrucciones de campo</div><div style="font-size:14px;margin-top:7px;color:#4A4E63;line-height:1.55;background:#FAFAFC;padding:10px 14px;border-radius:8px;border:1px solid #EFF0F6">@orden.Observaciones</div> }
+            <div style="margin-top:auto;padding-top:20px;display:flex;gap:10px">
+                <button @onclick="() => Editar(orden)" style="flex:1;min-width:0;padding:12px;border:1px solid #E3E5EE;background:#fff;color:#4A4E63;border-radius:9px;font-weight:700;font-size:14px;cursor:pointer;font-family:'Manrope'">Editar</button>
+                <button @onclick="() => OrdenAEliminar = orden.Id" style="flex:1;min-width:0;padding:12px;border:1px solid #F5C2C4;background:#fff;color:#C4141B;border-radius:9px;font-weight:700;font-size:14px;cursor:pointer;font-family:'Manrope'">Eliminar</button>
+                @if (orden.Estado != "Finalizada") { <button @onclick="() => SolicitarCambioEstado(orden)" style="flex:1;min-width:0;padding:12px;border:1px solid #1D4ED8;background:#1D4ED8;color:#fff;border-radius:9px;font-weight:700;font-size:14px;cursor:pointer;font-family:'Manrope'">@(orden.Estado == "Pendiente de cobro" ? "Reabrir orden" : "Marcar lista para cobro")</button> }
+            </div>
+        </article>
+    }
+    </div>
+}
+
+@if (ModalAbierto)
+{
+    <div style="position:fixed;inset:0;background:rgba(20,22,43,.48);z-index:9999;display:flex;align-items:center;justify-content:center;padding:20px" @onclick="CerrarModal">
+        <div style="background:white;width:100%;max-width:650px;max-height:90vh;overflow:auto;border-radius:14px;padding:24px" @onclick:stopPropagation>
+            <h2 style="font-size:21px;margin:0 0 18px">@(EditandoId.HasValue ? "Editar orden" : "Nueva orden de trabajo")</h2>
+            @if (!EditandoId.HasValue)
+            {
+                <label for="orden-cotizacion" style="font-weight:700">Cotización aprobada</label>
+                <select id="orden-cotizacion" @bind="FormCotizacionId" style="display:block;width:100%;padding:10px;border:1px solid #D5D8E6;border-radius:7px;margin:6px 0 16px"><option value="0">Seleccione una cotización</option>@foreach (var cot in CotizacionesDisponibles) { <option value="@cot.Id">COT-@cot.Id.ToString("D5") · @cot.Cliente</option> }</select>
+                @if (CotizacionSeleccionada is not null)
+                {
+                    <div style="background:#F7F8FC;padding:14px;border-radius:8px;margin-bottom:16px"><strong>Materiales de la cotización</strong><div style="font-size:13px;color:#6B7085">Se incorporarán con las cantidades aprobadas.</div>@foreach (var d in CotizacionSeleccionada.Detalles) { <div style="margin-top:6px">@d.CodigoArticulo · @d.NombreArticulo <strong>× @d.Cantidad</strong></div> }@if (!CotizacionSeleccionada.Detalles.Any()) { <div>La cotización incluye solo mano de obra.</div> }</div>
+                }
+            }
+            
+            <label for="orden-tareas" style="font-weight:700">Tareas (una por línea)</label><textarea id="orden-tareas" @bind="FormTrabajos" rows="4" style="display:block;width:100%;padding:10px;border:1px solid #D5D8E6;border-radius:7px;margin:6px 0 16px"></textarea>
+            <label for="orden-herramientas" style="font-weight:700">Herramientas asignadas (una por línea)</label><textarea id="orden-herramientas" @bind="FormHerramientas" rows="3" style="display:block;width:100%;padding:10px;border:1px solid #D5D8E6;border-radius:7px;margin:6px 0 16px" placeholder="Multímetro&#10;Escalera"></textarea>
+            <label for="orden-instrucciones" style="font-weight:700">Instrucciones de campo</label><textarea id="orden-instrucciones" @bind="FormObservaciones" rows="3" maxlength="2000" style="display:block;width:100%;padding:10px;border:1px solid #D5D8E6;border-radius:7px;margin:6px 0 16px"></textarea>
+            <div style="display:flex;justify-content:flex-end;gap:9px"><button @onclick="CerrarModal" style="padding:9px 14px;background:white;border:1px solid #D5D8E6;border-radius:7px;cursor:pointer">Cancelar</button><button @onclick="Guardar" style="padding:9px 16px;background:#1D4ED8;color:white;border:0;border-radius:7px;cursor:pointer">Guardar</button></div>
+        </div>
+    </div>
+}
+
+@if (OrdenAEliminar.HasValue)
+{
+    <div style="position:fixed;inset:0;background:rgba(14,16,40,.5);display:flex;align-items:center;justify-content:center;z-index:10000;padding:20px" @onclick="CerrarEliminar">
+        <div style="background:#fff;border-radius:16px;width:100%;max-width:400px;padding:32px;box-shadow:0 20px 40px rgba(0,0,0,.2)" @onclick:stopPropagation>
+            <div style="font-family:'Manrope';font-weight:800;font-size:22px;color:#14162B;margin-bottom:10px">Eliminar orden de trabajo</div>
+            <div style="color:#4A4E63;font-size:14px;margin-bottom:24px">¿Está seguro que desea eliminar esta orden? Esta acción no se puede deshacer.</div>
+            <div style="display:flex;justify-content:flex-end;gap:12px"><button @onclick="CerrarEliminar" style="padding:10px 20px;border:1px solid #D5D8E6;background:#fff;border-radius:8px;font-weight:700;font-size:14px;cursor:pointer;color:#4A4E63">Cancelar</button><button @onclick="Eliminar" style="padding:10px 24px;border:0;background:#C0392B;color:#fff;border-radius:8px;font-weight:700;font-size:14px;cursor:pointer;font-family:'Manrope'">Eliminar</button></div>
+        </div>
+    </div>
+}
+
+@if (OrdenEstadoPendienteId.HasValue)
+{
+    <div style="position:fixed;inset:0;background:rgba(14,16,40,.5);display:flex;align-items:center;justify-content:center;z-index:10001;padding:20px" @onclick="CerrarConfirmacionEstado">
+        <div style="background:#fff;border-radius:16px;width:100%;max-width:400px;padding:32px;box-shadow:0 20px 40px rgba(0,0,0,.2)" @onclick:stopPropagation>
+            <div style="font-family:'Manrope';font-weight:800;font-size:22px;color:#14162B;margin-bottom:10px">Confirmar cambio de estado</div>
+            <div style="color:#4A4E63;font-size:14px;margin-bottom:24px">¿Desea cambiar la orden a <strong>@EstadoOrdenPendiente</strong>?</div>
+            <div style="display:flex;justify-content:flex-end;gap:12px"><button @onclick="CerrarConfirmacionEstado" style="padding:10px 20px;border:1px solid #D5D8E6;background:#fff;border-radius:8px;font-weight:700;cursor:pointer;color:#4A4E63">Cancelar</button><button @onclick="ConfirmarCambioEstado" style="padding:10px 24px;border:0;background:#1D4ED8;color:#fff;border-radius:8px;font-weight:700;cursor:pointer">Confirmar</button></div>
+        </div>
+    </div>
+}
+
+@if (AppState.EsGerente && CotizacionDetalle is not null)
+{ <CotizacionDocumento Cotizacion="CotizacionDetalle" OnClose="CerrarCotizacion" /> }
+
+@code {
+    private List<ElectroGestion.Models.OrdenTrabajo> OrdenesRows = [];
+    private List<ElectroGestion.Models.Cotizacion> CotizacionesDisponibles = [];
+    private bool Cargando;
+    private string FiltroId = "", FiltroCliente = "", FiltroServicio = "", FiltroEstado = "";
+    private DateTime? FiltroDesde, FiltroHasta;
+    private ElectroGestion.Models.Cotizacion? CotizacionDetalle;
+    private bool ModalAbierto;
+    private int? EditandoId, OrdenAEliminar;
+    private int? OrdenEstadoPendienteId;
+    private string EstadoOrdenPendiente = "";
+    private int FormCotizacionId;
+    private string FormTrabajos = "", FormHerramientas = "", FormObservaciones = "";
+    private ElectroGestion.Models.Cotizacion? CotizacionSeleccionada => CotizacionesDisponibles.FirstOrDefault(c => c.Id == FormCotizacionId);
+    private IEnumerable<ElectroGestion.Models.OrdenTrabajo> OrdenesFiltradas => OrdenesRows.Where(o =>
+        (string.IsNullOrWhiteSpace(FiltroId) || o.Id.ToString().Contains(FiltroId) || o.Code.Contains(FiltroId, StringComparison.OrdinalIgnoreCase)) &&
+        (string.IsNullOrWhiteSpace(FiltroCliente) || o.Cliente.Contains(FiltroCliente, StringComparison.OrdinalIgnoreCase)) &&
+        (string.IsNullOrWhiteSpace(FiltroServicio) || o.TipoServicio == FiltroServicio) &&
+        (!FiltroDesde.HasValue || o.FechaCreacion.Date >= FiltroDesde.Value.Date) &&
+        (!FiltroHasta.HasValue || o.FechaCreacion.Date <= FiltroHasta.Value.Date) &&
+        (string.IsNullOrWhiteSpace(FiltroEstado) || o.Estado == FiltroEstado));
+
+    protected override async Task OnInitializedAsync() => await Recargar();
+
+    private async Task Recargar()
+    {
+        Cargando = true;
+        try { OrdenesRows = await OrdenService.ObtenerTodasAsync(); CotizacionesDisponibles = await OrdenService.ObtenerCotizacionesDisponiblesAsync(); }
+        catch { ToastService.Notify(new ToastMessage(ToastType.Danger, "No se pudieron cargar las órdenes.")); }
+        finally { Cargando = false; }
+    }
+
+    private void AbrirNueva() { EditandoId = null; FormCotizacionId = 0; FormTrabajos = FormHerramientas = FormObservaciones = ""; ModalAbierto = true; }
+    private async Task Editar(ElectroGestion.Models.OrdenTrabajo orden) { if (!await OrdenService.PuedeModificarAsync(orden.Id)) { ToastService.Notify(new ToastMessage(ToastType.Warning, "La orden no se puede modificar porque ya tiene un cobro o su solicitud fue finalizada.")); return; } EditandoId = orden.Id; FormCotizacionId = orden.CotizacionId; FormTrabajos = string.Join("\n", orden.Trabajos); FormHerramientas = string.Join("\n", orden.Herramientas); FormObservaciones = orden.Observaciones; ModalAbierto = true; }
+    private void CerrarModal() => ModalAbierto = false;
+    private static List<string> Lineas(string texto) => texto.Split(['\r', '\n'], StringSplitOptions.RemoveEmptyEntries).Select(x => x.Trim()).Where(x => x.Length > 0).ToList();
+
+    private async Task Guardar()
+    {
+        if (!EditandoId.HasValue && FormCotizacionId <= 0) { ToastService.Notify(new ToastMessage(ToastType.Warning, "Seleccione una cotización aprobada.")); return; }
+        var guardado = EditandoId.HasValue
+            ? await OrdenService.ActualizarAsync(EditandoId.Value, Lineas(FormTrabajos), Lineas(FormHerramientas), FormObservaciones)
+            : await OrdenService.CrearAsync(FormCotizacionId, Lineas(FormTrabajos), Lineas(FormHerramientas), FormObservaciones);
+        if (!guardado) { ToastService.Notify(new ToastMessage(ToastType.Warning, "No se pudo guardar. Verifique la cotización y que no tenga otra orden.")); return; }
+        CerrarModal(); ToastService.Notify(new ToastMessage(ToastType.Success, "Orden guardada.")); await Recargar();
+    }
+
+    private async Task SolicitarCambioEstado(ElectroGestion.Models.OrdenTrabajo orden)
+    {
+        if (orden.Estado == "Pendiente de cobro" && await OrdenService.TieneCobroAsync(orden.Id))
+        {
+            ToastService.Notify(new ToastMessage(ToastType.Warning, "No se puede reabrir la orden porque ya hay un cobro creado. Revise el detalle del cobro para reabrirlo."));
+            return;
+        }
+        OrdenEstadoPendienteId = orden.Id;
+        EstadoOrdenPendiente = orden.Estado == "Pendiente de cobro" ? "En proceso" : "Pendiente de cobro";
+    }
+
+    private void CerrarConfirmacionEstado() { OrdenEstadoPendienteId = null; EstadoOrdenPendiente = ""; }
+    private async Task ConfirmarCambioEstado()
+    {
+        if (!OrdenEstadoPendienteId.HasValue) return;
+        var id = OrdenEstadoPendienteId.Value;
+        var estado = EstadoOrdenPendiente;
+        CerrarConfirmacionEstado();
+        if (await OrdenService.CambiarEstadoAsync(id, estado)) { await Recargar(); ToastService.Notify(new ToastMessage(ToastType.Success, "Estado de la orden actualizado.")); }
+        else ToastService.Notify(new ToastMessage(ToastType.Warning, "No se puede cambiar el estado porque la solicitud ya finalizó o la orden tiene un cobro creado."));
+    }
+
+    private async Task Eliminar()
+    {
+        if (!OrdenAEliminar.HasValue) return;
+        var id = OrdenAEliminar.Value; OrdenAEliminar = null;
+        if (await OrdenService.EliminarAsync(id)) { await Recargar(); ToastService.Notify(new ToastMessage(ToastType.Success, "Orden eliminada.")); }
+        else ToastService.Notify(new ToastMessage(ToastType.Warning, "No se puede eliminar una orden vinculada a una solicitud finalizada o a un cobro."));
+    }
+    private void CerrarEliminar() => OrdenAEliminar = null;
+
+    private async Task VerCotizacion(int ordenId)
+    {
+        if (!AppState.EsGerente) return;
+        CotizacionDetalle = await OrdenService.ObtenerCotizacionDeOrdenAsync(ordenId);
+        if (CotizacionDetalle is null)
+            ToastService.Notify(new ToastMessage(ToastType.Warning, "No se encontró la cotización de esta orden."));
+    }
+    private void CerrarCotizacion() => CotizacionDetalle = null;
+}
+</file>
+
 <file path="Context/Contexto.cs">
 using Microsoft.EntityFrameworkCore;
 using ElectroGestion.Models;
@@ -41674,221 +41897,6 @@ public class Contexto : DbContext
             }
         );
     }
-}
-</file>
-
-<file path="Components/Pages/Gerente/Ordenes.razor">
-@inject ElectroGestion.Services.AppStateService AppState
-@inject ElectroGestion.Services.OrdenTrabajoService OrdenService
-@inject BlazorBootstrap.ToastService ToastService
-
-<PageTitle>Órdenes de Trabajo | ElectroGestion</PageTitle>
-
-<style>
-    .orden-filtros { display:flex; flex-direction:column; gap:18px; padding:18px; }
-    .orden-filtros-fila { display:flex; align-items:center; gap:18px; flex-wrap:wrap; }
-    .orden-filtro { display:flex; align-items:center; gap:9px; min-width:0; }
-    .orden-filtro label { font-family:'Manrope'; font-size:14px; font-weight:800; color:#14162B; white-space:nowrap; }
-    .orden-filtro input, .orden-filtro select { min-width:0; padding:9px 11px; border:1px solid #D5D8E6; border-radius:7px; background:#fff; color:#4A4E63; }
-</style>
-
-<div style="display:flex;justify-content:space-between;align-items:center;gap:16px;margin-bottom:24px;flex-wrap:wrap">
-    <div><div class="page-title" style="font-family:'Manrope';font-weight:800;font-size:31px;letter-spacing:-.6px">Órdenes de trabajo</div><p style="color:#6B7085;margin:5px 0 0">Materiales de la cotización y herramientas para el trabajo en campo.</p></div>
-    <button @onclick="AbrirNueva" style="padding:11px 18px;background:#1D4ED8;color:white;border:0;border-radius:9px;font-weight:700;cursor:pointer">+ Nueva orden</button>
-</div>
-
-<div style="background:#fff;border:1px solid #E3E5EE;border-radius:12px;margin-bottom:18px">
-    <div class="orden-filtros">
-        <div class="orden-filtros-fila">
-            <div class="orden-filtro"><label for="orden-id">ID:</label><input id="orden-id" @bind="FiltroId" @bind:event="oninput" placeholder="ID" style="width:125px" /></div>
-            <div class="orden-filtro"><label for="orden-cliente">Cliente:</label><input id="orden-cliente" @bind="FiltroCliente" @bind:event="oninput" placeholder="Nombre del cliente" style="width:220px" /></div>
-            <div class="orden-filtro"><label for="orden-servicio">Tipo de servicio:</label><select id="orden-servicio" @bind="FiltroServicio" style="width:220px"><option value="">Todos</option>@foreach (var servicio in OrdenesRows.Select(o => o.TipoServicio).Where(s => !string.IsNullOrWhiteSpace(s)).Distinct().OrderBy(s => s)) { <option value="@servicio">@servicio</option> }</select></div>
-        </div>
-        <div class="orden-filtros-fila">
-            <div class="orden-filtro"><label for="orden-desde">Desde:</label><input id="orden-desde" type="date" @bind="FiltroDesde" /></div>
-            <div class="orden-filtro"><label for="orden-hasta">Hasta:</label><input id="orden-hasta" type="date" @bind="FiltroHasta" /></div>
-            <div class="orden-filtro"><label for="orden-estado">Estado:</label><select id="orden-estado" @bind="FiltroEstado" style="width:210px"><option value="">Todos</option><option>En proceso</option><option>Pendiente de cobro</option><option>Finalizada</option></select></div>
-            <div style="margin-left:auto"><button @onclick="() => StateHasChanged()" style="padding:9px 20px;border:0;border-radius:7px;background:#1D4ED8;color:#fff;font-weight:700;cursor:pointer">Buscar</button></div>
-        </div>
-    </div>
-</div>
-
-@if (Cargando)
-{ <p>Cargando órdenes...</p> }
-else if (!OrdenesFiltradas.Any())
-{ <div style="background:white;border:1px solid #E3E5EE;border-radius:12px;padding:28px;color:#6B7085">No hay órdenes con los filtros seleccionados.</div> }
-else
-{
-    <div style="display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px" class="resp-grid-2">
-    @foreach (var orden in OrdenesFiltradas)
-    {
-        <article style="background:#fff;border:1px solid #E3E5EE;border-radius:14px;padding:22px;display:flex;flex-direction:column">
-            <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:12px">
-                <div><div style="font-family:ui-monospace,monospace;font-size:12px;color:#8B90A3;font-weight:700">ORDEN @orden.Code</div><div style="font-family:'Manrope';font-weight:800;font-size:19px;margin-top:4px">@orden.Cliente</div><div style="color:#6B7085;font-size:14px;margin-top:2px">@orden.TipoServicio</div></div>
-                @{ var colors = ElectroGestion.Services.AppStateService.GetBadgeColors(orden.Estado); }
-                <span style="display:inline-block;padding:5px 11px;border-radius:20px;font-size:12px;font-weight:800;background:@colors.Bg;color:@colors.Fg;white-space:nowrap">@orden.Estado</span>
-            </div>
-            <button @onclick="() => VerCotizacion(orden.Id)" style="align-self:flex-start;margin-top:12px;padding:0;border:0;background:none;color:#1D4ED8;font-weight:700;cursor:pointer">Ver cotización COT-@orden.CotizacionId.ToString("D5")</button>
-            <div style="margin-top:18px;font-size:12px;color:#8B90A3;font-weight:800;text-transform:uppercase;letter-spacing:.06em">Tareas a realizar (Checklist Técnico)</div>
-            <div style="display:flex;flex-direction:column;gap:8px;margin-top:10px">
-                @for (var i = 0; i < orden.Trabajos.Count; i++)
-                { <div style="display:flex;gap:10px;align-items:flex-start;font-size:14px"><span style="flex:0 0 22px;height:22px;border-radius:6px;background:#EDEBFF;color:#1D4ED8;font-weight:800;font-size:12px;display:flex;align-items:center;justify-content:center">@(i + 1)</span><span style="color:#4A4E63">@orden.Trabajos[i]</span></div> }
-            </div>
-            <div style="margin-top:18px;font-size:12px;color:#8B90A3;font-weight:800;text-transform:uppercase;letter-spacing:.06em">Materiales de la cotización</div>
-            <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:10px">
-                @foreach (var material in orden.MaterialesCotizados) { <span style="padding:5px 11px;border:1px solid #E3E5EE;border-radius:20px;font-size:12.5px;background:#F7F8FC;color:#14162B">@material.Nombre × @material.Cantidad</span> }
-                @if (orden.MaterialesCotizados.Count == 0) { <span style="color:#8B90A3;font-size:13px">Sin materiales cotizados.</span> }
-            </div>
-            <div style="margin-top:18px;font-size:12px;color:#8B90A3;font-weight:800;text-transform:uppercase;letter-spacing:.06em">Herramientas asignadas</div>
-            <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:10px">
-                @foreach (var herramienta in orden.Herramientas) { <span style="padding:5px 11px;border:1px solid #E3E5EE;border-radius:20px;font-size:12.5px;background:#F7F8FC;color:#14162B">@herramienta</span> }
-                @if (orden.Herramientas.Count == 0) { <span style="color:#8B90A3;font-size:13px">Sin herramientas asignadas.</span> }
-            </div>
-            @if (!string.IsNullOrWhiteSpace(orden.Observaciones)) { <div style="margin-top:18px;font-size:12px;color:#8B90A3;font-weight:800;text-transform:uppercase;letter-spacing:.06em">Instrucciones de campo</div><div style="font-size:14px;margin-top:7px;color:#4A4E63;line-height:1.55;background:#FAFAFC;padding:10px 14px;border-radius:8px;border:1px solid #EFF0F6">@orden.Observaciones</div> }
-            <div style="margin-top:auto;padding-top:20px;display:flex;gap:10px">
-                <button @onclick="() => Editar(orden)" style="flex:1;min-width:0;padding:12px;border:1px solid #E3E5EE;background:#fff;color:#4A4E63;border-radius:9px;font-weight:700;font-size:14px;cursor:pointer;font-family:'Manrope'">Editar</button>
-                <button @onclick="() => OrdenAEliminar = orden.Id" style="flex:1;min-width:0;padding:12px;border:1px solid #F5C2C4;background:#fff;color:#C4141B;border-radius:9px;font-weight:700;font-size:14px;cursor:pointer;font-family:'Manrope'">Eliminar</button>
-                @if (orden.Estado != "Finalizada") { <button @onclick="() => SolicitarCambioEstado(orden)" style="flex:1;min-width:0;padding:12px;border:1px solid #1D4ED8;background:#1D4ED8;color:#fff;border-radius:9px;font-weight:700;font-size:14px;cursor:pointer;font-family:'Manrope'">@(orden.Estado == "Pendiente de cobro" ? "Reabrir orden" : "Marcar lista para cobro")</button> }
-            </div>
-        </article>
-    }
-    </div>
-}
-
-@if (ModalAbierto)
-{
-    <div style="position:fixed;inset:0;background:rgba(20,22,43,.48);z-index:9999;display:flex;align-items:center;justify-content:center;padding:20px" @onclick="CerrarModal">
-        <div style="background:white;width:100%;max-width:650px;max-height:90vh;overflow:auto;border-radius:14px;padding:24px" @onclick:stopPropagation>
-            <h2 style="font-size:21px;margin:0 0 18px">@(EditandoId.HasValue ? "Editar orden" : "Nueva orden de trabajo")</h2>
-            @if (!EditandoId.HasValue)
-            {
-                <label for="orden-cotizacion" style="font-weight:700">Cotización aprobada</label>
-                <select id="orden-cotizacion" @bind="FormCotizacionId" style="display:block;width:100%;padding:10px;border:1px solid #D5D8E6;border-radius:7px;margin:6px 0 16px"><option value="0">Seleccione una cotización</option>@foreach (var cot in CotizacionesDisponibles) { <option value="@cot.Id">COT-@cot.Id.ToString("D5") · @cot.Cliente</option> }</select>
-                @if (CotizacionSeleccionada is not null)
-                {
-                    <div style="background:#F7F8FC;padding:14px;border-radius:8px;margin-bottom:16px"><strong>Materiales de la cotización</strong><div style="font-size:13px;color:#6B7085">Se incorporarán con las cantidades aprobadas.</div>@foreach (var d in CotizacionSeleccionada.Detalles) { <div style="margin-top:6px">@d.CodigoArticulo · @d.NombreArticulo <strong>× @d.Cantidad</strong></div> }@if (!CotizacionSeleccionada.Detalles.Any()) { <div>La cotización incluye solo mano de obra.</div> }</div>
-                }
-            }
-            
-            <label for="orden-tareas" style="font-weight:700">Tareas (una por línea)</label><textarea id="orden-tareas" @bind="FormTrabajos" rows="4" style="display:block;width:100%;padding:10px;border:1px solid #D5D8E6;border-radius:7px;margin:6px 0 16px"></textarea>
-            <label for="orden-herramientas" style="font-weight:700">Herramientas asignadas (una por línea)</label><textarea id="orden-herramientas" @bind="FormHerramientas" rows="3" style="display:block;width:100%;padding:10px;border:1px solid #D5D8E6;border-radius:7px;margin:6px 0 16px" placeholder="Multímetro&#10;Escalera"></textarea>
-            <label for="orden-instrucciones" style="font-weight:700">Instrucciones de campo</label><textarea id="orden-instrucciones" @bind="FormObservaciones" rows="3" maxlength="2000" style="display:block;width:100%;padding:10px;border:1px solid #D5D8E6;border-radius:7px;margin:6px 0 16px"></textarea>
-            <div style="display:flex;justify-content:flex-end;gap:9px"><button @onclick="CerrarModal" style="padding:9px 14px;background:white;border:1px solid #D5D8E6;border-radius:7px;cursor:pointer">Cancelar</button><button @onclick="Guardar" style="padding:9px 16px;background:#1D4ED8;color:white;border:0;border-radius:7px;cursor:pointer">Guardar</button></div>
-        </div>
-    </div>
-}
-
-@if (OrdenAEliminar.HasValue)
-{
-    <div style="position:fixed;inset:0;background:rgba(14,16,40,.5);display:flex;align-items:center;justify-content:center;z-index:10000;padding:20px" @onclick="CerrarEliminar">
-        <div style="background:#fff;border-radius:16px;width:100%;max-width:400px;padding:32px;box-shadow:0 20px 40px rgba(0,0,0,.2)" @onclick:stopPropagation>
-            <div style="font-family:'Manrope';font-weight:800;font-size:22px;color:#14162B;margin-bottom:10px">Eliminar orden de trabajo</div>
-            <div style="color:#4A4E63;font-size:14px;margin-bottom:24px">¿Está seguro que desea eliminar esta orden? Esta acción no se puede deshacer.</div>
-            <div style="display:flex;justify-content:flex-end;gap:12px"><button @onclick="CerrarEliminar" style="padding:10px 20px;border:1px solid #D5D8E6;background:#fff;border-radius:8px;font-weight:700;font-size:14px;cursor:pointer;color:#4A4E63">Cancelar</button><button @onclick="Eliminar" style="padding:10px 24px;border:0;background:#C0392B;color:#fff;border-radius:8px;font-weight:700;font-size:14px;cursor:pointer;font-family:'Manrope'">Eliminar</button></div>
-        </div>
-    </div>
-}
-
-@if (OrdenEstadoPendienteId.HasValue)
-{
-    <div style="position:fixed;inset:0;background:rgba(14,16,40,.5);display:flex;align-items:center;justify-content:center;z-index:10001;padding:20px" @onclick="CerrarConfirmacionEstado">
-        <div style="background:#fff;border-radius:16px;width:100%;max-width:400px;padding:32px;box-shadow:0 20px 40px rgba(0,0,0,.2)" @onclick:stopPropagation>
-            <div style="font-family:'Manrope';font-weight:800;font-size:22px;color:#14162B;margin-bottom:10px">Confirmar cambio de estado</div>
-            <div style="color:#4A4E63;font-size:14px;margin-bottom:24px">¿Desea cambiar la orden a <strong>@EstadoOrdenPendiente</strong>?</div>
-            <div style="display:flex;justify-content:flex-end;gap:12px"><button @onclick="CerrarConfirmacionEstado" style="padding:10px 20px;border:1px solid #D5D8E6;background:#fff;border-radius:8px;font-weight:700;cursor:pointer;color:#4A4E63">Cancelar</button><button @onclick="ConfirmarCambioEstado" style="padding:10px 24px;border:0;background:#1D4ED8;color:#fff;border-radius:8px;font-weight:700;cursor:pointer">Confirmar</button></div>
-        </div>
-    </div>
-}
-
-@if (AppState.EsGerente && CotizacionDetalle is not null)
-{ <CotizacionDocumento Cotizacion="CotizacionDetalle" OnClose="CerrarCotizacion" /> }
-
-@code {
-    private List<ElectroGestion.Models.OrdenTrabajo> OrdenesRows = [];
-    private List<ElectroGestion.Models.Cotizacion> CotizacionesDisponibles = [];
-    private bool Cargando;
-    private string FiltroId = "", FiltroCliente = "", FiltroServicio = "", FiltroEstado = "";
-    private DateTime? FiltroDesde, FiltroHasta;
-    private ElectroGestion.Models.Cotizacion? CotizacionDetalle;
-    private bool ModalAbierto;
-    private int? EditandoId, OrdenAEliminar;
-    private int? OrdenEstadoPendienteId;
-    private string EstadoOrdenPendiente = "";
-    private int FormCotizacionId;
-    private string FormTrabajos = "", FormHerramientas = "", FormObservaciones = "";
-    private ElectroGestion.Models.Cotizacion? CotizacionSeleccionada => CotizacionesDisponibles.FirstOrDefault(c => c.Id == FormCotizacionId);
-    private IEnumerable<ElectroGestion.Models.OrdenTrabajo> OrdenesFiltradas => OrdenesRows.Where(o =>
-        (string.IsNullOrWhiteSpace(FiltroId) || o.Id.ToString().Contains(FiltroId) || o.Code.Contains(FiltroId, StringComparison.OrdinalIgnoreCase)) &&
-        (string.IsNullOrWhiteSpace(FiltroCliente) || o.Cliente.Contains(FiltroCliente, StringComparison.OrdinalIgnoreCase)) &&
-        (string.IsNullOrWhiteSpace(FiltroServicio) || o.TipoServicio == FiltroServicio) &&
-        (!FiltroDesde.HasValue || o.FechaCreacion.Date >= FiltroDesde.Value.Date) &&
-        (!FiltroHasta.HasValue || o.FechaCreacion.Date <= FiltroHasta.Value.Date) &&
-        (string.IsNullOrWhiteSpace(FiltroEstado) || o.Estado == FiltroEstado));
-
-    protected override async Task OnInitializedAsync() => await Recargar();
-
-    private async Task Recargar()
-    {
-        Cargando = true;
-        try { OrdenesRows = await OrdenService.ObtenerTodasAsync(); CotizacionesDisponibles = await OrdenService.ObtenerCotizacionesDisponiblesAsync(); }
-        catch { ToastService.Notify(new ToastMessage(ToastType.Danger, "No se pudieron cargar las órdenes.")); }
-        finally { Cargando = false; }
-    }
-
-    private void AbrirNueva() { EditandoId = null; FormCotizacionId = 0; FormTrabajos = FormHerramientas = FormObservaciones = ""; ModalAbierto = true; }
-    private async Task Editar(ElectroGestion.Models.OrdenTrabajo orden) { if (!await OrdenService.PuedeModificarAsync(orden.Id)) { ToastService.Notify(new ToastMessage(ToastType.Warning, "La orden no se puede modificar porque ya tiene un cobro o su solicitud fue finalizada.")); return; } EditandoId = orden.Id; FormCotizacionId = orden.CotizacionId; FormTrabajos = string.Join("\n", orden.Trabajos); FormHerramientas = string.Join("\n", orden.Herramientas); FormObservaciones = orden.Observaciones; ModalAbierto = true; }
-    private void CerrarModal() => ModalAbierto = false;
-    private static List<string> Lineas(string texto) => texto.Split(['\r', '\n'], StringSplitOptions.RemoveEmptyEntries).Select(x => x.Trim()).Where(x => x.Length > 0).ToList();
-
-    private async Task Guardar()
-    {
-        if (!EditandoId.HasValue && FormCotizacionId <= 0) { ToastService.Notify(new ToastMessage(ToastType.Warning, "Seleccione una cotización aprobada.")); return; }
-        var guardado = EditandoId.HasValue
-            ? await OrdenService.ActualizarAsync(EditandoId.Value, Lineas(FormTrabajos), Lineas(FormHerramientas), FormObservaciones)
-            : await OrdenService.CrearAsync(FormCotizacionId, Lineas(FormTrabajos), Lineas(FormHerramientas), FormObservaciones);
-        if (!guardado) { ToastService.Notify(new ToastMessage(ToastType.Warning, "No se pudo guardar. Verifique la cotización y que no tenga otra orden.")); return; }
-        CerrarModal(); ToastService.Notify(new ToastMessage(ToastType.Success, "Orden guardada.")); await Recargar();
-    }
-
-    private async Task SolicitarCambioEstado(ElectroGestion.Models.OrdenTrabajo orden)
-    {
-        if (orden.Estado == "Pendiente de cobro" && await OrdenService.TieneCobroAsync(orden.Id))
-        {
-            ToastService.Notify(new ToastMessage(ToastType.Warning, "No se puede reabrir la orden porque ya hay un cobro creado. Revise el detalle del cobro para reabrirlo."));
-            return;
-        }
-        OrdenEstadoPendienteId = orden.Id;
-        EstadoOrdenPendiente = orden.Estado == "Pendiente de cobro" ? "En proceso" : "Pendiente de cobro";
-    }
-
-    private void CerrarConfirmacionEstado() { OrdenEstadoPendienteId = null; EstadoOrdenPendiente = ""; }
-    private async Task ConfirmarCambioEstado()
-    {
-        if (!OrdenEstadoPendienteId.HasValue) return;
-        var id = OrdenEstadoPendienteId.Value;
-        var estado = EstadoOrdenPendiente;
-        CerrarConfirmacionEstado();
-        if (await OrdenService.CambiarEstadoAsync(id, estado)) { await Recargar(); ToastService.Notify(new ToastMessage(ToastType.Success, "Estado de la orden actualizado.")); }
-        else ToastService.Notify(new ToastMessage(ToastType.Warning, "No se puede cambiar el estado porque la solicitud ya finalizó o la orden tiene un cobro creado."));
-    }
-
-    private async Task Eliminar()
-    {
-        if (!OrdenAEliminar.HasValue) return;
-        var id = OrdenAEliminar.Value; OrdenAEliminar = null;
-        if (await OrdenService.EliminarAsync(id)) { await Recargar(); ToastService.Notify(new ToastMessage(ToastType.Success, "Orden eliminada.")); }
-        else ToastService.Notify(new ToastMessage(ToastType.Warning, "No se puede eliminar una orden vinculada a una solicitud finalizada o a un cobro."));
-    }
-    private void CerrarEliminar() => OrdenAEliminar = null;
-
-    private async Task VerCotizacion(int ordenId)
-    {
-        if (!AppState.EsGerente) return;
-        CotizacionDetalle = await OrdenService.ObtenerCotizacionDeOrdenAsync(ordenId);
-        if (CotizacionDetalle is null)
-            ToastService.Notify(new ToastMessage(ToastType.Warning, "No se encontró la cotización de esta orden."));
-    }
-    private void CerrarCotizacion() => CotizacionDetalle = null;
 }
 </file>
 
@@ -42287,10 +42295,13 @@ else { @foreach (var cobro in Filtrados) { var (bg, fg) = ElectroGestion.Service
     <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px;background:#F7F8FC;padding:14px;border-radius:10px"><div>Total<br/><b>RD$ @CobroDetalle.Monto.ToString("N2")</b></div><div>Pagado<br/><b>RD$ @CobroDetalle.MontoPagado.ToString("N2")</b></div><div>Saldo<br/><b>RD$ @CobroDetalle.SaldoPendiente.ToString("N2")</b></div></div>
     <h3 style="margin:22px 0 10px">Abonos registrados</h3>
     <div style="overflow-x:auto"><table class="cobro-tabla" style="width:100%;border-collapse:collapse;font-size:14px"><thead><tr><th>Fecha</th><th>Método</th><th class="num">Monto</th><th>Estado</th></tr></thead><tbody>@if(!CobroDetalle.Abonos.Any()){<tr><td colspan="4" style="padding:12px;color:#6B7085">Aún no hay abonos registrados.</td></tr>}else{@foreach(var abono in CobroDetalle.Abonos.OrderBy(a => a.Fecha)){<tr><td>@abono.Fecha.ToString("dd/MM/yyyy HH:mm")</td><td>@abono.MetodoPago</td><td class="num">RD$ @abono.Monto.ToString("N2")</td><td>@(abono.Anulado ? "Revertido" : "Recibido")</td></tr>}}</tbody></table></div>
-    @if(CobroDetalle.Estado == "Pendiente de cobro" && CobroDetalle.SaldoPendiente > 0) { <div style="border:1px solid #E3E5EE;border-radius:10px;padding:16px;margin-top:18px"><h3 style="margin:0 0 12px">Registrar abono</h3><div style="display:grid;grid-template-columns:1fr 1fr;gap:12px"><div><label style="font-weight:700">Monto</label><input type="number" min="0.01" max="@CobroDetalle.SaldoPendiente" step="0.01" @bind="MontoAbono" style="display:block;width:100%;padding:9px;margin-top:5px;border:1px solid #D5D8E6;border-radius:7px" /></div><div><label style="font-weight:700">Método de pago</label><select @bind="MetodoAbono" style="display:block;width:100%;padding:9px;margin-top:5px;border:1px solid #D5D8E6;border-radius:7px"><option>Efectivo</option><option>Transferencia</option><option>Cheque</option><option>Tarjeta de Crédito</option></select></div></div><button @onclick="RegistrarAbono" disabled="@(MontoAbono <= 0 || MontoAbono > CobroDetalle.SaldoPendiente)" style="margin-top:13px;padding:9px 15px;background:#1D4ED8;color:#fff;border:0;border-radius:8px;font-weight:700">Guardar abono</button></div> }
+    @if(CobroDetalle.Estado == "Pendiente de cobro" && CobroDetalle.SaldoPendiente > 0) { <div style="border:1px solid #E3E5EE;border-radius:10px;padding:16px;margin-top:18px"><h3 style="margin:0 0 8px">Saldo pendiente</h3><p style="margin:0 0 12px;color:#6B7085">Registra el próximo pago para continuar saldando esta cuenta.</p><button @onclick="AbrirModalAbono" style="padding:9px 15px;background:#1D4ED8;color:#fff;border:0;border-radius:8px;font-weight:700">Registrar abono</button></div> }
     @if(CobroDetalle.Estado == "Pendiente de cobro" && CobroDetalle.SaldoPendiente <= 0) { <div style="border:1px solid #A7F3D0;background:#ECFDF5;color:#065F46;border-radius:10px;padding:14px;margin-top:18px">El saldo está cubierto. Confirma para finalizar el cobro.</div> }
     <div style="display:flex;justify-content:flex-end;gap:10px;margin-top:22px;flex-wrap:wrap"><button @onclick="CerrarDetalleCobro" style="padding:10px 16px;border:1px solid #D5D8E6;background:#fff;border-radius:8px">Cerrar</button><button @onclick="() => VerFactura(CobroDetalle)" style="padding:10px 16px;border:1px solid #D5D8E6;background:#fff;border-radius:8px">Ver factura</button>@if (CobroDetalle.Estado == "Pendiente de cobro" && CobroDetalle.SaldoPendiente <= 0) { <button @onclick="() => ConfirmarFinalizacionId = CobroDetalle.Id" style="padding:10px 16px;border:0;background:#059669;color:#fff;border-radius:8px;font-weight:700">Finalizar</button> }@if (CobroDetalle.Estado == "Finalizada") { <button @onclick="() => ConfirmarReaperturaId = CobroDetalle.Id" style="padding:10px 16px;border:0;background:#1D4ED8;color:#fff;border-radius:8px;font-weight:700">Revertir</button> }</div>
 </div></div> }
+
+@if (ModalAbonoAbierto && CobroDetalle is not null)
+{ <div style="position:fixed;inset:0;background:rgba(14,16,40,.55);display:flex;align-items:center;justify-content:center;z-index:10000;padding:20px" @onclick="CerrarModalAbono"><div style="background:#fff;border-radius:16px;width:100%;max-width:480px;padding:26px;box-shadow:0 20px 40px rgba(0,0,0,.2)" @onclick:stopPropagation><h3 style="margin:0 0 8px">Registrar abono</h3><p style="margin:0 0 18px;color:#6B7085">Saldo pendiente: <b>RD$ @CobroDetalle.SaldoPendiente.ToString("N2")</b></p><label style="font-weight:700">Monto recibido</label><input type="number" min="0.01" max="@CobroDetalle.SaldoPendiente" step="0.01" @bind="MontoAbono" style="display:block;width:100%;padding:10px;margin:6px 0 14px;border:1px solid #D5D8E6;border-radius:8px" /><label style="font-weight:700">Método de pago</label><select @bind="MetodoAbono" style="display:block;width:100%;padding:10px;margin:6px 0 20px;border:1px solid #D5D8E6;border-radius:8px"><option>Efectivo</option><option>Transferencia</option><option>Cheque</option><option>Tarjeta de Crédito</option></select><div style="display:flex;justify-content:flex-end;gap:10px"><button @onclick="CerrarModalAbono" style="padding:9px 14px;border:1px solid #D5D8E6;background:#fff;border-radius:8px">Cancelar</button><button @onclick="RegistrarAbono" disabled="@(MontoAbono <= 0 || MontoAbono > CobroDetalle.SaldoPendiente)" style="padding:9px 15px;background:#1D4ED8;color:#fff;border:0;border-radius:8px;font-weight:700">Guardar abono</button></div></div></div> }
 
 @if (ConfirmarFinalizacionId.HasValue)
 { <div style="position:fixed;inset:0;background:rgba(14,16,40,.5);display:flex;align-items:center;justify-content:center;z-index:10001;padding:20px"><div style="background:#fff;border-radius:16px;max-width:430px;padding:28px"><h3>Finalizar cobro</h3><p>El cobro quedará finalizado. Si la orden está pendiente de cobro, también se finalizarán la orden y la solicitud.</p><div style="display:flex;justify-content:flex-end;gap:10px"><button @onclick="() => ConfirmarFinalizacionId = null" style="padding:9px 14px;border:1px solid #D5D8E6;background:#fff;border-radius:8px">Cancelar</button><button @onclick="FinalizarCobro" style="padding:9px 16px;background:#059669;color:#fff;border:0;border-radius:8px">Confirmar</button></div></div></div> }
@@ -42307,7 +42318,7 @@ else { @foreach (var cobro in Filtrados) { var (bg, fg) = ElectroGestion.Service
 @code {
     private List<ElectroGestion.Models.Cobro> ListaCobros = [];
     private List<ElectroGestion.Models.Cotizacion> CotizacionesAprobadas = [];
-    private bool Cargando, ModalAbierto;
+    private bool Cargando, ModalAbierto, ModalAbonoAbierto;
     private string FiltroId = "", FiltroCliente = "", FiltroFactura = "", FiltroEstado = "", MetodoPago = "Transferencia", MetodoAbono = "Transferencia";
     private int CotizacionSeleccionadaId;
     private decimal AbonoInicial, MontoAbono;
@@ -42341,7 +42352,7 @@ else { @foreach (var cobro in Filtrados) { var (bg, fg) = ElectroGestion.Service
     private async Task RegistrarAbono()
     {
         if (CobroDetalle is null) return;
-        if (await CobroService.RegistrarAbonoAsync(CobroDetalle.Id, MontoAbono, MetodoAbono)) { var id = CobroDetalle.Id; MontoAbono = 0; await Recargar(); CobroDetalle = ListaCobros.FirstOrDefault(c => c.Id == id); ToastService.Notify(new ToastMessage(ToastType.Success, CobroDetalle?.SaldoPendiente <= 0 ? "Abono registrado. Ya puede finalizar el cobro." : "Abono registrado correctamente.")); }
+        if (await CobroService.RegistrarAbonoAsync(CobroDetalle.Id, MontoAbono, MetodoAbono)) { var id = CobroDetalle.Id; MontoAbono = 0; ModalAbonoAbierto = false; await Recargar(); CobroDetalle = ListaCobros.FirstOrDefault(c => c.Id == id); ToastService.Notify(new ToastMessage(ToastType.Success, CobroDetalle?.SaldoPendiente <= 0 ? "Abono registrado. Ya puede finalizar el cobro." : "Abono registrado correctamente.")); }
         else ToastService.Notify(new ToastMessage(ToastType.Warning, "No se pudo registrar el abono. Verifique el saldo disponible."));
     }
     private async Task FinalizarCobro()
@@ -42356,6 +42367,8 @@ else { @foreach (var cobro in Filtrados) { var (bg, fg) = ElectroGestion.Service
     private async Task EliminarCobro() { if (!ConfirmarEliminarId.HasValue) return; var id = ConfirmarEliminarId.Value; ConfirmarEliminarId = null; if (await CobroService.EliminarAsync(id)) { if (CobroDetalle?.Id == id) CobroDetalle = null; ToastService.Notify(new ToastMessage(ToastType.Success, "Cobro eliminado.")); await Recargar(); } else ToastService.Notify(new ToastMessage(ToastType.Warning, "No se pudo eliminar el cobro.")); }
     private void VerDetalleCobro(int id) { CobroDetalle = ListaCobros.FirstOrDefault(c => c.Id == id); MontoAbono = 0; }
     private void CerrarDetalleCobro() => CobroDetalle = null;
+    private void AbrirModalAbono() { if (CobroDetalle is null || CobroDetalle.SaldoPendiente <= 0) return; MontoAbono = CobroDetalle.SaldoPendiente; MetodoAbono = string.IsNullOrWhiteSpace(CobroDetalle.MetodoPago) ? "Transferencia" : CobroDetalle.MetodoPago; ModalAbonoAbierto = true; }
+    private void CerrarModalAbono() => ModalAbonoAbierto = false;
     private void VerFactura(ElectroGestion.Models.Cobro cobro) { CobroDetalle = null; FacturaSeleccionada = cobro; }
     private void CerrarFactura() => FacturaSeleccionada = null;
 }
