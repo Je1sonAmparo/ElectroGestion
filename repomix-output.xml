@@ -14345,198 +14345,6 @@ public class SolicitudEventoService(IDbContextFactory<Contexto> factory, AppStat
 }
 </file>
 
-<file path="Components/Pages/Compartidas/Historial.razor">
-@page "/historial"
-@inject ElectroGestion.Services.AppStateService AppState
-@inject ElectroGestion.Services.SolicitudService SolicitudService
-@inject NavigationManager NavManager
-
-<PageTitle>Historial | ElectroGestion</PageTitle>
-
-<div style="display:flex;align-items:flex-start;justify-content:space-between;gap:20px;margin-bottom:24px">
-    <div>
-        <div class="page-title" style="font-family:'Manrope';font-weight:800;font-size:31px;letter-spacing:-.6px">Historial</div>
-        <div style="color:#6B7085;font-size:14.5px;margin-top:5px">Solicitudes finalizadas.</div>
-    </div>
-</div>
-
-<div style="background:#fff;border:1px solid #E3E5EE;border-radius:14px;overflow:hidden">
-    <div style="padding:18px 18px 12px;border-bottom:1px solid #EFF0F6">
-        <div style="display:flex;align-items:center;gap:20px;white-space:nowrap;overflow-x:auto" class="resp-search-block">
-            <div style="display:flex;align-items:center;gap:10px">
-                <span style="font-family:'Manrope';font-weight:800;font-size:15px;color:#14162B">ID:</span>
-                <input @bind="SearchId" @bind:event="oninput" placeholder="ID"
-                    style="width:120px;padding:9px 12px;border:1px solid #D5D8E6;border-radius:6px;font-size:14px;color:#4A4E63" />
-            </div>
-            <div style="display:flex;align-items:center;gap:10px">
-                <span style="font-family:'Manrope';font-weight:800;font-size:15px;color:#14162B">Cliente:</span>
-                <input @bind="SearchCliente" @bind:event="oninput" placeholder="Nombre"
-                    style="width:170px;padding:9px 12px;border:1px solid #D5D8E6;border-radius:6px;font-size:14px;color:#4A4E63" />
-            </div>
-            <div style="display:flex;align-items:center;gap:10px">
-                <span style="font-family:'Manrope';font-weight:800;font-size:15px;color:#14162B">Tipo:</span>
-                <input @bind="SearchTipo" @bind:event="oninput" placeholder="Tipo"
-                    style="width:150px;padding:9px 12px;border:1px solid #D5D8E6;border-radius:6px;font-size:14px;color:#4A4E63" />
-            </div>
-            <div style="display:flex;align-items:center;gap:10px">
-                <span style="font-family:'Manrope';font-weight:800;font-size:15px;color:#14162B">Fecha:</span>
-                <select @bind="FiltroFecha" style="width:160px;padding:9px 12px;border:1px solid #D5D8E6;border-radius:6px;font-size:14px;background:#fff;color:#4A4E63">
-                    <option value="Todas las fechas">Todas las fechas</option>
-                    <option value="Últimos 7 días">Últimos 7 días</option>
-                    <option value="Últimos 30 días">Últimos 30 días</option>
-                </select>
-            </div>
-            <div style="display:flex;justify-content:flex-end;flex:1;min-width:90px">
-                <button class="primary-btn" @onclick="Filtrar"
-                    style="padding:9px 16px;background:#1D4ED8;color:#fff;border:0;border-radius:6px;font-weight:700;font-size:14px;cursor:pointer;font-family:'Manrope'">Buscar</button>
-            </div>
-        </div>
-    </div>
-
-    <div style="display:grid;grid-template-columns:80px 1.2fr 1.4fr 1fr 1fr 80px;padding:14px 18px;font-size:12px;font-weight:800;color:#8B90A3;text-transform:uppercase;letter-spacing:.06em;border-bottom:1px solid #EFF0F6"
-         class="resp-table-row">
-        <div>ID</div>
-        <div>Cliente</div>
-        <div>Tipo de servicio</div>
-        <div>Fecha finalización</div>
-        <div>Estado</div>
-        <div style="text-align:right">Acción</div>
-    </div>
-
-    @if (HistorialFiltrado.Any())
-    {
-        @foreach (var h in HistorialFiltrado)
-        {
-            <div style="display:grid;grid-template-columns:80px 1.2fr 1.4fr 1fr 1fr 80px;padding:16px 18px;border-bottom:1px solid #F4F5FB;align-items:center;font-size:14px"
-                 class="resp-table-row">
-                <div style="font-family:ui-monospace,monospace;color:#6B7085">@h.Id.ToString("D4")</div>
-                <div style="font-weight:700">@h.Cliente?.Nombre</div>
-                <div>@h.Servicio?.Nombre</div>
-                <div style="color:#6B7085">@ElectroGestion.Services.AppStateService.FormatFecha((h.FechaFin ?? h.FechaSolicitud).ToString("yyyy-MM-dd"))</div>
-                <div>
-                    <span style="display:inline-block;padding:5px 11px;border-radius:20px;font-size:12px;font-weight:800;background:#E4F6EA;color:#17803D">
-                        Finalizada
-                    </span>
-                </div>
-                <div style="display:flex;justify-content:flex-end">
-                    <button title="Ver detalle" @onclick="() => AbrirDetalle(h)"
-                            style="width:32px;height:32px;border:1px solid #D5D8E6;background:#fff;border-radius:8px;cursor:pointer;color:#4A4E63;display:flex;align-items:center;justify-content:center">
-                        <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2">
-                            <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
-                            <circle cx="12" cy="12" r="3"></circle>
-                        </svg>
-                    </button>
-                </div>
-            </div>
-        }
-    }
-    else
-    {
-        <div style="padding:38px;text-align:center;color:#8B90A3;font-size:14px">
-            Aún no hay servicios finalizados.
-        </div>
-    }
-</div>
-
-@if (IsModalOpen && SelectedHistorial != null)
-{
-    <div style="position:fixed;inset:0;background:rgba(14,16,40,.5);display:flex;align-items:center;justify-content:center;z-index:9999;padding:20px" @onclick="CerrarDetalle">
-        <div style="background:#fff;border-radius:16px;width:100%;max-width:620px;padding:32px;box-shadow:0 20px 40px rgba(0,0,0,.2);animation:tin .2s ease-out" @onclick:stopPropagation>
-            <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:20px">
-                <div>
-                    <div style="font-family:'Manrope';font-weight:800;font-size:22px;color:#14162B">Detalle de Historial</div>
-                    <div style="font-size:14px;color:#6B7085;margin-top:3px">Historial @SelectedHistorial.Id.ToString("D4")</div>
-                </div>
-                <button @onclick="CerrarDetalle" aria-label="Cerrar" style="width:32px;height:32px;border:1px solid #E3E5EE;border-radius:8px;background:#fff;display:flex;align-items:center;justify-content:center;color:#8B90A3;cursor:pointer">
-                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M18 6 6 18M6 6l12 12"/></svg>
-                </button>
-            </div>
-            <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px" class="resp-grid-2">
-                <div style="background:#F7F8FC;border:1px solid #EFF0F6;border-radius:10px;padding:12px 14px"><div style="font-size:11.5px;color:#8B90A3;font-weight:800;text-transform:uppercase">Cliente</div><div style="font-size:14px;margin-top:4px;font-weight:700;color:#14162B">@SelectedHistorial.Cliente?.Nombre</div></div>
-                <div style="background:#F7F8FC;border:1px solid #EFF0F6;border-radius:10px;padding:12px 14px"><div style="font-size:11.5px;color:#8B90A3;font-weight:800;text-transform:uppercase">Tipo de Servicio</div><div style="font-size:14px;margin-top:4px;font-weight:700;color:#14162B">@SelectedHistorial.Servicio?.Nombre</div></div>
-                <div style="background:#F7F8FC;border:1px solid #EFF0F6;border-radius:10px;padding:12px 14px"><div style="font-size:11.5px;color:#8B90A3;font-weight:800;text-transform:uppercase">Fecha Finalización</div><div style="font-size:14px;margin-top:4px;font-weight:700;color:#14162B">@ElectroGestion.Services.AppStateService.FormatFecha((SelectedHistorial.FechaFin ?? SelectedHistorial.FechaSolicitud).ToString("yyyy-MM-dd"))</div></div>
-                <div style="background:#F7F8FC;border:1px solid #EFF0F6;border-radius:10px;padding:12px 14px"><div style="font-size:11.5px;color:#8B90A3;font-weight:800;text-transform:uppercase">Técnico Asignado</div><div style="font-size:14px;margin-top:4px;font-weight:700;color:#14162B">@SelectedHistorial.TecnicoAsignado</div></div>
-                <div style="grid-column:1 / -1;background:#F7F8FC;border:1px solid #EFF0F6;border-radius:10px;padding:12px 14px"><div style="font-size:11.5px;color:#8B90A3;font-weight:800;text-transform:uppercase">Dirección</div><div style="font-size:14px;margin-top:4px;font-weight:700;color:#14162B">@SelectedHistorial.Direccion</div></div>
-            </div>
-            <SolicitudTimeline SolicitudId="SelectedHistorial.Id" />
-            <div style="margin-top:24px;display:flex;justify-content:flex-end;border-top:1px solid #EFF0F6;padding-top:17px">
-                <button @onclick="CerrarDetalle" style="padding:10px 20px;border:1px solid #D5D8E6;background:#fff;border-radius:8px;font-weight:700;cursor:pointer;color:#14162B">Cerrar</button>
-            </div>
-        </div>
-    </div>
-}
-
-@code {
-    private string SearchId = "";
-    private string SearchCliente = "";
-    private string SearchTipo = "";
-    private string FiltroFecha = "Todas las fechas";
-    
-    private bool IsModalOpen = false;
-    private ElectroGestion.Models.Solicitud? SelectedHistorial;
-    private List<ElectroGestion.Models.Solicitud> SolicitudesHistoricas = [];
-
-    protected override async Task OnInitializedAsync()
-    {
-        try { SolicitudesHistoricas = await SolicitudService.GetList(s => s.EstadoSolicitud != null && s.EstadoSolicitud.Nombre == "Finalizada"); }
-        catch { SolicitudesHistoricas = []; }
-    }
-
-    private void AbrirDetalle(ElectroGestion.Models.Solicitud s)
-    {
-        SelectedHistorial = s;
-        IsModalOpen = true;
-        StateHasChanged();
-    }
-
-    private void CerrarDetalle()
-    {
-        IsModalOpen = false;
-        SelectedHistorial = null;
-        StateHasChanged();
-    }
-
-    private void Filtrar()
-    {
-        StateHasChanged();
-    }
-
-    private IEnumerable<ElectroGestion.Models.Solicitud> HistorialFiltrado
-    {
-        get
-        {
-            var res = SolicitudesHistoricas.AsEnumerable();
-
-            if (!string.IsNullOrWhiteSpace(SearchId))
-            {
-                res = res.Where(x => x.Id.ToString().Contains(SearchId));
-            }
-            if (!string.IsNullOrWhiteSpace(SearchCliente))
-            {
-                res = res.Where(x => x.Cliente != null && x.Cliente.Nombre.Contains(SearchCliente, StringComparison.OrdinalIgnoreCase));
-            }
-            if (!string.IsNullOrWhiteSpace(SearchTipo))
-            {
-                res = res.Where(x => x.Servicio != null && x.Servicio.Nombre.Contains(SearchTipo, StringComparison.OrdinalIgnoreCase));
-            }
-
-            if (FiltroFecha == "Últimos 7 días")
-            {
-                var lim = DateTime.Today.AddDays(-7);
-                res = res.Where(x => (x.FechaFin ?? x.FechaSolicitud) >= lim);
-            }
-            else if (FiltroFecha == "Últimos 30 días")
-            {
-                var lim = DateTime.Today.AddDays(-30);
-                res = res.Where(x => (x.FechaFin ?? x.FechaSolicitud) >= lim);
-            }
-
-            return res;
-        }
-    }
-}
-</file>
-
 <file path="Models/Cobro.cs">
 namespace ElectroGestion.Models;
 
@@ -15258,6 +15066,198 @@ public class VisitaService(IDbContextFactory<Contexto> contextFactory)
 }
 </file>
 
+<file path="Components/Pages/Compartidas/Historial.razor">
+@page "/historial"
+@inject ElectroGestion.Services.AppStateService AppState
+@inject ElectroGestion.Services.SolicitudService SolicitudService
+@inject NavigationManager NavManager
+
+<PageTitle>Historial | ElectroGestion</PageTitle>
+
+<div style="display:flex;align-items:flex-start;justify-content:space-between;gap:20px;margin-bottom:24px">
+    <div>
+        <div class="page-title" style="font-family:'Manrope';font-weight:800;font-size:31px;letter-spacing:-.6px">Historial</div>
+        <div style="color:#6B7085;font-size:14.5px;margin-top:5px">Solicitudes finalizadas.</div>
+    </div>
+</div>
+
+<div style="background:#fff;border:1px solid #E3E5EE;border-radius:14px;overflow:hidden">
+    <div style="padding:18px 18px 12px;border-bottom:1px solid #EFF0F6">
+        <div style="display:flex;align-items:center;gap:20px;white-space:nowrap;overflow-x:auto" class="resp-search-block">
+            <div style="display:flex;align-items:center;gap:10px">
+                <span style="font-family:'Manrope';font-weight:800;font-size:15px;color:#14162B">ID:</span>
+                <input @bind="SearchId" @bind:event="oninput" placeholder="ID"
+                    style="width:120px;padding:9px 12px;border:1px solid #D5D8E6;border-radius:6px;font-size:14px;color:#4A4E63" />
+            </div>
+            <div style="display:flex;align-items:center;gap:10px">
+                <span style="font-family:'Manrope';font-weight:800;font-size:15px;color:#14162B">Cliente:</span>
+                <input @bind="SearchCliente" @bind:event="oninput" placeholder="Nombre"
+                    style="width:170px;padding:9px 12px;border:1px solid #D5D8E6;border-radius:6px;font-size:14px;color:#4A4E63" />
+            </div>
+            <div style="display:flex;align-items:center;gap:10px">
+                <span style="font-family:'Manrope';font-weight:800;font-size:15px;color:#14162B">Tipo:</span>
+                <input @bind="SearchTipo" @bind:event="oninput" placeholder="Tipo"
+                    style="width:150px;padding:9px 12px;border:1px solid #D5D8E6;border-radius:6px;font-size:14px;color:#4A4E63" />
+            </div>
+            <div style="display:flex;align-items:center;gap:10px">
+                <span style="font-family:'Manrope';font-weight:800;font-size:15px;color:#14162B">Fecha:</span>
+                <select @bind="FiltroFecha" style="width:160px;padding:9px 12px;border:1px solid #D5D8E6;border-radius:6px;font-size:14px;background:#fff;color:#4A4E63">
+                    <option value="Todas las fechas">Todas las fechas</option>
+                    <option value="Últimos 7 días">Últimos 7 días</option>
+                    <option value="Últimos 30 días">Últimos 30 días</option>
+                </select>
+            </div>
+            <div style="display:flex;justify-content:flex-end;flex:1;min-width:90px">
+                <button class="primary-btn" @onclick="Filtrar"
+                    style="padding:9px 16px;background:#1D4ED8;color:#fff;border:0;border-radius:6px;font-weight:700;font-size:14px;cursor:pointer;font-family:'Manrope'">Buscar</button>
+            </div>
+        </div>
+    </div>
+
+    <div style="display:grid;grid-template-columns:80px 1.2fr 1.4fr 1fr 1fr 80px;padding:14px 18px;font-size:12px;font-weight:800;color:#8B90A3;text-transform:uppercase;letter-spacing:.06em;border-bottom:1px solid #EFF0F6"
+         class="resp-table-row">
+        <div>ID</div>
+        <div>Cliente</div>
+        <div>Tipo de servicio</div>
+        <div>Fecha finalización</div>
+        <div>Estado</div>
+        <div style="text-align:right">Acción</div>
+    </div>
+
+    @if (HistorialFiltrado.Any())
+    {
+        @foreach (var h in HistorialFiltrado)
+        {
+            <div style="display:grid;grid-template-columns:80px 1.2fr 1.4fr 1fr 1fr 80px;padding:16px 18px;border-bottom:1px solid #F4F5FB;align-items:center;font-size:14px"
+                 class="resp-table-row">
+                <div style="font-family:ui-monospace,monospace;color:#6B7085">@h.Id.ToString("D4")</div>
+                <div style="font-weight:700">@h.Cliente?.Nombre</div>
+                <div>@h.Servicio?.Nombre</div>
+                <div style="color:#6B7085">@ElectroGestion.Services.AppStateService.FormatFecha((h.FechaFin ?? h.FechaSolicitud).ToString("yyyy-MM-dd"))</div>
+                <div>
+                    <span style="display:inline-block;padding:5px 11px;border-radius:20px;font-size:12px;font-weight:800;background:#E4F6EA;color:#17803D">
+                        Finalizada
+                    </span>
+                </div>
+                <div style="display:flex;justify-content:flex-end">
+                    <button title="Ver detalle" @onclick="() => AbrirDetalle(h)"
+                            style="width:32px;height:32px;border:1px solid #D5D8E6;background:#fff;border-radius:8px;cursor:pointer;color:#4A4E63;display:flex;align-items:center;justify-content:center">
+                        <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                            <circle cx="12" cy="12" r="3"></circle>
+                        </svg>
+                    </button>
+                </div>
+            </div>
+        }
+    }
+    else
+    {
+        <div style="padding:38px;text-align:center;color:#8B90A3;font-size:14px">
+            Aún no hay servicios finalizados.
+        </div>
+    }
+</div>
+
+@if (IsModalOpen && SelectedHistorial != null)
+{
+    <div style="position:fixed;inset:0;background:rgba(14,16,40,.5);display:flex;align-items:center;justify-content:center;z-index:9999;padding:20px;overflow-y:auto" @onclick="CerrarDetalle">
+        <div style="background:#fff;border-radius:16px;width:100%;max-width:620px;max-height:calc(100vh - 40px);max-height:calc(100dvh - 40px);overflow-y:auto;overscroll-behavior:contain;box-sizing:border-box;padding:32px;box-shadow:0 20px 40px rgba(0,0,0,.2);animation:tin .2s ease-out" @onclick:stopPropagation>
+            <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:20px">
+                <div>
+                    <div style="font-family:'Manrope';font-weight:800;font-size:22px;color:#14162B">Detalle de Historial</div>
+                    <div style="font-size:14px;color:#6B7085;margin-top:3px">Historial @SelectedHistorial.Id.ToString("D4")</div>
+                </div>
+                <button @onclick="CerrarDetalle" aria-label="Cerrar" style="width:32px;height:32px;border:1px solid #E3E5EE;border-radius:8px;background:#fff;display:flex;align-items:center;justify-content:center;color:#8B90A3;cursor:pointer">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M18 6 6 18M6 6l12 12"/></svg>
+                </button>
+            </div>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px" class="resp-grid-2">
+                <div style="background:#F7F8FC;border:1px solid #EFF0F6;border-radius:10px;padding:12px 14px"><div style="font-size:11.5px;color:#8B90A3;font-weight:800;text-transform:uppercase">Cliente</div><div style="font-size:14px;margin-top:4px;font-weight:700;color:#14162B">@SelectedHistorial.Cliente?.Nombre</div></div>
+                <div style="background:#F7F8FC;border:1px solid #EFF0F6;border-radius:10px;padding:12px 14px"><div style="font-size:11.5px;color:#8B90A3;font-weight:800;text-transform:uppercase">Tipo de Servicio</div><div style="font-size:14px;margin-top:4px;font-weight:700;color:#14162B">@SelectedHistorial.Servicio?.Nombre</div></div>
+                <div style="background:#F7F8FC;border:1px solid #EFF0F6;border-radius:10px;padding:12px 14px"><div style="font-size:11.5px;color:#8B90A3;font-weight:800;text-transform:uppercase">Fecha Finalización</div><div style="font-size:14px;margin-top:4px;font-weight:700;color:#14162B">@ElectroGestion.Services.AppStateService.FormatFecha((SelectedHistorial.FechaFin ?? SelectedHistorial.FechaSolicitud).ToString("yyyy-MM-dd"))</div></div>
+                <div style="background:#F7F8FC;border:1px solid #EFF0F6;border-radius:10px;padding:12px 14px"><div style="font-size:11.5px;color:#8B90A3;font-weight:800;text-transform:uppercase">Técnico Asignado</div><div style="font-size:14px;margin-top:4px;font-weight:700;color:#14162B">@SelectedHistorial.TecnicoAsignado</div></div>
+                <div style="grid-column:1 / -1;background:#F7F8FC;border:1px solid #EFF0F6;border-radius:10px;padding:12px 14px"><div style="font-size:11.5px;color:#8B90A3;font-weight:800;text-transform:uppercase">Dirección</div><div style="font-size:14px;margin-top:4px;font-weight:700;color:#14162B">@SelectedHistorial.Direccion</div></div>
+            </div>
+            <SolicitudTimeline SolicitudId="SelectedHistorial.Id" />
+            <div style="margin-top:24px;display:flex;justify-content:flex-end;border-top:1px solid #EFF0F6;padding-top:17px">
+                <button @onclick="CerrarDetalle" style="padding:10px 20px;border:1px solid #D5D8E6;background:#fff;border-radius:8px;font-weight:700;cursor:pointer;color:#14162B">Cerrar</button>
+            </div>
+        </div>
+    </div>
+}
+
+@code {
+    private string SearchId = "";
+    private string SearchCliente = "";
+    private string SearchTipo = "";
+    private string FiltroFecha = "Todas las fechas";
+    
+    private bool IsModalOpen = false;
+    private ElectroGestion.Models.Solicitud? SelectedHistorial;
+    private List<ElectroGestion.Models.Solicitud> SolicitudesHistoricas = [];
+
+    protected override async Task OnInitializedAsync()
+    {
+        try { SolicitudesHistoricas = await SolicitudService.GetList(s => s.EstadoSolicitud != null && s.EstadoSolicitud.Nombre == "Finalizada"); }
+        catch { SolicitudesHistoricas = []; }
+    }
+
+    private void AbrirDetalle(ElectroGestion.Models.Solicitud s)
+    {
+        SelectedHistorial = s;
+        IsModalOpen = true;
+        StateHasChanged();
+    }
+
+    private void CerrarDetalle()
+    {
+        IsModalOpen = false;
+        SelectedHistorial = null;
+        StateHasChanged();
+    }
+
+    private void Filtrar()
+    {
+        StateHasChanged();
+    }
+
+    private IEnumerable<ElectroGestion.Models.Solicitud> HistorialFiltrado
+    {
+        get
+        {
+            var res = SolicitudesHistoricas.AsEnumerable();
+
+            if (!string.IsNullOrWhiteSpace(SearchId))
+            {
+                res = res.Where(x => x.Id.ToString().Contains(SearchId));
+            }
+            if (!string.IsNullOrWhiteSpace(SearchCliente))
+            {
+                res = res.Where(x => x.Cliente != null && x.Cliente.Nombre.Contains(SearchCliente, StringComparison.OrdinalIgnoreCase));
+            }
+            if (!string.IsNullOrWhiteSpace(SearchTipo))
+            {
+                res = res.Where(x => x.Servicio != null && x.Servicio.Nombre.Contains(SearchTipo, StringComparison.OrdinalIgnoreCase));
+            }
+
+            if (FiltroFecha == "Últimos 7 días")
+            {
+                var lim = DateTime.Today.AddDays(-7);
+                res = res.Where(x => (x.FechaFin ?? x.FechaSolicitud) >= lim);
+            }
+            else if (FiltroFecha == "Últimos 30 días")
+            {
+                var lim = DateTime.Today.AddDays(-30);
+                res = res.Where(x => (x.FechaFin ?? x.FechaSolicitud) >= lim);
+            }
+
+            return res;
+        }
+    }
+}
+</file>
+
 <file path="Components/Pages/Gerente/Solicitudes.razor">
 @inject ElectroGestion.Services.AppStateService AppState
 @inject ElectroGestion.Services.SolicitudService SolicitudService
@@ -15943,335 +15943,6 @@ app.Run();
 }
 </file>
 
-<file path="Context/Contexto.cs">
-using Microsoft.EntityFrameworkCore;
-using ElectroGestion.Models;
-
-namespace ElectroGestion.Context;
-
-public class Contexto : DbContext
-{
-    public Contexto(DbContextOptions<Contexto> options) : base(options) { }
-
-    public DbSet<Solicitud> Solicitudes { get; set; }
-    public DbSet<SolicitudEvento> SolicitudesEventos { get; set; }
-    public DbSet<Visita> Visitas { get; set; }
-    public DbSet<Levantamiento> Levantamientos { get; set; }
-    public DbSet<Cotizacion> Cotizaciones { get; set; }
-    public DbSet<DetalleCotizacion> DetallesCotizacion { get; set; }
-    public DbSet<OrdenTrabajo> OrdenesTrabajo { get; set; }
-    public DbSet<Cobro> Cobros { get; set; }
-    public DbSet<Cliente> Clientes { get; set; }
-    public DbSet<Usuario> Usuarios { get; set; }
-    public DbSet<Servicio> Servicios { get; set; }
-    public DbSet<EstadoSolicitud> EstadosSolicitud { get; set; }
-    public DbSet<DetalleSolicitud> DetallesSolicitud { get; set; }
-    public DbSet<ClienteTelefono> ClientesTelefonos { get; set; }
-
-    protected override void OnModelCreating(ModelBuilder modelBuilder)
-    {
-        base.OnModelCreating(modelBuilder);
-
-        modelBuilder.Entity<Cliente>(entity =>
-        {
-            entity.HasMany(c => c.Telefonos)
-                .WithOne(t => t.Cliente)
-                .HasForeignKey(t => t.ClienteId)
-                .OnDelete(DeleteBehavior.Cascade);
-
-            entity.HasMany(c => c.Solicitudes)
-                .WithOne(s => s.Cliente)
-                .HasForeignKey(s => s.ClienteId)
-                .OnDelete(DeleteBehavior.Restrict);
-        });
-
-        modelBuilder.Entity<Servicio>(entity =>
-        {
-            entity.HasMany(s => s.Solicitudes)
-                .WithOne(sol => sol.Servicio)
-                .HasForeignKey(sol => sol.ServicioId)
-                .OnDelete(DeleteBehavior.Restrict);
-
-            entity.HasMany(s => s.Detalles)
-                .WithOne(d => d.Servicio)
-                .HasForeignKey(d => d.ServicioId)
-                .OnDelete(DeleteBehavior.Restrict);
-        });
-
-        modelBuilder.Entity<EstadoSolicitud>(entity =>
-        {
-            entity.HasMany(e => e.Solicitudes)
-                .WithOne(s => s.EstadoSolicitud)
-                .HasForeignKey(s => s.EstadoSolicitudId)
-                .OnDelete(DeleteBehavior.Restrict);
-        });
-
-        modelBuilder.Entity<Levantamiento>(entity =>
-        {
-            entity.HasQueryFilter(l => l.Solicitud != null && !l.Solicitud.IsDeleted);
-            entity.HasIndex(l => l.SolicitudId).IsUnique();
-            entity.Property(l => l.FotografiasJson).HasColumnType("nvarchar(max)");
-            entity.HasOne(l => l.Solicitud)
-                .WithOne(s => s.Levantamiento)
-                .HasForeignKey<Levantamiento>(l => l.SolicitudId)
-                .OnDelete(DeleteBehavior.Cascade);
-        });
-
-        modelBuilder.Entity<Cotizacion>(entity =>
-        {
-            entity.Property(c => c.Cliente).HasMaxLength(200).IsRequired();
-            entity.Property(c => c.SolicitudId).HasMaxLength(50).IsRequired();
-            entity.Property(c => c.Estado).HasMaxLength(40).IsRequired();
-            entity.Property(c => c.MotivoRechazo).HasMaxLength(1000).IsRequired();
-            entity.Property(c => c.MontoTotal).HasPrecision(18, 2);
-            entity.Property(c => c.PorcentajeItbis).HasPrecision(5, 2);
-            entity.Property(c => c.MontoManoObra).HasPrecision(18, 2);
-            entity.HasOne(c => c.Solicitud)
-                .WithMany()
-                .HasForeignKey(c => c.SolicitudDbId)
-                .OnDelete(DeleteBehavior.Restrict);
-            entity.HasIndex(c => c.SolicitudDbId).IsUnique().HasFilter("[SolicitudDbId] IS NOT NULL");
-        });
-
-        modelBuilder.Entity<DetalleCotizacion>(entity =>
-        {
-            entity.Property(d => d.CodigoArticulo).HasMaxLength(40).IsRequired();
-            entity.Property(d => d.NombreArticulo).HasMaxLength(200).IsRequired();
-            entity.Property(d => d.PrecioUnitario).HasPrecision(18, 2);
-            entity.Ignore(d => d.Subtotal);
-            entity.HasOne(d => d.Cotizacion)
-                .WithMany(c => c.Detalles)
-                .HasForeignKey(d => d.CotizacionId)
-                .OnDelete(DeleteBehavior.Cascade);
-        });
-
-        modelBuilder.Entity<OrdenTrabajo>(entity =>
-        {
-            entity.Property(o => o.Code).HasMaxLength(20).IsRequired();
-            entity.Property(o => o.Cliente).HasMaxLength(200).IsRequired();
-            entity.Property(o => o.TipoServicio).HasMaxLength(200).IsRequired();
-            entity.Property(o => o.Estado).HasMaxLength(30).IsRequired();
-            entity.Property(o => o.TrabajosJson).HasColumnType("nvarchar(max)");
-            entity.Property(o => o.MaterialesJson).HasColumnType("nvarchar(max)");
-            entity.Property(o => o.HerramientasJson).HasColumnType("nvarchar(max)");
-            entity.Property(o => o.Observaciones).HasMaxLength(2000);
-            entity.HasIndex(o => o.CotizacionId).IsUnique();
-            entity.HasOne(o => o.Cotizacion).WithMany().HasForeignKey(o => o.CotizacionId).OnDelete(DeleteBehavior.Restrict);
-            entity.HasOne<Solicitud>().WithMany().HasForeignKey(o => o.SolicitudId).OnDelete(DeleteBehavior.Restrict);
-        });
-
-        modelBuilder.Entity<Cobro>(entity =>
-        {
-            entity.Property(c => c.Cliente).HasMaxLength(200).IsRequired();
-            entity.Property(c => c.MetodoPago).HasMaxLength(40).IsRequired();
-            entity.Property(c => c.Estado).HasMaxLength(20).IsRequired();
-            entity.Property(c => c.Monto).HasPrecision(18, 2);
-            entity.HasIndex(c => c.OrdenTrabajoId).IsUnique();
-            entity.HasOne(c => c.OrdenTrabajo).WithMany().HasForeignKey(c => c.OrdenTrabajoId).OnDelete(DeleteBehavior.Restrict);
-        });
-
-        modelBuilder.Entity<SolicitudEvento>(entity =>
-        {
-            entity.HasQueryFilter(e => e.Solicitud != null && !e.Solicitud.IsDeleted);
-            entity.Property(e => e.Titulo).HasMaxLength(120).IsRequired();
-            entity.Property(e => e.Detalle).HasMaxLength(500).IsRequired();
-            entity.HasIndex(e => new { e.SolicitudId, e.Fecha });
-            entity.HasOne(e => e.Solicitud).WithMany(s => s.Eventos)
-                .HasForeignKey(e => e.SolicitudId).OnDelete(DeleteBehavior.Restrict);
-        });
-
-        modelBuilder.Entity<DetalleSolicitud>()
-            .HasQueryFilter(d => d.Solicitud != null && !d.Solicitud.IsDeleted);
-
-        modelBuilder.Entity<Solicitud>(entity =>
-        {
-            entity.HasQueryFilter(s => !s.IsDeleted);
-
-            entity.HasMany(s => s.Detalles)
-                .WithOne(d => d.Solicitud)
-                .HasForeignKey(d => d.SolicitudId)
-                .OnDelete(DeleteBehavior.Cascade);
-
-            entity.HasMany<Visita>()
-                .WithOne(v => v.Solicitud)
-                .HasForeignKey(v => v.SolicitudId)
-                .OnDelete(DeleteBehavior.Restrict);
-        });
-
-        modelBuilder.Entity<Visita>(entity =>
-        {
-            entity.HasQueryFilter(v => !v.IsDeleted && v.Solicitud != null && !v.Solicitud.IsDeleted);
-
-            entity.HasOne(v => v.Tecnico)
-                .WithMany()
-                .HasForeignKey(v => v.TecnicoId)
-                .OnDelete(DeleteBehavior.SetNull);
-        });
-
-        modelBuilder.Entity<Usuario>(entity =>
-        {
-            entity.Property(u => u.UsuarioLogin).HasMaxLength(50).IsRequired();
-            entity.Property(u => u.PasswordHash).HasMaxLength(500).IsRequired();
-            entity.Property(u => u.Nombre).HasMaxLength(150).IsRequired();
-            entity.Property(u => u.Cargo).HasMaxLength(80).IsRequired();
-            entity.Property(u => u.Rol).HasMaxLength(30).IsRequired();
-            entity.HasIndex(u => u.UsuarioLogin).IsUnique();
-        });
-
-        modelBuilder.Entity<Usuario>().HasData(
-            new Usuario
-            {
-                Id = 1,
-                UsuarioLogin = "ana",
-                PasswordHash = "AQAAAAIAAYagAAAAEHjAvVupymZcL4Z7wSkz9ro//N3Hyz31400GKF9GEPnxQFaOPv8TGpO2FJZ8XqCSwg==",
-                Nombre = "Ana Hernández",
-                Cargo = "Gerente",
-                Rol = "Gerente"
-            },
-            new Usuario
-            {
-                Id = 2,
-                UsuarioLogin = "luis",
-                PasswordHash = "AQAAAAIAAYagAAAAEAXFkAX9eqMt9778g9tjjfmZCQWcmM5qlxzOI9VP6eXkDBo7XL52AGtJ9CTZWHUm7g==",
-                Nombre = "Luis Peña",
-                Cargo = "Técnico",
-                Rol = "Técnico"
-            },
-            new Usuario
-            {
-                Id = 3,
-                UsuarioLogin = "admin",
-                PasswordHash = "AQAAAAIAAYagAAAAEDlXkB6f7Cn7W7LhwqonLz2YWMWnkh0z783OtK2aOGgJYxTR1gP7p26z3JILLccOWQ==",
-                Nombre = "Administrador",
-                Cargo = "Administrador",
-                Rol = "Admin"
-            });
-
-        modelBuilder.Entity<EstadoSolicitud>().HasData(
-            new EstadoSolicitud { Id = 1, Nombre = "Pendiente" },
-            new EstadoSolicitud { Id = 2, Nombre = "En proceso" },
-            new EstadoSolicitud { Id = 3, Nombre = "Finalizada" },
-            new EstadoSolicitud { Id = 4, Nombre = "Cancelada" },
-            new EstadoSolicitud { Id = 5, Nombre = "En Espera Administración" },
-            new EstadoSolicitud { Id = 6, Nombre = "En revisión" },
-            new EstadoSolicitud { Id = 7, Nombre = "Enviada al cliente" },
-            new EstadoSolicitud { Id = 8, Nombre = "Aprobada" },
-            new EstadoSolicitud { Id = 9, Nombre = "Rechazada" },
-            new EstadoSolicitud { Id = 10, Nombre = "Pendiente de cobro" }
-        );
-
-        modelBuilder.Entity<Cliente>().HasData(
-            new Cliente { Id = 1, Nombre = "Melody Santos", Correo = "melody@email.com", Rnc = "402-1234567-1", Direccion = "Calle Duarte #24, Santiago", Servicios = 8, Ultimo = "Instalación de Sistema UPS" },
-            new Cliente { Id = 2, Nombre = "Constructora López", Correo = "info@clopez.com", Rnc = "101-987654-2", Direccion = "Av. Estrella Sadhalá #102, Santiago", Servicios = 5, Ultimo = "Instalación Solar" },
-            new Cliente { Id = 3, Nombre = "Farmacia El Sol", Correo = "farmacia@elsol.do", Rnc = "130-334455-3", Direccion = "Calle 16 #7, La Vega", Servicios = 6, Ultimo = "Mantenimiento Eléctrico" },
-            new Cliente { Id = 4, Nombre = "Colmado Hernández", Correo = "hernandez@colmado.com", Rnc = "402-667788-4", Direccion = "Calle Principal #58, Moca", Servicios = 3, Ultimo = "Cableado Estructurado" },
-            new Cliente { Id = 5, Nombre = "Taller Mecánico RD", Correo = "taller@mecanicord.com", Rnc = "130-112233-5", Direccion = "Carretera Luperón km 5, Santiago", Servicios = 1, Ultimo = "Instalación de Planta Eléctrica" }
-        );
-
-        modelBuilder.Entity<ClienteTelefono>().HasData(
-            new ClienteTelefono { Id = 1, ClienteId = 1, Numero = "809-000-0000", Tipo = "Principal" },
-            new ClienteTelefono { Id = 2, ClienteId = 1, Numero = "829-111-2222", Tipo = "Alternativo" },
-            new ClienteTelefono { Id = 3, ClienteId = 2, Numero = "809-555-1212", Tipo = "Principal" },
-            new ClienteTelefono { Id = 4, ClienteId = 3, Numero = "829-441-8890", Tipo = "Principal" },
-            new ClienteTelefono { Id = 5, ClienteId = 4, Numero = "849-220-3311", Tipo = "Principal" },
-            new ClienteTelefono { Id = 6, ClienteId = 5, Numero = "809-778-4402", Tipo = "Principal" },
-            new ClienteTelefono { Id = 7, ClienteId = 5, Numero = "809-999-0000", Tipo = "Alternativo" }
-        );
-
-        modelBuilder.Entity<Servicio>().HasData(
-            new Servicio { Id = 1, ServicioId = "SV-001", Nombre = "Instalación de Paneles Solares", Categoria = "Instalaciones", PrecioBase = 85000, Estado = "Activo" },
-            new Servicio { Id = 2, ServicioId = "SV-002", Nombre = "Instalación de Sistema UPS", Categoria = "Instalaciones", PrecioBase = 45000, Estado = "Activo" },
-            new Servicio { Id = 3, ServicioId = "SV-003", Nombre = "Mantenimiento Eléctrico", Categoria = "Mantenimiento", PrecioBase = 12500, Estado = "Activo" },
-            new Servicio { Id = 4, ServicioId = "SV-004", Nombre = "Cableado Estructurado", Categoria = "Redes y Cableado", PrecioBase = 28000, Estado = "Activo" },
-            new Servicio { Id = 5, ServicioId = "SV-005", Nombre = "Instalación de Planta Eléctrica", Categoria = "Instalaciones", PrecioBase = 120000, Estado = "Activo" }
-        );
-
-        modelBuilder.Entity<Solicitud>().HasData(
-            new Solicitud
-            {
-                Id = 1,
-                ClienteId = 1,
-                ServicioId = 2,
-                Contacto = "Melody Santos",
-                Direccion = "Calle Duarte #24, Santiago",
-                FechaSolicitud = new DateTime(2026, 10, 1),
-                EstadoSolicitudId = 1
-            },
-            new Solicitud
-            {
-                Id = 2,
-                ClienteId = 2,
-                ServicioId = 1,
-                Contacto = "Constructora López",
-                Direccion = "Av. Estrella Sadhalá #102, Santiago",
-                FechaSolicitud = new DateTime(2026, 10, 2),
-                EstadoSolicitudId = 2
-            },
-            new Solicitud
-            {
-                Id = 3,
-                ClienteId = 3,
-                ServicioId = 3,
-                Contacto = "Farmacia El Sol",
-                Direccion = "Calle 16 #7, La Vega",
-                FechaSolicitud = new DateTime(2026, 10, 3),
-                EstadoSolicitudId = 1
-            },
-            new Solicitud
-            {
-                Id = 4,
-                ClienteId = 4,
-                ServicioId = 4,
-                Contacto = "Colmado Hernández",
-                Direccion = "Calle Principal #58, Moca",
-                FechaSolicitud = new DateTime(2026, 9, 29),
-                EstadoSolicitudId = 3
-            },
-            new Solicitud
-            {
-                Id = 5,
-                ClienteId = 5,
-                ServicioId = 5,
-                Contacto = "Taller Mecánico RD",
-                Direccion = "Carretera Luperón km 5, Santiago",
-                FechaSolicitud = new DateTime(2026, 10, 4),
-                EstadoSolicitudId = 2
-            },
-            new Solicitud
-            {
-                Id = 6,
-                ClienteId = 1,
-                ServicioId = 3,
-                Contacto = "Melody Santos",
-                Direccion = "Calle Duarte #24, Santiago",
-                FechaSolicitud = new DateTime(2026, 9, 20),
-                EstadoSolicitudId = 3
-            },
-            new Solicitud
-            {
-                Id = 7,
-                ClienteId = 2,
-                ServicioId = 4,
-                Contacto = "Constructora López",
-                Direccion = "Av. Estrella Sadhalá #102, Santiago",
-                FechaSolicitud = new DateTime(2026, 9, 25),
-                EstadoSolicitudId = 4
-            },
-            new Solicitud
-            {
-                Id = 8,
-                ClienteId = 3,
-                ServicioId = 2,
-                Contacto = "Farmacia El Sol",
-                Direccion = "Calle 16 #7, La Vega",
-                FechaSolicitud = new DateTime(2026, 10, 6),
-                EstadoSolicitudId = 1
-            }
-        );
-    }
-}
-</file>
-
 <file path="Components/Pages/Gerente/Cotizaciones.razor">
 @page "/cotizaciones"
 @inject ElectroGestion.Services.CotizacionService CotizacionService
@@ -16663,6 +16334,335 @@ public class Contexto : DbContext
         "En revisión" => ("#FEF3C7", "#92400E"), "Enviada al cliente" => ("#DBEAFE", "#1E40AF"),
         "Aprobada" => ("#D1FAE5", "#065F46"), "Rechazada" => ("#FEE2E2", "#991B1B"), _ => ("#F3F4F6", "#374151")
     };
+}
+</file>
+
+<file path="Context/Contexto.cs">
+using Microsoft.EntityFrameworkCore;
+using ElectroGestion.Models;
+
+namespace ElectroGestion.Context;
+
+public class Contexto : DbContext
+{
+    public Contexto(DbContextOptions<Contexto> options) : base(options) { }
+
+    public DbSet<Solicitud> Solicitudes { get; set; }
+    public DbSet<SolicitudEvento> SolicitudesEventos { get; set; }
+    public DbSet<Visita> Visitas { get; set; }
+    public DbSet<Levantamiento> Levantamientos { get; set; }
+    public DbSet<Cotizacion> Cotizaciones { get; set; }
+    public DbSet<DetalleCotizacion> DetallesCotizacion { get; set; }
+    public DbSet<OrdenTrabajo> OrdenesTrabajo { get; set; }
+    public DbSet<Cobro> Cobros { get; set; }
+    public DbSet<Cliente> Clientes { get; set; }
+    public DbSet<Usuario> Usuarios { get; set; }
+    public DbSet<Servicio> Servicios { get; set; }
+    public DbSet<EstadoSolicitud> EstadosSolicitud { get; set; }
+    public DbSet<DetalleSolicitud> DetallesSolicitud { get; set; }
+    public DbSet<ClienteTelefono> ClientesTelefonos { get; set; }
+
+    protected override void OnModelCreating(ModelBuilder modelBuilder)
+    {
+        base.OnModelCreating(modelBuilder);
+
+        modelBuilder.Entity<Cliente>(entity =>
+        {
+            entity.HasMany(c => c.Telefonos)
+                .WithOne(t => t.Cliente)
+                .HasForeignKey(t => t.ClienteId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            entity.HasMany(c => c.Solicitudes)
+                .WithOne(s => s.Cliente)
+                .HasForeignKey(s => s.ClienteId)
+                .OnDelete(DeleteBehavior.Restrict);
+        });
+
+        modelBuilder.Entity<Servicio>(entity =>
+        {
+            entity.HasMany(s => s.Solicitudes)
+                .WithOne(sol => sol.Servicio)
+                .HasForeignKey(sol => sol.ServicioId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            entity.HasMany(s => s.Detalles)
+                .WithOne(d => d.Servicio)
+                .HasForeignKey(d => d.ServicioId)
+                .OnDelete(DeleteBehavior.Restrict);
+        });
+
+        modelBuilder.Entity<EstadoSolicitud>(entity =>
+        {
+            entity.HasMany(e => e.Solicitudes)
+                .WithOne(s => s.EstadoSolicitud)
+                .HasForeignKey(s => s.EstadoSolicitudId)
+                .OnDelete(DeleteBehavior.Restrict);
+        });
+
+        modelBuilder.Entity<Levantamiento>(entity =>
+        {
+            entity.HasQueryFilter(l => l.Solicitud != null && !l.Solicitud.IsDeleted);
+            entity.HasIndex(l => l.SolicitudId).IsUnique();
+            entity.Property(l => l.FotografiasJson).HasColumnType("nvarchar(max)");
+            entity.HasOne(l => l.Solicitud)
+                .WithOne(s => s.Levantamiento)
+                .HasForeignKey<Levantamiento>(l => l.SolicitudId)
+                .OnDelete(DeleteBehavior.Cascade);
+        });
+
+        modelBuilder.Entity<Cotizacion>(entity =>
+        {
+            entity.Property(c => c.Cliente).HasMaxLength(200).IsRequired();
+            entity.Property(c => c.SolicitudId).HasMaxLength(50).IsRequired();
+            entity.Property(c => c.Estado).HasMaxLength(40).IsRequired();
+            entity.Property(c => c.MotivoRechazo).HasMaxLength(1000).IsRequired();
+            entity.Property(c => c.MontoTotal).HasPrecision(18, 2);
+            entity.Property(c => c.PorcentajeItbis).HasPrecision(5, 2);
+            entity.Property(c => c.MontoManoObra).HasPrecision(18, 2);
+            entity.HasOne(c => c.Solicitud)
+                .WithMany()
+                .HasForeignKey(c => c.SolicitudDbId)
+                .OnDelete(DeleteBehavior.Restrict);
+            entity.HasIndex(c => c.SolicitudDbId).IsUnique().HasFilter("[SolicitudDbId] IS NOT NULL");
+        });
+
+        modelBuilder.Entity<DetalleCotizacion>(entity =>
+        {
+            entity.Property(d => d.CodigoArticulo).HasMaxLength(40).IsRequired();
+            entity.Property(d => d.NombreArticulo).HasMaxLength(200).IsRequired();
+            entity.Property(d => d.PrecioUnitario).HasPrecision(18, 2);
+            entity.Ignore(d => d.Subtotal);
+            entity.HasOne(d => d.Cotizacion)
+                .WithMany(c => c.Detalles)
+                .HasForeignKey(d => d.CotizacionId)
+                .OnDelete(DeleteBehavior.Cascade);
+        });
+
+        modelBuilder.Entity<OrdenTrabajo>(entity =>
+        {
+            entity.Property(o => o.Code).HasMaxLength(20).IsRequired();
+            entity.Property(o => o.Cliente).HasMaxLength(200).IsRequired();
+            entity.Property(o => o.TipoServicio).HasMaxLength(200).IsRequired();
+            entity.Property(o => o.Estado).HasMaxLength(30).IsRequired();
+            entity.Property(o => o.TrabajosJson).HasColumnType("nvarchar(max)");
+            entity.Property(o => o.MaterialesJson).HasColumnType("nvarchar(max)");
+            entity.Property(o => o.HerramientasJson).HasColumnType("nvarchar(max)");
+            entity.Property(o => o.Observaciones).HasMaxLength(2000);
+            entity.HasIndex(o => o.CotizacionId).IsUnique();
+            entity.HasOne(o => o.Cotizacion).WithMany().HasForeignKey(o => o.CotizacionId).OnDelete(DeleteBehavior.Restrict);
+            entity.HasOne<Solicitud>().WithMany().HasForeignKey(o => o.SolicitudId).OnDelete(DeleteBehavior.Restrict);
+        });
+
+        modelBuilder.Entity<Cobro>(entity =>
+        {
+            entity.Property(c => c.Cliente).HasMaxLength(200).IsRequired();
+            entity.Property(c => c.MetodoPago).HasMaxLength(40).IsRequired();
+            entity.Property(c => c.Estado).HasMaxLength(20).IsRequired();
+            entity.Property(c => c.Monto).HasPrecision(18, 2);
+            entity.HasIndex(c => c.OrdenTrabajoId).IsUnique();
+            entity.HasOne(c => c.OrdenTrabajo).WithMany().HasForeignKey(c => c.OrdenTrabajoId).OnDelete(DeleteBehavior.Restrict);
+        });
+
+        modelBuilder.Entity<SolicitudEvento>(entity =>
+        {
+            entity.HasQueryFilter(e => e.Solicitud != null && !e.Solicitud.IsDeleted);
+            entity.Property(e => e.Titulo).HasMaxLength(120).IsRequired();
+            entity.Property(e => e.Detalle).HasMaxLength(500).IsRequired();
+            entity.HasIndex(e => new { e.SolicitudId, e.Fecha });
+            entity.HasOne(e => e.Solicitud).WithMany(s => s.Eventos)
+                .HasForeignKey(e => e.SolicitudId).OnDelete(DeleteBehavior.Restrict);
+        });
+
+        modelBuilder.Entity<DetalleSolicitud>()
+            .HasQueryFilter(d => d.Solicitud != null && !d.Solicitud.IsDeleted);
+
+        modelBuilder.Entity<Solicitud>(entity =>
+        {
+            entity.HasQueryFilter(s => !s.IsDeleted);
+
+            entity.HasMany(s => s.Detalles)
+                .WithOne(d => d.Solicitud)
+                .HasForeignKey(d => d.SolicitudId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            entity.HasMany<Visita>()
+                .WithOne(v => v.Solicitud)
+                .HasForeignKey(v => v.SolicitudId)
+                .OnDelete(DeleteBehavior.Restrict);
+        });
+
+        modelBuilder.Entity<Visita>(entity =>
+        {
+            entity.HasQueryFilter(v => !v.IsDeleted && v.Solicitud != null && !v.Solicitud.IsDeleted);
+
+            entity.HasOne(v => v.Tecnico)
+                .WithMany()
+                .HasForeignKey(v => v.TecnicoId)
+                .OnDelete(DeleteBehavior.SetNull);
+        });
+
+        modelBuilder.Entity<Usuario>(entity =>
+        {
+            entity.Property(u => u.UsuarioLogin).HasMaxLength(50).IsRequired();
+            entity.Property(u => u.PasswordHash).HasMaxLength(500).IsRequired();
+            entity.Property(u => u.Nombre).HasMaxLength(150).IsRequired();
+            entity.Property(u => u.Cargo).HasMaxLength(80).IsRequired();
+            entity.Property(u => u.Rol).HasMaxLength(30).IsRequired();
+            entity.HasIndex(u => u.UsuarioLogin).IsUnique();
+        });
+
+        modelBuilder.Entity<Usuario>().HasData(
+            new Usuario
+            {
+                Id = 1,
+                UsuarioLogin = "ana",
+                PasswordHash = "AQAAAAIAAYagAAAAEHjAvVupymZcL4Z7wSkz9ro//N3Hyz31400GKF9GEPnxQFaOPv8TGpO2FJZ8XqCSwg==",
+                Nombre = "Ana Hernández",
+                Cargo = "Gerente",
+                Rol = "Gerente"
+            },
+            new Usuario
+            {
+                Id = 2,
+                UsuarioLogin = "luis",
+                PasswordHash = "AQAAAAIAAYagAAAAEAXFkAX9eqMt9778g9tjjfmZCQWcmM5qlxzOI9VP6eXkDBo7XL52AGtJ9CTZWHUm7g==",
+                Nombre = "Luis Peña",
+                Cargo = "Técnico",
+                Rol = "Técnico"
+            },
+            new Usuario
+            {
+                Id = 3,
+                UsuarioLogin = "admin",
+                PasswordHash = "AQAAAAIAAYagAAAAEDlXkB6f7Cn7W7LhwqonLz2YWMWnkh0z783OtK2aOGgJYxTR1gP7p26z3JILLccOWQ==",
+                Nombre = "Administrador",
+                Cargo = "Administrador",
+                Rol = "Admin"
+            });
+
+        modelBuilder.Entity<EstadoSolicitud>().HasData(
+            new EstadoSolicitud { Id = 1, Nombre = "Pendiente" },
+            new EstadoSolicitud { Id = 2, Nombre = "En proceso" },
+            new EstadoSolicitud { Id = 3, Nombre = "Finalizada" },
+            new EstadoSolicitud { Id = 4, Nombre = "Cancelada" },
+            new EstadoSolicitud { Id = 5, Nombre = "En Espera Administración" },
+            new EstadoSolicitud { Id = 6, Nombre = "En revisión" },
+            new EstadoSolicitud { Id = 7, Nombre = "Enviada al cliente" },
+            new EstadoSolicitud { Id = 8, Nombre = "Aprobada" },
+            new EstadoSolicitud { Id = 9, Nombre = "Rechazada" },
+            new EstadoSolicitud { Id = 10, Nombre = "Pendiente de cobro" }
+        );
+
+        modelBuilder.Entity<Cliente>().HasData(
+            new Cliente { Id = 1, Nombre = "Melody Santos", Correo = "melody@email.com", Rnc = "402-1234567-1", Direccion = "Calle Duarte #24, Santiago", Servicios = 8, Ultimo = "Instalación de Sistema UPS" },
+            new Cliente { Id = 2, Nombre = "Constructora López", Correo = "info@clopez.com", Rnc = "101-987654-2", Direccion = "Av. Estrella Sadhalá #102, Santiago", Servicios = 5, Ultimo = "Instalación Solar" },
+            new Cliente { Id = 3, Nombre = "Farmacia El Sol", Correo = "farmacia@elsol.do", Rnc = "130-334455-3", Direccion = "Calle 16 #7, La Vega", Servicios = 6, Ultimo = "Mantenimiento Eléctrico" },
+            new Cliente { Id = 4, Nombre = "Colmado Hernández", Correo = "hernandez@colmado.com", Rnc = "402-667788-4", Direccion = "Calle Principal #58, Moca", Servicios = 3, Ultimo = "Cableado Estructurado" },
+            new Cliente { Id = 5, Nombre = "Taller Mecánico RD", Correo = "taller@mecanicord.com", Rnc = "130-112233-5", Direccion = "Carretera Luperón km 5, Santiago", Servicios = 1, Ultimo = "Instalación de Planta Eléctrica" }
+        );
+
+        modelBuilder.Entity<ClienteTelefono>().HasData(
+            new ClienteTelefono { Id = 1, ClienteId = 1, Numero = "809-000-0000", Tipo = "Principal" },
+            new ClienteTelefono { Id = 2, ClienteId = 1, Numero = "829-111-2222", Tipo = "Alternativo" },
+            new ClienteTelefono { Id = 3, ClienteId = 2, Numero = "809-555-1212", Tipo = "Principal" },
+            new ClienteTelefono { Id = 4, ClienteId = 3, Numero = "829-441-8890", Tipo = "Principal" },
+            new ClienteTelefono { Id = 5, ClienteId = 4, Numero = "849-220-3311", Tipo = "Principal" },
+            new ClienteTelefono { Id = 6, ClienteId = 5, Numero = "809-778-4402", Tipo = "Principal" },
+            new ClienteTelefono { Id = 7, ClienteId = 5, Numero = "809-999-0000", Tipo = "Alternativo" }
+        );
+
+        modelBuilder.Entity<Servicio>().HasData(
+            new Servicio { Id = 1, ServicioId = "SV-001", Nombre = "Instalación de Paneles Solares", Categoria = "Instalaciones", PrecioBase = 85000, Estado = "Activo" },
+            new Servicio { Id = 2, ServicioId = "SV-002", Nombre = "Instalación de Sistema UPS", Categoria = "Instalaciones", PrecioBase = 45000, Estado = "Activo" },
+            new Servicio { Id = 3, ServicioId = "SV-003", Nombre = "Mantenimiento Eléctrico", Categoria = "Mantenimiento", PrecioBase = 12500, Estado = "Activo" },
+            new Servicio { Id = 4, ServicioId = "SV-004", Nombre = "Cableado Estructurado", Categoria = "Redes y Cableado", PrecioBase = 28000, Estado = "Activo" },
+            new Servicio { Id = 5, ServicioId = "SV-005", Nombre = "Instalación de Planta Eléctrica", Categoria = "Instalaciones", PrecioBase = 120000, Estado = "Activo" }
+        );
+
+        modelBuilder.Entity<Solicitud>().HasData(
+            new Solicitud
+            {
+                Id = 1,
+                ClienteId = 1,
+                ServicioId = 2,
+                Contacto = "Melody Santos",
+                Direccion = "Calle Duarte #24, Santiago",
+                FechaSolicitud = new DateTime(2026, 10, 1),
+                EstadoSolicitudId = 1
+            },
+            new Solicitud
+            {
+                Id = 2,
+                ClienteId = 2,
+                ServicioId = 1,
+                Contacto = "Constructora López",
+                Direccion = "Av. Estrella Sadhalá #102, Santiago",
+                FechaSolicitud = new DateTime(2026, 10, 2),
+                EstadoSolicitudId = 2
+            },
+            new Solicitud
+            {
+                Id = 3,
+                ClienteId = 3,
+                ServicioId = 3,
+                Contacto = "Farmacia El Sol",
+                Direccion = "Calle 16 #7, La Vega",
+                FechaSolicitud = new DateTime(2026, 10, 3),
+                EstadoSolicitudId = 1
+            },
+            new Solicitud
+            {
+                Id = 4,
+                ClienteId = 4,
+                ServicioId = 4,
+                Contacto = "Colmado Hernández",
+                Direccion = "Calle Principal #58, Moca",
+                FechaSolicitud = new DateTime(2026, 9, 29),
+                EstadoSolicitudId = 3
+            },
+            new Solicitud
+            {
+                Id = 5,
+                ClienteId = 5,
+                ServicioId = 5,
+                Contacto = "Taller Mecánico RD",
+                Direccion = "Carretera Luperón km 5, Santiago",
+                FechaSolicitud = new DateTime(2026, 10, 4),
+                EstadoSolicitudId = 2
+            },
+            new Solicitud
+            {
+                Id = 6,
+                ClienteId = 1,
+                ServicioId = 3,
+                Contacto = "Melody Santos",
+                Direccion = "Calle Duarte #24, Santiago",
+                FechaSolicitud = new DateTime(2026, 9, 20),
+                EstadoSolicitudId = 3
+            },
+            new Solicitud
+            {
+                Id = 7,
+                ClienteId = 2,
+                ServicioId = 4,
+                Contacto = "Constructora López",
+                Direccion = "Av. Estrella Sadhalá #102, Santiago",
+                FechaSolicitud = new DateTime(2026, 9, 25),
+                EstadoSolicitudId = 4
+            },
+            new Solicitud
+            {
+                Id = 8,
+                ClienteId = 3,
+                ServicioId = 2,
+                Contacto = "Farmacia El Sol",
+                Direccion = "Calle 16 #7, La Vega",
+                FechaSolicitud = new DateTime(2026, 10, 6),
+                EstadoSolicitudId = 1
+            }
+        );
+    }
 }
 </file>
 
