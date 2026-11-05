@@ -23,8 +23,8 @@ public class VentaService(IDbContextFactory<Contexto> factory, AppStateService a
     public async Task<string?> GuardarAsync(Venta datos, bool registrar)
     {
         if (!appState.EsGerente) return "Acceso restringido.";
-        if (datos.Cantidad <= 0 || datos.TasaItbis is < 0 or > 100 || datos.TipoComprobante is not (Venta.Consumo or Venta.CreditoFiscal))
-            return "Revise la cantidad, el ITBIS y el tipo de comprobante.";
+        if (datos.Cantidad <= 0 || datos.TipoComprobante is not (Venta.Consumo or Venta.CreditoFiscal))
+            return "Revise la cantidad y el tipo de comprobante.";
 
         var nombre = datos.NombreCliente.Trim();
         var documento = datos.DocumentoCliente.Trim().Replace("-", "");
@@ -57,7 +57,7 @@ public class VentaService(IDbContextFactory<Contexto> factory, AppStateService a
             venta.DocumentoCliente = documento;
             venta.Cantidad = datos.Cantidad;
             venta.PrecioUnitario = articulo.PrecioUnidad;
-            venta.TasaItbis = Math.Round(datos.TasaItbis, 2);
+            venta.TasaItbis = 18m;
             venta.TipoComprobante = datos.TipoComprobante;
             venta.Ncf = registrar ? ncf : null;
 
