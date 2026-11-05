@@ -240,6 +240,7 @@
     private string FormNombre = "";
     private string FormCategoria = "";
     private int FormCantidad = 0;
+    private int? CantidadOriginal;
     private decimal FormPrecio = 0;
 
     private List<ElectroGestion.Models.ArticuloInventario> FilteredInventario => AppState.Inventario
@@ -264,6 +265,7 @@
             FormNombre = item.Nombre;
             FormCategoria = item.Categoria;
             FormCantidad = item.Cantidad;
+            CantidadOriginal = item.Cantidad;
             FormPrecio = item.PrecioUnidad;
         }
         else
@@ -273,6 +275,7 @@
             FormNombre = "";
             FormCategoria = "";
             FormCantidad = 0;
+            CantidadOriginal = null;
             FormPrecio = 0;
         }
         IsModalOpen = true;
@@ -300,9 +303,10 @@
             Cantidad = FormCantidad,
             PrecioUnidad = FormPrecio
         };
-        if (!await InventarioService.GuardarAsync(articulo))
+        if (!await InventarioService.GuardarAsync(articulo, CantidadOriginal))
         {
-            ToastService.Notify(new ToastMessage(ToastType.Warning, "No se pudo guardar. Verifique los datos y que el código sea único."));
+            ToastService.Notify(new ToastMessage(ToastType.Warning, "No se pudo guardar. Verifique los datos, el código y el stock actual."));
+            await CargarInventario();
             return;
         }
         await CargarInventario();

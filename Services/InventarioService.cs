@@ -12,7 +12,7 @@ public class InventarioService(IDbContextFactory<Contexto> factory)
         return await db.ArticulosInventario.AsNoTracking().OrderByDescending(a => a.Id).ToListAsync();
     }
 
-    public async Task<bool> GuardarAsync(ArticuloInventario articulo)
+    public async Task<bool> GuardarAsync(ArticuloInventario articulo, int? cantidadOriginal = null)
     {
         articulo.Codigo = articulo.Codigo.Trim();
         articulo.Nombre = articulo.Nombre.Trim();
@@ -29,12 +29,26 @@ public class InventarioService(IDbContextFactory<Contexto> factory)
             db.ArticulosInventario.Add(articulo);
         else
         {
+            if (cantidadOriginal.HasValue && articulo.Cantidad != cantidadOriginal.Value)
+            {
+                try
+                {
+                    return await db.ArticulosInventario
+                        .Where(a => a.Id == articulo.Id && a.Cantidad == cantidadOriginal.Value)
+                        .ExecuteUpdateAsync(set => set.SetProperty(a => a.Codigo, articulo.Codigo)
+                            .SetProperty(a => a.Nombre, articulo.Nombre)
+                            .SetProperty(a => a.Categoria, articulo.Categoria)
+                            .SetProperty(a => a.PrecioUnidad, articulo.PrecioUnidad)
+                            .SetProperty(a => a.Cantidad, articulo.Cantidad)) == 1;
+                }
+                catch (System.Data.Common.DbException) { return false; }
+            }
             var existente = await db.ArticulosInventario.FindAsync(articulo.Id);
             if (existente is null) return false;
             existente.Codigo = articulo.Codigo;
             existente.Nombre = articulo.Nombre;
             existente.Categoria = articulo.Categoria;
-            existente.Cantidad = articulo.Cantidad;
+            if (!cantidadOriginal.HasValue) existente.Cantidad = articulo.Cantidad;
             existente.PrecioUnidad = articulo.PrecioUnidad;
         }
 

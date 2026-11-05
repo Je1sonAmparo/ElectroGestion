@@ -301,6 +301,15 @@
     {
         if (MontoManoObra < 0)
         { ToastService.Notify(new ToastMessage(ToastType.Warning, "La mano de obra no puede tener un monto negativo.")); return; }
+        if (FormDetalles.Count > 0)
+        {
+            try { AppState.Inventario = await InventarioService.ObtenerTodosAsync(); }
+            catch
+            {
+                ToastService.Notify(new ToastMessage(ToastType.Warning, "No se pudo consultar el stock disponible."));
+                return;
+            }
+        }
         if (SubtotalNeto <= 0 || FormDetalles.Any(d => d.Cantidad <= 0 || d.Cantidad > (AppState.Inventario.FirstOrDefault(a => a.Id == d.ArticuloInventarioId)?.Cantidad ?? 0)))
         {
             ToastService.Notify(new ToastMessage(ToastType.Warning, "Ingrese materiales o mano de obra y verifique el stock disponible.")); return;
