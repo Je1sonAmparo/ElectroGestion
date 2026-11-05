@@ -121,6 +121,15 @@ public class OrdenTrabajoService(IDbContextFactory<Contexto> contextFactory, App
         return await db.Cobros.AnyAsync(c => c.OrdenTrabajoId == id);
     }
 
+    public async Task<bool> PuedeModificarAsync(int id)
+    {
+        if (!appState.EsGerente) return false;
+        await using var db = await contextFactory.CreateDbContextAsync();
+        var orden = await db.OrdenesTrabajo.AsNoTracking().FirstOrDefaultAsync(o => o.Id == id);
+        return orden is not null && !await SolicitudFinalizadaAsync(db, orden.SolicitudId) &&
+            !await db.Cobros.AnyAsync(c => c.OrdenTrabajoId == id);
+    }
+
     private static Task<bool> SolicitudFinalizadaAsync(Contexto db, int solicitudId) =>
         db.Solicitudes.Where(s => s.Id == solicitudId)
             .AnyAsync(s => s.EstadoSolicitud != null && s.EstadoSolicitud.Nombre == "Finalizada");
