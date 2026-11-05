@@ -12,6 +12,7 @@ public class CobroService(IDbContextFactory<Contexto> factory, AppStateService a
         return await db.Cobros.AsNoTracking()
             .Include(c => c.OrdenTrabajo).ThenInclude(o => o!.Cotizacion).ThenInclude(q => q!.Detalles)
             .Include(c => c.OrdenTrabajo).ThenInclude(o => o!.Cotizacion).ThenInclude(q => q!.Solicitud).ThenInclude(s => s!.Cliente)
+            .Include(c => c.OrdenTrabajo).ThenInclude(o => o!.Cotizacion).ThenInclude(q => q!.Solicitud).ThenInclude(s => s!.Servicio)
             .OrderByDescending(c => c.Id).ToListAsync();
     }
 
