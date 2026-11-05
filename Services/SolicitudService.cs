@@ -104,23 +104,20 @@ public class SolicitudService(IDbContextFactory<Contexto> contextFactory) : Apli
     }
 
     public async Task<bool> Eliminar(int id)
-    {
-        await using var contexto = await contextFactory.CreateDbContextAsync();
-        var solicitud = await contexto.Solicitudes.FirstOrDefaultAsync(s => s.Id == id);
-        if (solicitud is null || solicitud.EstadoSolicitudId is 2 or 5 ||
-            await contexto.EstadosSolicitud.AnyAsync(e => e.Id == solicitud.EstadoSolicitudId && e.Nombre == "Finalizada"))
-        {
-            return false;
-        }
+        => await EliminarVarios([id]);
 
+    public async Task<bool> EliminarVarios(IReadOnlyCollection<int> ids)
+    {
+        if (ids.Count == 0 || ids.Count != ids.Distinct().Count()) return false;
+        await using var contexto = await contextFactory.CreateDbContextAsync();
+        await using var transaccion = await contexto.Database.BeginTransactionAsync();
+        var solicitudes = await contexto.Solicitudes.Include(s => s.EstadoSolicitud).Where(s => ids.Contains(s.Id)).ToListAsync();
+        if (solicitudes.Count != ids.Count || solicitudes.Any(s => s.EstadoSolicitudId is 2 or 5 || s.EstadoSolicitud?.Nombre == "Finalizada")) return false;
         var visitas = await contexto.Visitas
             .IgnoreQueryFilters()
-            .Where(v => v.SolicitudId == id)
+            .Where(v => ids.Contains(v.SolicitudId))
             .ToListAsync();
-        if (visitas.Any(v => v.Estado is "En proceso" or "En Espera Administración"))
-        {
-            return false;
-        }
+        if (visitas.Any(v => v.Estado is "En proceso" or "En Espera Administración")) return false;
 
         foreach (var visita in visitas)
         {
@@ -131,8 +128,10 @@ public class SolicitudService(IDbContextFactory<Contexto> contextFactory) : Apli
             }
         }
 
-        solicitud.IsDeleted = true;
-        return await contexto.SaveChangesAsync() > 0;
+        foreach (var solicitud in solicitudes) solicitud.IsDeleted = true;
+        await contexto.SaveChangesAsync();
+        await transaccion.CommitAsync();
+        return true;
     }
 
     public async Task<List<Solicitud>> ObtenerEliminadasAsync()
