@@ -464,6 +464,46 @@ namespace ElectroGestion.Migrations
                     b.ToTable("DetallesSolicitud");
                 });
 
+            modelBuilder.Entity("ElectroGestion.Models.DetalleVenta", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("ArticuloInventarioId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("Cantidad")
+                        .HasColumnType("int");
+
+                    b.Property<string>("CodigoArticulo")
+                        .IsRequired()
+                        .HasMaxLength(40)
+                        .HasColumnType("nvarchar(40)");
+
+                    b.Property<string>("NombreArticulo")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
+
+                    b.Property<decimal>("PrecioUnitario")
+                        .HasPrecision(18, 2)
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<int>("VentaId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ArticuloInventarioId");
+
+                    b.HasIndex("VentaId");
+
+                    b.ToTable("DetallesVenta");
+                });
+
             modelBuilder.Entity("ElectroGestion.Models.EstadoSolicitud", b =>
                 {
                     b.Property<int>("Id")
@@ -1185,6 +1225,23 @@ namespace ElectroGestion.Migrations
                     b.Navigation("Solicitud");
                 });
 
+            modelBuilder.Entity("ElectroGestion.Models.DetalleVenta", b =>
+                {
+                    b.HasOne("ElectroGestion.Models.ArticuloInventario", null)
+                        .WithMany()
+                        .HasForeignKey("ArticuloInventarioId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("ElectroGestion.Models.Venta", "Venta")
+                        .WithMany("Detalles")
+                        .HasForeignKey("VentaId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Venta");
+                });
+
             modelBuilder.Entity("ElectroGestion.Models.Levantamiento", b =>
                 {
                     b.HasOne("ElectroGestion.Models.Solicitud", "Solicitud")
@@ -1314,6 +1371,11 @@ namespace ElectroGestion.Migrations
                     b.Navigation("Eventos");
 
                     b.Navigation("Levantamiento");
+                });
+
+            modelBuilder.Entity("ElectroGestion.Models.Venta", b =>
+                {
+                    b.Navigation("Detalles");
                 });
 #pragma warning restore 612, 618
         }
