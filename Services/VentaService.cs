@@ -18,13 +18,15 @@ public class VentaService(IDbContextFactory<Contexto> factory, AppStateService a
     {
         if (!appState.EsGerente) return [];
         await using var db = await factory.CreateDbContextAsync();
-        return await db.Ventas.AsNoTracking().OrderByDescending(v => v.Id).ToListAsync();
+        return await db.Ventas.AsNoTracking().Include(v => v.Detalles).OrderByDescending(v => v.Id).ToListAsync();
     }
 
     public async Task<string?> GuardarAsync(Venta datos, bool registrar)
     {
         if (!appState.EsGerente) return "Acceso restringido.";
-        if (datos.Cantidad <= 0 || datos.TipoComprobante is not (Venta.Consumo or Venta.CreditoFiscal))
+        if (datos.Detalles.Count == 0 || datos.Detalles.Any(d => d.Cantidad <= 0) ||
+            datos.Detalles.Select(d => d.ArticuloInventarioId).Distinct().Count() != datos.Detalles.Count ||
+            datos.TipoComprobante is not (Venta.Consumo or Venta.CreditoFiscal))
             return "Revise la cantidad y el tipo de comprobante.";
 
         var nombre = datos.NombreCliente.Trim();
@@ -37,22 +39,31 @@ public class VentaService(IDbContextFactory<Contexto> factory, AppStateService a
         try
         {
             var venta = datos.Id == 0 ? new Venta { FechaCreacion = AhoraDominicana }
-                : await db.Ventas.SingleOrDefaultAsync(v => v.Id == datos.Id && v.Estado == Venta.Borrador);
+                : await db.Ventas.Include(v => v.Detalles).SingleOrDefaultAsync(v => v.Id == datos.Id && v.Estado == Venta.Borrador);
             if (venta is null) return "Solo se pueden editar borradores.";
 
-            var articulo = await db.ArticulosInventario.AsNoTracking().SingleOrDefaultAsync(a => a.Id == datos.ArticuloInventarioId);
-            if (articulo is null) return "Seleccione un producto del inventario.";
+            var ids = datos.Detalles.Select(d => d.ArticuloInventarioId).ToList();
+            var articulos = await db.ArticulosInventario.AsNoTracking().Where(a => ids.Contains(a.Id)).ToDictionaryAsync(a => a.Id);
+            if (articulos.Count != ids.Count) return "Seleccione productos disponibles del inventario.";
             if (datos.ClienteId.HasValue && !await db.Clientes.AnyAsync(c => c.Id == datos.ClienteId))
                 return "El cliente seleccionado no está disponible.";
 
-            venta.ArticuloInventarioId = articulo.Id;
+            if (venta.Id > 0) db.DetallesVenta.RemoveRange(venta.Detalles);
+            venta.Detalles = datos.Detalles.Select(d =>
+            {
+                var articulo = articulos[d.ArticuloInventarioId];
+                return new DetalleVenta { ArticuloInventarioId = articulo.Id, CodigoArticulo = articulo.Codigo,
+                    NombreArticulo = articulo.Nombre, PrecioUnitario = articulo.PrecioUnidad, Cantidad = d.Cantidad };
+            }).ToList();
+            var primero = venta.Detalles[0];
+            venta.ArticuloInventarioId = primero.ArticuloInventarioId;
             venta.ClienteId = datos.ClienteId;
-            venta.CodigoArticulo = articulo.Codigo;
-            venta.NombreArticulo = articulo.Nombre;
+            venta.CodigoArticulo = primero.CodigoArticulo;
+            venta.NombreArticulo = primero.NombreArticulo;
             venta.NombreCliente = nombre;
             venta.DocumentoCliente = documento;
-            venta.Cantidad = datos.Cantidad;
-            venta.PrecioUnitario = articulo.PrecioUnidad;
+            venta.Cantidad = primero.Cantidad;
+            venta.PrecioUnitario = primero.PrecioUnitario;
             venta.TasaItbis = 18m;
             venta.TipoComprobante = datos.TipoComprobante;
             var prefijo = venta.TipoComprobante == Venta.CreditoFiscal ? "DEMO-B01-" : "DEMO-B02-";
@@ -72,10 +83,13 @@ public class VentaService(IDbContextFactory<Contexto> factory, AppStateService a
                 if (venta.TipoComprobante == Venta.Consumo && venta.Total >= 250_000m && documento.Length == 0)
                     return "Identifique al comprador en facturas de consumo de RD$ 250,000 o más.";
 
-                var descontado = await db.ArticulosInventario
-                    .Where(a => a.Id == articulo.Id && a.Cantidad >= venta.Cantidad)
-                    .ExecuteUpdateAsync(set => set.SetProperty(a => a.Cantidad, a => a.Cantidad - venta.Cantidad));
-                if (descontado == 0) return "No hay suficientes existencias para registrar la venta.";
+                foreach (var linea in venta.Detalles)
+                {
+                    var descontado = await db.ArticulosInventario
+                        .Where(a => a.Id == linea.ArticuloInventarioId && a.Cantidad >= linea.Cantidad)
+                        .ExecuteUpdateAsync(set => set.SetProperty(a => a.Cantidad, a => a.Cantidad - linea.Cantidad));
+                    if (descontado == 0) return $"Stock insuficiente para {linea.NombreArticulo}.";
+                }
                 venta.Estado = Venta.Registrada;
                 venta.FechaVenta = AhoraDominicana;
             }
@@ -105,12 +119,15 @@ public class VentaService(IDbContextFactory<Contexto> factory, AppStateService a
         await using var transaccion = await db.Database.BeginTransactionAsync(IsolationLevel.Serializable);
         try
         {
-            var venta = await db.Ventas.SingleOrDefaultAsync(v => v.Id == id && v.Estado == Venta.Registrada);
+            var venta = await db.Ventas.Include(v => v.Detalles).SingleOrDefaultAsync(v => v.Id == id && v.Estado == Venta.Registrada);
             if (venta is null) return false;
-            var devuelto = await db.ArticulosInventario
-                .Where(a => a.Id == venta.ArticuloInventarioId && a.Cantidad <= int.MaxValue - venta.Cantidad)
-                .ExecuteUpdateAsync(set => set.SetProperty(a => a.Cantidad, a => a.Cantidad + venta.Cantidad));
-            if (devuelto == 0) return false;
+            foreach (var linea in venta.Detalles)
+            {
+                var devuelto = await db.ArticulosInventario
+                    .Where(a => a.Id == linea.ArticuloInventarioId && a.Cantidad <= int.MaxValue - linea.Cantidad)
+                    .ExecuteUpdateAsync(set => set.SetProperty(a => a.Cantidad, a => a.Cantidad + linea.Cantidad));
+                if (devuelto == 0) return false;
+            }
             venta.Estado = Venta.Anulada;
             await db.SaveChangesAsync();
             await transaccion.CommitAsync();
@@ -138,18 +155,21 @@ public class VentaService(IDbContextFactory<Contexto> factory, AppStateService a
         var inicio = actual.AddMonths(-2);
         var fin = actual.AddMonths(1);
         await using var db = await factory.CreateDbContextAsync();
-        var articulosCategoria = db.ArticulosInventario.AsNoTracking()
-            .Where(a => string.IsNullOrEmpty(categoria) || a.Categoria == categoria)
-            .Select(a => a.Id);
         var ventas = await db.Ventas.AsNoTracking()
-            .Where(v => v.Estado == Venta.Registrada && v.FechaVenta >= inicio && v.FechaVenta < fin && articulosCategoria.Contains(v.ArticuloInventarioId))
+            .Include(v => v.Detalles)
+            .Where(v => v.Estado == Venta.Registrada && v.FechaVenta >= inicio && v.FechaVenta < fin)
             .ToListAsync();
+        var articulosCategoria = string.IsNullOrEmpty(categoria) ? null :
+            (await db.ArticulosInventario.AsNoTracking().Where(a => a.Categoria == categoria).Select(a => a.Id).ToListAsync()).ToHashSet();
         return Enumerable.Range(0, 3).Select(i =>
         {
             var mes = inicio.AddMonths(i);
-            var operaciones = ventas.Where(v => v.FechaVenta!.Value.Month == mes.Month).ToList();
-            return new MesVentas(mes, operaciones.Count, operaciones.Sum(v => (long)v.Cantidad),
-                operaciones.Sum(v => v.Subtotal), operaciones.Sum(v => v.Itbis));
+            var operaciones = ventas.Where(v => v.FechaVenta!.Value.Year == mes.Year && v.FechaVenta.Value.Month == mes.Month)
+                .Select(v => new { Venta = v, Lineas = v.Detalles.Where(d => articulosCategoria is null || articulosCategoria.Contains(d.ArticuloInventarioId)).ToList() })
+                .Where(x => x.Lineas.Count > 0).ToList();
+            var subtotal = operaciones.Sum(x => x.Lineas.Sum(d => d.Subtotal));
+            return new MesVentas(mes, operaciones.Count, operaciones.Sum(x => x.Lineas.Sum(d => (long)d.Cantidad)),
+                subtotal, Math.Round(subtotal * 0.18m, 2, MidpointRounding.AwayFromZero));
         }).ToList();
     }
 }
