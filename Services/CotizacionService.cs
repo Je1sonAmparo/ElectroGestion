@@ -67,7 +67,8 @@ public class CotizacionService(IDbContextFactory<Contexto> contextFactory)
         if (!DetallesValidos(detalles, montoManoObra)) return false;
         await using var db = await contextFactory.CreateDbContextAsync();
         var cotizacion = await db.Cotizaciones.Include(c => c.Detalles).FirstOrDefaultAsync(c => c.Id == id);
-        if (cotizacion is null || cotizacion.Estado != EnRevision) return false;
+        if (cotizacion is null || cotizacion.Estado != EnRevision ||
+            (cotizacion.SolicitudDbId.HasValue && await SolicitudFinalizadaAsync(db, cotizacion.SolicitudDbId.Value))) return false;
         db.DetallesCotizacion.RemoveRange(cotizacion.Detalles);
         cotizacion.Detalles = detalles.Select(CopiarDetalle).ToList();
         cotizacion.PorcentajeItbis = TasaItbis;
@@ -110,6 +111,7 @@ public class CotizacionService(IDbContextFactory<Contexto> contextFactory)
         await using var db = await contextFactory.CreateDbContextAsync();
         var cotizacion = await db.Cotizaciones.FirstOrDefaultAsync(c => c.Id == id);
         if (cotizacion is null) return false;
+        if (cotizacion.SolicitudDbId.HasValue && await SolicitudFinalizadaAsync(db, cotizacion.SolicitudDbId.Value)) return false;
 
         if (cotizacion.Estado == EnRevision && nuevoEstado == "Enviada al cliente")
         {
@@ -152,6 +154,8 @@ public class CotizacionService(IDbContextFactory<Contexto> contextFactory)
         await using var db = await contextFactory.CreateDbContextAsync();
         var cotizacion = await db.Cotizaciones.FindAsync(id);
         if (cotizacion is null) return ResultadoEliminarCotizacion.NoEncontrada;
+        if (cotizacion.SolicitudDbId.HasValue && await SolicitudFinalizadaAsync(db, cotizacion.SolicitudDbId.Value))
+            return ResultadoEliminarCotizacion.NoEncontrada;
         if (await db.OrdenesTrabajo.AnyAsync(o => o.CotizacionId == id))
             return ResultadoEliminarCotizacion.VinculadaAOrden;
 
@@ -159,4 +163,8 @@ public class CotizacionService(IDbContextFactory<Contexto> contextFactory)
         await db.SaveChangesAsync();
         return ResultadoEliminarCotizacion.Eliminada;
     }
+
+    private static Task<bool> SolicitudFinalizadaAsync(Contexto db, int solicitudId) =>
+        db.Solicitudes.Where(s => s.Id == solicitudId)
+            .AnyAsync(s => s.EstadoSolicitud != null && s.EstadoSolicitud.Nombre == "Finalizada");
 }
