@@ -364,7 +364,7 @@ else
 @code {
     private const int MaxPhotoSize = 5 * 1024 * 1024;
     private const string TecnicoSinAsignar = "sin-asignar";
-    private static readonly string[] EstadosLevantamiento = ["Pendiente", "En proceso", "En Espera Administración", "Cancelada"];
+    private static readonly string[] EstadosLevantamiento = ["Pendiente", "En proceso", "En Espera Administración", "En revisión", "Enviada al cliente", "Aprobada", "Rechazada", "Pendiente de cobro", "Finalizada", "Cancelada"];
     private const string InputStyle = "width:100%;padding:12px 13px;border:1px solid #D5D8E6;border-radius:9px;font-size:14.5px";
     private const string ReadOnlyInputStyle = "width:100%;padding:12px 13px;border:1px solid #D5D8E6;border-radius:9px;font-size:14.5px;background:#F7F8FC";
     private const string ModalBackdropStyle = "position:fixed;inset:0;z-index:1055;background:rgba(20,22,43,.48);display:flex;align-items:center;justify-content:center;padding:18px";
@@ -450,7 +450,7 @@ else
         AppState.OnChange += OnAppStateChanged;
         if (AppState.EsGerente)
         {
-            SearchEstado = "En Espera Administración";
+            SearchEstado = "Todos";
         }
         else if (AppState.Session?.Rol == "Técnico")
         {
