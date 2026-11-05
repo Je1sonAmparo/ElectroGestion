@@ -1,5 +1,6 @@
 @page "/inventario"
 @inject ElectroGestion.Services.AppStateService AppState
+@inject ElectroGestion.Services.InventarioService InventarioService
 @inject BlazorBootstrap.ToastService ToastService
 
 <PageTitle>Inventario | ElectroGestion</PageTitle>
@@ -37,6 +38,22 @@
                 <input @bind="SearchCategoria" @bind:event="oninput" placeholder="Categoría"
                     style="width:160px;padding:9px 12px;border:1px solid #D5D8E6;border-radius:6px;font-size:14px;color:#4A4E63" />
             </div>
+            <div style="display:flex;align-items:center;gap:10px">
+                <span style="font-family:'Manrope';font-weight:800;font-size:15px;color:#14162B">ID:</span>
+                <input @bind="SearchId" @bind:event="oninput" placeholder="ID" style="width:90px;padding:9px 12px;border:1px solid #D5D8E6;border-radius:6px;font-size:14px" />
+            </div>
+            <div style="display:flex;align-items:center;gap:10px">
+                <span style="font-family:'Manrope';font-weight:800;font-size:15px;color:#14162B">Estado:</span>
+                <select @bind="SearchEstado" style="padding:9px 12px;border:1px solid #D5D8E6;border-radius:6px;font-size:14px;background:#fff"><option value="">Todos</option><option>Con stock</option><option>Sin stock</option></select>
+            </div>
+            <div style="display:flex;align-items:center;gap:10px">
+                <span style="font-family:'Manrope';font-weight:800;font-size:15px;color:#14162B">Precio desde:</span>
+                <input @bind="SearchPrecioDesde" type="number" min="0" step="0.01" style="width:110px;padding:9px 12px;border:1px solid #D5D8E6;border-radius:6px;font-size:14px" />
+            </div>
+            <div style="display:flex;align-items:center;gap:10px">
+                <span style="font-family:'Manrope';font-weight:800;font-size:15px;color:#14162B">Hasta:</span>
+                <input @bind="SearchPrecioHasta" type="number" min="0" step="0.01" style="width:110px;padding:9px 12px;border:1px solid #D5D8E6;border-radius:6px;font-size:14px" />
+            </div>
             <div style="display:flex;justify-content:flex-end;margin-left:auto">
                 <button class="primary-btn" @onclick="Filtrar"
                     style="padding:9px 16px;background:#1D4ED8;color:#fff;border:0;border-radius:6px;font-weight:700;font-size:14px;cursor:pointer;font-family:'Manrope'">Buscar</button>
@@ -53,6 +70,7 @@
                     <th style="padding:14px 18px;text-align:left;color:#4A4E63;font-weight:700">Nombre</th>
                     <th style="padding:14px 18px;text-align:left;color:#4A4E63;font-weight:700">Categoría</th>
                     <th style="padding:14px 18px;text-align:left;color:#4A4E63;font-weight:700">Cantidad</th>
+                    <th style="padding:14px 18px;text-align:left;color:#4A4E63;font-weight:700">Estado</th>
                     <th style="padding:14px 18px;text-align:left;color:#4A4E63;font-weight:700">Precio Unitario</th>
                     <th style="padding:14px 18px;text-align:center;color:#4A4E63;font-weight:700">Acciones</th>
                 </tr>
@@ -61,7 +79,7 @@
                 @if (!FilteredInventario.Any())
                 {
                     <tr>
-                        <td colspan="7" style="padding:24px;text-align:center;color:#6B7085">No se encontraron artículos.</td>
+                        <td colspan="8" style="padding:24px;text-align:center;color:#6B7085">No se encontraron artículos.</td>
                     </tr>
                 }
                 else
@@ -83,6 +101,7 @@
                                     <span style="color:#065F46">@art.Cantidad</span>
                                 }
                             </td>
+                            <td style="padding:14px 18px"><span style="padding:4px 10px;border-radius:20px;font-size:12px;font-weight:700;background:@(art.Cantidad > 0 ? "#D1FAE5" : "#FEE2E2");color:@(art.Cantidad > 0 ? "#065F46" : "#991B1B")">@art.Estado</span></td>
                             <td style="padding:14px 18px;color:#4A4E63;font-weight:700">RD$ @art.PrecioUnidad.ToString("N2")</td>
                             <td style="padding:14px 18px;text-align:center">
                                 <div style="display:flex;gap:8px;justify-content:center">
@@ -92,6 +111,7 @@
                                     <button @onclick="() => AbrirModal(art.Id)" title="Editar" aria-label="Editar" class="table-action-icon" style="width:30px;height:30px;border:1px solid #D5D8E6;background:#fff;border-radius:7px;cursor:pointer;color:#5F6479;display:flex;align-items:center;justify-content:center;padding:0">
                                         <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 1 1 3 3L7 19l-4 1 1-4 12.5-12.5Z"/></svg>
                                     </button>
+                                    <button @onclick="() => AbrirStock(art.Id)" title="Agregar stock" aria-label="Agregar stock" style="padding:6px 10px;border:1px solid #1D4ED8;background:#EFF6FF;color:#1D4ED8;border-radius:7px;cursor:pointer;font-weight:700">+ Stock</button>
                                 </div>
                             </td>
                         </tr>
@@ -162,6 +182,7 @@
                 <div style="background:#F7F8FC;border:1px solid #EFF0F6;border-radius:10px;padding:12px 14px"><div style="font-size:11.5px;color:#8B90A3;font-weight:800;text-transform:uppercase">Nombre</div><div style="font-size:14px;margin-top:4px;font-weight:700;color:#14162B">@SelectedArticulo.Nombre</div></div>
                 <div style="background:#F7F8FC;border:1px solid #EFF0F6;border-radius:10px;padding:12px 14px"><div style="font-size:11.5px;color:#8B90A3;font-weight:800;text-transform:uppercase">Categoría</div><div style="font-size:14px;margin-top:4px;font-weight:700;color:#14162B">@SelectedArticulo.Categoria</div></div>
                 <div style="background:#F7F8FC;border:1px solid #EFF0F6;border-radius:10px;padding:12px 14px"><div style="font-size:11.5px;color:#8B90A3;font-weight:800;text-transform:uppercase">Stock Actual</div><div style="font-size:14px;margin-top:4px;font-weight:700;color:#14162B">@SelectedArticulo.Cantidad unid.</div></div>
+                <div style="background:#F7F8FC;border:1px solid #EFF0F6;border-radius:10px;padding:12px 14px"><div style="font-size:11.5px;color:#8B90A3;font-weight:800;text-transform:uppercase">Estado</div><div style="font-size:14px;margin-top:4px;font-weight:700;color:#14162B">@SelectedArticulo.Estado</div></div>
                 <div style="background:#F7F8FC;border:1px solid #EFF0F6;border-radius:10px;padding:12px 14px"><div style="font-size:11.5px;color:#8B90A3;font-weight:800;text-transform:uppercase">Precio Unitario</div><div style="font-size:14px;margin-top:4px;font-weight:700;color:#14162B">RD$ @SelectedArticulo.PrecioUnidad.ToString("N2")</div></div>
             </div>
             <div style="margin-top:24px;display:flex;justify-content:flex-end;border-top:1px solid #EFF0F6;padding-top:17px">
@@ -171,20 +192,49 @@
     </div>
 }
 
+@if (StockArticuloId.HasValue)
+{
+    <div style="position:fixed;inset:0;background:rgba(14,16,40,.5);display:flex;align-items:center;justify-content:center;z-index:10000;padding:20px" @onclick="CerrarStock">
+        <div style="background:#fff;border-radius:16px;width:100%;max-width:420px;padding:26px" @onclick:stopPropagation>
+            <h3 style="margin:0 0 8px">Agregar stock</h3>
+            <p style="color:#6B7085">@StockArticulo?.Nombre · Existencia actual: @StockArticulo?.Cantidad</p>
+            <label for="cantidad-stock" style="font-weight:700">Unidades a agregar</label>
+            <input id="cantidad-stock" @bind="CantidadAgregar" type="number" min="1" step="1" style="display:block;width:100%;padding:10px;margin:7px 0 18px;border:1px solid #D5D8E6;border-radius:8px" />
+            <div style="display:flex;justify-content:flex-end;gap:10px"><button @onclick="CerrarStock" style="padding:9px 14px;background:#fff;border:1px solid #D5D8E6;border-radius:8px">Cancelar</button><button @onclick="GuardarStock" style="padding:9px 14px;background:#1D4ED8;color:#fff;border:0;border-radius:8px;font-weight:700">Agregar</button></div>
+        </div>
+    </div>
+}
+
 @code {
     private string SearchCodigo = "";
     private string SearchNombre = "";
     private string SearchCategoria = "";
+    private string SearchId = "";
+    private string SearchEstado = "";
+    private decimal? SearchPrecioDesde;
+    private decimal? SearchPrecioHasta;
+    private (string Id, string Codigo, string Nombre, string Categoria, string Estado, decimal? PrecioDesde, decimal? PrecioHasta) FiltrosAplicados = ("", "", "", "", "", null, null);
+
+    protected override async Task OnInitializedAsync() => await CargarInventario();
+
+    private async Task CargarInventario()
+    {
+        AppState.Inventario = await InventarioService.ObtenerTodosAsync();
+        AppState.NotifyStateChanged();
+    }
 
     private void Filtrar()
     {
-        StateHasChanged();
+        FiltrosAplicados = (SearchId.Trim(), SearchCodigo.Trim(), SearchNombre.Trim(), SearchCategoria.Trim(), SearchEstado, SearchPrecioDesde, SearchPrecioHasta);
     }
 
     private bool IsModalOpen = false;
     private string ModalTitle = "";
     private int? EditId = null;
     private ElectroGestion.Models.ArticuloInventario? SelectedArticulo;
+    private int? StockArticuloId;
+    private int CantidadAgregar = 1;
+    private ElectroGestion.Models.ArticuloInventario? StockArticulo => AppState.Inventario.FirstOrDefault(a => a.Id == StockArticuloId);
 
     private string FormCodigo = "";
     private string FormNombre = "";
@@ -193,12 +243,13 @@
     private decimal FormPrecio = 0;
 
     private List<ElectroGestion.Models.ArticuloInventario> FilteredInventario => AppState.Inventario
-        .Where(a => {
-            bool matchCod = string.IsNullOrEmpty(SearchCodigo) || a.Codigo.Contains(SearchCodigo, StringComparison.OrdinalIgnoreCase);
-            bool matchNombre = string.IsNullOrEmpty(SearchNombre) || a.Nombre.Contains(SearchNombre, StringComparison.OrdinalIgnoreCase);
-            bool matchCat = string.IsNullOrEmpty(SearchCategoria) || a.Categoria.Contains(SearchCategoria, StringComparison.OrdinalIgnoreCase);
-            return matchCod && matchNombre && matchCat;
-        })
+        .Where(a => (FiltrosAplicados.Id.Length == 0 || a.Id.ToString().Contains(FiltrosAplicados.Id)) &&
+            a.Codigo.Contains(FiltrosAplicados.Codigo, StringComparison.OrdinalIgnoreCase) &&
+            a.Nombre.Contains(FiltrosAplicados.Nombre, StringComparison.OrdinalIgnoreCase) &&
+            a.Categoria.Contains(FiltrosAplicados.Categoria, StringComparison.OrdinalIgnoreCase) &&
+            (FiltrosAplicados.Estado.Length == 0 || a.Estado == FiltrosAplicados.Estado) &&
+            (!FiltrosAplicados.PrecioDesde.HasValue || a.PrecioUnidad >= FiltrosAplicados.PrecioDesde.Value) &&
+            (!FiltrosAplicados.PrecioHasta.HasValue || a.PrecioUnidad <= FiltrosAplicados.PrecioHasta.Value))
         .OrderByDescending(a => a.Id)
         .ToList();
 
@@ -232,7 +283,7 @@
         IsModalOpen = false;
     }
 
-    private void GuardarArticulo()
+    private async Task GuardarArticulo()
     {
         if (string.IsNullOrWhiteSpace(FormCodigo) || string.IsNullOrWhiteSpace(FormNombre) || FormPrecio < 0 || FormCantidad < 0)
         {
@@ -240,33 +291,37 @@
             return;
         }
 
-        if (EditId.HasValue)
+        var articulo = new ElectroGestion.Models.ArticuloInventario
         {
-            var item = AppState.Inventario.First(x => x.Id == EditId.Value);
-            item.Codigo = FormCodigo;
-            item.Nombre = FormNombre;
-            item.Categoria = FormCategoria;
-            item.Cantidad = FormCantidad;
-            item.PrecioUnidad = FormPrecio;
-            ToastService.Notify(new ToastMessage(ToastType.Success, "Artículo actualizado con éxito."));
-        }
-        else
+            Id = EditId ?? 0,
+            Codigo = FormCodigo,
+            Nombre = FormNombre,
+            Categoria = FormCategoria,
+            Cantidad = FormCantidad,
+            PrecioUnidad = FormPrecio
+        };
+        if (!await InventarioService.GuardarAsync(articulo))
         {
-            var nuevo = new ElectroGestion.Models.ArticuloInventario
-            {
-                Id = AppState.NextArticuloId(),
-                Codigo = FormCodigo,
-                Nombre = FormNombre,
-                Categoria = FormCategoria,
-                Cantidad = FormCantidad,
-                PrecioUnidad = FormPrecio
-            };
-            AppState.Inventario.Add(nuevo);
-            ToastService.Notify(new ToastMessage(ToastType.Success, "Artículo creado con éxito."));
+            ToastService.Notify(new ToastMessage(ToastType.Warning, "No se pudo guardar. Verifique los datos y que el código sea único."));
+            return;
         }
-
-        AppState.NotifyStateChanged();
+        await CargarInventario();
+        ToastService.Notify(new ToastMessage(ToastType.Success, EditId.HasValue ? "Artículo actualizado con éxito." : "Artículo creado con éxito."));
         CerrarModal();
+    }
+
+    private void AbrirStock(int id) { StockArticuloId = id; CantidadAgregar = 1; }
+    private void CerrarStock() => StockArticuloId = null;
+    private async Task GuardarStock()
+    {
+        if (!StockArticuloId.HasValue || !await InventarioService.AgregarStockAsync(StockArticuloId.Value, CantidadAgregar))
+        {
+            ToastService.Notify(new ToastMessage(ToastType.Warning, "Ingrese una cantidad válida para agregar stock."));
+            return;
+        }
+        await CargarInventario();
+        CerrarStock();
+        ToastService.Notify(new ToastMessage(ToastType.Success, "Stock agregado correctamente."));
     }
 
     private void VerDetalle(int id)
