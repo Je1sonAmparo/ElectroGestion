@@ -13,6 +13,7 @@ public class Contexto : DbContext
     public DbSet<Cotizacion> Cotizaciones { get; set; }
     public DbSet<DetalleCotizacion> DetallesCotizacion { get; set; }
     public DbSet<OrdenTrabajo> OrdenesTrabajo { get; set; }
+    public DbSet<Cobro> Cobros { get; set; }
     public DbSet<Cliente> Clientes { get; set; }
     public DbSet<Usuario> Usuarios { get; set; }
     public DbSet<Servicio> Servicios { get; set; }
@@ -112,6 +113,16 @@ public class Contexto : DbContext
             entity.HasOne<Solicitud>().WithMany().HasForeignKey(o => o.SolicitudId).OnDelete(DeleteBehavior.Restrict);
         });
 
+        modelBuilder.Entity<Cobro>(entity =>
+        {
+            entity.Property(c => c.Cliente).HasMaxLength(200).IsRequired();
+            entity.Property(c => c.MetodoPago).HasMaxLength(40).IsRequired();
+            entity.Property(c => c.Estado).HasMaxLength(20).IsRequired();
+            entity.Property(c => c.Monto).HasPrecision(18, 2);
+            entity.HasIndex(c => c.OrdenTrabajoId).IsUnique();
+            entity.HasOne(c => c.OrdenTrabajo).WithMany().HasForeignKey(c => c.OrdenTrabajoId).OnDelete(DeleteBehavior.Restrict);
+        });
+
         modelBuilder.Entity<DetalleSolicitud>()
             .HasQueryFilter(d => d.Solicitud != null && !d.Solicitud.IsDeleted);
 
@@ -184,7 +195,12 @@ public class Contexto : DbContext
             new EstadoSolicitud { Id = 2, Nombre = "En proceso" },
             new EstadoSolicitud { Id = 3, Nombre = "Finalizada" },
             new EstadoSolicitud { Id = 4, Nombre = "Cancelada" },
-            new EstadoSolicitud { Id = 5, Nombre = "En Espera Administración" }
+            new EstadoSolicitud { Id = 5, Nombre = "En Espera Administración" },
+            new EstadoSolicitud { Id = 6, Nombre = "En revisión" },
+            new EstadoSolicitud { Id = 7, Nombre = "Enviada al cliente" },
+            new EstadoSolicitud { Id = 8, Nombre = "Aprobada" },
+            new EstadoSolicitud { Id = 9, Nombre = "Rechazada" },
+            new EstadoSolicitud { Id = 10, Nombre = "Pendiente de cobro" }
         );
 
         modelBuilder.Entity<Cliente>().HasData(
