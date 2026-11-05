@@ -34,7 +34,7 @@ else
                     {
                         <tr @key="venta.Id">
                             <td>@venta.Id</td><td>@((venta.FechaVenta ?? venta.FechaCreacion).ToString("dd/MM/yyyy"))</td>
-                            <td>@Comprador(venta)</td><td>@venta.NombreArticulo × @venta.Cantidad</td>
+                            <td>@Comprador(venta)</td><td>@(venta.Detalles.Count == 1 ? venta.Detalles[0].NombreArticulo : $"{venta.Detalles.Count} productos")</td>
                             <td>@venta.TipoComprobante <small>@venta.Ncf</small></td>
                             <td>@Moneda(venta.Total)</td><td><span class="ventas-estado" data-estado="@venta.Estado">@venta.Estado</span></td>
                             <td><div class="ventas-acciones">
@@ -66,8 +66,8 @@ else
             <section class="ventas-modal" role="dialog" aria-modal="true" aria-labelledby="titulo-venta" @onclick:stopPropagation>
                 <h2 id="titulo-venta">@(form.Id == 0 ? "Nueva venta" : "Editar borrador")</h2>
                 <div class="ventas-formulario">
-                    <label>Producto
-                        <select @bind="form.ArticuloInventarioId">
+                    <label class="ventas-producto">Producto
+                        <select @bind="ArticuloSeleccionadoId">
                             <option value="0">Seleccione un producto</option>
                             @foreach (var articulo in Articulos)
                             {
@@ -75,12 +75,13 @@ else
                             }
                         </select>
                     </label>
-                    <label>Cantidad <input type="number" min="1" step="1" @bind="form.Cantidad" />
+                    <label>Cantidad <input type="number" min="1" step="1" @bind="CantidadNueva" />
                         @if (ArticuloSeleccionado is { } productoDisponible)
                         {
                             <small class="ventas-disponibilidad">Hay @productoDisponible.Cantidad unidades en stock.</small>
                         }
                     </label>
+                    <div class="ventas-agregar"><button type="button" class="ventas-primary" @onclick="AgregarProducto">Agregar producto</button></div>
                     <label>Tipo de comprobante <select @bind="form.TipoComprobante" @bind:after="CambiarTipoComprobante"><option value="@Venta.Consumo">Factura de consumo (B02 / E32)</option><option value="@Venta.CreditoFiscal">Comprobante de Crédito Fiscal (B01 / E31)</option></select></label>
                     @if (form.TipoComprobante == Venta.CreditoFiscal)
                     {
@@ -93,16 +94,19 @@ else
                         <label>Nombre o razón social <input maxlength="200" @bind="form.NombreCliente" /></label>
                         <label>RNC o cédula <input maxlength="30" @bind="form.DocumentoCliente" /></label>
                     }
-                    else if (form.Cantidad > 0 && ArticuloSeleccionado is { } productoConsumo && productoConsumo.PrecioUnidad * form.Cantidad >= 250_000m)
+                    else if (form.Detalles.Sum(d => d.Subtotal) * 1.18m >= 250_000m)
                     {
                         <label>RNC o cédula del comprador (requerido desde RD$ 250,000) <input maxlength="30" @bind="form.DocumentoCliente" /></label>
                     }
                 </div>
-                @if (ArticuloSeleccionado is { } elegido)
+                @if (form.Detalles.Count > 0)
                 {
-                    var subtotal = elegido.PrecioUnidad * form.Cantidad;
+                    var subtotal = form.Detalles.Sum(d => d.Subtotal);
                     var impuesto = CotizacionService.CalcularImpuesto(subtotal, 18m);
-                    <div class="ventas-resumen"><div class="ventas-resumen-filas"><span>Precio unitario</span><strong>@Moneda(elegido.PrecioUnidad)</strong><span>Subtotal</span><strong>@Moneda(subtotal)</strong><span>ITBIS (18%)</span><strong>@Moneda(impuesto)</strong><span class="ventas-total-label">Total</span><strong class="ventas-total">@Moneda(subtotal + impuesto)</strong></div></div>
+                    <div class="ventas-tabla ventas-lineas"><table><thead><tr><th>Código</th><th>Producto</th><th>Cantidad</th><th>Precio unitario</th><th>Subtotal</th><th>Acción</th></tr></thead><tbody>
+                        @foreach (var linea in form.Detalles) { <tr><td>@linea.CodigoArticulo</td><td>@linea.NombreArticulo</td><td>@linea.Cantidad</td><td>@Moneda(linea.PrecioUnitario)</td><td>@Moneda(linea.Subtotal)</td><td><button type="button" class="ventas-quitar" @onclick="() => QuitarProducto(linea.ArticuloInventarioId)">Quitar</button></td></tr> }
+                    </tbody></table></div>
+                    <div class="ventas-resumen"><div class="ventas-resumen-filas"><span>Subtotal</span><strong>@Moneda(subtotal)</strong><span>ITBIS (18%)</span><strong>@Moneda(impuesto)</strong><span class="ventas-total-label">Total</span><strong class="ventas-total">@Moneda(subtotal + impuesto)</strong></div></div>
                 }
                 <div class="ventas-pie">
                     <button disabled="@Ocupado" @onclick="CerrarFormulario">Cancelar</button>
@@ -138,7 +142,7 @@ else
                 <div class="factura-cliente"><strong>Cliente</strong><span>@Comprador(detalle)</span>@if (!string.IsNullOrWhiteSpace(detalle.DocumentoCliente)){<span>RNC/Cédula: @detalle.DocumentoCliente</span>}</div>
                 <div class="ventas-tabla">
                     <table><colgroup><col style="width:15%" /><col style="width:33%" /><col style="width:20%" /><col style="width:12%" /><col style="width:20%" /></colgroup><thead><tr><th>Código</th><th>Descripción</th><th>Precio unitario</th><th>Cantidad</th><th>Importe</th></tr></thead>
-                        <tbody><tr><td>@detalle.CodigoArticulo</td><td>@detalle.NombreArticulo</td><td>@Moneda(detalle.PrecioUnitario)</td><td>@detalle.Cantidad</td><td>@Moneda(detalle.Subtotal)</td></tr></tbody>
+                        <tbody>@foreach (var linea in detalle.Detalles) { <tr><td>@linea.CodigoArticulo</td><td>@linea.NombreArticulo</td><td>@Moneda(linea.PrecioUnitario)</td><td>@linea.Cantidad</td><td>@Moneda(linea.Subtotal)</td></tr> }</tbody>
                     </table>
                 </div>
                 <div class="factura-totales"><div><span>Subtotal</span><strong>@Moneda(detalle.Subtotal)</strong><span>ITBIS (@detalle.TasaItbis.ToString("0.##") %)</span><strong>@Moneda(detalle.Itbis)</strong><span class="factura-total-label">Total</span><strong class="factura-total">@Moneda(detalle.Total)</strong></div></div>
@@ -178,10 +182,12 @@ else
         (Filtros.Tipo.Length == 0 || v.TipoComprobante == Filtros.Tipo) &&
         (Filtros.Estado.Length == 0 || v.Estado == Filtros.Estado) &&
         (Comprador(v).Contains(Filtros.Texto, StringComparison.OrdinalIgnoreCase) ||
-            v.NombreArticulo.Contains(Filtros.Texto, StringComparison.OrdinalIgnoreCase) ||
+            v.Detalles.Any(d => d.NombreArticulo.Contains(Filtros.Texto, StringComparison.OrdinalIgnoreCase)) ||
             (v.Ncf ?? "").Contains(Filtros.Texto, StringComparison.OrdinalIgnoreCase)));
 
-    private ArticuloInventario? ArticuloSeleccionado => Articulos.FirstOrDefault(a => a.Id == Formulario?.ArticuloInventarioId);
+    private int ArticuloSeleccionadoId;
+    private int CantidadNueva = 1;
+    private ArticuloInventario? ArticuloSeleccionado => Articulos.FirstOrDefault(a => a.Id == ArticuloSeleccionadoId);
     private static string Comprador(Venta v) => string.IsNullOrWhiteSpace(v.NombreCliente) ? "Consumidor final" : v.NombreCliente;
     private static string Moneda(decimal importe) => $"RD$ {importe:N2}";
     private void AplicarFiltros() => Filtros = (Busqueda.Trim(), Tipo, Estado);
@@ -207,13 +213,30 @@ else
             Clientes = (await ClienteService.GetList(c => true)).OrderBy(c => c.Nombre).ToList();
             Formulario = venta is null ? new Venta() : new Venta
             {
-                Id = venta.Id, ArticuloInventarioId = venta.ArticuloInventarioId, ClienteId = venta.ClienteId,
+                Id = venta.Id, ClienteId = venta.ClienteId,
                 NombreCliente = venta.NombreCliente, DocumentoCliente = venta.DocumentoCliente,
-                Cantidad = venta.Cantidad, TipoComprobante = venta.TipoComprobante, TasaItbis = venta.TasaItbis
+                TipoComprobante = venta.TipoComprobante, TasaItbis = venta.TasaItbis,
+                Detalles = venta.Detalles.Select(d => new DetalleVenta { ArticuloInventarioId = d.ArticuloInventarioId, CodigoArticulo = d.CodigoArticulo, NombreArticulo = d.NombreArticulo, Cantidad = d.Cantidad, PrecioUnitario = d.PrecioUnitario }).ToList()
             };
+            ArticuloSeleccionadoId = 0;
+            CantidadNueva = 1;
         }
         catch { ToastService.Notify(new ToastMessage(ToastType.Danger, "No se pudieron cargar los productos o clientes.")); }
     }
+
+    private void AgregarProducto()
+    {
+        if (Formulario is not { } form || ArticuloSeleccionado is not { } articulo || CantidadNueva <= 0) return;
+        var actual = form.Detalles.FirstOrDefault(d => d.ArticuloInventarioId == articulo.Id);
+        var total = (actual?.Cantidad ?? 0) + CantidadNueva;
+        if (total > articulo.Cantidad) { ToastService.Notify(new ToastMessage(ToastType.Warning, $"Stock disponible: {articulo.Cantidad} unidades.")); return; }
+        if (actual is null) form.Detalles.Add(new DetalleVenta { ArticuloInventarioId = articulo.Id, CodigoArticulo = articulo.Codigo, NombreArticulo = articulo.Nombre, PrecioUnitario = articulo.PrecioUnidad, Cantidad = CantidadNueva });
+        else actual.Cantidad = total;
+        ArticuloSeleccionadoId = 0;
+        CantidadNueva = 1;
+    }
+
+    private void QuitarProducto(int articuloId) => Formulario?.Detalles.RemoveAll(d => d.ArticuloInventarioId == articuloId);
 
     private void SeleccionarCliente()
     {
