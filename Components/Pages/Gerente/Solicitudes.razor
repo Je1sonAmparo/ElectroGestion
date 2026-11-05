@@ -390,6 +390,11 @@
         var s = solicitudes.FirstOrDefault(x => x.Id == id);
         if (s != null)
         {
+            if (s.EstadoSolicitud?.Nombre == "Finalizada")
+            {
+                ToastService.ShowWarning("No se puede editar una solicitud finalizada. Reábrala desde el detalle de su cobro.", "Solicitud finalizada");
+                return;
+            }
             IsFormModalOpen = true;
             ModalTitle = "Editar Solicitud";
             ModalSub = "Modifique los datos de la solicitud.";
@@ -404,7 +409,7 @@
     {
         if (!PuedeEliminarSolicitud(id))
         {
-            ToastService.ShowWarning("No se puede eliminar una solicitud En proceso o En Espera Administración.", "Atención");
+            ToastService.ShowWarning("No se puede eliminar una solicitud en proceso, en espera de administración o finalizada.", "Atención");
             return;
         }
 
@@ -413,7 +418,7 @@
     }
 
     private bool PuedeEliminarSolicitud(int id) =>
-        solicitudes.FirstOrDefault(s => s.Id == id)?.EstadoSolicitud?.Nombre is not ("En proceso" or "En Espera Administración");
+        solicitudes.FirstOrDefault(s => s.Id == id)?.EstadoSolicitud?.Nombre is not ("En proceso" or "En Espera Administración" or "Finalizada");
 
     private async Task EjecutarEliminar()
     {
