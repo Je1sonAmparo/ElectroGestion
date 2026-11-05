@@ -32,6 +32,8 @@ td small { display:block; color:#6B7085; }
 .ventas-agregar button { min-height:40px; }
 .ventas-lineas { margin-top:16px; border:1px solid #E3E5EE; border-radius:8px; }
 .ventas-quitar { color:#B91C1C; border-color:#FECACA; }
+.ventas-cantidad-linea { width:76px; padding:6px 8px; }
+.ventas-lineas .ventas-disponibilidad { display:block; margin-top:3px; }
 .ventas-disponibilidad { color:#6B7085; font-size:12px; font-weight:500; }
 .ventas-modal .ventas-resumen { display:flex; justify-content:flex-end; margin-top:16px; padding:12px 16px; background:#F7F8FC; border-radius:8px; }
 .ventas-resumen-filas { display:grid; grid-template-columns:minmax(145px,auto) auto; gap:7px 22px; min-width:min(100%, 330px); color:#4A4E63; font-size:14px; }
