@@ -13,7 +13,7 @@
 </style>
 
 <div style="display:flex;justify-content:space-between;align-items:center;gap:16px;margin-bottom:24px;flex-wrap:wrap">
-    <div><h1 class="page-title" style="font-family:'Manrope';font-size:31px;margin:0">Órdenes de trabajo</h1><p style="color:#6B7085;margin:5px 0 0">Materiales de la cotización y herramientas para el trabajo en campo.</p></div>
+    <div><div class="page-title" style="font-family:'Manrope';font-weight:800;font-size:31px;letter-spacing:-.6px">Órdenes de trabajo</div><p style="color:#6B7085;margin:5px 0 0">Materiales de la cotización y herramientas para el trabajo en campo.</p></div>
     <button @onclick="AbrirNueva" style="padding:11px 18px;background:#1D4ED8;color:white;border:0;border-radius:9px;font-weight:700;cursor:pointer">+ Nueva orden</button>
 </div>
 
@@ -89,7 +89,7 @@ else
                     <div style="background:#F7F8FC;padding:14px;border-radius:8px;margin-bottom:16px"><strong>Materiales de la cotización</strong><div style="font-size:13px;color:#6B7085">Se incorporarán con las cantidades aprobadas.</div>@foreach (var d in CotizacionSeleccionada.Detalles) { <div style="margin-top:6px">@d.CodigoArticulo · @d.NombreArticulo <strong>× @d.Cantidad</strong></div> }@if (!CotizacionSeleccionada.Detalles.Any()) { <div>La cotización incluye solo mano de obra.</div> }</div>
                 }
             }
-            else { <div style="background:#F7F8FC;padding:12px;border-radius:8px;margin-bottom:16px">Los materiales se mantienen iguales a la cotización vinculada.</div> }
+            
             <label for="orden-tareas" style="font-weight:700">Tareas (una por línea)</label><textarea id="orden-tareas" @bind="FormTrabajos" rows="4" style="display:block;width:100%;padding:10px;border:1px solid #D5D8E6;border-radius:7px;margin:6px 0 16px"></textarea>
             <label for="orden-herramientas" style="font-weight:700">Herramientas asignadas (una por línea)</label><textarea id="orden-herramientas" @bind="FormHerramientas" rows="3" style="display:block;width:100%;padding:10px;border:1px solid #D5D8E6;border-radius:7px;margin:6px 0 16px" placeholder="Multímetro&#10;Escalera"></textarea>
             <label for="orden-instrucciones" style="font-weight:700">Instrucciones de campo</label><textarea id="orden-instrucciones" @bind="FormObservaciones" rows="3" maxlength="2000" style="display:block;width:100%;padding:10px;border:1px solid #D5D8E6;border-radius:7px;margin:6px 0 16px"></textarea>
@@ -99,7 +99,15 @@ else
 }
 
 @if (OrdenAEliminar.HasValue)
-{ <div style="position:fixed;inset:0;background:rgba(20,22,43,.48);z-index:10000;display:flex;align-items:center;justify-content:center;padding:20px"><div style="background:white;padding:24px;border-radius:14px;max-width:420px"><h2 style="font-size:20px">Eliminar orden</h2><p>¿Desea eliminar esta orden de trabajo?</p><div style="display:flex;justify-content:end;gap:9px"><button @onclick="() => OrdenAEliminar = null">Cancelar</button><button @onclick="Eliminar" style="background:#C4141B;color:white;border:0;border-radius:7px;padding:8px 14px">Eliminar</button></div></div></div> }
+{
+    <div style="position:fixed;inset:0;background:rgba(14,16,40,.5);display:flex;align-items:center;justify-content:center;z-index:10000;padding:20px" @onclick="CerrarEliminar">
+        <div style="background:#fff;border-radius:16px;width:100%;max-width:400px;padding:32px;box-shadow:0 20px 40px rgba(0,0,0,.2)" @onclick:stopPropagation>
+            <div style="font-family:'Manrope';font-weight:800;font-size:22px;color:#14162B;margin-bottom:10px">Eliminar orden de trabajo</div>
+            <div style="color:#4A4E63;font-size:14px;margin-bottom:24px">¿Está seguro que desea eliminar esta orden? Esta acción no se puede deshacer.</div>
+            <div style="display:flex;justify-content:flex-end;gap:12px"><button @onclick="CerrarEliminar" style="padding:10px 20px;border:1px solid #D5D8E6;background:#fff;border-radius:8px;font-weight:700;font-size:14px;cursor:pointer;color:#4A4E63">Cancelar</button><button @onclick="Eliminar" style="padding:10px 24px;border:0;background:#C0392B;color:#fff;border-radius:8px;font-weight:700;font-size:14px;cursor:pointer;font-family:'Manrope'">Eliminar</button></div>
+        </div>
+    </div>
+}
 
 @if (AppState.EsGerente && CotizacionDetalle is not null)
 { <CotizacionDocumento Cotizacion="CotizacionDetalle" OnClose="CerrarCotizacion" /> }
@@ -160,6 +168,7 @@ else
         var id = OrdenAEliminar.Value; OrdenAEliminar = null;
         if (await OrdenService.EliminarAsync(id)) { await Recargar(); ToastService.Notify(new ToastMessage(ToastType.Success, "Orden eliminada.")); }
     }
+    private void CerrarEliminar() => OrdenAEliminar = null;
 
     private async Task VerCotizacion(int ordenId)
     {
