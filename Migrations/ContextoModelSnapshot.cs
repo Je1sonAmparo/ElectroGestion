@@ -167,7 +167,7 @@ namespace ElectroGestion.Migrations
                             Correo = "info@clopez.com",
                             Direccion = "Av. Estrella Sadhalá #102, Santiago",
                             Nombre = "Constructora López",
-                            Rnc = "101-987654-2",
+                            Rnc = "101-98765-2",
                             Servicios = 5,
                             Ultimo = "Instalación Solar"
                         },
@@ -177,7 +177,7 @@ namespace ElectroGestion.Migrations
                             Correo = "farmacia@elsol.do",
                             Direccion = "Calle 16 #7, La Vega",
                             Nombre = "Farmacia El Sol",
-                            Rnc = "130-334455-3",
+                            Rnc = "130-33445-3",
                             Servicios = 6,
                             Ultimo = "Mantenimiento Eléctrico"
                         },
@@ -187,7 +187,7 @@ namespace ElectroGestion.Migrations
                             Correo = "hernandez@colmado.com",
                             Direccion = "Calle Principal #58, Moca",
                             Nombre = "Colmado Hernández",
-                            Rnc = "402-667788-4",
+                            Rnc = "402-6677884-1",
                             Servicios = 3,
                             Ultimo = "Cableado Estructurado"
                         },
@@ -197,7 +197,7 @@ namespace ElectroGestion.Migrations
                             Correo = "taller@mecanicord.com",
                             Direccion = "Carretera Luperón km 5, Santiago",
                             Nombre = "Taller Mecánico RD",
-                            Rnc = "130-112233-5",
+                            Rnc = "130-11223-5",
                             Servicios = 1,
                             Ultimo = "Instalación de Planta Eléctrica"
                         });
