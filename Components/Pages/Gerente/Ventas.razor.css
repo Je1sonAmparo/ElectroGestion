@@ -26,16 +26,16 @@ td small { display:block; color:#6B7085; }
 .ventas-modal h2 { font-size:22px; font-weight:800; margin:0 0 16px; }
 .ventas-formulario { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:14px; }
 .ventas-formulario label { display:grid; gap:5px; }
+.ventas-disponibilidad { color:#6B7085; font-size:12px; font-weight:500; }
 .ventas-modal .ventas-resumen { display:flex; justify-content:flex-end; margin-top:16px; padding:12px 16px; background:#F7F8FC; border-radius:8px; }
 .ventas-resumen-filas { display:grid; grid-template-columns:minmax(145px,auto) auto; gap:7px 22px; min-width:min(100%, 330px); color:#4A4E63; font-size:14px; }
 .ventas-resumen-filas strong { text-align:right; color:#14162B; }
 .ventas-resumen-filas .ventas-total-label, .ventas-resumen-filas .ventas-total { border-top:1px solid #D5D8E6; padding-top:9px; font-size:16px; }
-.factura-encabezado { display:flex; align-items:center; justify-content:space-between; gap:20px; }
-.factura-encabezado img { width:min(42%, 250px); height:auto; object-fit:contain; }
+.factura-encabezado { display:flex; align-items:flex-start; justify-content:space-between; gap:20px; border-bottom:1px solid #777; padding-bottom:14px; }
+.factura-encabezado img { width:min(42%, 260px); height:auto; object-fit:contain; }
 .factura-encabezado div { text-align:right; }
 .factura-encabezado h2 { margin:0 0 6px; }
 .factura-encabezado p { margin:3px 0; }
-.factura-demo { margin:14px 0; padding:7px 10px; border:1px solid #D5D8E6; text-align:center; font-size:11px; font-weight:800; letter-spacing:.06em; color:#4A4E63 !important; }
 .factura-cliente { display:grid; gap:5px; margin:18px 0; }
 .factura-totales { display:flex; justify-content:flex-end; margin-top:12px; }
 .factura-totales div { display:grid; grid-template-columns:minmax(150px,auto) auto; gap:7px 22px; min-width:300px; }
@@ -44,7 +44,6 @@ td small { display:block; color:#6B7085; }
 .ventas-pie { display:flex; justify-content:flex-end; gap:10px; flex-wrap:wrap; margin-top:18px; padding-top:14px; border-top:1px solid #EFF0F6; }
 @media (max-width:600px) { .ventas-formulario { grid-template-columns:1fr; } }
 @media print {
-    .factura-encabezado img { width:220px; }
-    .factura-encabezado h2 { font-size:22px; }
-    .ventas-modal { padding:20px; }
+    .factura-encabezado img { width:260px; }
+    .factura-encabezado h2 { font-size:20px; }
 }
