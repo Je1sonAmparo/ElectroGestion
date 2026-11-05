@@ -49,6 +49,7 @@ public class SolicitudService(IDbContextFactory<Contexto> contextFactory) : Apli
             await using var contexto = await contextFactory.CreateDbContextAsync();
             var existente = await contexto.Solicitudes.FirstOrDefaultAsync(s => s.Id == solicitud.Id);
             if (existente == null) return false;
+            if (await contexto.EstadosSolicitud.AnyAsync(e => e.Id == existente.EstadoSolicitudId && e.Nombre == "Finalizada")) return false;
 
             existente.ClienteId = solicitud.ClienteId;
             existente.ServicioId = solicitud.ServicioId;
@@ -92,7 +93,8 @@ public class SolicitudService(IDbContextFactory<Contexto> contextFactory) : Apli
     {
         await using var contexto = await contextFactory.CreateDbContextAsync();
         var solicitud = await contexto.Solicitudes.FirstOrDefaultAsync(s => s.Id == id);
-        if (solicitud is null || solicitud.EstadoSolicitudId is 2 or 5)
+        if (solicitud is null || solicitud.EstadoSolicitudId is 2 or 5 ||
+            await contexto.EstadosSolicitud.AnyAsync(e => e.Id == solicitud.EstadoSolicitudId && e.Nombre == "Finalizada"))
         {
             return false;
         }
