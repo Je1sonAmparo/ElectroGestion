@@ -67,6 +67,7 @@ public class OrdenTrabajoService(IDbContextFactory<Contexto> contextFactory, App
         solicitud.EstadoSolicitudId = await db.EstadosSolicitud.Where(e => e.Nombre == "En proceso").Select(e => e.Id).FirstAsync();
         await db.SaveChangesAsync();
         orden.Code = $"OT-{orden.Id:D4}";
+        RegistroEventosSolicitud.Agregar(db, orden.SolicitudId, "Orden de trabajo creada", $"Se creó {orden.Code} en estado En proceso.");
         await db.SaveChangesAsync();
         return true;
     }
@@ -81,6 +82,7 @@ public class OrdenTrabajoService(IDbContextFactory<Contexto> contextFactory, App
         orden.Trabajos = LimpiarLista(trabajos);
         orden.Herramientas = LimpiarLista(herramientas);
         orden.Observaciones = observaciones.Trim();
+        RegistroEventosSolicitud.Agregar(db, orden.SolicitudId, "Orden de trabajo actualizada", "Se actualizaron tareas, herramientas o instrucciones de campo.");
         await db.SaveChangesAsync();
         return true;
     }
@@ -98,6 +100,7 @@ public class OrdenTrabajoService(IDbContextFactory<Contexto> contextFactory, App
         var estadoSolicitud = await db.EstadosSolicitud.FirstOrDefaultAsync(e => e.Nombre == estado);
         var solicitud = await db.Solicitudes.FirstOrDefaultAsync(s => s.Id == orden.SolicitudId);
         if (estadoSolicitud is not null && solicitud is not null) solicitud.EstadoSolicitudId = estadoSolicitud.Id;
+        RegistroEventosSolicitud.Agregar(db, orden.SolicitudId, "Estado de orden actualizado", $"La orden pasó a {estado}.");
         await db.SaveChangesAsync();
         return true;
     }
@@ -109,6 +112,7 @@ public class OrdenTrabajoService(IDbContextFactory<Contexto> contextFactory, App
         var orden = await db.OrdenesTrabajo.FindAsync(id);
         if (orden is null || await SolicitudFinalizadaAsync(db, orden.SolicitudId) ||
             await db.Cobros.AnyAsync(c => c.OrdenTrabajoId == id)) return false;
+        RegistroEventosSolicitud.Agregar(db, orden.SolicitudId, "Orden de trabajo eliminada", $"Se eliminó {orden.Code}.");
         db.OrdenesTrabajo.Remove(orden);
         await db.SaveChangesAsync();
         return true;
