@@ -126,6 +126,7 @@ public class Contexto : DbContext
 
         modelBuilder.Entity<SolicitudEvento>(entity =>
         {
+            entity.HasQueryFilter(e => e.Solicitud != null && !e.Solicitud.IsDeleted);
             entity.Property(e => e.Titulo).HasMaxLength(120).IsRequired();
             entity.Property(e => e.Detalle).HasMaxLength(500).IsRequired();
             entity.HasIndex(e => new { e.SolicitudId, e.Fecha });
