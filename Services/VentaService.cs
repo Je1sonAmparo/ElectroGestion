@@ -77,9 +77,10 @@ public class VentaService(IDbContextFactory<Contexto> factory, AppStateService a
 
             if (registrar)
             {
-                if (venta.TipoComprobante == Venta.CreditoFiscal &&
-                    (nombre.Length == 0 || !Regex.IsMatch(documento, @"\A(?:[0-9]{9}|[0-9]{11})\z")))
-                    return "Indique el nombre y el RNC o cédula del comprador para crédito fiscal.";
+                if (venta.TipoComprobante == Venta.CreditoFiscal && nombre.Length == 0)
+                    return "Indique el nombre o razón social del comprador.";
+                if (venta.TipoComprobante == Venta.CreditoFiscal && !Regex.IsMatch(documento, @"\A(?:[0-9]{9}|[0-9]{11})\z"))
+                    return "El RNC debe tener 9 dígitos o la cédula 11 dígitos. Revise los datos del cliente seleccionado.";
                 if (venta.TipoComprobante == Venta.Consumo && venta.Total >= 250_000m && documento.Length == 0)
                     return "Identifique al comprador en facturas de consumo de RD$ 250,000 o más.";
 
