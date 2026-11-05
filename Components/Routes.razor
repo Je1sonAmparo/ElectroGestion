@@ -1,4 +1,6 @@
 @inject ElectroGestion.Services.AppStateService AppState
+@inject ElectroGestion.Services.AutenticacionService Autenticacion
+@inject Microsoft.AspNetCore.Components.Authorization.AuthenticationStateProvider AuthenticationStateProvider
 
 <Router AppAssembly="typeof(Program).Assembly" NotFoundPage="typeof(ElectroGestion.Components.Pages.NotFound)">
     <Found Context="routeData">
@@ -27,3 +29,14 @@
         }
     </Found>
 </Router>
+
+@code {
+    protected override async Task OnInitializedAsync()
+    {
+        var estado = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+        if (estado.User.Identity?.IsAuthenticated != true ||
+            !int.TryParse(estado.User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value, out var id)) return;
+        var usuario = await Autenticacion.ObtenerUsuarioAsync(id);
+        if (usuario is not null) AppState.Login(usuario);
+    }
+}
