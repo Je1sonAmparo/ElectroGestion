@@ -4,7 +4,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace ElectroGestion.Services;
 
-public enum ResultadoEliminarCotizacion { Eliminada, VinculadaAOrden, SolicitudFinalizada, NoEncontrada }
+public enum ResultadoEliminarCotizacion { Eliminada, VinculadaAOrden, VinculadaACobro, SolicitudFinalizada, NoEncontrada }
 
 public class CotizacionService(IDbContextFactory<Contexto> contextFactory)
 {
@@ -168,6 +168,8 @@ public class CotizacionService(IDbContextFactory<Contexto> contextFactory)
             return ResultadoEliminarCotizacion.SolicitudFinalizada;
         if (await db.OrdenesTrabajo.AnyAsync(o => o.CotizacionId == id))
             return ResultadoEliminarCotizacion.VinculadaAOrden;
+        if (await db.Cobros.AnyAsync(c => c.CotizacionId == id))
+            return ResultadoEliminarCotizacion.VinculadaACobro;
 
         if (cotizacion.SolicitudDbId.HasValue)
             RegistroEventosSolicitud.Agregar(db, cotizacion.SolicitudDbId.Value, "Cotización eliminada", "Se eliminó la cotización vinculada.");
