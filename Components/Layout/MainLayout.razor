@@ -3,6 +3,7 @@
 @inject ElectroGestion.Services.AppStateService AppState
 @inject NavigationManager NavManager
 @inject BlazorBootstrap.ToastService ToastService
+@inject IJSRuntime JS
 
 @if (!AppState.IsAuthenticated)
 {
@@ -257,11 +258,17 @@ else
         StateHasChanged();
     }
 
-    private void ConfirmLogout()
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender && AppState.IsAuthenticated)
+            await JS.InvokeVoidAsync("electroSession.startActivity");
+    }
+
+    private async Task ConfirmLogout()
     {
         showLogoutConfirm = false;
+        await JS.InvokeVoidAsync("electroSession.logout");
         AppState.Logout();
-        ToastService.ShowSuccess("Sesión cerrada correctamente.", "Éxito");
-        NavManager.NavigateTo("/");
+        NavManager.NavigateTo("/login", forceLoad: true);
     }
 }
