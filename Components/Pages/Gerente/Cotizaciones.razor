@@ -366,6 +366,11 @@
             ToastService.Notify(new ToastMessage(ToastType.Warning, "No se puede eliminar: la cotización tiene una orden de trabajo vinculada."));
             return;
         }
+        if (resultado == ElectroGestion.Services.ResultadoEliminarCotizacion.SolicitudFinalizada)
+        {
+            ToastService.Notify(new ToastMessage(ToastType.Warning, "No se puede eliminar una cotización vinculada a una solicitud finalizada."));
+            return;
+        }
         if (resultado != ElectroGestion.Services.ResultadoEliminarCotizacion.Eliminada)
         {
             ToastService.Notify(new ToastMessage(ToastType.Warning, "La cotización ya no existe."));
