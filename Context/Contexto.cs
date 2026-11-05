@@ -12,6 +12,7 @@ public class Contexto : DbContext
     public DbSet<Levantamiento> Levantamientos { get; set; }
     public DbSet<Cotizacion> Cotizaciones { get; set; }
     public DbSet<DetalleCotizacion> DetallesCotizacion { get; set; }
+    public DbSet<OrdenTrabajo> OrdenesTrabajo { get; set; }
     public DbSet<Cliente> Clientes { get; set; }
     public DbSet<Usuario> Usuarios { get; set; }
     public DbSet<Servicio> Servicios { get; set; }
@@ -94,6 +95,21 @@ public class Contexto : DbContext
                 .WithMany(c => c.Detalles)
                 .HasForeignKey(d => d.CotizacionId)
                 .OnDelete(DeleteBehavior.Cascade);
+        });
+
+        modelBuilder.Entity<OrdenTrabajo>(entity =>
+        {
+            entity.Property(o => o.Code).HasMaxLength(20).IsRequired();
+            entity.Property(o => o.Cliente).HasMaxLength(200).IsRequired();
+            entity.Property(o => o.TipoServicio).HasMaxLength(200).IsRequired();
+            entity.Property(o => o.Estado).HasMaxLength(30).IsRequired();
+            entity.Property(o => o.TrabajosJson).HasColumnType("nvarchar(max)");
+            entity.Property(o => o.MaterialesJson).HasColumnType("nvarchar(max)");
+            entity.Property(o => o.HerramientasJson).HasColumnType("nvarchar(max)");
+            entity.Property(o => o.Observaciones).HasMaxLength(2000);
+            entity.HasIndex(o => o.CotizacionId).IsUnique();
+            entity.HasOne(o => o.Cotizacion).WithMany().HasForeignKey(o => o.CotizacionId).OnDelete(DeleteBehavior.Restrict);
+            entity.HasOne<Solicitud>().WithMany().HasForeignKey(o => o.SolicitudId).OnDelete(DeleteBehavior.Restrict);
         });
 
         modelBuilder.Entity<DetalleSolicitud>()
