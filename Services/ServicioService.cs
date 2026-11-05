@@ -9,20 +9,14 @@ public class ServicioService(IDbContextFactory<Contexto> contextFactory) : Aplic
 {
     public async Task<bool> Guardar(Servicio servicio)
     {
-        if (!await Existe(servicio.Id))
-        {
-            return await Insertar(servicio);
-        }
-        else
-        {
-            return await Modificar(servicio);
-        }
-    }
+        servicio.ServicioId = servicio.ServicioId.Trim();
+        servicio.Nombre = servicio.Nombre.Trim();
+        servicio.Categoria = servicio.Categoria.Trim();
+        if (servicio.ServicioId.Length is 0 or > 20 || servicio.Nombre.Length is 0 or > 150 ||
+            servicio.Categoria.Length > 80 || servicio.Estado is not ("Activo" or "Inactivo"))
+            return false;
 
-    private async Task<bool> Existe(int id)
-    {
-        await using var contexto = await contextFactory.CreateDbContextAsync();
-        return await contexto.Servicios.AnyAsync(s => s.Id == id);
+        return servicio.Id == 0 ? await Insertar(servicio) : await Modificar(servicio);
     }
 
     private async Task<bool> Insertar(Servicio servicio)
@@ -52,10 +46,10 @@ public class ServicioService(IDbContextFactory<Contexto> contextFactory) : Aplic
             existente.ServicioId = servicio.ServicioId;
             existente.Nombre = servicio.Nombre;
             existente.Categoria = servicio.Categoria;
-            existente.PrecioBase = servicio.PrecioBase;
             existente.Estado = servicio.Estado;
 
-            return await contexto.SaveChangesAsync() > 0;
+            await contexto.SaveChangesAsync();
+            return true;
         }
         catch
         {
@@ -84,8 +78,8 @@ public class ServicioService(IDbContextFactory<Contexto> contextFactory) : Aplic
         try
         {
             await using var contexto = await contextFactory.CreateDbContextAsync();
-            var tieneSolicitudes = await contexto.Solicitudes.AnyAsync(s => s.ServicioId == id);
-            if (tieneSolicitudes)
+            if (await contexto.Solicitudes.IgnoreQueryFilters().AnyAsync(s => s.ServicioId == id) ||
+                await contexto.DetallesSolicitud.AnyAsync(d => d.ServicioId == id))
             {
                 return false;
             }

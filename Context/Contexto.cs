@@ -244,11 +244,11 @@ public class Contexto : DbContext
         );
 
         modelBuilder.Entity<Servicio>().HasData(
-            new Servicio { Id = 1, ServicioId = "SV-001", Nombre = "Instalación de Paneles Solares", Categoria = "Instalaciones", PrecioBase = 85000, Estado = "Activo" },
-            new Servicio { Id = 2, ServicioId = "SV-002", Nombre = "Instalación de Sistema UPS", Categoria = "Instalaciones", PrecioBase = 45000, Estado = "Activo" },
-            new Servicio { Id = 3, ServicioId = "SV-003", Nombre = "Mantenimiento Eléctrico", Categoria = "Mantenimiento", PrecioBase = 12500, Estado = "Activo" },
-            new Servicio { Id = 4, ServicioId = "SV-004", Nombre = "Cableado Estructurado", Categoria = "Redes y Cableado", PrecioBase = 28000, Estado = "Activo" },
-            new Servicio { Id = 5, ServicioId = "SV-005", Nombre = "Instalación de Planta Eléctrica", Categoria = "Instalaciones", PrecioBase = 120000, Estado = "Activo" }
+            new Servicio { Id = 1, ServicioId = "SV-001", Nombre = "Instalación de Paneles Solares", Categoria = "Instalaciones", Estado = "Activo" },
+            new Servicio { Id = 2, ServicioId = "SV-002", Nombre = "Instalación de Sistema UPS", Categoria = "Instalaciones", Estado = "Activo" },
+            new Servicio { Id = 3, ServicioId = "SV-003", Nombre = "Mantenimiento Eléctrico", Categoria = "Mantenimiento", Estado = "Activo" },
+            new Servicio { Id = 4, ServicioId = "SV-004", Nombre = "Cableado Estructurado", Categoria = "Redes y Cableado", Estado = "Activo" },
+            new Servicio { Id = 5, ServicioId = "SV-005", Nombre = "Instalación de Planta Eléctrica", Categoria = "Instalaciones", Estado = "Activo" }
         );
 
         modelBuilder.Entity<Solicitud>().HasData(

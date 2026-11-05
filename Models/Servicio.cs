@@ -1,5 +1,4 @@
 using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
 
 namespace ElectroGestion.Models;
 
@@ -16,9 +15,6 @@ public class Servicio
 
     [StringLength(80)]
     public string Categoria { get; set; } = "";
-
-    [Column(TypeName = "decimal(18,2)")]
-    public decimal PrecioBase { get; set; }
 
     [StringLength(30)]
     public string Estado { get; set; } = "Activo";

@@ -119,7 +119,6 @@ erDiagram
         string ServicioId
         string Nombre
         string Categoria
-        decimal PrecioBase
         string Estado
     }
 

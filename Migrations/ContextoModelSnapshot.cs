@@ -622,9 +622,6 @@ namespace ElectroGestion.Migrations
                         .HasMaxLength(150)
                         .HasColumnType("nvarchar(150)");
 
-                    b.Property<decimal>("PrecioBase")
-                        .HasColumnType("decimal(18,2)");
-
                     b.Property<string>("ServicioId")
                         .IsRequired()
                         .HasMaxLength(20)
@@ -641,7 +638,6 @@ namespace ElectroGestion.Migrations
                             Categoria = "Instalaciones",
                             Estado = "Activo",
                             Nombre = "Instalación de Paneles Solares",
-                            PrecioBase = 85000m,
                             ServicioId = "SV-001"
                         },
                         new
@@ -650,7 +646,6 @@ namespace ElectroGestion.Migrations
                             Categoria = "Instalaciones",
                             Estado = "Activo",
                             Nombre = "Instalación de Sistema UPS",
-                            PrecioBase = 45000m,
                             ServicioId = "SV-002"
                         },
                         new
@@ -659,7 +654,6 @@ namespace ElectroGestion.Migrations
                             Categoria = "Mantenimiento",
                             Estado = "Activo",
                             Nombre = "Mantenimiento Eléctrico",
-                            PrecioBase = 12500m,
                             ServicioId = "SV-003"
                         },
                         new
@@ -668,7 +662,6 @@ namespace ElectroGestion.Migrations
                             Categoria = "Redes y Cableado",
                             Estado = "Activo",
                             Nombre = "Cableado Estructurado",
-                            PrecioBase = 28000m,
                             ServicioId = "SV-004"
                         },
                         new
@@ -677,7 +670,6 @@ namespace ElectroGestion.Migrations
                             Categoria = "Instalaciones",
                             Estado = "Activo",
                             Nombre = "Instalación de Planta Eléctrica",
-                            PrecioBase = 120000m,
                             ServicioId = "SV-005"
                         });
                 });
