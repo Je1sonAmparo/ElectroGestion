@@ -18,6 +18,7 @@ public class Contexto : DbContext
     public DbSet<AbonoCobro> AbonosCobro { get; set; }
     public DbSet<ArticuloInventario> ArticulosInventario { get; set; }
     public DbSet<Venta> Ventas { get; set; }
+    public DbSet<DetalleVenta> DetallesVenta { get; set; }
     public DbSet<Cliente> Clientes { get; set; }
     public DbSet<Usuario> Usuarios { get; set; }
     public DbSet<Servicio> Servicios { get; set; }
@@ -36,6 +37,16 @@ public class Contexto : DbContext
             entity.HasIndex(v => v.Ncf).IsUnique();
             entity.HasIndex(v => new { v.Estado, v.FechaVenta });
             entity.HasOne<ArticuloInventario>().WithMany().HasForeignKey(v => v.ArticuloInventarioId)
+                .OnDelete(DeleteBehavior.Restrict);
+            entity.HasMany(v => v.Detalles).WithOne(d => d.Venta).HasForeignKey(d => d.VentaId)
+                .OnDelete(DeleteBehavior.Cascade);
+        });
+
+        modelBuilder.Entity<DetalleVenta>(entity =>
+        {
+            entity.Property(d => d.PrecioUnitario).HasPrecision(18, 2);
+            entity.Ignore(d => d.Subtotal);
+            entity.HasOne<ArticuloInventario>().WithMany().HasForeignKey(d => d.ArticuloInventarioId)
                 .OnDelete(DeleteBehavior.Restrict);
         });
 
