@@ -34,6 +34,7 @@ public class CobroService(IDbContextFactory<Contexto> factory, AppStateService a
         if (orden is null || orden.Cotizacion is null || await db.Cobros.AnyAsync(c => c.OrdenTrabajoId == ordenId)) return false;
         var cobro = new Cobro { OrdenTrabajoId = orden.Id, Cliente = orden.Cliente, FacturaId = 0, Fecha = DateTime.Now, MetodoPago = metodoPago.Trim(), Monto = orden.Cotizacion.MontoTotal, Estado = "Pendiente de cobro" };
         db.Cobros.Add(cobro);
+        RegistroEventosSolicitud.Agregar(db, orden.SolicitudId, "Cobro creado", $"Se registró el cobro de {orden.Code} por RD$ {cobro.Monto:N2}; estado: Pendiente de cobro.");
         await db.SaveChangesAsync();
         cobro.FacturaId = 1000 + cobro.Id;
         await db.SaveChangesAsync();
@@ -53,6 +54,7 @@ public class CobroService(IDbContextFactory<Contexto> factory, AppStateService a
             var solicitud = await db.Solicitudes.FirstOrDefaultAsync(s => s.Id == cobro.OrdenTrabajo.SolicitudId);
             var estadoFinal = await db.EstadosSolicitud.FirstOrDefaultAsync(e => e.Nombre == "Finalizada");
             if (solicitud is not null && estadoFinal is not null) solicitud.EstadoSolicitudId = estadoFinal.Id;
+            RegistroEventosSolicitud.Agregar(db, cobro.OrdenTrabajo.SolicitudId, "Cobro finalizado", $"Se registró el pago final de la orden por RD$ {cobro.Monto:N2}.");
         }
         await db.SaveChangesAsync();
         return true;
@@ -73,6 +75,7 @@ public class CobroService(IDbContextFactory<Contexto> factory, AppStateService a
         cobro.Estado = "Pendiente de cobro";
         cobro.OrdenTrabajo.Estado = "Pendiente de cobro";
         solicitud.EstadoSolicitudId = estadoPendiente.Id;
+        RegistroEventosSolicitud.Agregar(db, solicitud.Id, "Cobro reabierto", "El cobro, la orden y la solicitud volvieron a Pendiente de cobro.");
         await db.SaveChangesAsync();
         return true;
     }
@@ -93,6 +96,8 @@ public class CobroService(IDbContextFactory<Contexto> factory, AppStateService a
             solicitud.EstadoSolicitudId = estadoPendiente.Id;
         }
 
+        if (cobro.OrdenTrabajo is not null)
+            RegistroEventosSolicitud.Agregar(db, cobro.OrdenTrabajo.SolicitudId, "Cobro eliminado", $"Se eliminó el cobro de la orden {cobro.OrdenTrabajo.Code}.");
         db.Cobros.Remove(cobro);
         await db.SaveChangesAsync();
         return true;
