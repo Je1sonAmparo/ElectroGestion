@@ -10,5 +10,6 @@ public class Cobro
     public DateTime Fecha { get; set; }
     public decimal Monto { get; set; }
     public string MetodoPago { get; set; } = "";
-    public string Estado { get; set; } = "Pendiente";
+    public string Estado { get; set; } = "Pendiente de cobro";
 }
+
