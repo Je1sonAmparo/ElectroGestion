@@ -25,6 +25,8 @@ td small { display:block; color:#6B7085; }
 .ventas-modal h2 { font-size:22px; font-weight:800; margin:0 0 16px; }
 .ventas-formulario { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:14px; }
 .ventas-formulario label { display:grid; gap:5px; }
+.ventas-tasa-fija { display:grid; align-content:center; gap:5px; padding:10px 12px; border:1px solid #E3E5EE; border-radius:8px; color:#4A4E63; font-size:14px; }
+.ventas-tasa-fija strong { color:#14162B; }
 .ventas-modal .ventas-resumen { display:flex; justify-content:flex-end; margin-top:16px; padding:12px 16px; background:#F7F8FC; border-radius:8px; }
 .ventas-resumen-filas { display:grid; grid-template-columns:minmax(145px,auto) auto; gap:7px 22px; min-width:min(100%, 330px); color:#4A4E63; font-size:14px; }
 .ventas-resumen-filas strong { text-align:right; color:#14162B; }
