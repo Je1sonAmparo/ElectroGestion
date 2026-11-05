@@ -76,26 +76,30 @@ else
                         </select>
                     </label>
                     <label>Cantidad <input type="number" min="1" step="1" @bind="form.Cantidad" /></label>
-                    <label>Cliente del catálogo
-                        <select @bind="form.ClienteId" @bind:after="SeleccionarCliente">
-                            <option value="">Sin cliente registrado</option>
-                            @foreach (var cliente in Clientes)
-                            {
-                                <option value="@cliente.Id">@cliente.Nombre</option>
-                            }
-                        </select>
-                    </label>
-                    <label>Nombre o razón social <input maxlength="200" @bind="form.NombreCliente" /></label>
-                    <label>RNC, cédula o documento <input maxlength="30" @bind="form.DocumentoCliente" /></label>
-                    <label>Tipo de comprobante <select @bind="form.TipoComprobante"><option>@Venta.Consumo</option><option>@Venta.CreditoFiscal</option></select></label>
-                    <label>NCF o e-NCF emitido <input maxlength="13" @bind="form.Ncf" placeholder="Requerido para registrar" /></label>
+                    <label>Tipo de comprobante <select @bind="form.TipoComprobante" @bind:after="CambiarTipoComprobante"><option value="@Venta.Consumo">Factura de consumo (B02 / E32)</option><option value="@Venta.CreditoFiscal">Comprobante de Crédito Fiscal (B01 / E31)</option></select></label>
+                    @if (form.TipoComprobante == Venta.CreditoFiscal)
+                    {
+                        <label>Cliente del catálogo (opcional)
+                            <select @bind="form.ClienteId" @bind:after="SeleccionarCliente">
+                                <option value="">Ingresar datos manualmente</option>
+                                @foreach (var cliente in Clientes) { <option value="@cliente.Id">@cliente.Nombre</option> }
+                            </select>
+                        </label>
+                        <label>Nombre o razón social <input maxlength="200" @bind="form.NombreCliente" /></label>
+                        <label>RNC o cédula <input maxlength="30" @bind="form.DocumentoCliente" /></label>
+                    }
+                    else if (form.Cantidad > 0 && ArticuloSeleccionado is { } productoConsumo && productoConsumo.PrecioUnidad * form.Cantidad >= 250_000m)
+                    {
+                        <label>RNC o cédula del comprador (requerido desde RD$ 250,000) <input maxlength="30" @bind="form.DocumentoCliente" /></label>
+                    }
+                    <label>NCF o e-NCF emitido <input maxlength="13" @bind="form.Ncf" placeholder="B02… / E32…" /></label>
                     <label>ITBIS (%) <input type="number" min="0" max="100" step="0.01" @bind="form.TasaItbis" /></label>
                 </div>
                 @if (ArticuloSeleccionado is { } elegido)
                 {
                     var subtotal = elegido.PrecioUnidad * form.Cantidad;
                     var impuesto = CotizacionService.CalcularImpuesto(subtotal, form.TasaItbis);
-                    <p class="ventas-resumen">Precio unitario @Moneda(elegido.PrecioUnidad) · Subtotal @Moneda(subtotal) · ITBIS @Moneda(impuesto) · <strong>Total @Moneda(subtotal + impuesto)</strong></p>
+                    <div class="ventas-resumen"><div class="ventas-resumen-filas"><span>Precio unitario</span><strong>@Moneda(elegido.PrecioUnidad)</strong><span>Subtotal</span><strong>@Moneda(subtotal)</strong><span>ITBIS (@form.TasaItbis.ToString("0.##") %)</span><strong>@Moneda(impuesto)</strong><span class="ventas-total-label">Total</span><strong class="ventas-total">@Moneda(subtotal + impuesto)</strong></div></div>
                 }
                 <div class="ventas-pie">
                     <button disabled="@Ocupado" @onclick="CerrarFormulario">Cancelar</button>
@@ -119,21 +123,15 @@ else
         </style>
         <div class="ventas-overlay" @onclick="() => Detalle = null">
             <section class="ventas-modal venta-documento" role="dialog" aria-modal="true" aria-labelledby="detalle-venta" @onclick:stopPropagation>
-                <h2 id="detalle-venta">ElectroGestión · Venta @detalle.Id</h2>
-                <p>Registro interno · @detalle.TipoComprobante · @detalle.Estado</p>
-                <p><strong>Cliente</strong> @Comprador(detalle) @detalle.DocumentoCliente</p>
-                <p><strong>Fecha</strong> @((detalle.FechaVenta ?? detalle.FechaCreacion).ToString("dd/MM/yyyy HH:mm"))</p>
-                @if (detalle.Ncf is not null)
-                {
-                    <p><strong>Comprobante registrado</strong> @detalle.Ncf</p>
-                }
+                <div class="factura-encabezado"><img src="images/electrogestion-logo.png" alt="ElectroGestión" /><div><h2 id="detalle-venta">@(detalle.TipoComprobante == Venta.CreditoFiscal ? "Comprobante de Crédito Fiscal" : "Factura de consumo")</h2><p>Venta N.º @detalle.Id</p><p>Fecha: @((detalle.FechaVenta ?? detalle.FechaCreacion).ToString("dd/MM/yyyy HH:mm"))</p>@if (!string.IsNullOrWhiteSpace(detalle.Ncf)) { <p>NCF: @detalle.Ncf</p> }</div></div>
+                <hr />
+                <div class="factura-cliente"><strong>Cliente</strong><span>@Comprador(detalle)</span>@if (!string.IsNullOrWhiteSpace(detalle.DocumentoCliente)){<span>RNC/Cédula: @detalle.DocumentoCliente</span>}</div>
                 <div class="ventas-tabla">
-                    <table><thead><tr><th>Producto</th><th>Cantidad</th><th>Precio unitario</th><th>Subtotal</th></tr></thead>
-                        <tbody><tr><td>@detalle.CodigoArticulo · @detalle.NombreArticulo</td><td>@detalle.Cantidad</td><td>@Moneda(detalle.PrecioUnitario)</td><td>@Moneda(detalle.Subtotal)</td></tr></tbody>
+                    <table><thead><tr><th>Código</th><th>Descripción</th><th>Precio unitario</th><th>Cantidad</th><th>Importe</th></tr></thead>
+                        <tbody><tr><td>@detalle.CodigoArticulo</td><td>@detalle.NombreArticulo</td><td>@Moneda(detalle.PrecioUnitario)</td><td>@detalle.Cantidad</td><td>@Moneda(detalle.Subtotal)</td></tr></tbody>
                     </table>
                 </div>
-                <p>ITBIS (@detalle.TasaItbis.ToString("0.##") %) @Moneda(detalle.Itbis)</p>
-                <p><strong>Total @Moneda(detalle.Total)</strong></p>
+                <div class="factura-totales"><div><span>Subtotal</span><strong>@Moneda(detalle.Subtotal)</strong><span>ITBIS (@detalle.TasaItbis.ToString("0.##") %)</span><strong>@Moneda(detalle.Itbis)</strong><span class="factura-total-label">Total</span><strong class="factura-total">@Moneda(detalle.Total)</strong></div></div>
                 <div class="ventas-pie">
                     <button @onclick="() => Detalle = null">Cerrar</button>
                     <button class="ventas-primary" @onclick="Imprimir">Imprimir detalle</button>
@@ -213,6 +211,17 @@ else
         var cliente = Clientes.FirstOrDefault(c => c.Id == form.ClienteId);
         form.NombreCliente = cliente?.Nombre ?? "";
         form.DocumentoCliente = cliente?.Rnc ?? "";
+    }
+
+    private void CambiarTipoComprobante()
+    {
+        if (Formulario is not { } form) return;
+        form.ClienteId = null;
+        if (form.TipoComprobante == Venta.Consumo)
+        {
+            form.NombreCliente = "";
+            form.DocumentoCliente = "";
+        }
     }
 
     private async Task Guardar(bool registrar)
