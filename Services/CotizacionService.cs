@@ -58,6 +58,7 @@ public class CotizacionService(IDbContextFactory<Contexto> contextFactory)
         await db.SaveChangesAsync();
         var estadoRevision = await db.EstadosSolicitud.FirstAsync(e => e.Nombre == EnRevision);
         solicitud.EstadoSolicitudId = estadoRevision.Id;
+        RegistroEventosSolicitud.Agregar(db, solicitudId, "Cotización creada", "Se generó una cotización en estado En revisión.");
         await db.SaveChangesAsync();
         return true;
     }
@@ -80,6 +81,8 @@ public class CotizacionService(IDbContextFactory<Contexto> contextFactory)
             {
                 Codigo = d.CodigoArticulo, Nombre = d.NombreArticulo, Cantidad = d.Cantidad
             }).ToList();
+        if (cotizacion.SolicitudDbId.HasValue)
+            RegistroEventosSolicitud.Agregar(db, cotizacion.SolicitudDbId.Value, "Cotización actualizada", "Se actualizaron materiales, mano de obra o importes.");
         await db.SaveChangesAsync();
         return true;
     }
@@ -144,6 +147,7 @@ public class CotizacionService(IDbContextFactory<Contexto> contextFactory)
             var estadoSolicitud = await db.EstadosSolicitud.FirstOrDefaultAsync(e => e.Nombre == nuevoEstado);
             var solicitud = await db.Solicitudes.FirstOrDefaultAsync(s => s.Id == cotizacion.SolicitudDbId.Value);
             if (estadoSolicitud is not null && solicitud is not null) solicitud.EstadoSolicitudId = estadoSolicitud.Id;
+            RegistroEventosSolicitud.Agregar(db, cotizacion.SolicitudDbId.Value, "Estado de cotización actualizado", $"La cotización pasó a {nuevoEstado}.");
         }
         await db.SaveChangesAsync();
         return true;
@@ -159,6 +163,8 @@ public class CotizacionService(IDbContextFactory<Contexto> contextFactory)
         if (await db.OrdenesTrabajo.AnyAsync(o => o.CotizacionId == id))
             return ResultadoEliminarCotizacion.VinculadaAOrden;
 
+        if (cotizacion.SolicitudDbId.HasValue)
+            RegistroEventosSolicitud.Agregar(db, cotizacion.SolicitudDbId.Value, "Cotización eliminada", "Se eliminó la cotización vinculada.");
         db.Cotizaciones.Remove(cotizacion);
         await db.SaveChangesAsync();
         return ResultadoEliminarCotizacion.Eliminada;
