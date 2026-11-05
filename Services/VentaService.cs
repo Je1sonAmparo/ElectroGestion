@@ -1,6 +1,7 @@
 using System.Data;
 using System.Data.Common;
 using System.Text.RegularExpressions;
+using System.Security.Cryptography;
 using ElectroGestion.Context;
 using ElectroGestion.Models;
 using Microsoft.EntityFrameworkCore;
@@ -28,13 +29,8 @@ public class VentaService(IDbContextFactory<Contexto> factory, AppStateService a
 
         var nombre = datos.NombreCliente.Trim();
         var documento = datos.DocumentoCliente.Trim().Replace("-", "");
-        var ncf = datos.Ncf?.Trim().ToUpperInvariant();
-        if (nombre.Length > 200 || documento.Length > 30 || ncf?.Length > 13)
+        if (nombre.Length > 200 || documento.Length > 30)
             return "Revise la longitud de los datos del comprador y del comprobante.";
-
-        if (registrar && !Regex.IsMatch(ncf ?? "", datos.TipoComprobante == Venta.CreditoFiscal
-            ? @"\A(?:B01[0-9]{8}|E31[0-9]{10})\z" : @"\A(?:B02[0-9]{8}|E32[0-9]{10})\z"))
-            return "Ingrese el número del comprobante emitido para el tipo seleccionado.";
 
         await using var db = await factory.CreateDbContextAsync();
         await using var transaccion = await db.Database.BeginTransactionAsync(IsolationLevel.Serializable);
@@ -59,7 +55,14 @@ public class VentaService(IDbContextFactory<Contexto> factory, AppStateService a
             venta.PrecioUnitario = articulo.PrecioUnidad;
             venta.TasaItbis = 18m;
             venta.TipoComprobante = datos.TipoComprobante;
-            venta.Ncf = registrar ? ncf : null;
+            var prefijo = venta.TipoComprobante == Venta.CreditoFiscal ? "DEMO-B01-" : "DEMO-B02-";
+            if (venta.Ncf is null || !venta.Ncf.StartsWith(prefijo, StringComparison.Ordinal))
+            {
+                string referencia;
+                do { referencia = prefijo + RandomNumberGenerator.GetInt32(0, 10000).ToString("D4"); }
+                while (await db.Ventas.AnyAsync(v => v.Ncf == referencia));
+                venta.Ncf = referencia;
+            }
 
             if (registrar)
             {
@@ -68,8 +71,6 @@ public class VentaService(IDbContextFactory<Contexto> factory, AppStateService a
                     return "Indique el nombre y el RNC o cédula del comprador para crédito fiscal.";
                 if (venta.TipoComprobante == Venta.Consumo && venta.Total >= 250_000m && documento.Length == 0)
                     return "Identifique al comprador en facturas de consumo de RD$ 250,000 o más.";
-                if (await db.Ventas.AnyAsync(v => v.Ncf == ncf))
-                    return "Este comprobante ya está registrado.";
 
                 var descontado = await db.ArticulosInventario
                     .Where(a => a.Id == articulo.Id && a.Cantidad >= venta.Cantidad)
