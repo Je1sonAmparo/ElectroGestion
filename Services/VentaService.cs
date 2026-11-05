@@ -169,7 +169,7 @@ public class VentaService(IDbContextFactory<Contexto> factory, AppStateService a
                 .Where(x => x.Lineas.Count > 0).ToList();
             var subtotal = operaciones.Sum(x => x.Lineas.Sum(d => d.Subtotal));
             return new MesVentas(mes, operaciones.Count, operaciones.Sum(x => x.Lineas.Sum(d => (long)d.Cantidad)),
-                subtotal, Math.Round(subtotal * 0.18m, 2, MidpointRounding.AwayFromZero));
+                subtotal, operaciones.Sum(x => Math.Round(x.Lineas.Sum(d => d.Subtotal) * 0.18m, 2, MidpointRounding.AwayFromZero)));
         }).ToList();
     }
 }
