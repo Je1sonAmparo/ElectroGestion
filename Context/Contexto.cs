@@ -10,6 +10,8 @@ public class Contexto : DbContext
     public DbSet<Solicitud> Solicitudes { get; set; }
     public DbSet<Visita> Visitas { get; set; }
     public DbSet<Levantamiento> Levantamientos { get; set; }
+    public DbSet<Cotizacion> Cotizaciones { get; set; }
+    public DbSet<DetalleCotizacion> DetallesCotizacion { get; set; }
     public DbSet<Cliente> Clientes { get; set; }
     public DbSet<Usuario> Usuarios { get; set; }
     public DbSet<Servicio> Servicios { get; set; }
@@ -63,6 +65,34 @@ public class Contexto : DbContext
             entity.HasOne(l => l.Solicitud)
                 .WithOne(s => s.Levantamiento)
                 .HasForeignKey<Levantamiento>(l => l.SolicitudId)
+                .OnDelete(DeleteBehavior.Cascade);
+        });
+
+        modelBuilder.Entity<Cotizacion>(entity =>
+        {
+            entity.Property(c => c.Cliente).HasMaxLength(200).IsRequired();
+            entity.Property(c => c.SolicitudId).HasMaxLength(50).IsRequired();
+            entity.Property(c => c.Estado).HasMaxLength(40).IsRequired();
+            entity.Property(c => c.MotivoRechazo).HasMaxLength(1000).IsRequired();
+            entity.Property(c => c.MontoTotal).HasPrecision(18, 2);
+            entity.Property(c => c.PorcentajeItbis).HasPrecision(5, 2);
+            entity.Property(c => c.MontoManoObra).HasPrecision(18, 2);
+            entity.HasOne(c => c.Solicitud)
+                .WithMany()
+                .HasForeignKey(c => c.SolicitudDbId)
+                .OnDelete(DeleteBehavior.Restrict);
+            entity.HasIndex(c => c.SolicitudDbId).IsUnique().HasFilter("[SolicitudDbId] IS NOT NULL");
+        });
+
+        modelBuilder.Entity<DetalleCotizacion>(entity =>
+        {
+            entity.Property(d => d.CodigoArticulo).HasMaxLength(40).IsRequired();
+            entity.Property(d => d.NombreArticulo).HasMaxLength(200).IsRequired();
+            entity.Property(d => d.PrecioUnitario).HasPrecision(18, 2);
+            entity.Ignore(d => d.Subtotal);
+            entity.HasOne(d => d.Cotizacion)
+                .WithMany(c => c.Detalles)
+                .HasForeignKey(d => d.CotizacionId)
                 .OnDelete(DeleteBehavior.Cascade);
         });
 
