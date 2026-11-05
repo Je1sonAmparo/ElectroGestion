@@ -56,6 +56,9 @@ public class CotizacionService(IDbContextFactory<Contexto> contextFactory)
             Detalles = detalles.Select(CopiarDetalle).ToList()
         });
         await db.SaveChangesAsync();
+        var estadoRevision = await db.EstadosSolicitud.FirstAsync(e => e.Nombre == EnRevision);
+        solicitud.EstadoSolicitudId = estadoRevision.Id;
+        await db.SaveChangesAsync();
         return true;
     }
 
@@ -134,6 +137,12 @@ public class CotizacionService(IDbContextFactory<Contexto> contextFactory)
         }
 
         cotizacion.Estado = nuevoEstado;
+        if (cotizacion.SolicitudDbId.HasValue)
+        {
+            var estadoSolicitud = await db.EstadosSolicitud.FirstOrDefaultAsync(e => e.Nombre == nuevoEstado);
+            var solicitud = await db.Solicitudes.FirstOrDefaultAsync(s => s.Id == cotizacion.SolicitudDbId.Value);
+            if (estadoSolicitud is not null && solicitud is not null) solicitud.EstadoSolicitudId = estadoSolicitud.Id;
+        }
         await db.SaveChangesAsync();
         return true;
     }
