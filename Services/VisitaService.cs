@@ -210,6 +210,7 @@ public class VisitaService(IDbContextFactory<Contexto> contextFactory)
 
             visita.Solicitud = null;
             contexto.Visitas.Add(visita);
+            RegistroEventosSolicitud.Agregar(contexto, visita.SolicitudId, "Visita programada", $"Visita {visita.Fecha:dd/MM/yyyy} de {visita.Hora} a {visita.HoraFin}; estado: {visita.Estado}.");
         }
         else
         {
@@ -234,6 +235,9 @@ public class VisitaService(IDbContextFactory<Contexto> contextFactory)
             existente.Hora = visita.Hora;
             existente.HoraFin = visita.HoraFin;
             existente.Estado = visita.Estado;
+            if (existente.SolicitudId != visita.SolicitudId)
+                RegistroEventosSolicitud.Agregar(contexto, existente.SolicitudId, "Visita reasignada", "La visita fue movida a otra solicitud.");
+            RegistroEventosSolicitud.Agregar(contexto, visita.SolicitudId, "Visita actualizada", $"Nueva fecha: {visita.Fecha:dd/MM/yyyy}, {visita.Hora} a {visita.HoraFin}.");
         }
 
         return await contexto.SaveChangesAsync() > 0;
@@ -279,6 +283,7 @@ public class VisitaService(IDbContextFactory<Contexto> contextFactory)
 
         visita.IsDeleted = true;
         visita.EliminadaPorSolicitud = false;
+        RegistroEventosSolicitud.Agregar(contexto, visita.SolicitudId, "Visita eliminada", "Se eliminó la visita programada.");
 
         return await contexto.SaveChangesAsync() > 0;
     }
@@ -314,6 +319,7 @@ public class VisitaService(IDbContextFactory<Contexto> contextFactory)
         }
 
         visita.Estado = estado;
+        RegistroEventosSolicitud.Agregar(contexto, visita.SolicitudId, "Estado de visita actualizado", $"La visita cambió al estado {estado}.");
         var solicitud = await contexto.Solicitudes.FirstOrDefaultAsync(s => s.Id == visita.SolicitudId);
         if (solicitud != null)
         {
