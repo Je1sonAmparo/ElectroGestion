@@ -22,6 +22,39 @@ namespace ElectroGestion.Migrations
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
 
+            modelBuilder.Entity("ElectroGestion.Models.AbonoCobro", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<bool>("Anulado")
+                        .HasColumnType("bit");
+
+                    b.Property<int>("CobroId")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("Fecha")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("MetodoPago")
+                        .IsRequired()
+                        .HasMaxLength(40)
+                        .HasColumnType("nvarchar(40)");
+
+                    b.Property<decimal>("Monto")
+                        .HasPrecision(18, 2)
+                        .HasColumnType("decimal(18,2)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CobroId", "Fecha");
+
+                    b.ToTable("AbonosCobro");
+                });
+
             modelBuilder.Entity("ElectroGestion.Models.Cliente", b =>
                 {
                     b.Property<int>("Id")
@@ -207,6 +240,9 @@ namespace ElectroGestion.Migrations
                         .HasMaxLength(200)
                         .HasColumnType("nvarchar(200)");
 
+                    b.Property<int>("CotizacionId")
+                        .HasColumnType("int");
+
                     b.Property<string>("Estado")
                         .IsRequired()
                         .HasMaxLength(20)
@@ -227,13 +263,15 @@ namespace ElectroGestion.Migrations
                         .HasPrecision(18, 2)
                         .HasColumnType("decimal(18,2)");
 
-                    b.Property<int>("OrdenTrabajoId")
+                    b.Property<int?>("OrdenTrabajoId")
                         .HasColumnType("int");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("OrdenTrabajoId")
+                    b.HasIndex("CotizacionId")
                         .IsUnique();
+
+                    b.HasIndex("OrdenTrabajoId");
 
                     b.ToTable("Cobros");
                 });
@@ -942,6 +980,17 @@ namespace ElectroGestion.Migrations
                     b.ToTable("Visitas");
                 });
 
+            modelBuilder.Entity("ElectroGestion.Models.AbonoCobro", b =>
+                {
+                    b.HasOne("ElectroGestion.Models.Cobro", "Cobro")
+                        .WithMany("Abonos")
+                        .HasForeignKey("CobroId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Cobro");
+                });
+
             modelBuilder.Entity("ElectroGestion.Models.ClienteTelefono", b =>
                 {
                     b.HasOne("ElectroGestion.Models.Cliente", "Cliente")
@@ -955,11 +1004,18 @@ namespace ElectroGestion.Migrations
 
             modelBuilder.Entity("ElectroGestion.Models.Cobro", b =>
                 {
+                    b.HasOne("ElectroGestion.Models.Cotizacion", "Cotizacion")
+                        .WithMany()
+                        .HasForeignKey("CotizacionId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
                     b.HasOne("ElectroGestion.Models.OrdenTrabajo", "OrdenTrabajo")
                         .WithMany()
                         .HasForeignKey("OrdenTrabajoId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.Navigation("Cotizacion");
 
                     b.Navigation("OrdenTrabajo");
                 });
@@ -1093,6 +1149,11 @@ namespace ElectroGestion.Migrations
                     b.Navigation("Solicitudes");
 
                     b.Navigation("Telefonos");
+                });
+
+            modelBuilder.Entity("ElectroGestion.Models.Cobro", b =>
+                {
+                    b.Navigation("Abonos");
                 });
 
             modelBuilder.Entity("ElectroGestion.Models.Cotizacion", b =>
