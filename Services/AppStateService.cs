@@ -206,6 +206,7 @@ public class AppStateService
         "Pendiente" => ("#FEF3C7", "#92400E"),
         "En proceso" => ("#DBEAFE", "#1E40AF"),
         "En Espera Administración" => ("#E0E7FF", "#3730A3"),
+        "Pendiente de cobro" => ("#EDE9FE", "#6D28D9"),
         "Finalizada" => ("#D1FAE5", "#065F46"),
         "Cancelada" => ("#FEE2E2", "#991B1B"),
         "Activo" => ("#D1FAE5", "#065F46"),
