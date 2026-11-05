@@ -428,6 +428,70 @@ namespace ElectroGestion.Migrations
                     b.ToTable("Levantamientos");
                 });
 
+            modelBuilder.Entity("ElectroGestion.Models.OrdenTrabajo", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Cliente")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
+
+                    b.Property<string>("Code")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("nvarchar(20)");
+
+                    b.Property<int>("CotizacionId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Estado")
+                        .IsRequired()
+                        .HasMaxLength(30)
+                        .HasColumnType("nvarchar(30)");
+
+                    b.Property<DateTime>("FechaCreacion")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("HerramientasJson")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("MaterialesJson")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Observaciones")
+                        .IsRequired()
+                        .HasMaxLength(2000)
+                        .HasColumnType("nvarchar(2000)");
+
+                    b.Property<int>("SolicitudId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("TipoServicio")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
+
+                    b.Property<string>("TrabajosJson")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CotizacionId")
+                        .IsUnique();
+
+                    b.HasIndex("SolicitudId");
+
+                    b.ToTable("OrdenesTrabajo");
+                });
+
             modelBuilder.Entity("ElectroGestion.Models.Servicio", b =>
                 {
                     b.Property<int>("Id")
@@ -838,6 +902,23 @@ namespace ElectroGestion.Migrations
                         .IsRequired();
 
                     b.Navigation("Solicitud");
+                });
+
+            modelBuilder.Entity("ElectroGestion.Models.OrdenTrabajo", b =>
+                {
+                    b.HasOne("ElectroGestion.Models.Cotizacion", "Cotizacion")
+                        .WithMany()
+                        .HasForeignKey("CotizacionId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("ElectroGestion.Models.Solicitud", null)
+                        .WithMany()
+                        .HasForeignKey("SolicitudId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Cotizacion");
                 });
 
             modelBuilder.Entity("ElectroGestion.Models.Solicitud", b =>
