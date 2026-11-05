@@ -19,7 +19,9 @@ public class CobroService(IDbContextFactory<Contexto> factory, AppStateService a
     {
         if (!appState.EsGerente) return [];
         await using var db = await factory.CreateDbContextAsync();
-        return await db.OrdenesTrabajo.AsNoTracking().Where(o => o.Estado == "Pendiente de cobro" && !db.Cobros.Any(c => c.OrdenTrabajoId == o.Id))
+        return await db.OrdenesTrabajo.AsNoTracking()
+            .Include(o => o.Cotizacion)
+            .Where(o => o.Estado == "Pendiente de cobro" && !db.Cobros.Any(c => c.OrdenTrabajoId == o.Id))
             .OrderByDescending(o => o.Id).ToListAsync();
     }
 
