@@ -1,5 +1,8 @@
 @page "/reportes"
 @inject ElectroGestion.Services.ReporteConsumoService ReporteConsumoService
+@inject VentaService VentaService
+@inject AppStateService AppState
+@inject ToastService ToastService
 
 <PageTitle>@(View == AnnualView ? "Reporte de Consumo en Servicios del último año" : "Reportes") | ElectroGestion</PageTitle>
 
@@ -23,14 +26,17 @@
                 <span class="report-card-link">Ver reporte <span aria-hidden="true">&rarr;</span></span>
             </button>
 
-            <div class="report-overview-card report-overview-disabled" aria-disabled="true">
+            @if (AppState.EsGerente)
+            {
+            <button class="report-overview-card report-overview-active" @onclick="OpenSalesReport">
                 <span class="report-icon report-icon-amber" aria-hidden="true">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v10M8.5 13.5h7"/></svg>
                 </span>
-                <span class="report-card-title">Reportes Financieros</span>
-                <span class="report-card-description">Ingresos, egresos y balance general por período.</span>
-                <span class="report-card-disabled-label">Próximamente</span>
-            </div>
+                <span class="report-card-title">Reporte de ventas de los últimos 3 meses</span>
+                <span class="report-card-description">Ingresos por venta directa de equipos y materiales.</span>
+                <span class="report-card-link">Ver reporte <span aria-hidden="true">&rarr;</span></span>
+            </button>
+            }
 
             <div class="report-overview-card report-overview-disabled" aria-disabled="true">
                 <span class="report-icon report-icon-green" aria-hidden="true">
@@ -41,6 +47,45 @@
                 <span class="report-card-disabled-label">Próximamente</span>
             </div>
         </section>
+    }
+    else if (View == SalesView && AppState.EsGerente)
+    {
+        <nav class="report-breadcrumb" aria-label="Ruta de navegación">
+            <button @onclick="GoOverview">Reportes</button><span aria-hidden="true">/</span>
+            <span aria-current="page">Ventas de los últimos 3 meses</span>
+        </nav>
+        <div class="report-section-heading">
+            <h2>Reporte de ventas de los últimos 3 meses</h2>
+            <p>Ventas directas registradas durante el mes actual y los dos anteriores. Los ingresos se muestran antes de ITBIS.</p>
+        </div>
+        @if (SalesMonths.Count == 3)
+        {
+            var max = SalesMonths.Max(m => m.Ingresos);
+            <section class="report-data-layout">
+                <div class="report-table-wrap">
+                    <table class="report-data-table">
+                        <thead><tr><th>Mes</th><th>Ventas</th><th>Unidades</th><th>Ingresos (RD$)</th><th>ITBIS (RD$)</th><th>Total (RD$)</th></tr></thead>
+                        <tbody>
+                            @foreach (var mes in SalesMonths)
+                            {
+                                <tr><th scope="row">@SalesMonth(mes)</th><td>@mes.Ventas</td><td>@mes.Unidades</td><td>@FormatMoney(mes.Ingresos)</td><td>@FormatMoney(mes.Itbis)</td><td>@FormatMoney(mes.Ingresos + mes.Itbis)</td></tr>
+                            }
+                            <tr class="report-total-row"><th scope="row">TOTAL</th><td>@SalesMonths.Sum(m => m.Ventas)</td><td>@SalesMonths.Sum(m => m.Unidades)</td><td>@FormatMoney(SalesMonths.Sum(m => m.Ingresos))</td><td>@FormatMoney(SalesMonths.Sum(m => m.Itbis))</td><td>@FormatMoney(SalesMonths.Sum(m => m.Ingresos + m.Itbis))</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+                <article class="report-monthly-card">
+                    <h2>Ingresos mensuales por ventas directas</h2>
+                    @foreach (var mes in SalesMonths)
+                    {
+                        <div class="sales-month">
+                            <div><span>@SalesMonth(mes)</span><strong>RD$ @FormatMoney(mes.Ingresos)</strong></div>
+                            <div class="sales-month-track" aria-hidden="true"><span style="width:@(FormatNumber(max == 0 ? 0 : (double)(mes.Ingresos / max * 100)))%"></span></div>
+                        </div>
+                    }
+                </article>
+            </section>
+        }
     }
     else if (View == ConsumptionListView)
     {
@@ -242,6 +287,19 @@
     private const string OverviewView = "overview";
     private const string ConsumptionListView = "consumption-list";
     private const string AnnualView = "annual-consumption";
+    private const string SalesView = "ventas";
+    private List<MesVentas> SalesMonths = [];
+
+    private async Task OpenSalesReport()
+    {
+        if (!AppState.EsGerente) return;
+        View = SalesView;
+        SalesMonths = [];
+        try { SalesMonths = await VentaService.UltimosTresMesesAsync(); }
+        catch { ToastService.Notify(new ToastMessage(ToastType.Danger, "No se pudo cargar el reporte de ventas.")); }
+    }
+
+    private static string SalesMonth(MesVentas mes) => mes.Mes.ToString("MMMM yyyy", System.Globalization.CultureInfo.GetCultureInfo("es-DO"));
     private const string AllServices = "Todos los Servicios";
 
     private string View = OverviewView;
