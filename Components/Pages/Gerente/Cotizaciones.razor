@@ -261,8 +261,9 @@
         finally { Cargando = false; }
     }
 
-    private void AbrirNueva()
+    private async Task AbrirNueva()
     {
+        await Recargar();
         EditandoId = null; SolicitudSeleccionada = 0; FormDetalles = []; ArticuloSeleccionadoId = 0; CantidadArticulo = 1; MontoManoObra = 0m; ModalAbierto = true;
     }
 
