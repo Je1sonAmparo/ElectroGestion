@@ -71,8 +71,10 @@
                             }
                             @if (cot.Estado == "Enviada al cliente")
                             { <button @onclick='() => Transicionar(cot.Id, "En revisión")' style="padding:7px 11px;border:1px solid #D5D8E6;background:#fff;border-radius:7px;cursor:pointer">Volver a revisión</button> }
-                            else if (cot.Estado is "Aprobada" or "Rechazada")
+                            else if (cot.Estado == "Aprobada")
                             { <button @onclick='() => Transicionar(cot.Id, "Enviada al cliente")' style="padding:7px 11px;border:1px solid #D5D8E6;background:#fff;border-radius:7px;cursor:pointer">Volver a enviada</button> }
+                            else if (cot.Estado == "Rechazada")
+                            { <button @onclick='() => Transicionar(cot.Id, "En revisión")' style="padding:7px 11px;border:1px solid #D5D8E6;background:#fff;border-radius:7px;cursor:pointer">Volver a revisión</button> }
                             @if (cot.Solicitud?.Levantamiento is not null) { <button @onclick="() => VerLevantamiento(cot.Solicitud)" style="padding:7px 11px;border:1px solid #D5D8E6;background:#fff;border-radius:7px;cursor:pointer">Levantamiento</button> }
                             <button @onclick="() => VerCotizacion(cot)" style="padding:7px 11px;border:1px solid #D5D8E6;background:#fff;border-radius:7px;cursor:pointer">Detalle</button>
                         </div>
