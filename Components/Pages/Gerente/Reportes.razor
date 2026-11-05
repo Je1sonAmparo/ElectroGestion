@@ -1,4 +1,5 @@
 @page "/reportes"
+@inject ElectroGestion.Services.ReporteConsumoService ReporteConsumoService
 
 <PageTitle>@(View == AnnualView ? "Reporte de Consumo en Servicios del último año" : "Reportes") | ElectroGestion</PageTitle>
 
@@ -117,7 +118,7 @@
                     <option value="Todos los Servicios">Todos los Servicios</option>
                     @foreach (var row in ReportRows)
                     {
-                        <option value="@row.Name">@row.Name</option>
+                        <option value="@row.Servicio">@row.Servicio</option>
                     }
                 </select>
             </label>
@@ -146,48 +147,28 @@
                 </article>
             </div>
             <article class="report-chart-card">
-                <h2>Porcentaje de Consumo de Materiales por Categoría</h2>
+                <h2>Porcentaje de Consumo de Materiales por Servicio</h2>
                 <div class="report-donut-layout">
-                    <svg class="report-donut-svg" viewBox="-55 0 400 210" role="img" aria-label="Consumo: Climatización 30%, Paneles Solares 25%, Redes 20%, Automatización 15%, Seguridad 10%">
+                    <svg class="report-donut-svg" viewBox="0 0 220 220" role="img" aria-label="Distribución real del consumo de materiales por servicio">
                         <g transform="translate(45 0)">
-                        <g transform="translate(100 105) rotate(-90) translate(-100 -105)">
-                            <circle cx="100" cy="105" r="55" fill="none" stroke="#1D4ED8" stroke-width="30" stroke-dasharray="103.67 241.90" />
-                            <circle cx="100" cy="105" r="55" fill="none" stroke="#3B82F6" stroke-width="30" stroke-dasharray="86.39 259.18" stroke-dashoffset="-103.67" />
-                            <circle cx="100" cy="105" r="55" fill="none" stroke="#60A5FA" stroke-width="30" stroke-dasharray="69.12 276.46" stroke-dashoffset="-190.06" />
-                            <circle cx="100" cy="105" r="55" fill="none" stroke="#93C5FD" stroke-width="30" stroke-dasharray="51.84 293.74" stroke-dashoffset="-259.18" />
-                            <circle cx="100" cy="105" r="55" fill="none" stroke="#BFDBFE" stroke-width="30" stroke-dasharray="34.56 311.02" stroke-dashoffset="-311.02" />
-                        </g>
-                        <circle cx="100" cy="105" r="70" fill="none" stroke="#14162B" stroke-width="1.5" />
-                        <circle cx="100" cy="105" r="40" fill="#fff" stroke="#14162B" stroke-width="1.5" />
-                        <path d="M100 35v30 M121.6 38.4 112.4 67 M166.6 126.6 138 117.4 M100 175v-30 M43.4 146.2 67.7 128.5 M30 105h30" fill="none" stroke="#14162B" stroke-width="1.2" />
-
-                        <polyline points="135,66 149,54 165,54" fill="none" stroke="#1D4ED8" stroke-width="1.4" />
-                        <text x="169" y="52" class="pie-label" text-anchor="start">Climatización (AC)</text>
-                        <text x="169" y="64" class="pie-percent" text-anchor="start" fill="#1D4ED8">30%</text>
-
-                        <polyline points="128,158 138,177 151,177" fill="none" stroke="#3B82F6" stroke-width="1.4" />
-                        <text x="155" y="175" class="pie-label" text-anchor="start">Paneles Solares</text>
-                        <text x="155" y="187" class="pie-percent" text-anchor="start" fill="#3B82F6">25%</text>
-
-                        <polyline points="35,146 21,158 8,158" fill="none" stroke="#60A5FA" stroke-width="1.4" />
-                        <text x="7" y="156" class="pie-label" text-anchor="end">Redes</text>
-                        <text x="7" y="168" class="pie-percent" text-anchor="end" fill="#60A5FA">20%</text>
-
-                        <polyline points="34,81 20,70 6,70" fill="none" stroke="#93C5FD" stroke-width="1.4" />
-                        <text x="5" y="68" class="pie-label" text-anchor="end">Automatización</text>
-                        <text x="5" y="80" class="pie-percent" text-anchor="end" fill="#93C5FD">15%</text>
-
-                        <polyline points="79,38 72,20 58,20" fill="none" stroke="#BFDBFE" stroke-width="1.4" />
-                        <text x="57" y="18" class="pie-label" text-anchor="end">Seguridad</text>
-                        <text x="57" y="30" class="pie-percent" text-anchor="end" fill="#BFDBFE">10%</text>
+                            <g transform="translate(100 110) rotate(-90) translate(-100 -110)">
+                                @foreach (var segment in DonutSegments)
+                                {
+                                    <circle cx="100" cy="110" r="55" fill="none" stroke="@segment.Color" stroke-width="30" stroke-dasharray="@($"{FormatNumber(segment.Length)} {FormatNumber(DonutCircumference - segment.Length)}")" stroke-dashoffset="@(-segment.Offset)" />
+                                }
+                            </g>
+                            <circle cx="100" cy="110" r="40" fill="#fff" stroke="#E3E5EE" stroke-width="1.5" />
                         </g>
                     </svg>
                     <div class="report-legend">
-                        <div><span class="legend-swatch swatch-blue"></span>Climatización (AC) (30%)</div>
-                        <div><span class="legend-swatch swatch-blue-2"></span>Paneles Solares (25%)</div>
-                        <div><span class="legend-swatch swatch-blue-3"></span>Redes (20%)</div>
-                        <div><span class="legend-swatch swatch-blue-4"></span>Automatización (15%)</div>
-                        <div><span class="legend-swatch swatch-blue-5"></span>Seguridad (10%)</div>
+                        @foreach (var segment in DonutSegments)
+                        {
+                            <div><span class="legend-swatch" style="background:@segment.Color"></span>@segment.Servicio (@FormatPercent(segment.Porcentaje))%</div>
+                        }
+                        @if (DonutSegments.Count == 0)
+                        {
+                            <div>Sin consumo registrado en el período.</div>
+                        }
                     </div>
                 </div>
             </article>
@@ -209,21 +190,21 @@
                         @foreach (var row in VisibleRows)
                         {
                             <tr>
-                                <th scope="row">@row.Name</th>
-                                <td>RD$ @FormatMoney(row.MaterialCost)</td>
-                                <td>RD$ @FormatMoney(row.ConsumableCost)</td>
-                                <td class="report-row-total">RD$ @FormatMoney(row.TotalCost)</td>
-                                <td class="report-installations">@row.Installations</td>
+                                <th scope="row">@row.Servicio</th>
+                                <td>RD$ @FormatMoney(row.Materiales)</td>
+                                <td>RD$ @FormatMoney(row.Consumibles)</td>
+                                <td class="report-row-total">RD$ @FormatMoney(row.Total)</td>
+                                <td class="report-installations">@row.Instalaciones</td>
                             </tr>
                         }
-                        @if (SelectedCategory == AllServices)
+                        @if (AppliedCategory == AllServices)
                         {
                             <tr class="report-total-row">
                                 <th scope="row">TOTAL</th>
-                                <td>RD$ @FormatMoney(933000m)</td>
-                                <td>RD$ @FormatMoney(463000m)</td>
-                                <td>RD$ @FormatMoney(1625000m)</td>
-                                <td class="report-installations">108</td>
+                                <td>RD$ @FormatMoney(TotalMaterials)</td>
+                                <td>RD$ @FormatMoney(TotalConsumables)</td>
+                                <td>RD$ @FormatMoney(TotalConsumption)</td>
+                                <td class="report-installations">@InstallationCount</td>
                             </tr>
                         }
                     </tbody>
@@ -232,17 +213,16 @@
 
             <article class="report-monthly-card">
                 <h2>Tendencia Mensual de Consumo (Costo)</h2>
-                <div class="report-bar-chart" role="img" aria-label="Tendencia de consumo: octubre 450 mil, septiembre 380 mil, agosto 520 mil pesos">
-                    <div class="report-y-axis"><span>1,000,000</span><span>800,000</span><span>600,000</span><span>400,000</span><span>200,000</span><span>0</span></div>
+                <div class="report-bar-chart" role="img" aria-label="Tendencia mensual de consumo de materiales en @AppliedYear">
+                    <div class="report-y-axis">@foreach(var mark in AxisMarks){<span>@FormatAxis(mark)</span>}</div>
                     <div class="report-bars">
-                        <div class="report-bar-column"><strong>450,000</strong><span class="report-bar" style="--bar-height:45%"></span><span class="report-month">Oct</span></div>
-                        <div class="report-bar-column"><strong>380,000</strong><span class="report-bar" style="--bar-height:38%"></span><span class="report-month">Sep</span></div>
-                        <div class="report-bar-column"><strong>520,000</strong><span class="report-bar" style="--bar-height:52%"></span><span class="report-month">Ago</span></div>
+                        @foreach(var mes in VisibleMonths){<div class="report-bar-column"><strong>@FormatMoney(mes.Total)</strong><span class="report-bar" style="--bar-height:@BarHeight(mes.Total)%"></span><span class="report-month">@mes.Etiqueta</span></div>}
                     </div>
                 </div>
                 <div class="report-chart-caption"><span class="legend-swatch swatch-blue-2"></span>Consumo Total (RD$)</div>
             </article>
         </section>
+        <p style="margin:10px 2px;color:#6B7085;font-size:12px">El consumo se calcula con los materiales registrados en órdenes finalizadas durante el año seleccionado. Los consumibles no se registran por separado en el sistema.</p>
     }
 </div>
 
@@ -253,51 +233,101 @@
     private const string AllServices = "Todos los Servicios";
 
     private string View = OverviewView;
-    private string SelectedYear = "Año 2025";
+    private string SelectedYear = DateTime.Today.Year.ToString();
     private string SelectedCategory = AllServices;
-    private string AppliedYear = "Año 2025";
+    private int AppliedYear = DateTime.Today.Year;
     private string AppliedCategory = AllServices;
-    private readonly string[] Years = ["Año 2025", "Año 2024", "Año 2023", "Año 2022", "Año 2021"];
+    private List<string> Years = [];
+    private List<ElectroGestion.Services.FilaConsumoServicio> ReportRows = [];
+    private List<ElectroGestion.Services.MesConsumoServicio> MonthlyRows = [];
+    private readonly string[] ChartColors = ["#1D4ED8", "#3B82F6", "#60A5FA", "#93C5FD", "#BFDBFE", "#818CF8", "#A78BFA", "#34D399"];
+    private const double DonutCircumference = 345.575;
 
-    private readonly List<ReportRow> ReportRows =
-    [
-        new("Solar", "Instalación Paneles Solares", 250000m, 120000m, 30, 12000m),
-        new("AC (Industrial)", "Instalación de Sistema UPS", 180000m, 75000m, 25, 15000m),
-        new("AC (Residencial)", "Instalación de Sistema UPS", 150000m, 65000m, 16, 10000m),
-        new("Cableado Red", "Cableado Estructurado", 160000m, 70000m, 22, 9000m),
-        new("Seguridad", "Mantenimiento Eléctrico", 83000m, 23000m, 12, 8000m),
-        new("Automatización", "Instalación de Planta Eléctrica", 110000m, 110000m, 3, 21000m)
-    ];
+    protected override async Task OnInitializedAsync()
+    {
+        var currentYear = DateTime.Today.Year;
+        Years = Enumerable.Range(currentYear - 4, 5).Reverse().Select(y => y.ToString()).ToList();
+        SelectedYear = AppliedYear.ToString();
+        await LoadReportAsync(AppliedYear);
+    }
 
-    private IEnumerable<ReportRow> VisibleRows => AppliedCategory == AllServices
+    private IEnumerable<ElectroGestion.Services.FilaConsumoServicio> VisibleRows => AppliedCategory == AllServices
         ? ReportRows
-        : ReportRows.Where(row => row.Name == AppliedCategory);
+        : ReportRows.Where(row => row.Servicio == AppliedCategory);
 
-    private bool IsAllServices => AppliedCategory == AllServices;
-    private decimal TotalConsumption => IsAllServices ? 1625000m : VisibleRows.Sum(row => row.TotalCost);
-    private decimal InventoryRisk => IsAllServices ? 75000m : VisibleRows.Sum(row => row.InventoryRisk);
-    private int InstallationCount => IsAllServices ? 108 : VisibleRows.Sum(row => row.Installations);
-    private decimal AverageConsumption => IsAllServices
-        ? 1696.24m
-        : InstallationCount == 0 ? 0 : TotalConsumption / InstallationCount;
-    private string HighestConsumptionService => IsAllServices
-        ? "Instalación Paneles Solares"
-        : VisibleRows.FirstOrDefault()?.ServiceLabel ?? "—";
+    private IEnumerable<ElectroGestion.Services.MesConsumoServicio> VisibleMonths => MonthlyRows
+        .Where(row => AppliedCategory == AllServices || row.Servicio == AppliedCategory)
+        .GroupBy(row => row.NumeroMes)
+        .OrderBy(group => group.Key)
+        .Select(group => new ElectroGestion.Services.MesConsumoServicio(
+            AppliedCategory, group.Key, group.First().Etiqueta, group.Sum(row => row.Total)));
+    private decimal TotalMaterials => VisibleRows.Sum(row => row.Materiales);
+    private decimal TotalConsumables => VisibleRows.Sum(row => row.Consumibles);
+    private decimal TotalConsumption => TotalMaterials + TotalConsumables;
+    private decimal InventoryRisk => VisibleRows.Sum(row => row.RiesgoInventario);
+    private int InstallationCount => VisibleRows.Sum(row => row.Instalaciones);
+    private decimal AverageConsumption => InstallationCount == 0 ? 0 : TotalConsumption / InstallationCount;
+    private string HighestConsumptionService
+    {
+        get
+        {
+            var top = VisibleRows.OrderByDescending(row => row.Total).FirstOrDefault();
+            return top is not null && top.Total > 0 ? top.Servicio : "—";
+        }
+    }
+    private decimal MonthlyMax => Math.Max(1m, VisibleMonths.Select(month => month.Total).DefaultIfEmpty(0m).Max());
+    private IEnumerable<decimal> AxisMarks => Enumerable.Range(0, 6).Reverse().Select(i => decimal.Round(MonthlyMax * i / 5m, 0));
+
+    private List<DonutSegment> DonutSegments
+    {
+        get
+        {
+            var rows = VisibleRows.Where(row => row.Materiales > 0).OrderByDescending(row => row.Materiales).Take(8).ToList();
+            var total = rows.Sum(row => row.Materiales);
+            var offset = 0d;
+            var result = new List<DonutSegment>();
+            for (var i = 0; i < rows.Count; i++)
+            {
+                var percent = total == 0 ? 0 : (double)(rows[i].Materiales / total);
+                var length = DonutCircumference * percent;
+                result.Add(new DonutSegment(rows[i].Servicio, percent * 100, length, offset, ChartColors[i % ChartColors.Length]));
+                offset += length;
+            }
+            return result;
+        }
+    }
+
+    private async Task LoadReportAsync(int year)
+    {
+        var data = await ReporteConsumoService.ObtenerAsync(year);
+        ReportRows = data.Servicios.ToList();
+        MonthlyRows = data.Meses.ToList();
+    }
 
     private void OpenConsumptionList() => View = ConsumptionListView;
-    private void OpenAnnualReport() => View = AnnualView;
+    private async Task OpenAnnualReport()
+    {
+        View = AnnualView;
+        SelectedCategory = AllServices;
+        AppliedCategory = AllServices;
+        SelectedYear = DateTime.Today.Year.ToString();
+        AppliedYear = DateTime.Today.Year;
+        await LoadReportAsync(AppliedYear);
+    }
     private void GoOverview() => View = OverviewView;
 
-    private void UpdateReport()
+    private async Task UpdateReport()
     {
-        AppliedYear = SelectedYear;
+        if (!int.TryParse(SelectedYear, out var year)) return;
+        AppliedYear = year;
         AppliedCategory = SelectedCategory;
+        await LoadReportAsync(year);
     }
 
     private static string FormatMoney(decimal value) => value.ToString("#,##0.00", System.Globalization.CultureInfo.InvariantCulture);
-
-    private sealed record ReportRow(string Name, string ServiceLabel, decimal MaterialCost, decimal ConsumableCost, int Installations, decimal InventoryRisk)
-    {
-        public decimal TotalCost => MaterialCost + ConsumableCost;
-    }
+    private static string FormatNumber(double value) => value.ToString("0.##", System.Globalization.CultureInfo.InvariantCulture);
+    private static string FormatPercent(double value) => value.ToString("0.#", System.Globalization.CultureInfo.InvariantCulture);
+    private string FormatAxis(decimal value) => value.ToString("#,##0", System.Globalization.CultureInfo.InvariantCulture);
+    private string BarHeight(decimal value) => Math.Max(1, (double)(value / MonthlyMax * 100m)).ToString("0.#", System.Globalization.CultureInfo.InvariantCulture);
+    private sealed record DonutSegment(string Servicio, double Porcentaje, double Length, double Offset, string Color);
 }
