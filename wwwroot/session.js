@@ -20,7 +20,7 @@ window.electroSession = {
       lastPing = now;
       try {
         const response = await fetch('/auth/activity', { method: 'POST', credentials: 'same-origin' });
-        if (response.status === 401) window.location.replace('/login');
+        if (!response.ok) window.location.replace('/login');
       } catch { /* The next interaction can retry after connectivity returns. */ }
     };
     for (const event of ['pointerdown', 'keydown', 'scroll']) document.addEventListener(event, ping, { passive: true });
