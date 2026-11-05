@@ -23,9 +23,12 @@ builder.Services.AddScoped<IPasswordHasher<Usuario>, PasswordHasher<Usuario>>();
 builder.Services.AddScoped<ClienteService>();
 builder.Services.AddScoped<ServicioService>();
 builder.Services.AddScoped<SolicitudService>();
+builder.Services.AddScoped<SolicitudEventoService>();
 builder.Services.AddScoped<VisitaService>();
 builder.Services.AddScoped<LevantamientoService>();
 builder.Services.AddScoped<CotizacionService>();
+builder.Services.AddScoped<OrdenTrabajoService>();
+builder.Services.AddScoped<CobroService>();
 
 builder.Services.AddBlazorBootstrap();
 

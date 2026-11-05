@@ -56,6 +56,11 @@
                     <option value="Pendiente">Pendiente</option>
                     <option value="En proceso">En proceso</option>
                     <option value="En Espera Administración">En Espera Administración</option>
+                    <option value="En revisión">En revisión</option>
+                    <option value="Enviada al cliente">Enviada al cliente</option>
+                    <option value="Aprobada">Aprobada</option>
+                    <option value="Rechazada">Rechazada</option>
+                    <option value="Pendiente de cobro">Pendiente de cobro</option>
                     <option value="Finalizada">Finalizada</option>
                     <option value="Cancelada">Cancelada</option>
                 </select>
@@ -158,7 +163,7 @@
 @if (IsDetalleModalOpen && SelectedSolicitud != null)
 {
     <div style="position:fixed;inset:0;background:rgba(14,16,40,.5);display:flex;align-items:center;justify-content:center;z-index:9999;padding:20px">
-        <div style="background:#fff;border-radius:16px;width:100%;max-width:620px;padding:32px;box-shadow:0 20px 40px rgba(0,0,0,.2);animation:tin .2s ease-out">
+        <div style="background:#fff;border-radius:16px;width:100%;max-width:620px;max-height:90vh;overflow:auto;padding:32px;box-shadow:0 20px 40px rgba(0,0,0,.2);animation:tin .2s ease-out">
             <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:20px">
                 <div>
                     <div style="font-family:'Manrope';font-weight:800;font-size:22px;color:#14162B">Detalle de la solicitud</div>
@@ -175,6 +180,7 @@
                 <div style="background:#F7F8FC;border:1px solid #EFF0F6;border-radius:10px;padding:12px 14px"><div style="font-size:11.5px;color:#8B90A3;font-weight:800;text-transform:uppercase">Dirección</div><div style="font-size:14px;margin-top:4px;font-weight:700;color:#14162B">@SelectedSolicitud.Direccion</div></div>
                 <div style="background:#F7F8FC;border:1px solid #EFF0F6;border-radius:10px;padding:12px 14px"><div style="font-size:11.5px;color:#8B90A3;font-weight:800;text-transform:uppercase">Estado</div><div style="font-size:14px;margin-top:4px;font-weight:700;color:#14162B">@SelectedSolicitud.EstadoSolicitud?.Nombre</div></div>
             </div>
+            <SolicitudTimeline SolicitudId="SelectedSolicitud.Id" />
             <div style="margin-top:24px;display:flex;justify-content:flex-end;border-top:1px solid #EFF0F6;padding-top:17px">
                 <button @onclick="CerrarDetalle" style="padding:10px 20px;border:1px solid #D5D8E6;background:#fff;border-radius:8px;font-weight:700;cursor:pointer;color:#14162B">Cerrar</button>
             </div>
@@ -385,6 +391,11 @@
         var s = solicitudes.FirstOrDefault(x => x.Id == id);
         if (s != null)
         {
+            if (s.EstadoSolicitud?.Nombre == "Finalizada")
+            {
+                ToastService.ShowWarning("No se puede editar una solicitud finalizada. Reábrala desde el detalle de su cobro.", "Solicitud finalizada");
+                return;
+            }
             IsFormModalOpen = true;
             ModalTitle = "Editar Solicitud";
             ModalSub = "Modifique los datos de la solicitud.";
@@ -399,7 +410,7 @@
     {
         if (!PuedeEliminarSolicitud(id))
         {
-            ToastService.ShowWarning("No se puede eliminar una solicitud En proceso o En Espera Administración.", "Atención");
+            ToastService.ShowWarning("No se puede eliminar una solicitud en proceso, en espera de administración o finalizada.", "Atención");
             return;
         }
 
@@ -408,7 +419,7 @@
     }
 
     private bool PuedeEliminarSolicitud(int id) =>
-        solicitudes.FirstOrDefault(s => s.Id == id)?.EstadoSolicitud?.Nombre is not ("En proceso" or "En Espera Administración");
+        solicitudes.FirstOrDefault(s => s.Id == id)?.EstadoSolicitud?.Nombre is not ("En proceso" or "En Espera Administración" or "Finalizada");
 
     private async Task EjecutarEliminar()
     {

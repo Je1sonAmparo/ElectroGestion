@@ -11,6 +11,15 @@
                 </div>
             </LayoutView>
         }
+        else if (!AppState.EsGerente && routeData.PageType == typeof(ElectroGestion.Components.Pages.Gerente.Cotizaciones))
+        {
+            <LayoutView Layout="typeof(Layout.MainLayout)">
+                <div style="background:#fff;border:1px solid #E3E5EE;border-radius:14px;padding:28px;max-width:680px">
+                    <h1 style="font-family:'Manrope';font-weight:800;font-size:24px;color:#14162B">Acceso restringido</h1>
+                    <p style="color:#6B7085;margin:0">Solo el gerente puede ver cotizaciones.</p>
+                </div>
+            </LayoutView>
+        }
         else
         {
             <RouteView RouteData="routeData" DefaultLayout="typeof(Layout.MainLayout)" />

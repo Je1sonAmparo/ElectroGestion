@@ -4,12 +4,14 @@ using Microsoft.EntityFrameworkCore;
 
 namespace ElectroGestion.Services;
 
+public enum ResultadoEliminarCotizacion { Eliminada, VinculadaAOrden, VinculadaACobro, SolicitudFinalizada, NoEncontrada }
+
 public class CotizacionService(IDbContextFactory<Contexto> contextFactory)
 {
     public const string EnRevision = "En revisión";
     public const decimal TasaItbis = 18m;
     public static readonly string[] Estados = [EnRevision, "Enviada al cliente", "Aprobada", "Rechazada"];
-    private const int EnEsperaAdministracionId = 5;
+    private const string EnEsperaAdministracion = "En Espera Administración";
 
     public async Task<List<Cotizacion>> ObtenerTodasAsync()
     {
@@ -26,7 +28,10 @@ public class CotizacionService(IDbContextFactory<Contexto> contextFactory)
     {
         await using var db = await contextFactory.CreateDbContextAsync();
         return await db.Solicitudes.AsNoTracking()
-            .Where(s => s.EstadoSolicitudId == EnEsperaAdministracionId && s.Levantamiento != null &&
+            .Where(s => s.EstadoSolicitud != null &&
+                (s.EstadoSolicitud.Nombre == EnEsperaAdministracion ||
+                    db.Visitas.Any(v => v.SolicitudId == s.Id && !v.IsDeleted && v.Estado == EnEsperaAdministracion)) &&
+                s.Levantamiento != null &&
                 !db.Cotizaciones.Any(c => c.SolicitudDbId == s.Id))
             .Include(s => s.Cliente).Include(s => s.Servicio).Include(s => s.Levantamiento)
             .OrderBy(s => s.FechaSolicitud).ToListAsync();
@@ -37,7 +42,9 @@ public class CotizacionService(IDbContextFactory<Contexto> contextFactory)
         if (!DetallesValidos(detalles, montoManoObra)) return false;
         await using var db = await contextFactory.CreateDbContextAsync();
         var solicitud = await db.Solicitudes.Include(s => s.Cliente)
-            .FirstOrDefaultAsync(s => s.Id == solicitudId && s.EstadoSolicitudId == EnEsperaAdministracionId && s.Levantamiento != null);
+            .FirstOrDefaultAsync(s => s.Id == solicitudId && s.Levantamiento != null && s.EstadoSolicitud != null &&
+                (s.EstadoSolicitud.Nombre == EnEsperaAdministracion ||
+                    db.Visitas.Any(v => v.SolicitudId == s.Id && !v.IsDeleted && v.Estado == EnEsperaAdministracion)));
         if (solicitud is null || await db.Cotizaciones.AnyAsync(c => c.SolicitudDbId == solicitudId))
             return false;
 
@@ -54,6 +61,10 @@ public class CotizacionService(IDbContextFactory<Contexto> contextFactory)
             Detalles = detalles.Select(CopiarDetalle).ToList()
         });
         await db.SaveChangesAsync();
+        var estadoRevision = await db.EstadosSolicitud.FirstAsync(e => e.Nombre == EnRevision);
+        solicitud.EstadoSolicitudId = estadoRevision.Id;
+        RegistroEventosSolicitud.Agregar(db, solicitudId, "Cotización creada", "Se generó una cotización en estado En revisión.");
+        await db.SaveChangesAsync();
         return true;
     }
 
@@ -62,12 +73,21 @@ public class CotizacionService(IDbContextFactory<Contexto> contextFactory)
         if (!DetallesValidos(detalles, montoManoObra)) return false;
         await using var db = await contextFactory.CreateDbContextAsync();
         var cotizacion = await db.Cotizaciones.Include(c => c.Detalles).FirstOrDefaultAsync(c => c.Id == id);
-        if (cotizacion is null || cotizacion.Estado != EnRevision) return false;
+        if (cotizacion is null || cotizacion.Estado != EnRevision ||
+            (cotizacion.SolicitudDbId.HasValue && await SolicitudFinalizadaAsync(db, cotizacion.SolicitudDbId.Value))) return false;
         db.DetallesCotizacion.RemoveRange(cotizacion.Detalles);
         cotizacion.Detalles = detalles.Select(CopiarDetalle).ToList();
         cotizacion.PorcentajeItbis = TasaItbis;
         cotizacion.MontoManoObra = montoManoObra;
         cotizacion.MontoTotal = CalcularTotal(detalles, montoManoObra);
+        var ordenVinculada = await db.OrdenesTrabajo.FirstOrDefaultAsync(o => o.CotizacionId == id);
+        if (ordenVinculada is not null)
+            ordenVinculada.MaterialesCotizados = detalles.Select(d => new MaterialOrden
+            {
+                Codigo = d.CodigoArticulo, Nombre = d.NombreArticulo, Cantidad = d.Cantidad
+            }).ToList();
+        if (cotizacion.SolicitudDbId.HasValue)
+            RegistroEventosSolicitud.Agregar(db, cotizacion.SolicitudDbId.Value, "Cotización actualizada", "Se actualizaron materiales, mano de obra o importes.");
         await db.SaveChangesAsync();
         return true;
     }
@@ -99,6 +119,7 @@ public class CotizacionService(IDbContextFactory<Contexto> contextFactory)
         await using var db = await contextFactory.CreateDbContextAsync();
         var cotizacion = await db.Cotizaciones.FirstOrDefaultAsync(c => c.Id == id);
         if (cotizacion is null) return false;
+        if (cotizacion.SolicitudDbId.HasValue && await SolicitudFinalizadaAsync(db, cotizacion.SolicitudDbId.Value)) return false;
 
         if (cotizacion.Estado == EnRevision && nuevoEstado == "Enviada al cliente")
         {
@@ -115,6 +136,12 @@ public class CotizacionService(IDbContextFactory<Contexto> contextFactory)
             cotizacion.FechaRespuesta = null;
             cotizacion.MotivoRechazo = "";
         }
+        else if (cotizacion.Estado == "Rechazada" && nuevoEstado == EnRevision)
+        {
+            cotizacion.FechaEnvio = null;
+            cotizacion.FechaRespuesta = null;
+            cotizacion.MotivoRechazo = "";
+        }
         else if (cotizacion.Estado is "Aprobada" or "Rechazada" && nuevoEstado == "Enviada al cliente")
         {
             cotizacion.FechaRespuesta = null;
@@ -126,7 +153,37 @@ public class CotizacionService(IDbContextFactory<Contexto> contextFactory)
         }
 
         cotizacion.Estado = nuevoEstado;
+        if (cotizacion.SolicitudDbId.HasValue)
+        {
+            var estadoSolicitud = await db.EstadosSolicitud.FirstOrDefaultAsync(e => e.Nombre == nuevoEstado);
+            var solicitud = await db.Solicitudes.FirstOrDefaultAsync(s => s.Id == cotizacion.SolicitudDbId.Value);
+            if (estadoSolicitud is not null && solicitud is not null) solicitud.EstadoSolicitudId = estadoSolicitud.Id;
+            RegistroEventosSolicitud.Agregar(db, cotizacion.SolicitudDbId.Value, "Estado de cotización actualizado", $"La cotización pasó a {nuevoEstado}.");
+        }
         await db.SaveChangesAsync();
         return true;
     }
+
+    public async Task<ResultadoEliminarCotizacion> EliminarAsync(int id)
+    {
+        await using var db = await contextFactory.CreateDbContextAsync();
+        var cotizacion = await db.Cotizaciones.FindAsync(id);
+        if (cotizacion is null) return ResultadoEliminarCotizacion.NoEncontrada;
+        if (cotizacion.SolicitudDbId.HasValue && await SolicitudFinalizadaAsync(db, cotizacion.SolicitudDbId.Value))
+            return ResultadoEliminarCotizacion.SolicitudFinalizada;
+        if (await db.OrdenesTrabajo.AnyAsync(o => o.CotizacionId == id))
+            return ResultadoEliminarCotizacion.VinculadaAOrden;
+        if (await db.Cobros.AnyAsync(c => c.CotizacionId == id))
+            return ResultadoEliminarCotizacion.VinculadaACobro;
+
+        if (cotizacion.SolicitudDbId.HasValue)
+            RegistroEventosSolicitud.Agregar(db, cotizacion.SolicitudDbId.Value, "Cotización eliminada", "Se eliminó la cotización vinculada.");
+        db.Cotizaciones.Remove(cotizacion);
+        await db.SaveChangesAsync();
+        return ResultadoEliminarCotizacion.Eliminada;
+    }
+
+    private static Task<bool> SolicitudFinalizadaAsync(Contexto db, int solicitudId) =>
+        db.Solicitudes.Where(s => s.Id == solicitudId)
+            .AnyAsync(s => s.EstadoSolicitud != null && s.EstadoSolicitud.Nombre == "Finalizada");
 }

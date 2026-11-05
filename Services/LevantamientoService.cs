@@ -17,7 +17,7 @@ public class LevantamientoService(IDbContextFactory<Contexto> contextFactory)
         return await contexto.Solicitudes
             .Where(s => !s.IsDeleted &&
                 s.EstadoSolicitudId != EstadoFinalizadaId &&
-                contexto.Visitas.Any(v => !v.IsDeleted && v.SolicitudId == s.Id))
+                contexto.Visitas.Any(v => !v.IsDeleted && v.SolicitudId == s.Id && v.Estado != "Cancelada"))
             .Include(s => s.Cliente)
             .Include(s => s.Servicio)
             .Include(s => s.EstadoSolicitud)
@@ -53,7 +53,8 @@ public class LevantamientoService(IDbContextFactory<Contexto> contextFactory)
         var solicitud = await contexto.Solicitudes
             .Include(s => s.Levantamiento)
             .FirstOrDefaultAsync(s => s.Id == solicitudId);
-        if (solicitud is null || !await TieneVisitaActivaAsync(contexto, solicitudId))
+        if (solicitud is null || solicitud.EstadoSolicitudId == EstadoFinalizadaId ||
+            !await TieneVisitaActivaAsync(contexto, solicitudId))
         {
             return false;
         }
@@ -69,6 +70,7 @@ public class LevantamientoService(IDbContextFactory<Contexto> contextFactory)
         }
 
         await ActualizarEstadoVisitaAsync(contexto, solicitudId, "En proceso");
+        RegistroEventosSolicitud.Agregar(contexto, solicitudId, "Levantamiento iniciado", "El técnico comenzó el levantamiento del servicio.");
         await contexto.SaveChangesAsync();
         return true;
     }
@@ -87,6 +89,7 @@ public class LevantamientoService(IDbContextFactory<Contexto> contextFactory)
         var levantamiento = solicitud.Levantamiento ?? new Levantamiento { SolicitudId = solicitudId };
         CopiarDatos(datos, levantamiento);
         levantamiento.BorradorGuardado = true;
+        RegistroEventosSolicitud.Agregar(contexto, solicitudId, "Levantamiento guardado", "Se guardó un borrador del levantamiento técnico.");
 
         if (solicitud.Levantamiento is null)
         {
@@ -113,6 +116,7 @@ public class LevantamientoService(IDbContextFactory<Contexto> contextFactory)
         CopiarDatos(datos, solicitud.Levantamiento);
         solicitud.EstadoSolicitudId = EstadoEnEsperaAdministracionId;
         solicitud.Levantamiento.BorradorGuardado = false;
+        RegistroEventosSolicitud.Agregar(contexto, solicitudId, "Levantamiento enviado a administración", "El levantamiento fue completado y enviado para revisión.");
         await ActualizarEstadoVisitaAsync(contexto, solicitudId, "En Espera Administración");
         await contexto.SaveChangesAsync();
         return true;
@@ -133,6 +137,7 @@ public class LevantamientoService(IDbContextFactory<Contexto> contextFactory)
 
         CopiarDatos(datos, solicitud.Levantamiento);
         solicitud.Levantamiento.BorradorGuardado = false;
+        RegistroEventosSolicitud.Agregar(contexto, solicitudId, "Levantamiento actualizado", "Se actualizaron datos o fotografías del levantamiento.");
         await contexto.SaveChangesAsync();
         return true;
     }

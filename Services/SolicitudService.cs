@@ -34,6 +34,8 @@ public class SolicitudService(IDbContextFactory<Contexto> contextFactory) : Apli
             solicitud.Servicio = null;
             solicitud.EstadoSolicitud = null;
             contexto.Solicitudes.Add(solicitud);
+            await contexto.SaveChangesAsync();
+            RegistroEventosSolicitud.Agregar(contexto, solicitud.Id, "Solicitud creada", "Se registró la solicitud del servicio.");
             return await contexto.SaveChangesAsync() > 0;
         }
         catch
@@ -49,12 +51,14 @@ public class SolicitudService(IDbContextFactory<Contexto> contextFactory) : Apli
             await using var contexto = await contextFactory.CreateDbContextAsync();
             var existente = await contexto.Solicitudes.FirstOrDefaultAsync(s => s.Id == solicitud.Id);
             if (existente == null) return false;
+            if (await contexto.EstadosSolicitud.AnyAsync(e => e.Id == existente.EstadoSolicitudId && e.Nombre == "Finalizada")) return false;
 
             existente.ClienteId = solicitud.ClienteId;
             existente.ServicioId = solicitud.ServicioId;
             existente.Contacto = solicitud.Contacto;
             existente.Direccion = solicitud.Direccion;
             existente.EstadoSolicitudId = solicitud.EstadoSolicitudId;
+            RegistroEventosSolicitud.Agregar(contexto, existente.Id, "Solicitud actualizada", "Se actualizaron los datos principales de la solicitud.");
 
             return await contexto.SaveChangesAsync() > 0;
         }
@@ -92,7 +96,8 @@ public class SolicitudService(IDbContextFactory<Contexto> contextFactory) : Apli
     {
         await using var contexto = await contextFactory.CreateDbContextAsync();
         var solicitud = await contexto.Solicitudes.FirstOrDefaultAsync(s => s.Id == id);
-        if (solicitud is null || solicitud.EstadoSolicitudId is 2 or 5)
+        if (solicitud is null || solicitud.EstadoSolicitudId is 2 or 5 ||
+            await contexto.EstadosSolicitud.AnyAsync(e => e.Id == solicitud.EstadoSolicitudId && e.Nombre == "Finalizada"))
         {
             return false;
         }
@@ -147,6 +152,7 @@ public class SolicitudService(IDbContextFactory<Contexto> contextFactory) : Apli
         }
 
         solicitud.IsDeleted = false;
+        RegistroEventosSolicitud.Agregar(contexto, solicitud.Id, "Solicitud restaurada", "La solicitud fue restaurada desde eliminadas.");
         var visitasEliminadasEnCascada = await contexto.Visitas
             .IgnoreQueryFilters()
             .Where(v => v.SolicitudId == id && v.EliminadaPorSolicitud)

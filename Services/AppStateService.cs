@@ -13,7 +13,6 @@ public class AppStateService
     public List<Cliente> Clientes { get; set; } = new();
     public List<Solicitud> Solicitudes { get; set; } = new();
     public List<Visita> Visitas { get; set; } = new();
-    public List<OrdenTrabajo> Ordenes { get; set; } = new();
     public List<Servicio> Servicios { get; set; } = new();
     public List<EstadoSolicitud> EstadosSolicitud { get; set; } = new();
     public List<DetalleSolicitud> DetallesSolicitud { get; set; } = new();
@@ -125,25 +124,6 @@ public class AppStateService
             new() { Id = 7, SolicitudId = 8, Solicitud = Solicitudes[7], Fecha = DateTime.Today.AddDays(-28), Hora = "15:00", HoraFin = "17:30", Estado = "Cancelada" }
         };
 
-        Ordenes = new List<OrdenTrabajo>
-        {
-            new()
-            {
-                Id = 1, Code = "OT-0001", SolicitudId = 1, Estado = "En proceso",
-                Trabajos = new() { "Montaje del gabinete UPS en sala técnica", "Conexión de banco de baterías y puesta a tierra", "Pruebas de transferencia y respaldo (30 min)" },
-                Materiales = new() { "UPS 6 kVA", "Baterías 12V x8", "Cable THHN #6", "Breaker 60A", "Canaleta metálica", "Multímetro" },
-                Observaciones = "Coordinar con el cliente el corte de energía entre 9:00 y 11:00 AM. Requiere dos técnicos."
-            },
-            new()
-            {
-                Id = 2, Code = "OT-0002", SolicitudId = 2, Estado = "En proceso",
-                Trabajos = new() { "Instalación de estructura en techo (12 paneles)", "Tendido de tubería y cableado DC", "Configuración de inversor y monitoreo" },
-                Materiales = new() { "Paneles 550W x12", "Inversor híbrido 6kW", "Riel de aluminio", "Tubería EMT 3/4", "Cable solar #10", "Herramienta de crimpado" },
-                Observaciones = "Verificar disponibilidad de andamio en obra. Entregar informe fotográfico al finalizar."
-            }
-        };
-
-
         Cotizaciones = new List<Cotizacion>
         {
             new() { Id = 1, SolicitudId = "REQ-001", Cliente = "Acme Corp", Fecha = DateTime.Today.AddDays(-2), MontoTotal = 15000.00m, Estado = "Aprobada" },
@@ -152,8 +132,8 @@ public class AppStateService
 
         Cobros = new List<Cobro>
         {
-            new() { Id = 1, Cliente = "Acme Corp", FacturaId = 1001, Fecha = DateTime.Today.AddDays(-1), Monto = 7500.00m, MetodoPago = "Transferencia", Estado = "Completado" },
-            new() { Id = 2, Cliente = "Globex S.A.", FacturaId = 1002, Fecha = DateTime.Today, Monto = 4000.00m, MetodoPago = "Cheque", Estado = "Pendiente" }
+            new() { Id = 1, Cliente = "Acme Corp", FacturaId = 1001, Fecha = DateTime.Today.AddDays(-1), Monto = 7500.00m, MetodoPago = "Transferencia", Estado = "Finalizada" },
+            new() { Id = 2, Cliente = "Globex S.A.", FacturaId = 1002, Fecha = DateTime.Today, Monto = 4000.00m, MetodoPago = "Cheque", Estado = "Pendiente de cobro" }
         };
 
         Inventario = new List<ArticuloInventario>
@@ -172,7 +152,6 @@ public class AppStateService
     public int NextSolicitudId() => Solicitudes.Count > 0 ? Solicitudes.Max(s => s.Id) + 1 : 1;
     public int NextClienteId() => Clientes.Count > 0 ? Clientes.Max(c => c.Id) + 1 : 1;
     public int NextUsuarioId() => Usuarios.Count > 0 ? Usuarios.Max(u => u.Id) + 1 : 1;
-    public int NextOrdenId() => Ordenes.Count > 0 ? Ordenes.Max(o => o.Id) + 1 : 1;
     public int NextServicioId() => Servicios.Count > 0 ? Servicios.Max(s => s.Id) + 1 : 1;
     public int NextCotizacionId() => Cotizaciones.Count > 0 ? Cotizaciones.Max(c => c.Id) + 1 : 1;
     public int NextCobroId() => Cobros.Count > 0 ? Cobros.Max(c => c.Id) + 1 : 1;
@@ -227,6 +206,7 @@ public class AppStateService
         "Pendiente" => ("#FEF3C7", "#92400E"),
         "En proceso" => ("#DBEAFE", "#1E40AF"),
         "En Espera Administración" => ("#E0E7FF", "#3730A3"),
+        "Pendiente de cobro" => ("#EDE9FE", "#6D28D9"),
         "Finalizada" => ("#D1FAE5", "#065F46"),
         "Cancelada" => ("#FEE2E2", "#991B1B"),
         "Activo" => ("#D1FAE5", "#065F46"),
@@ -236,3 +216,5 @@ public class AppStateService
         _ => ("#F3F4F6", "#374151")
     };
 }
+
+

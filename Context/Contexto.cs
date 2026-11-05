@@ -8,10 +8,14 @@ public class Contexto : DbContext
     public Contexto(DbContextOptions<Contexto> options) : base(options) { }
 
     public DbSet<Solicitud> Solicitudes { get; set; }
+    public DbSet<SolicitudEvento> SolicitudesEventos { get; set; }
     public DbSet<Visita> Visitas { get; set; }
     public DbSet<Levantamiento> Levantamientos { get; set; }
     public DbSet<Cotizacion> Cotizaciones { get; set; }
     public DbSet<DetalleCotizacion> DetallesCotizacion { get; set; }
+    public DbSet<OrdenTrabajo> OrdenesTrabajo { get; set; }
+    public DbSet<Cobro> Cobros { get; set; }
+    public DbSet<AbonoCobro> AbonosCobro { get; set; }
     public DbSet<Cliente> Clientes { get; set; }
     public DbSet<Usuario> Usuarios { get; set; }
     public DbSet<Servicio> Servicios { get; set; }
@@ -96,6 +100,51 @@ public class Contexto : DbContext
                 .OnDelete(DeleteBehavior.Cascade);
         });
 
+        modelBuilder.Entity<OrdenTrabajo>(entity =>
+        {
+            entity.Property(o => o.Code).HasMaxLength(20).IsRequired();
+            entity.Property(o => o.Cliente).HasMaxLength(200).IsRequired();
+            entity.Property(o => o.TipoServicio).HasMaxLength(200).IsRequired();
+            entity.Property(o => o.Estado).HasMaxLength(30).IsRequired();
+            entity.Property(o => o.TrabajosJson).HasColumnType("nvarchar(max)");
+            entity.Property(o => o.MaterialesJson).HasColumnType("nvarchar(max)");
+            entity.Property(o => o.HerramientasJson).HasColumnType("nvarchar(max)");
+            entity.Property(o => o.Observaciones).HasMaxLength(2000);
+            entity.HasIndex(o => o.CotizacionId).IsUnique();
+            entity.HasOne(o => o.Cotizacion).WithMany().HasForeignKey(o => o.CotizacionId).OnDelete(DeleteBehavior.Restrict);
+            entity.HasOne<Solicitud>().WithMany().HasForeignKey(o => o.SolicitudId).OnDelete(DeleteBehavior.Restrict);
+        });
+
+        modelBuilder.Entity<Cobro>(entity =>
+        {
+            entity.Property(c => c.Cliente).HasMaxLength(200).IsRequired();
+            entity.Property(c => c.MetodoPago).HasMaxLength(40).IsRequired();
+            entity.Property(c => c.Estado).HasMaxLength(20).IsRequired();
+            entity.Property(c => c.Monto).HasPrecision(18, 2);
+            entity.HasIndex(c => c.CotizacionId).IsUnique();
+            entity.HasIndex(c => c.OrdenTrabajoId);
+            entity.HasOne(c => c.Cotizacion).WithMany().HasForeignKey(c => c.CotizacionId).OnDelete(DeleteBehavior.Restrict);
+            entity.HasOne(c => c.OrdenTrabajo).WithMany().HasForeignKey(c => c.OrdenTrabajoId).OnDelete(DeleteBehavior.Restrict);
+        });
+
+        modelBuilder.Entity<AbonoCobro>(entity =>
+        {
+            entity.Property(a => a.Monto).HasPrecision(18, 2);
+            entity.Property(a => a.MetodoPago).HasMaxLength(40).IsRequired();
+            entity.HasIndex(a => new { a.CobroId, a.Fecha });
+            entity.HasOne(a => a.Cobro).WithMany(c => c.Abonos).HasForeignKey(a => a.CobroId).OnDelete(DeleteBehavior.Cascade);
+        });
+
+        modelBuilder.Entity<SolicitudEvento>(entity =>
+        {
+            entity.HasQueryFilter(e => e.Solicitud != null && !e.Solicitud.IsDeleted);
+            entity.Property(e => e.Titulo).HasMaxLength(120).IsRequired();
+            entity.Property(e => e.Detalle).HasMaxLength(500).IsRequired();
+            entity.HasIndex(e => new { e.SolicitudId, e.Fecha });
+            entity.HasOne(e => e.Solicitud).WithMany(s => s.Eventos)
+                .HasForeignKey(e => e.SolicitudId).OnDelete(DeleteBehavior.Restrict);
+        });
+
         modelBuilder.Entity<DetalleSolicitud>()
             .HasQueryFilter(d => d.Solicitud != null && !d.Solicitud.IsDeleted);
 
@@ -168,7 +217,12 @@ public class Contexto : DbContext
             new EstadoSolicitud { Id = 2, Nombre = "En proceso" },
             new EstadoSolicitud { Id = 3, Nombre = "Finalizada" },
             new EstadoSolicitud { Id = 4, Nombre = "Cancelada" },
-            new EstadoSolicitud { Id = 5, Nombre = "En Espera Administración" }
+            new EstadoSolicitud { Id = 5, Nombre = "En Espera Administración" },
+            new EstadoSolicitud { Id = 6, Nombre = "En revisión" },
+            new EstadoSolicitud { Id = 7, Nombre = "Enviada al cliente" },
+            new EstadoSolicitud { Id = 8, Nombre = "Aprobada" },
+            new EstadoSolicitud { Id = 9, Nombre = "Rechazada" },
+            new EstadoSolicitud { Id = 10, Nombre = "Pendiente de cobro" }
         );
 
         modelBuilder.Entity<Cliente>().HasData(
