@@ -8,6 +8,7 @@ public class OrdenTrabajoService(IDbContextFactory<Contexto> contextFactory, App
 {
     public async Task<List<OrdenTrabajo>> ObtenerTodasAsync()
     {
+        if (!appState.IsAuthenticated) return [];
         await using var db = await contextFactory.CreateDbContextAsync();
         return await db.OrdenesTrabajo.AsNoTracking().OrderByDescending(o => o.Id).ToListAsync();
     }
@@ -21,18 +22,6 @@ public class OrdenTrabajoService(IDbContextFactory<Contexto> contextFactory, App
                 !db.OrdenesTrabajo.Any(o => o.CotizacionId == c.Id))
             .Include(c => c.Detalles)
             .OrderByDescending(c => c.Id).ToListAsync();
-    }
-
-    public async Task<Cotizacion?> ObtenerCotizacionDeOrdenAsync(int ordenId)
-    {
-        if (!appState.EsGerente) return null;
-        await using var db = await contextFactory.CreateDbContextAsync();
-        return await db.Cotizaciones.AsNoTracking()
-            .Where(c => db.OrdenesTrabajo.Any(o => o.Id == ordenId && o.CotizacionId == c.Id))
-            .Include(c => c.Detalles)
-            .Include(c => c.Solicitud).ThenInclude(s => s!.Cliente)
-            .Include(c => c.Solicitud).ThenInclude(s => s!.Servicio)
-            .FirstOrDefaultAsync();
     }
 
     public async Task<bool> CrearAsync(int cotizacionId, List<string> trabajos, List<string> herramientas, string observaciones)
