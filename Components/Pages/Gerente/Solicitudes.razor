@@ -74,13 +74,17 @@
         </div>
     </div>
 
+    <div style="padding:10px 18px;display:flex;justify-content:flex-end;align-items:center;gap:12px">
+        <span style="font-size:13px;color:#6B7085">@Seleccionadas.Count seleccionadas</span>
+        <button disabled="@(Seleccionadas.Count == 0)" @onclick="ConfirmarSeleccionadas" style="padding:8px 14px;border:1px solid #F5C2C4;background:#fff;color:#C4141B;border-radius:8px;font-weight:700;cursor:pointer">Eliminar seleccionadas</button>
+    </div>
     <div style="overflow-x:auto">
         <table style="width:100%;border-collapse:collapse;font-size:14px;table-layout:fixed">
             <thead>
                 <tr style="border-bottom:1px solid #EFF0F6;background:#FAFAFC;color:#6B7085;font-family:'Manrope';font-weight:800;font-size:13px;text-transform:uppercase;letter-spacing:0.5px">
                     <th @onclick='() => OrdenarPor("Id")' style="padding:14px 18px;text-align:left;width:12%;cursor:pointer;user-select:none" title="Ordenar por ID">
                         <div style="display:inline-flex;align-items:center;gap:6px">
-                            <span>ID</span>
+                            <input type="checkbox" aria-label="Seleccionar todas las solicitudes visibles que se pueden eliminar" checked="@(ElegiblesVisibles.Count > 0 && ElegiblesVisibles.All(id => Seleccionadas.Contains(id)))" @onchange="e => SeleccionarTodas((bool)(e.Value ?? false))" @onclick:stopPropagation style="margin-right:5px" /><span>ID</span>
                             @if (SortColumn == "Id") { <span style="font-size:11px">@(SortAscending ? "▲" : "▼")</span> }
                         </div>
                     </th>
@@ -126,7 +130,7 @@
                     {
                         <tr style="border-bottom:1px solid #EFF0F6;transition:background 0.15s">
                             <td style="padding:18px;vertical-align:middle">
-                                <span style="font-family:ui-monospace,'SFMono-Regular',Consolas,monospace;font-size:14px;font-weight:700;letter-spacing:.05em;color:#5B6173">@s.Id.ToString("D4")</span>
+                                <input type="checkbox" aria-label="Seleccionar solicitud @s.Id" checked="@Seleccionadas.Contains(s.Id)" disabled="@(!PuedeEliminarSolicitud(s.Id))" @onchange="e => CambiarSeleccion(s.Id, (bool)(e.Value ?? false))" style="margin-right:8px" /><span style="font-family:ui-monospace,'SFMono-Regular',Consolas,monospace;font-size:14px;font-weight:700;letter-spacing:.05em;color:#5B6173">@s.Id.ToString("D4")</span>
                             </td>
                             <td style="padding:18px;vertical-align:middle;font-weight:700;color:#14162B">
                                 @s.Cliente?.Nombre
@@ -259,7 +263,7 @@
     <div style="position:fixed;inset:0;background:rgba(14,16,40,0.5);display:flex;align-items:center;justify-content:center;z-index:9999;padding:20px">
         <div style="background:#fff;border-radius:16px;width:100%;max-width:400px;padding:32px;box-shadow:0 20px 40px rgba(0,0,0,0.2);animation:tin 0.2s ease-out">
             <div style="font-family:'Manrope';font-weight:800;font-size:22px;color:#14162B;margin-bottom:10px">Eliminar Solicitud</div>
-            <div style="color:#4A4E63;font-size:14px;margin-bottom:24px">¿Estás seguro de que deseas eliminar esta solicitud?</div>
+            <div style="color:#4A4E63;font-size:14px;margin-bottom:24px">¿Deseas eliminar @(DeleteIds.Count == 1 ? "esta solicitud" : $"estas {DeleteIds.Count} solicitudes")? Confirma para continuar.</div>
             <div style="display:flex;justify-content:flex-end;gap:12px">
                 <button @onclick="CerrarEliminar" style="padding:10px 20px;border:1px solid #D5D8E6;background:#fff;border-radius:8px;font-weight:700;font-size:14px;cursor:pointer;color:#4A4E63">
                     Cancelar
@@ -289,6 +293,12 @@
     private bool IsFormModalOpen = false;
     private bool IsDeleteModalOpen = false;
     private int? DeleteId;
+    private HashSet<int> Seleccionadas = [];
+    private HashSet<int> DeleteIds = [];
+    private List<int> ElegiblesVisibles => FilteredSolicitudes.Where(s => PuedeEliminarSolicitud(s.Id)).Select(s => s.Id).ToList();
+    private void CambiarSeleccion(int id, bool marcado) { if (marcado && PuedeEliminarSolicitud(id)) Seleccionadas.Add(id); else Seleccionadas.Remove(id); }
+    private void SeleccionarTodas(bool marcado) { foreach (var id in ElegiblesVisibles) { if (marcado) Seleccionadas.Add(id); else Seleccionadas.Remove(id); } }
+    private void ConfirmarSeleccionadas() { DeleteIds = Seleccionadas.Where(PuedeEliminarSolicitud).ToHashSet(); IsDeleteModalOpen = DeleteIds.Count > 0; }
     private string ModalTitle = "";
     private string ModalSub = "";
     private int? FormId;
@@ -417,6 +427,7 @@
         }
 
         DeleteId = id;
+        DeleteIds = [id];
         IsDeleteModalOpen = true;
     }
 
@@ -425,14 +436,15 @@
 
     private async Task EjecutarEliminar()
     {
-        if (DeleteId.HasValue)
+        if (DeleteIds.Count > 0)
         {
-            var resultado = await SolicitudService.Eliminar(DeleteId.Value);
+            var resultado = await SolicitudService.EliminarVarios(DeleteIds);
             if (resultado)
             {
                 AppState.NotifyStateChanged();
                 ToastService.ShowSuccess("Solicitud eliminada correctamente.");
                 await CargarDatos();
+                Seleccionadas.Clear();
             }
             else
             {
@@ -442,12 +454,14 @@
         IsDeleteModalOpen = false;
         IsFormModalOpen = false;
         DeleteId = null;
+        DeleteIds.Clear();
     }
 
     private void CerrarEliminar()
     {
         IsDeleteModalOpen = false;
         DeleteId = null;
+        DeleteIds.Clear();
     }
 
     private void VerDetalle(int id)
