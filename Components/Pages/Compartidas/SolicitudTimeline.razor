@@ -1,0 +1,41 @@
+@inject ElectroGestion.Services.SolicitudEventoService EventoService
+
+<div style="margin-top:24px;border-top:1px solid #EFF0F6;padding-top:18px">
+    <div style="font-family:'Manrope';font-size:16px;font-weight:800;color:#14162B;margin-bottom:14px">Historial de cambios</div>
+    @if (Cargando)
+    {
+        <div style="font-size:13px;color:#8B90A3">Cargando historial...</div>
+    }
+    else if (!Eventos.Any())
+    {
+        <div style="padding:14px;background:#F8F9FC;border-radius:9px;color:#6B7085;font-size:13px">Aún no hay movimientos registrados para esta solicitud.</div>
+    }
+    else
+    {
+        <div style="display:flex;flex-direction:column;gap:0">
+            @foreach (var evento in Eventos)
+            {
+                <div style="display:grid;grid-template-columns:20px 1fr;gap:10px;min-height:58px">
+                    <div style="display:flex;flex-direction:column;align-items:center"><span style="width:10px;height:10px;border-radius:50%;background:#3156D9;margin-top:4px;flex:0 0 auto"></span><span style="width:2px;flex:1;background:#E3E7F2"></span></div>
+                    <div style="padding-bottom:14px"><div style="display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap"><strong style="font-size:13px;color:#20243A">@evento.Titulo</strong><time style="font-size:11.5px;color:#8B90A3">@evento.Fecha.ToString("dd/MM/yyyy HH:mm")</time></div><div style="font-size:12.5px;color:#626A80;margin-top:3px;line-height:1.45">@evento.Detalle</div></div>
+                </div>
+            }
+        </div>
+    }
+</div>
+
+@code {
+    [Parameter] public int SolicitudId { get; set; }
+    private int UltimaSolicitudId;
+    private bool Cargando;
+    private List<ElectroGestion.Models.SolicitudEvento> Eventos = [];
+
+    protected override async Task OnParametersSetAsync()
+    {
+        if (UltimaSolicitudId == SolicitudId && Eventos.Count > 0) return;
+        UltimaSolicitudId = SolicitudId;
+        Cargando = true;
+        try { Eventos = await EventoService.ObtenerAsync(SolicitudId); }
+        finally { Cargando = false; }
+    }
+}
