@@ -7,6 +7,8 @@ public class Servicio
     [Key]
     public int Id { get; set; }
 
+    public bool IsDeleted { get; set; }
+
     [Required, StringLength(20)]
     public string ServicioId { get; set; } = "";
 

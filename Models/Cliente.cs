@@ -8,6 +8,8 @@ public class Cliente
     [Key]
     public int Id { get; set; }
 
+    public bool IsDeleted { get; set; }
+
     [Required, StringLength(150)]
     public string Nombre { get; set; } = "";
 
