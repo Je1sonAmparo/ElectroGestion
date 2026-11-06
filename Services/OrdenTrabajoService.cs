@@ -10,7 +10,11 @@ public class OrdenTrabajoService(IDbContextFactory<Contexto> contextFactory, App
     {
         if (!appState.IsAuthenticated) return [];
         await using var db = await contextFactory.CreateDbContextAsync();
-        return await db.OrdenesTrabajo.AsNoTracking().OrderByDescending(o => o.Id).ToListAsync();
+        return await db.OrdenesTrabajo.AsNoTracking()
+            .OrderBy(o => o.Estado == "En proceso" ? 0 : o.Estado == "Pendiente de cobro" ? 1 : o.Estado == "Finalizada" ? 2 : 3)
+            .ThenBy(o => o.FechaCreacion)
+            .ThenBy(o => o.Id)
+            .ToListAsync();
     }
 
     public async Task<List<Cotizacion>> ObtenerCotizacionesDisponiblesAsync()

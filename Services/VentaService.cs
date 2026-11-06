@@ -18,7 +18,11 @@ public class VentaService(IDbContextFactory<Contexto> factory, AppStateService a
     {
         if (!appState.EsGerente) return [];
         await using var db = await factory.CreateDbContextAsync();
-        return await db.Ventas.AsNoTracking().Include(v => v.Detalles).OrderByDescending(v => v.Id).ToListAsync();
+        return await db.Ventas.AsNoTracking().Include(v => v.Detalles)
+            .OrderBy(v => v.Estado == Venta.Borrador ? 0 : v.Estado == Venta.Registrada ? 1 : 2)
+            .ThenByDescending(v => v.FechaVenta ?? v.FechaCreacion)
+            .ThenByDescending(v => v.Id)
+            .ToListAsync();
     }
 
     public async Task<string?> GuardarAsync(Venta datos, bool registrar)

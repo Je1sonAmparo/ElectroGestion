@@ -15,7 +15,9 @@ public class CobroService(IDbContextFactory<Contexto> factory, AppStateService a
             .Include(c => c.Cotizacion).ThenInclude(q => q!.Solicitud).ThenInclude(s => s!.Cliente)
             .Include(c => c.Cotizacion).ThenInclude(q => q!.Solicitud).ThenInclude(s => s!.Servicio)
             .Include(c => c.OrdenTrabajo)
-            .OrderByDescending(c => c.Id).ToListAsync();
+            .OrderBy(c => c.Estado == "Pendiente de cobro" ? 0 : 1)
+            .ThenBy(c => c.Fecha)
+            .ThenBy(c => c.Id).ToListAsync();
     }
 
     public async Task<List<Cotizacion>> ObtenerCotizacionesAprobadasAsync()

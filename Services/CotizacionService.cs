@@ -21,7 +21,9 @@ public class CotizacionService(IDbContextFactory<Contexto> contextFactory)
             .Include(c => c.Solicitud).ThenInclude(s => s!.Servicio)
             .Include(c => c.Solicitud).ThenInclude(s => s!.Levantamiento)
             .Include(c => c.Detalles)
-            .OrderByDescending(c => c.Id).ToListAsync();
+            .OrderBy(c => c.Estado == EnRevision ? 0 : c.Estado == "Enviada al cliente" ? 1 : c.Estado == "Rechazada" ? 2 : c.Estado == "Aprobada" ? 3 : 4)
+            .ThenBy(c => c.Fecha)
+            .ThenBy(c => c.Id).ToListAsync();
     }
 
     public async Task<List<Solicitud>> ObtenerLevantamientosPendientesAsync()
