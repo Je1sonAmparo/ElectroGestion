@@ -61,6 +61,7 @@ builder.Services.AddScoped<OrdenTrabajoService>();
 builder.Services.AddScoped<CobroService>();
 builder.Services.AddScoped<InicioDashboardService>();
 builder.Services.AddScoped<ReporteConsumoService>();
+builder.Services.AddScoped<DemoDataSeeder>();
 
 builder.Services.AddBlazorBootstrap();
 
@@ -78,6 +79,15 @@ if (args.Contains("--test-crud"))
     Environment.Exit(exito ? 0 : 1);
     return;
 }
+if (args.Contains("--seed-demo-data"))
+{
+    using var scope = app.Services.CreateScope();
+    var seeder = scope.ServiceProvider.GetRequiredService<DemoDataSeeder>();
+    var resultado = await seeder.ReemplazarDatosOperativosAsync();
+    Console.WriteLine($"Carga de demostración terminada: {resultado.Solicitudes} solicitudes, {resultado.Cotizaciones} cotizaciones, {resultado.Ordenes} órdenes, {resultado.Cobros} cobros, {resultado.Ventas} ventas y {resultado.Productos} productos.");
+    return;
+}
+
 
 // Configure the HTTP request pipeline.
 if (!app.Environment.IsDevelopment())
