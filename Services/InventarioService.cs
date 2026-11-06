@@ -43,7 +43,7 @@ public class InventarioService(IDbContextFactory<Contexto> factory)
                 }
                 catch (System.Data.Common.DbException) { return false; }
             }
-            var existente = await db.ArticulosInventario.FindAsync(articulo.Id);
+            var existente = await db.ArticulosInventario.FirstOrDefaultAsync(a => a.Id == articulo.Id);
             if (existente is null) return false;
             existente.Codigo = articulo.Codigo;
             existente.Nombre = articulo.Nombre;
@@ -75,9 +75,9 @@ public class InventarioService(IDbContextFactory<Contexto> factory)
     // (FKs reales: Venta.ArticuloInventarioId y DetalleVenta.ArticuloInventarioId; además, los
     // detalles de cotización guardan el Id como instantánea histórica).
     private static async Task<bool> ArticuloReferenciadoAsync(Contexto db, int id) =>
-        await db.Ventas.AnyAsync(v => v.ArticuloInventarioId == id) ||
-        await db.DetallesVenta.AnyAsync(d => d.ArticuloInventarioId == id) ||
-        await db.DetallesCotizacion.AnyAsync(d => d.ArticuloInventarioId == id);
+        await db.Ventas.IgnoreQueryFilters().AnyAsync(v => v.ArticuloInventarioId == id) ||
+        await db.DetallesVenta.IgnoreQueryFilters().AnyAsync(d => d.ArticuloInventarioId == id) ||
+        await db.DetallesCotizacion.IgnoreQueryFilters().AnyAsync(d => d.ArticuloInventarioId == id);
 
     public async Task<HashSet<int>> ObtenerElegiblesAsync(IEnumerable<int> ids)
     {
@@ -85,15 +85,15 @@ public class InventarioService(IDbContextFactory<Contexto> factory)
         if (idList.Count == 0) return [];
         await using var db = await factory.CreateDbContextAsync();
         var referenciados = new HashSet<int>();
-        var enVentas = await db.Ventas.AsNoTracking()
+        var enVentas = await db.Ventas.IgnoreQueryFilters().AsNoTracking()
             .Where(v => idList.Contains(v.ArticuloInventarioId))
             .Select(v => v.ArticuloInventarioId).ToListAsync();
         foreach (var id in enVentas) referenciados.Add(id);
-        var enDetallesVenta = await db.DetallesVenta.AsNoTracking()
+        var enDetallesVenta = await db.DetallesVenta.IgnoreQueryFilters().AsNoTracking()
             .Where(d => idList.Contains(d.ArticuloInventarioId))
             .Select(d => d.ArticuloInventarioId).ToListAsync();
         foreach (var id in enDetallesVenta) referenciados.Add(id);
-        var enDetallesCotizacion = await db.DetallesCotizacion.AsNoTracking()
+        var enDetallesCotizacion = await db.DetallesCotizacion.IgnoreQueryFilters().AsNoTracking()
             .Where(d => d.ArticuloInventarioId > 0 && idList.Contains(d.ArticuloInventarioId))
             .Select(d => d.ArticuloInventarioId).ToListAsync();
         foreach (var id in enDetallesCotizacion) referenciados.Add(id);
@@ -117,7 +117,7 @@ public class InventarioService(IDbContextFactory<Contexto> factory)
             }
             if (elegibles.Count > 0)
             {
-                db.ArticulosInventario.RemoveRange(elegibles);
+                foreach (var articulo in elegibles) articulo.IsDeleted = true;
                 await db.SaveChangesAsync();
             }
             await transaccion.CommitAsync();

@@ -114,7 +114,8 @@ public class VentaService(IDbContextFactory<Contexto> factory, AppStateService a
     {
         if (!appState.EsGerente) return false;
         await using var db = await factory.CreateDbContextAsync();
-        return await db.Ventas.Where(v => v.Id == id && v.Estado == Venta.Borrador).ExecuteDeleteAsync() == 1;
+        return await db.Ventas.Where(v => v.Id == id && v.Estado == Venta.Borrador)
+            .ExecuteUpdateAsync(set => set.SetProperty(v => v.IsDeleted, true)) == 1;
     }
 
     public async Task<HashSet<int>> ObtenerElegiblesAsync(IEnumerable<int> ids)
@@ -145,7 +146,7 @@ public class VentaService(IDbContextFactory<Contexto> factory, AppStateService a
             }
             var eliminados = await db.Ventas
                 .Where(v => borradores.Contains(v.Id) && v.Estado == Venta.Borrador)
-                .ExecuteDeleteAsync();
+                .ExecuteUpdateAsync(set => set.SetProperty(v => v.IsDeleted, true));
             await transaccion.CommitAsync();
             return eliminados;
         }

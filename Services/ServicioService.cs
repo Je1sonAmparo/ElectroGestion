@@ -122,7 +122,7 @@ public class ServicioService(IDbContextFactory<Contexto> contextFactory) : Aplic
 
             await contexto.Servicios
                 .Where(s => elegibles.Contains(s.Id))
-                .ExecuteDeleteAsync();
+                .ExecuteUpdateAsync(set => set.SetProperty(s => s.IsDeleted, true));
 
             await transaccion.CommitAsync();
             return elegibles.Count;

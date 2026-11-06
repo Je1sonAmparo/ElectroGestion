@@ -139,27 +139,26 @@ public class ClienteService(IDbContextFactory<Contexto> contextFactory) : Aplica
 
             var solicitudIds = await contexto.Solicitudes
                 .IgnoreQueryFilters()
-                .Where(s => elegibles.Contains(s.ClienteId))
+                .Where(s => elegibles.Contains(s.ClienteId) && !s.IsDeleted)
                 .Select(s => s.Id)
                 .ToListAsync();
             if (solicitudIds.Count > 0)
             {
                 await contexto.Visitas
                     .IgnoreQueryFilters()
-                    .Where(v => solicitudIds.Contains(v.SolicitudId))
-                    .ExecuteDeleteAsync();
+                    .Where(v => solicitudIds.Contains(v.SolicitudId) && !v.IsDeleted)
+                    .ExecuteUpdateAsync(set => set
+                        .SetProperty(v => v.IsDeleted, true)
+                        .SetProperty(v => v.EliminadaPorSolicitud, true));
                 await contexto.Solicitudes
                     .IgnoreQueryFilters()
                     .Where(s => solicitudIds.Contains(s.Id))
-                    .ExecuteDeleteAsync();
+                    .ExecuteUpdateAsync(set => set.SetProperty(s => s.IsDeleted, true));
             }
 
-            await contexto.ClientesTelefonos
-                .Where(t => elegibles.Contains(t.ClienteId))
-                .ExecuteDeleteAsync();
             var eliminados = await contexto.Clientes
                 .Where(c => elegibles.Contains(c.Id))
-                .ExecuteDeleteAsync();
+                .ExecuteUpdateAsync(set => set.SetProperty(c => c.IsDeleted, true));
 
             await transaccion.CommitAsync();
             return elegibles.Count;

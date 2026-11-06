@@ -155,8 +155,9 @@ public class SolicitudService(IDbContextFactory<Contexto> contextFactory) : Apli
         await using var contexto = await contextFactory.CreateDbContextAsync();
         var solicitud = await contexto.Solicitudes
             .IgnoreQueryFilters()
+            .Include(s => s.Cliente)
             .FirstOrDefaultAsync(s => s.Id == id && s.IsDeleted);
-        if (solicitud is null)
+        if (solicitud is null || solicitud.Cliente is null || solicitud.Cliente.IsDeleted)
         {
             return false;
         }

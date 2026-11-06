@@ -83,7 +83,7 @@ public class OrdenTrabajoService(IDbContextFactory<Contexto> contextFactory, App
     {
         if (!appState.EsGerente) return false;
         await using var db = await contextFactory.CreateDbContextAsync();
-        var orden = await db.OrdenesTrabajo.FindAsync(id);
+        var orden = await db.OrdenesTrabajo.FirstOrDefaultAsync(o => o.Id == id);
         if (orden is null || await SolicitudFinalizadaAsync(db, orden.SolicitudId)) return false;
         orden.Trabajos = LimpiarLista(trabajos);
         orden.Herramientas = LimpiarLista(herramientas);
@@ -98,7 +98,7 @@ public class OrdenTrabajoService(IDbContextFactory<Contexto> contextFactory, App
         if (!appState.IsAuthenticated || estado is not ("En proceso" or "Pendiente de cobro" or "Finalizada")) return false;
         if (!appState.EsGerente && estado != "Pendiente de cobro") return false;
         await using var db = await contextFactory.CreateDbContextAsync();
-        var orden = await db.OrdenesTrabajo.FindAsync(id);
+        var orden = await db.OrdenesTrabajo.FirstOrDefaultAsync(o => o.Id == id);
         if (orden is null || orden.Estado == estado) return false;
         if (estado == "En proceso" && await db.Cobros.AnyAsync(c => c.OrdenTrabajoId == id)) return false;
         if (await SolicitudFinalizadaAsync(db, orden.SolicitudId)) return false;
@@ -127,11 +127,11 @@ public class OrdenTrabajoService(IDbContextFactory<Contexto> contextFactory, App
     {
         if (!appState.EsGerente) return false;
         await using var db = await contextFactory.CreateDbContextAsync();
-        var orden = await db.OrdenesTrabajo.FindAsync(id);
+        var orden = await db.OrdenesTrabajo.FirstOrDefaultAsync(o => o.Id == id);
         if (orden is null || await SolicitudFinalizadaAsync(db, orden.SolicitudId) ||
-            await db.Cobros.AnyAsync(c => c.OrdenTrabajoId == id)) return false;
+            await db.Cobros.IgnoreQueryFilters().AnyAsync(c => c.OrdenTrabajoId == id)) return false;
         RegistroEventosSolicitud.Agregar(db, orden.SolicitudId, "Orden de trabajo eliminada", $"Se eliminó {orden.Code}.");
-        db.OrdenesTrabajo.Remove(orden);
+        orden.IsDeleted = true;
         await db.SaveChangesAsync();
         return true;
     }
@@ -150,7 +150,7 @@ public class OrdenTrabajoService(IDbContextFactory<Contexto> contextFactory, App
                 o.Id,
                 Finalizada = db.Solicitudes.Any(s => s.Id == o.SolicitudId &&
                     s.EstadoSolicitud != null && s.EstadoSolicitud.Nombre == "Finalizada"),
-                ConCobro = db.Cobros.Any(c => c.OrdenTrabajoId == o.Id)
+                ConCobro = db.Cobros.IgnoreQueryFilters().Any(c => c.OrdenTrabajoId == o.Id)
             })
             .ToListAsync();
         foreach (var orden in ordenes)
@@ -172,7 +172,7 @@ public class OrdenTrabajoService(IDbContextFactory<Contexto> contextFactory, App
             foreach (var orden in ordenes)
             {
                 if (await SolicitudFinalizadaAsync(db, orden.SolicitudId) ||
-                    await db.Cobros.AnyAsync(c => c.OrdenTrabajoId == orden.Id)) continue;
+                    await db.Cobros.IgnoreQueryFilters().AnyAsync(c => c.OrdenTrabajoId == orden.Id)) continue;
                 elegibles.Add(orden);
             }
             if (elegibles.Count == 0)
@@ -183,7 +183,7 @@ public class OrdenTrabajoService(IDbContextFactory<Contexto> contextFactory, App
             foreach (var orden in elegibles)
             {
                 RegistroEventosSolicitud.Agregar(db, orden.SolicitudId, "Orden de trabajo eliminada", $"Se eliminó {orden.Code}.");
-                db.OrdenesTrabajo.Remove(orden);
+                orden.IsDeleted = true;
             }
             await db.SaveChangesAsync();
             await transaccion.CommitAsync();

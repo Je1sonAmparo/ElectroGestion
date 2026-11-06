@@ -169,14 +169,14 @@ public class CotizacionService(IDbContextFactory<Contexto> contextFactory)
     public async Task<ResultadoEliminarCotizacion> EliminarAsync(int id)
     {
         await using var db = await contextFactory.CreateDbContextAsync();
-        var cotizacion = await db.Cotizaciones.FindAsync(id);
+        var cotizacion = await db.Cotizaciones.FirstOrDefaultAsync(c => c.Id == id);
         if (cotizacion is null) return ResultadoEliminarCotizacion.NoEncontrada;
         var resultado = await EvaluarGuardasAsync(db, cotizacion);
         if (resultado != ResultadoEliminarCotizacion.Eliminada) return resultado;
 
         if (cotizacion.SolicitudDbId.HasValue)
             RegistroEventosSolicitud.Agregar(db, cotizacion.SolicitudDbId.Value, "Cotización eliminada", "Se eliminó la cotización vinculada.");
-        db.Cotizaciones.Remove(cotizacion);
+        cotizacion.IsDeleted = true;
         await db.SaveChangesAsync();
         return ResultadoEliminarCotizacion.Eliminada;
     }
@@ -198,7 +198,7 @@ public class CotizacionService(IDbContextFactory<Contexto> contextFactory)
         {
             if (cotizacion.SolicitudDbId.HasValue)
                 RegistroEventosSolicitud.Agregar(db, cotizacion.SolicitudDbId.Value, "Cotización eliminada", "Se eliminó la cotización vinculada.");
-            db.Cotizaciones.Remove(cotizacion);
+            cotizacion.IsDeleted = true;
         }
         await db.SaveChangesAsync();
         await transaccion.CommitAsync();
@@ -224,9 +224,9 @@ public class CotizacionService(IDbContextFactory<Contexto> contextFactory)
     {
         if (cotizacion.SolicitudDbId.HasValue && await SolicitudFinalizadaAsync(db, cotizacion.SolicitudDbId.Value))
             return ResultadoEliminarCotizacion.SolicitudFinalizada;
-        if (await db.OrdenesTrabajo.AnyAsync(o => o.CotizacionId == cotizacion.Id))
+        if (await db.OrdenesTrabajo.IgnoreQueryFilters().AnyAsync(o => o.CotizacionId == cotizacion.Id))
             return ResultadoEliminarCotizacion.VinculadaAOrden;
-        if (await db.Cobros.AnyAsync(c => c.CotizacionId == cotizacion.Id))
+        if (await db.Cobros.IgnoreQueryFilters().AnyAsync(c => c.CotizacionId == cotizacion.Id))
             return ResultadoEliminarCotizacion.VinculadaACobro;
         return ResultadoEliminarCotizacion.Eliminada;
     }
