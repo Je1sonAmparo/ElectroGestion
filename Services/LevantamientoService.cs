@@ -23,7 +23,11 @@ public class LevantamientoService(IDbContextFactory<Contexto> contextFactory)
             .Include(s => s.EstadoSolicitud)
             .Include(s => s.Levantamiento)
             .AsNoTracking()
-            .OrderBy(s => s.Id)
+            .OrderBy(s => s.EstadoSolicitud != null && s.EstadoSolicitud.Nombre == "Pendiente" ? 0 :
+                s.EstadoSolicitud != null && s.EstadoSolicitud.Nombre == "En proceso" ? 1 :
+                s.EstadoSolicitud != null && s.EstadoSolicitud.Nombre == "En Espera Administración" ? 2 : 3)
+            .ThenBy(s => s.FechaSolicitud)
+            .ThenBy(s => s.Id)
             .ToListAsync();
     }
 
