@@ -74,23 +74,62 @@ public class ServicioService(IDbContextFactory<Contexto> contextFactory) : Aplic
     }
 
     public async Task<bool> Eliminar(int id)
+        => await EliminarVarios([id]) == 1;
+
+    public async Task<HashSet<int>> ObtenerElegiblesAsync(IEnumerable<int> ids)
     {
+        var listaIds = ids.Distinct().ToList();
+        if (listaIds.Count == 0) return [];
+
+        await using var contexto = await contextFactory.CreateDbContextAsync();
+        var vinculados = await contexto.Solicitudes
+            .IgnoreQueryFilters()
+            .Where(s => listaIds.Contains(s.ServicioId))
+            .Select(s => s.ServicioId)
+            .ToListAsync();
+        var vinculadosDetalles = await contexto.DetallesSolicitud
+            .Where(d => listaIds.Contains(d.ServicioId))
+            .Select(d => d.ServicioId)
+            .ToListAsync();
+
+        return listaIds.Except(vinculados).Except(vinculadosDetalles).ToHashSet();
+    }
+
+    public async Task<int> EliminarVarios(IReadOnlyCollection<int> ids)
+    {
+        if (ids.Count == 0 || ids.Count != ids.Distinct().Count()) return 0;
+
         try
         {
             await using var contexto = await contextFactory.CreateDbContextAsync();
-            if (await contexto.Solicitudes.IgnoreQueryFilters().AnyAsync(s => s.ServicioId == id) ||
-                await contexto.DetallesSolicitud.AnyAsync(d => d.ServicioId == id))
+            await using var transaccion = await contexto.Database.BeginTransactionAsync();
+
+            var vinculados = await contexto.Solicitudes
+                .IgnoreQueryFilters()
+                .Where(s => ids.Contains(s.ServicioId))
+                .Select(s => s.ServicioId)
+                .ToListAsync();
+            var vinculadosDetalles = await contexto.DetallesSolicitud
+                .Where(d => ids.Contains(d.ServicioId))
+                .Select(d => d.ServicioId)
+                .ToListAsync();
+            var elegibles = ids.Except(vinculados).Except(vinculadosDetalles).ToList();
+            if (elegibles.Count == 0)
             {
-                return false;
+                await transaccion.RollbackAsync();
+                return 0;
             }
 
-            return await contexto.Servicios
-                .Where(s => s.Id == id)
-                .ExecuteDeleteAsync() > 0;
+            await contexto.Servicios
+                .Where(s => elegibles.Contains(s.Id))
+                .ExecuteUpdateAsync(set => set.SetProperty(s => s.IsDeleted, true));
+
+            await transaccion.CommitAsync();
+            return elegibles.Count;
         }
         catch
         {
-            return false;
+            return 0;
         }
     }
 }

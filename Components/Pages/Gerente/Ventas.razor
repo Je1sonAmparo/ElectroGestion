@@ -16,37 +16,75 @@ else
 {
     <header class="ventas-header">
         <div><h1 class="page-title">Ventas</h1><p>Venta directa de equipos y materiales a clientes.</p></div>
-        <button class="ventas-primary" @onclick="() => Abrir(null)">+ Nueva venta</button>
+        <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;justify-content:flex-end">
+            <button @onclick="AlternarModoSeleccion" title="Seleccionar varias ventas para eliminar"
+                style="padding:10px 16px 10px 14px;background:#fff;border:1px solid @(ModoSeleccion ? "#B42318" : "#D5D8E6");color:@(ModoSeleccion ? "#B42318" : "#4A4E63");border-radius:8px;font-weight:700;font-size:14px;cursor:pointer;font-family:'Manrope';white-space:nowrap;display:flex;align-items:center;gap:8px;transition:all .15s">
+                <svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="4"/><path d="m8.5 12.5 2.5 2.5 5-5.5"/></svg>
+                <span>@(ModoSeleccion ? "Salir de selección" : "Seleccionar")</span>
+            </button>
+            <button class="ventas-primary" @onclick="() => Abrir(null)">+ Nueva venta</button>
+        </div>
     </header>
 
     <div class="ventas-panel">
         <div class="ventas-filtros">
-            <label>Buscar <input @bind="Busqueda" placeholder="Cliente, producto o NCF" /></label>
+            <label>ID <input @bind="FiltroId" @bind:event="oninput" placeholder="ID de venta" /></label>
+            <label>Cliente <input @bind="Busqueda" @bind:event="oninput" placeholder="Nombre del cliente" /></label>
+            <label>RNC/Cédula <input @bind="FiltroDocumento" @bind:event="oninput" placeholder="Documento" /></label>
+            <label>Producto <input @bind="FiltroProducto" @bind:event="oninput" placeholder="Nombre o código" /></label>
+            <label>NCF <input @bind="FiltroNcf" @bind:event="oninput" placeholder="Número de comprobante" /></label>
             <label>Comprobante <select @bind="Tipo"><option value="">Todos</option><option>@Venta.Consumo</option><option>@Venta.CreditoFiscal</option></select></label>
             <label>Estado <select @bind="Estado"><option value="">Todos</option><option>@Venta.Borrador</option><option>@Venta.Registrada</option><option>@Venta.Anulada</option></select></label>
+            <label>Desde <input type="date" @bind="FechaDesde" /></label>
+            <label>Hasta <input type="date" @bind="FechaHasta" /></label>
             <button class="ventas-primary" @onclick="AplicarFiltros">Buscar</button>
         </div>
+        @if (ModoSeleccion)
+        {
+            <div style="margin:14px 14px 0;padding:10px 14px;display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:12px;background:#EFF6FF;border:1px solid #B6C8F5;border-radius:10px">
+                <div style="display:flex;align-items:center;gap:9px;font-size:13.5px;color:#1D4ED8;font-weight:700;flex-wrap:wrap">
+                    <svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="4"/><path d="m8.5 12.5 2.5 2.5 5-5.5"/></svg>
+                    <span>@(Seleccionadas.Count == 1 ? "1 venta seleccionada" : $"{Seleccionadas.Count} ventas seleccionadas")</span>
+                    <span style="color:#6B7085;font-weight:500">· Haz clic en una fila para marcarla o desmarcarla</span>
+                </div>
+                <div style="display:flex;align-items:center;gap:10px">
+                    <button @onclick="AlternarTodas" style="padding:8px 14px;border:1px solid #B6C8F5;background:#fff;color:#1D4ED8;border-radius:8px;font-weight:700;font-size:13px;cursor:pointer;font-family:'Manrope'">
+                        @(TodasMarcadas ? "Desmarcar todas" : "Marcar todas")
+                    </button>
+                    <button disabled="@(Seleccionadas.Count == 0)" @onclick="ConfirmarSeleccionadas" style="padding:8px 16px;border:0;background:@(Seleccionadas.Count == 0 ? "#F1A4A7" : "#C0392B");color:#fff;border-radius:8px;font-weight:700;font-size:13px;cursor:pointer;font-family:'Manrope';display:flex;align-items:center;gap:7px">
+                        <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 6h18M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2M10 11v6M14 11v6"/></svg>
+                        <span>Eliminar @(Seleccionadas.Count == 1 ? "(1)" : $"({Seleccionadas.Count})")</span>
+                    </button>
+                </div>
+            </div>
+        }
         <div class="ventas-tabla">
             <table>
-                <thead><tr><th>ID</th><th>Fecha</th><th>Cliente</th><th>Producto</th><th>Comprobante</th><th>Total</th><th>Estado</th><th>Acciones</th></tr></thead>
+                <thead><tr><th><div style="display:inline-flex;align-items:center;gap:6px">@if (ModoSeleccion) { <input type="checkbox" aria-label="Seleccionar todas las ventas visibles que se pueden eliminar" checked="@TodasMarcadas" @onchange="e => SeleccionarTodas((bool)(e.Value ?? false))" @onclick:stopPropagation /> }<span>ID</span></div></th><th>Fecha</th><th>Cliente</th><th>Producto</th><th>Comprobante</th><th>Total</th><th>Estado</th><th>Acciones</th></tr></thead>
                 <tbody>
                     @foreach (var venta in Filtradas)
                     {
-                        <tr @key="venta.Id">
-                            <td>@venta.Id</td><td>@((venta.FechaVenta ?? venta.FechaCreacion).ToString("dd/MM/yyyy"))</td>
+                        <tr @key="venta.Id" @onclick="@(() => FilaClicked(venta.Id))" style="transition:background 0.15s;background:@(ModoSeleccion && Seleccionadas.Contains(venta.Id) ? "#EFF6FF" : "transparent");cursor:@(ModoSeleccion ? "pointer" : "default")">
+                            <td>
+                                @if (ModoSeleccion)
+                                {
+                                    <input type="checkbox" aria-label="Seleccionar venta @venta.Id" checked="@Seleccionadas.Contains(venta.Id)" disabled="@(!PuedeEliminarVenta(venta.Id))" @onchange="e => CambiarSeleccion(venta.Id, (bool)(e.Value ?? false))" @onclick:stopPropagation style="margin-right:8px" />
+                                }
+                                @venta.Id
+                            </td><td>@((venta.FechaVenta ?? venta.FechaCreacion).ToString("dd/MM/yyyy"))</td>
                             <td>@Comprador(venta)</td><td>@(venta.Detalles.Count == 1 ? venta.Detalles[0].NombreArticulo : $"{venta.Detalles.Count} productos")</td>
                             <td>@venta.TipoComprobante <small>@venta.Ncf</small></td>
                             <td>@Moneda(venta.Total)</td><td><span class="ventas-estado" data-estado="@venta.Estado">@venta.Estado</span></td>
                             <td><div class="ventas-acciones">
-                                <button class="table-action-icon ventas-icono" title="Ver detalle" aria-label="Ver detalle" @onclick="() => Detalle = venta"><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2 12s3.5-6 10-6 10 6 10 6-3.5 6-10 6S2 12 2 12Z"/><circle cx="12" cy="12" r="3"/></svg></button>
+                                <button class="table-action-icon ventas-icono" title="Ver detalle" aria-label="Ver detalle" @onclick="() => Detalle = venta" @onclick:stopPropagation><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2 12s3.5-6 10-6 10 6 10 6-3.5 6-10 6S2 12 2 12Z"/><circle cx="12" cy="12" r="3"/></svg></button>
                                 @if (venta.Estado == Venta.Borrador)
                                 {
-                                    <button class="table-action-icon ventas-icono" title="Editar" aria-label="Editar" @onclick="() => Abrir(venta)"><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 1 1 3 3L7 19l-4 1 1-4 12.5-12.5Z"/></svg></button>
-                                    <button class="table-action-icon ventas-icono" title="Eliminar borrador" aria-label="Eliminar borrador" @onclick="() => Confirmacion = venta"><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 6h18M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2M10 11v6M14 11v6"/></svg></button>
+                                    <button class="table-action-icon ventas-icono" title="Editar" aria-label="Editar" @onclick="() => Abrir(venta)" @onclick:stopPropagation><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 1 1 3 3L7 19l-4 1 1-4 12.5-12.5Z"/></svg></button>
+                                    <button class="table-action-icon ventas-icono" title="Eliminar borrador" aria-label="Eliminar borrador" @onclick="() => ConfirmarEliminarBorrador(venta.Id)" @onclick:stopPropagation><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 6h18M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2M10 11v6M14 11v6"/></svg></button>
                                 }
                                 else if (venta.Estado == Venta.Registrada)
                                 {
-                                    <button class="table-action-icon ventas-icono" title="Anular venta" aria-label="Anular venta" @onclick="() => Confirmacion = venta"><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M5.6 5.6 18.4 18.4"/></svg></button>
+                                    <button class="table-action-icon ventas-icono" title="Anular venta" aria-label="Anular venta" @onclick="() => Confirmacion = venta" @onclick:stopPropagation><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M5.6 5.6 18.4 18.4"/></svg></button>
                                 }
                             </div></td>
                         </tr>
@@ -159,10 +197,49 @@ else
         <div class="ventas-overlay">
             <section class="ventas-modal" role="dialog" aria-modal="true" aria-labelledby="confirmar-venta">
                 <h2 id="confirmar-venta">@(confirmar.Estado == Venta.Borrador ? "Eliminar borrador" : "Anular venta")</h2>
-                <p>@(confirmar.Estado == Venta.Borrador ? "Se eliminará el borrador seleccionado." : "Confirme que el comprobante ya fue corregido en su sistema de facturación y que las unidades regresaron al inventario.")</p>
+                <p>@(confirmar.Estado == Venta.Borrador ? "El borrador se conservará en Recuperación y el administrador podrá restaurarlo." : "Confirme que el comprobante ya fue corregido en su sistema de facturación y que las unidades regresaron al inventario.")</p>
                 <div class="ventas-pie">
                     <button disabled="@Ocupado" @onclick="() => Confirmacion = null">Cancelar</button>
                     <button class="ventas-danger" disabled="@Ocupado" @onclick="ConfirmarAccion">Confirmar</button>
+                </div>
+            </section>
+        </div>
+    }
+
+    @if (IsDeleteModalOpen)
+    {
+        <div class="ventas-overlay">
+            <section class="ventas-modal" role="dialog" aria-modal="true" aria-labelledby="eliminar-ventas">
+                <div style="font-family:'Manrope';font-weight:800;font-size:23px;color:#14162B;margin-bottom:12px">Eliminar @(DeleteIds.Count == 1 ? "venta" : "ventas")</div>
+                <div style="color:#4A4E63;font-size:14.5px;line-height:1.55">¿Está seguro que desea eliminar @(DeleteIds.Count == 1 ? "esta venta" : $"estas {DeleteIds.Count} ventas")? Los borradores se conservarán en Recuperación y el administrador podrá restaurarlos.</div>
+                @if (DeleteIds.Count > 1)
+                {
+                    <div style="background:#F9FAFB;border:1px solid #EFF0F6;border-radius:10px;max-height:200px;overflow:auto;margin-top:16px" class="resp-lista-eliminar">
+                        @foreach (var venta in VentasAEliminar)
+                        {
+                            <div style="display:flex;align-items:center;gap:12px;padding:9px 14px;border-bottom:1px solid #EFF0F6">
+                                <span style="font-family:ui-monospace,'SFMono-Regular',Consolas,monospace;font-size:12.5px;font-weight:700;letter-spacing:.05em;color:#C0392B;background:#FDECEC;border-radius:6px;padding:2px 8px;flex-shrink:0">@venta.Id</span>
+                                <div style="min-width:0">
+                                    <div style="font-size:13.5px;font-weight:700;color:#14162B;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">@Comprador(venta)</div>
+                                    <div style="font-size:12px;color:#6B7085;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">@(venta.Detalles.Count == 1 ? venta.Detalles[0].NombreArticulo : $"{venta.Detalles.Count} productos") · @Moneda(venta.Total)</div>
+                                </div>
+                            </div>
+                        }
+                    </div>
+                }
+                @if (Seleccionadas.Count > DeleteIds.Count)
+                {
+                    <div style="background:#FFF7E6;border:1px solid #F5E2B8;border-radius:8px;padding:9px 12px;font-size:12.5px;color:#8A6100;margin-top:12px">
+                        Nota: se omitieron @(Seleccionadas.Count - DeleteIds.Count) venta(s) porque solo las ventas en estado Borrador se pueden eliminar.
+                    </div>
+                }
+                <div style="display:flex;justify-content:flex-end;gap:12px;margin-top:28px">
+                    <button @onclick="CerrarEliminar" style="padding:11px 24px;border:1px solid #E3E5EE;background:#fff;border-radius:10px;font-weight:600;font-size:15px;cursor:pointer;color:#14162B;font-family:'Manrope'">
+                        Cancelar
+                    </button>
+                    <button @onclick="EjecutarEliminar" style="padding:11px 26px;border:0;background:#C0392B;color:#fff;border-radius:10px;font-weight:700;font-size:15px;cursor:pointer;font-family:'Manrope'">
+                        Eliminar
+                    </button>
                 </div>
             </section>
         </div>
@@ -175,22 +252,107 @@ else
     private List<Cliente> Clientes = [];
     private Venta? Formulario, Detalle, Confirmacion;
     private bool Ocupado;
-    private string Busqueda = "", Tipo = "", Estado = "";
-    private (string Texto, string Tipo, string Estado) Filtros = ("", "", "");
+    private string Busqueda = "", FiltroId = "", FiltroDocumento = "", FiltroProducto = "", FiltroNcf = "", Tipo = "", Estado = "";
+    private DateTime? FechaDesde, FechaHasta;
+    private (string Id, string Cliente, string Documento, string Producto, string Ncf, string Tipo, string Estado, DateTime? Desde, DateTime? Hasta) Filtros = ("", "", "", "", "", "", "", null, null);
+
+    // Modo selección + eliminación múltiple
+    private bool ModoSeleccion;
+    private HashSet<int> Seleccionadas = [];
+    private HashSet<int> DeleteIds = [];
+    private bool IsDeleteModalOpen;
+    private List<int> ElegiblesVisibles => Filtradas.Where(v => PuedeEliminarVenta(v.Id)).Select(v => v.Id).ToList();
+    private bool TodasMarcadas => ElegiblesVisibles.Count > 0 && ElegiblesVisibles.All(id => Seleccionadas.Contains(id));
+    private List<Venta> VentasAEliminar => DeleteIds
+        .Select(id => Lista.FirstOrDefault(v => v.Id == id))
+        .Where(v => v != null)
+        .Cast<Venta>()
+        .ToList();
+
+    private bool PuedeEliminarVenta(int id) => Lista.FirstOrDefault(v => v.Id == id)?.Estado == Venta.Borrador;
+
+    private void AlternarModoSeleccion()
+    {
+        ModoSeleccion = !ModoSeleccion;
+        if (!ModoSeleccion) Seleccionadas.Clear();
+    }
+
+    private void FilaClicked(int id)
+    {
+        if (!ModoSeleccion) return;
+        if (!PuedeEliminarVenta(id))
+        {
+            ToastService.Notify(new ToastMessage(ToastType.Warning, "Solo se puede eliminar una venta en estado Borrador (las ventas registradas o anuladas no se pueden eliminar)."));
+            return;
+        }
+        CambiarSeleccion(id, !Seleccionadas.Contains(id));
+    }
+
+    private void CambiarSeleccion(int id, bool marcado) { if (marcado && PuedeEliminarVenta(id)) Seleccionadas.Add(id); else Seleccionadas.Remove(id); }
+    private void SeleccionarTodas(bool marcado) { foreach (var id in ElegiblesVisibles) { if (marcado) Seleccionadas.Add(id); else Seleccionadas.Remove(id); } }
+    private void AlternarTodas() => SeleccionarTodas(!TodasMarcadas);
+    private void ConfirmarSeleccionadas() { DeleteIds = Seleccionadas.Where(PuedeEliminarVenta).ToHashSet(); IsDeleteModalOpen = DeleteIds.Count > 0; }
+
+    private void ConfirmarEliminarBorrador(int id)
+    {
+        if (!PuedeEliminarVenta(id))
+        {
+            ToastService.Notify(new ToastMessage(ToastType.Warning, "Solo se puede eliminar una venta en estado Borrador."));
+            return;
+        }
+        DeleteIds = [id];
+        IsDeleteModalOpen = true;
+    }
+
+    private void CerrarEliminar()
+    {
+        IsDeleteModalOpen = false;
+        DeleteIds.Clear();
+    }
+
+    private async Task EjecutarEliminar()
+    {
+        if (DeleteIds.Count > 0 && !Ocupado)
+        {
+            Ocupado = true;
+            try
+            {
+                var eliminadas = await VentaService.EliminarBorradoresAsync(DeleteIds);
+                if (eliminadas > 0)
+                {
+                    await Recargar();
+                    ToastService.Notify(new ToastMessage(ToastType.Success, eliminadas == 1 ? "Venta eliminada correctamente." : $"{eliminadas} ventas eliminadas correctamente."));
+                    Seleccionadas.Clear();
+                    ModoSeleccion = false;
+                }
+                else ToastService.Notify(new ToastMessage(ToastType.Warning, "No se pudo eliminar las ventas seleccionadas. Solo las ventas en estado Borrador se pueden eliminar."));
+            }
+            catch { ToastService.Notify(new ToastMessage(ToastType.Danger, "No se pudo completar la operación.")); }
+            finally { Ocupado = false; }
+        }
+        IsDeleteModalOpen = false;
+        DeleteIds.Clear();
+    }
 
     private IEnumerable<Venta> Filtradas => Lista.Where(v =>
+        (Filtros.Id.Length == 0 || v.Id.ToString().Contains(Filtros.Id)) &&
+        (Filtros.Cliente.Length == 0 || Comprador(v).Contains(Filtros.Cliente, StringComparison.OrdinalIgnoreCase)) &&
+        (Filtros.Documento.Length == 0 || v.DocumentoCliente.Contains(Filtros.Documento, StringComparison.OrdinalIgnoreCase)) &&
+        (Filtros.Producto.Length == 0 ||
+            v.Detalles.Any(d => d.NombreArticulo.Contains(Filtros.Producto, StringComparison.OrdinalIgnoreCase) || d.CodigoArticulo.Contains(Filtros.Producto, StringComparison.OrdinalIgnoreCase)) ||
+            (v.Detalles.Count == 0 && (v.NombreArticulo.Contains(Filtros.Producto, StringComparison.OrdinalIgnoreCase) || v.CodigoArticulo.Contains(Filtros.Producto, StringComparison.OrdinalIgnoreCase)))) &&
+        (Filtros.Ncf.Length == 0 || (v.Ncf ?? "").Contains(Filtros.Ncf, StringComparison.OrdinalIgnoreCase)) &&
         (Filtros.Tipo.Length == 0 || v.TipoComprobante == Filtros.Tipo) &&
         (Filtros.Estado.Length == 0 || v.Estado == Filtros.Estado) &&
-        (Comprador(v).Contains(Filtros.Texto, StringComparison.OrdinalIgnoreCase) ||
-            v.Detalles.Any(d => d.NombreArticulo.Contains(Filtros.Texto, StringComparison.OrdinalIgnoreCase)) ||
-            (v.Ncf ?? "").Contains(Filtros.Texto, StringComparison.OrdinalIgnoreCase)));
+        (!Filtros.Desde.HasValue || (v.FechaVenta ?? v.FechaCreacion).Date >= Filtros.Desde.Value.Date) &&
+        (!Filtros.Hasta.HasValue || (v.FechaVenta ?? v.FechaCreacion).Date <= Filtros.Hasta.Value.Date));
 
     private int ArticuloSeleccionadoId;
     private int CantidadNueva = 1;
     private ArticuloInventario? ArticuloSeleccionado => Articulos.FirstOrDefault(a => a.Id == ArticuloSeleccionadoId);
     private static string Comprador(Venta v) => string.IsNullOrWhiteSpace(v.NombreCliente) ? "Consumidor final" : v.NombreCliente;
     private static string Moneda(decimal importe) => $"RD$ {importe:N2}";
-    private void AplicarFiltros() => Filtros = (Busqueda.Trim(), Tipo, Estado);
+    private void AplicarFiltros() => Filtros = (FiltroId.Trim(), Busqueda.Trim(), FiltroDocumento.Trim(), FiltroProducto.Trim(), FiltroNcf.Trim(), Tipo, Estado, FechaDesde, FechaHasta);
     private void CerrarFormulario() { if (!Ocupado) Formulario = null; }
     private async Task Imprimir() => await JS.InvokeVoidAsync("window.print");
 

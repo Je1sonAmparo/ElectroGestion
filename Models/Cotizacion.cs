@@ -3,6 +3,7 @@ namespace ElectroGestion.Models;
 public class Cotizacion
 {
     public int Id { get; set; }
+    public bool IsDeleted { get; set; }
     public string SolicitudId { get; set; } = "";
     public int? SolicitudDbId { get; set; }
     public Solicitud? Solicitud { get; set; }

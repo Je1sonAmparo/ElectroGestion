@@ -10,10 +10,17 @@
         <div class="page-title" style="font-family:'Manrope';font-weight:800;font-size:31px;letter-spacing:-.8px;color:#1f2430;line-height:1.15">Clientes</div>
         <div style="color:#6B7085;font-size:14.5px;margin-top:5px">Clientes registrados en el sistema.</div>
     </div>
-    <button @onclick="NuevoCliente" style="padding:10px 16px 10px 18px;background:#1D4ED8;color:#fff;border:0;border-radius:8px;font-weight:700;font-size:14px;cursor:pointer;font-family:'Manrope';white-space:nowrap;display:flex;align-items:center;gap:8px">
-        <span style="font-size:20px;line-height:1;transform:translateY(-1px)">+</span>
-        <span>Nuevo cliente</span>
-    </button>
+    <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;justify-content:flex-end">
+        <button @onclick="AlternarModoSeleccion" title="Seleccionar varios clientes para eliminar"
+            style="padding:10px 16px 10px 14px;background:#fff;border:1px solid @(ModoSeleccion ? "#B42318" : "#D5D8E6");color:@(ModoSeleccion ? "#B42318" : "#4A4E63");border-radius:8px;font-weight:700;font-size:14px;cursor:pointer;font-family:'Manrope';white-space:nowrap;display:flex;align-items:center;gap:8px;transition:all .15s">
+            <svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="4"/><path d="m8.5 12.5 2.5 2.5 5-5.5"/></svg>
+            <span>@(ModoSeleccion ? "Salir de selección" : "Seleccionar")</span>
+        </button>
+        <button @onclick="NuevoCliente" style="padding:10px 16px 10px 18px;background:#1D4ED8;color:#fff;border:0;border-radius:8px;font-weight:700;font-size:14px;cursor:pointer;font-family:'Manrope';white-space:nowrap;display:flex;align-items:center;gap:8px">
+            <span style="font-size:20px;line-height:1;transform:translateY(-1px)">+</span>
+            <span>Nuevo cliente</span>
+        </button>
+    </div>
 </div>
 
 <div style="background:#fff;border:1px solid #E3E5EE;border-radius:12px;overflow:hidden">
@@ -58,12 +65,36 @@
         </div>
     </div>
 
+@if (ModoSeleccion)
+{
+    <div style="padding:10px 18px;display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:12px;background:#EFF6FF">
+        <div style="display:flex;align-items:center;gap:9px;font-size:13.5px;color:#1D4ED8;font-weight:700;flex-wrap:wrap">
+            <svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="4"/><path d="m8.5 12.5 2.5 2.5 5-5.5"/></svg>
+            <span>@(Seleccionadas.Count == 1 ? "1 cliente seleccionado" : $"{Seleccionadas.Count} clientes seleccionados")</span>
+            <span style="color:#6B7085;font-weight:500">· Haz clic en una fila para marcarla o desmarcarla</span>
+        </div>
+        <div style="display:flex;align-items:center;gap:10px">
+            <button @onclick="AlternarTodas" style="padding:8px 14px;border:1px solid #B6C8F5;background:#fff;color:#1D4ED8;border-radius:8px;font-weight:700;font-size:13px;cursor:pointer;font-family:'Manrope'">
+                @(TodasMarcadas ? "Desmarcar todas" : "Marcar todas")
+            </button>
+            <button disabled="@(Seleccionadas.Count == 0)" @onclick="ConfirmarSeleccionadas" style="padding:8px 16px;border:0;background:@(Seleccionadas.Count == 0 ? "#F1A4A7" : "#C0392B");color:#fff;border-radius:8px;font-weight:700;font-size:13px;cursor:pointer;font-family:'Manrope';display:flex;align-items:center;gap:7px">
+                <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 6h18M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2M10 11v6M14 11v6"/></svg>
+                <span>Eliminar @(Seleccionadas.Count == 1 ? "(1)" : $"({Seleccionadas.Count})")</span>
+            </button>
+        </div>
+    </div>
+}
+
     <div style="overflow-x:auto">
         <table style="width:100%;border-collapse:collapse;font-size:14px">
             <thead>
                 <tr style="border-bottom:1px solid #EFF0F6;background:#FAFAFC;color:#6B7085;font-family:'Manrope';font-weight:800;font-size:12px;text-transform:uppercase;letter-spacing:.35px">
                     <th @onclick='() => OrdenarPor("Nombre")' style="padding:14px 18px;text-align:left;width:23%;cursor:pointer;user-select:none" title="Ordenar por Cliente">
                         <div style="display:inline-flex;align-items:center;gap:6px">
+                            @if (ModoSeleccion)
+                            {
+                                <input type="checkbox" aria-label="Seleccionar todos los clientes visibles que se pueden eliminar" checked="@TodasMarcadas" @onchange="e => SeleccionarTodas((bool)(e.Value ?? false))" @onclick:stopPropagation style="margin-right:5px" />
+                            }
                             <span>Cliente</span>
                             @if (SortColumn == "Nombre") { <span style="font-size:11px">@(SortAscending ? "▲" : "▼")</span> }
                         </div>
@@ -102,17 +133,23 @@
                 {
                     @foreach (var c in FilteredClientes)
                     {
-                        <tr style="border-bottom:1px solid #EFF0F6">
-                            <td style="padding:16px 18px;font-weight:700;color:#14162B">@c.Nombre</td>
+                        <tr @onclick="@(() => FilaClicked(c.Id))" style="border-bottom:1px solid #EFF0F6;transition:background 0.15s;background:@(ModoSeleccion && Seleccionadas.Contains(c.Id) ? "#EFF6FF" : "transparent");cursor:@(ModoSeleccion ? "pointer" : "default")">
+                            <td style="padding:16px 18px;vertical-align:middle">
+                                @if (ModoSeleccion)
+                                {
+                                    <input type="checkbox" aria-label="Seleccionar cliente @c.Id" checked="@Seleccionadas.Contains(c.Id)" disabled="@(!PuedeEliminarCliente(c.Id))" @onchange="e => CambiarSeleccion(c.Id, (bool)(e.Value ?? false))" @onclick:stopPropagation style="margin-right:8px" />
+                                }
+                                <span style="font-weight:700;color:#14162B">@c.Nombre</span>
+                            </td>
                             <td style="padding:16px 18px;color:#6B7085">@c.Telefono</td>
                             <td style="padding:16px 18px;color:#6B7085">@c.Direccion</td>
                             <td style="padding:16px 18px;color:#14162B;font-weight:700">@c.Servicios</td>
                             <td style="padding:16px 18px;text-align:right">
                                 <div style="display:flex;gap:8px;justify-content:flex-end">
-                                    <button @onclick="() => VerDetalle(c.Id)" title="Ver detalle" aria-label="Ver detalle" class="view-btn table-action-icon" style="width:32px;height:32px;border:1px solid #D5D8E6;background:#fff;border-radius:8px;cursor:pointer;color:#5F6479;display:flex;align-items:center;justify-content:center;padding:0">
+                                    <button @onclick="() => VerDetalle(c.Id)" @onclick:stopPropagation title="Ver detalle" aria-label="Ver detalle" class="view-btn table-action-icon" style="width:32px;height:32px;border:1px solid #D5D8E6;background:#fff;border-radius:8px;cursor:pointer;color:#5F6479;display:flex;align-items:center;justify-content:center;padding:0">
                                         <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2 12s3.5-6 10-6 10 6 10 6-3.5 6-10 6S2 12 2 12Z"/><circle cx="12" cy="12" r="3"/></svg>
                                     </button>
-                                    <button @onclick="() => Editar(c.Id)" title="Editar" aria-label="Editar" class="edit-btn table-action-icon" style="width:32px;height:32px;border:1px solid #D5D8E6;background:#fff;border-radius:8px;cursor:pointer;color:#5F6479;display:flex;align-items:center;justify-content:center;padding:0">
+                                    <button @onclick="() => Editar(c.Id)" @onclick:stopPropagation title="Editar" aria-label="Editar" class="edit-btn table-action-icon" style="width:32px;height:32px;border:1px solid #D5D8E6;background:#fff;border-radius:8px;cursor:pointer;color:#5F6479;display:flex;align-items:center;justify-content:center;padding:0">
                                         <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 1 1 3 3L7 19l-4 1 1-4 12.5-12.5Z"/></svg>
                                     </button>
                                 </div>
@@ -219,14 +256,35 @@
 @if (IsDeleteModalOpen)
 {
     <div style="position:fixed;inset:0;background:rgba(14,16,40,0.5);display:flex;align-items:center;justify-content:center;z-index:9999;padding:20px">
-        <div style="background:#fff;border-radius:16px;width:100%;max-width:400px;padding:32px;box-shadow:0 20px 40px rgba(0,0,0,0.2);animation:tin 0.2s ease-out">
-            <div style="font-family:'Manrope';font-weight:800;font-size:22px;color:#14162B;margin-bottom:10px">Eliminar Cliente</div>
-            <div style="color:#4A4E63;font-size:14px;margin-bottom:24px">¿Está seguro que desea eliminar este cliente? Esta acción no se puede deshacer.</div>
-            <div style="display:flex;justify-content:flex-end;gap:12px">
-                <button @onclick="CerrarEliminar" style="padding:10px 20px;border:1px solid #D5D8E6;background:#fff;border-radius:8px;font-weight:700;font-size:14px;cursor:pointer;color:#4A4E63">
+        <div style="background:#fff;border-radius:14px;width:100%;max-width:430px;padding:30px;box-shadow:0 20px 40px rgba(0,0,0,0.2);animation:tin 0.2s ease-out">
+            <div style="font-family:'Manrope';font-weight:800;font-size:23px;color:#14162B;margin-bottom:12px">Eliminar @(DeleteIds.Count == 1 ? "cliente" : "clientes")</div>
+            <div style="color:#4A4E63;font-size:14.5px;line-height:1.55">¿Está seguro que desea eliminar @(DeleteIds.Count == 1 ? "este cliente" : $"estos {DeleteIds.Count} clientes")? El administrador podrá recuperarlos desde el módulo de Recuperación.</div>
+            @if (DeleteIds.Count > 1)
+            {
+                <div style="background:#F9FAFB;border:1px solid #EFF0F6;border-radius:10px;max-height:200px;overflow:auto;margin-top:16px" class="resp-lista-eliminar">
+                    @foreach (var c in ClientesAEliminar)
+                    {
+                        <div style="display:flex;align-items:center;gap:12px;padding:9px 14px;border-bottom:1px solid #EFF0F6">
+                            <span style="font-family:ui-monospace,'SFMono-Regular',Consolas,monospace;font-size:12.5px;font-weight:700;letter-spacing:.05em;color:#C0392B;background:#FDECEC;border-radius:6px;padding:2px 8px;flex-shrink:0">@c.Id.ToString("D4")</span>
+                            <div style="min-width:0">
+                                <div style="font-size:13.5px;font-weight:700;color:#14162B;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">@c.Nombre</div>
+                                <div style="font-size:12px;color:#6B7085;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">@c.Telefono@(c.Servicios > 0 ? $" · {c.Servicios} serv." : "")</div>
+                            </div>
+                        </div>
+                    }
+                </div>
+            }
+            @if (Seleccionadas.Count > DeleteIds.Count)
+            {
+                <div style="background:#FFF7E6;border:1px solid #F5E2B8;border-radius:8px;padding:9px 12px;font-size:12.5px;color:#8A6100;margin-top:12px">
+                    Nota: se omitieron @(Seleccionadas.Count - DeleteIds.Count) cliente(s) con solicitudes En proceso o En Espera Administración.
+                </div>
+            }
+            <div style="display:flex;justify-content:flex-end;gap:12px;margin-top:28px">
+                <button @onclick="CerrarEliminar" style="padding:11px 24px;border:1px solid #E3E5EE;background:#fff;border-radius:10px;font-weight:600;font-size:15px;cursor:pointer;color:#14162B;font-family:'Manrope'">
                     Cancelar
                 </button>
-                <button @onclick="EjecutarEliminar" style="padding:10px 24px;border:0;background:#C0392B;color:#fff;border-radius:8px;font-weight:700;font-size:14px;cursor:pointer;font-family:'Manrope'">
+                <button @onclick="EjecutarEliminar" style="padding:11px 26px;border:0;background:#C0392B;color:#fff;border-radius:10px;font-weight:700;font-size:15px;cursor:pointer;font-family:'Manrope'">
                     Eliminar
                 </button>
             </div>
@@ -241,6 +299,7 @@
     private string SearchCorreo = "";
     private string SearchTelefono = "";
     private string SearchDireccion = "";
+    private (string Id, string Nombre, string Rnc, string Correo, string Telefono, string Direccion) FiltrosAplicados = ("", "", "", "", "", "");
 
     private string SortColumn = "Nombre";
     private bool SortAscending = true;
@@ -260,6 +319,8 @@
 
     private void Filtrar()
     {
+        FiltrosAplicados = (SearchId.Trim(), SearchNombre.Trim(), SearchRnc.Trim(), SearchCorreo.Trim(), SearchTelefono.Trim(), SearchDireccion.Trim());
+        Seleccionadas.IntersectWith(FilteredClientes.Select(c => c.Id));
         StateHasChanged();
     }
     private bool IsModalOpen = false;
@@ -268,6 +329,40 @@
     private string ModalTitle = "";
     private int? EditId = null;
     private ElectroGestion.Models.Cliente? SelectedCliente;
+
+    private HashSet<int> Seleccionadas = [];
+    private HashSet<int> DeleteIds = [];
+    private bool ModoSeleccion;
+    private List<int> ElegiblesVisibles => FilteredClientes.Where(c => PuedeEliminarCliente(c.Id)).Select(c => c.Id).ToList();
+    private bool TodasMarcadas => ElegiblesVisibles.Count > 0 && ElegiblesVisibles.All(id => Seleccionadas.Contains(id));
+    private List<ElectroGestion.Models.Cliente> ClientesAEliminar => DeleteIds
+        .Select(id => clientes.FirstOrDefault(c => c.Id == id))
+        .Where(c => c != null)
+        .Cast<ElectroGestion.Models.Cliente>()
+        .ToList();
+
+    private void AlternarModoSeleccion()
+    {
+        ModoSeleccion = !ModoSeleccion;
+        if (!ModoSeleccion) Seleccionadas.Clear();
+    }
+
+    private void FilaClicked(int id)
+    {
+        if (!ModoSeleccion) return;
+        if (!PuedeEliminarCliente(id))
+        {
+            ToastService.ShowWarning("Este cliente tiene solicitudes En proceso o En Espera Administración y no se puede eliminar.", "Atención");
+            return;
+        }
+        CambiarSeleccion(id, !Seleccionadas.Contains(id));
+    }
+
+    private void AlternarTodas() => SeleccionarTodas(!TodasMarcadas);
+
+    private void CambiarSeleccion(int id, bool marcado) { if (marcado && PuedeEliminarCliente(id)) Seleccionadas.Add(id); else Seleccionadas.Remove(id); }
+    private void SeleccionarTodas(bool marcado) { foreach (var id in ElegiblesVisibles) { if (marcado) Seleccionadas.Add(id); else Seleccionadas.Remove(id); } }
+    private void ConfirmarSeleccionadas() { DeleteIds = Seleccionadas.Where(PuedeEliminarCliente).ToHashSet(); IsDeleteModalOpen = DeleteIds.Count > 0; }
 
     private List<ElectroGestion.Models.Cliente> clientes = new();
 
@@ -293,28 +388,45 @@
 
     private void ConfirmarEliminar(int id)
     {
+        if (!PuedeEliminarCliente(id))
+        {
+            ToastService.ShowWarning("No se puede eliminar un cliente con solicitudes En proceso o En Espera Administración.", "Atención");
+            return;
+        }
+
         DeleteId = id;
+        DeleteIds = [id];
         IsDeleteModalOpen = true;
+    }
+
+    private bool PuedeEliminarCliente(int id)
+    {
+        var cliente = clientes.FirstOrDefault(c => c.Id == id);
+        if (cliente == null) return false;
+        return cliente.Solicitudes == null || !cliente.Solicitudes.Any(s => s.EstadoSolicitudId == 2 || s.EstadoSolicitudId == 5);
     }
 
     private async Task EjecutarEliminar()
     {
-        if (DeleteId.HasValue)
+        if (DeleteIds.Count > 0)
         {
-            var resultado = await ClienteService.Eliminar(DeleteId.Value);
-            if (resultado)
+            var eliminados = await ClienteService.EliminarVarios(DeleteIds);
+            if (eliminados > 0)
             {
-                ToastService.ShowSuccess("Cliente eliminado exitosamente.");
+                ToastService.ShowSuccess(eliminados == 1 ? "Cliente eliminado correctamente." : $"{eliminados} clientes eliminados correctamente.");
                 await CargarClientes();
+                ModoSeleccion = false;
+                Seleccionadas.Clear();
             }
             else
             {
-                ToastService.ShowWarning("No se puede eliminar un cliente con solicitudes En proceso o En Espera Administración.", "Atención");
+                ToastService.ShowWarning("No se pudo eliminar. Los clientes con solicitudes En proceso o En Espera Administración están protegidos.", "Atención");
             }
         }
         IsDeleteModalOpen = false;
         IsModalOpen = false;
         DeleteId = null;
+        DeleteIds.Clear();
     }
 
     private void CerrarEliminar()
@@ -334,13 +446,14 @@
     {
         get
         {
+            var filtros = FiltrosAplicados;
             var q = clientes.Where(c => {
-                bool matchId = string.IsNullOrEmpty(SearchId) || c.Id.ToString().Contains(SearchId);
-                bool matchNombre = string.IsNullOrEmpty(SearchNombre) || c.Nombre.Contains(SearchNombre, StringComparison.OrdinalIgnoreCase);
-                bool matchRnc = string.IsNullOrEmpty(SearchRnc) || (!string.IsNullOrEmpty(c.Rnc) && c.Rnc.Contains(SearchRnc, StringComparison.OrdinalIgnoreCase));
-                bool matchCorreo = string.IsNullOrEmpty(SearchCorreo) || (!string.IsNullOrEmpty(c.Correo) && c.Correo.Contains(SearchCorreo, StringComparison.OrdinalIgnoreCase));
-                bool matchTelefono = string.IsNullOrEmpty(SearchTelefono) || (!string.IsNullOrEmpty(c.Telefono) && c.Telefono.Contains(SearchTelefono, StringComparison.OrdinalIgnoreCase)) || (!string.IsNullOrEmpty(c.Telefono2) && c.Telefono2.Contains(SearchTelefono, StringComparison.OrdinalIgnoreCase));
-                bool matchDireccion = string.IsNullOrEmpty(SearchDireccion) || c.Direccion.Contains(SearchDireccion, StringComparison.OrdinalIgnoreCase);
+                bool matchId = string.IsNullOrEmpty(filtros.Id) || c.Id.ToString().Contains(filtros.Id);
+                bool matchNombre = string.IsNullOrEmpty(filtros.Nombre) || c.Nombre.Contains(filtros.Nombre, StringComparison.OrdinalIgnoreCase);
+                bool matchRnc = string.IsNullOrEmpty(filtros.Rnc) || (!string.IsNullOrEmpty(c.Rnc) && c.Rnc.Contains(filtros.Rnc, StringComparison.OrdinalIgnoreCase));
+                bool matchCorreo = string.IsNullOrEmpty(filtros.Correo) || (!string.IsNullOrEmpty(c.Correo) && c.Correo.Contains(filtros.Correo, StringComparison.OrdinalIgnoreCase));
+                bool matchTelefono = string.IsNullOrEmpty(filtros.Telefono) || (!string.IsNullOrEmpty(c.Telefono) && c.Telefono.Contains(filtros.Telefono, StringComparison.OrdinalIgnoreCase)) || (!string.IsNullOrEmpty(c.Telefono2) && c.Telefono2.Contains(filtros.Telefono, StringComparison.OrdinalIgnoreCase));
+                bool matchDireccion = string.IsNullOrEmpty(filtros.Direccion) || c.Direccion.Contains(filtros.Direccion, StringComparison.OrdinalIgnoreCase);
                 return matchId && matchNombre && matchRnc && matchCorreo && matchTelefono && matchDireccion;
             });
 

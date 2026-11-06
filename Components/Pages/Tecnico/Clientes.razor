@@ -10,10 +10,12 @@
         <div class="page-title" style="font-family:'Manrope';font-weight:800;font-size:31px;letter-spacing:-.8px;color:#1f2430;line-height:1.15">Clientes</div>
         <div style="color:#6B7085;font-size:14.5px;margin-top:5px">Clientes registrados en el sistema.</div>
     </div>
-    <button @onclick="NuevoCliente" style="padding:10px 16px 10px 18px;background:#1D4ED8;color:#fff;border:0;border-radius:8px;font-weight:700;font-size:14px;cursor:pointer;font-family:'Manrope';white-space:nowrap;display:flex;align-items:center;gap:8px">
-        <span style="font-size:20px;line-height:1;transform:translateY(-1px)">+</span>
-        <span>Nuevo cliente</span>
-    </button>
+    <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;justify-content:flex-end">
+        <button @onclick="NuevoCliente" style="padding:10px 16px 10px 18px;background:#1D4ED8;color:#fff;border:0;border-radius:8px;font-weight:700;font-size:14px;cursor:pointer;font-family:'Manrope';white-space:nowrap;display:flex;align-items:center;gap:8px">
+            <span style="font-size:20px;line-height:1;transform:translateY(-1px)">+</span>
+            <span>Nuevo cliente</span>
+        </button>
+    </div>
 </div>
 
 <div style="background:#fff;border:1px solid #E3E5EE;border-radius:12px;overflow:hidden">
@@ -100,17 +102,19 @@
                 {
                     @foreach (var c in FilteredClientes)
                     {
-                        <tr style="border-bottom:1px solid #EFF0F6">
-                            <td style="padding:16px 18px;font-weight:700;color:#14162B">@c.Nombre</td>
+                        <tr style="border-bottom:1px solid #EFF0F6;transition:background 0.15s">
+                            <td style="padding:16px 18px;vertical-align:middle">
+                                <span style="font-weight:700;color:#14162B">@c.Nombre</span>
+                            </td>
                             <td style="padding:16px 18px;color:#6B7085">@c.Telefono</td>
                             <td style="padding:16px 18px;color:#6B7085">@c.Direccion</td>
                             <td style="padding:16px 18px;color:#14162B;font-weight:700">@c.Servicios</td>
                             <td style="padding:16px 18px;text-align:right">
                                 <div style="display:flex;gap:8px;justify-content:flex-end">
-                                    <button @onclick="() => VerDetalle(c.Id)" title="Ver detalle" aria-label="Ver detalle" class="view-btn table-action-icon" style="width:32px;height:32px;border:1px solid #D5D8E6;background:#fff;border-radius:8px;cursor:pointer;color:#5F6479;display:flex;align-items:center;justify-content:center;padding:0">
+                                    <button @onclick="() => VerDetalle(c.Id)" @onclick:stopPropagation title="Ver detalle" aria-label="Ver detalle" class="view-btn table-action-icon" style="width:32px;height:32px;border:1px solid #D5D8E6;background:#fff;border-radius:8px;cursor:pointer;color:#5F6479;display:flex;align-items:center;justify-content:center;padding:0">
                                         <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2 12s3.5-6 10-6 10 6 10 6-3.5 6-10 6S2 12 2 12Z"/><circle cx="12" cy="12" r="3"/></svg>
                                     </button>
-                                    <button @onclick="() => Editar(c.Id)" title="Editar" aria-label="Editar" class="edit-btn table-action-icon" style="width:32px;height:32px;border:1px solid #D5D8E6;background:#fff;border-radius:8px;cursor:pointer;color:#5F6479;display:flex;align-items:center;justify-content:center;padding:0">
+                                    <button @onclick="() => Editar(c.Id)" @onclick:stopPropagation title="Editar" aria-label="Editar" class="edit-btn table-action-icon" style="width:32px;height:32px;border:1px solid #D5D8E6;background:#fff;border-radius:8px;cursor:pointer;color:#5F6479;display:flex;align-items:center;justify-content:center;padding:0">
                                         <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 1 1 3 3L7 19l-4 1 1-4 12.5-12.5Z"/></svg>
                                     </button>
                                 </div>
@@ -193,6 +197,7 @@
     private string SearchCorreo = "";
     private string SearchTelefono = "";
     private string SearchDireccion = "";
+    private (string Id, string Nombre, string Rnc, string Correo, string Telefono, string Direccion) FiltrosAplicados = ("", "", "", "", "", "");
 
     private string SortColumn = "Nombre";
     private bool SortAscending = true;
@@ -212,6 +217,7 @@
 
     private void Filtrar()
     {
+        FiltrosAplicados = (SearchId.Trim(), SearchNombre.Trim(), SearchRnc.Trim(), SearchCorreo.Trim(), SearchTelefono.Trim(), SearchDireccion.Trim());
         StateHasChanged();
     }
 
@@ -219,6 +225,7 @@
     private string ModalTitle = "";
     private int? EditId;
     private ElectroGestion.Models.Cliente? SelectedCliente;
+
     private string FormNombre = "";
     private string FormRnc = "";
     private string FormCorreo = "";
@@ -242,13 +249,14 @@
     {
         get
         {
+            var filtros = FiltrosAplicados;
             var q = clientes.Where(c => {
-                bool matchId = string.IsNullOrEmpty(SearchId) || c.Id.ToString().Contains(SearchId);
-                bool matchNombre = string.IsNullOrEmpty(SearchNombre) || c.Nombre.Contains(SearchNombre, StringComparison.OrdinalIgnoreCase);
-                bool matchRnc = string.IsNullOrEmpty(SearchRnc) || (!string.IsNullOrEmpty(c.Rnc) && c.Rnc.Contains(SearchRnc, StringComparison.OrdinalIgnoreCase));
-                bool matchCorreo = string.IsNullOrEmpty(SearchCorreo) || (!string.IsNullOrEmpty(c.Correo) && c.Correo.Contains(SearchCorreo, StringComparison.OrdinalIgnoreCase));
-                bool matchTelefono = string.IsNullOrEmpty(SearchTelefono) || (!string.IsNullOrEmpty(c.Telefono) && c.Telefono.Contains(SearchTelefono, StringComparison.OrdinalIgnoreCase)) || (!string.IsNullOrEmpty(c.Telefono2) && c.Telefono2.Contains(SearchTelefono, StringComparison.OrdinalIgnoreCase));
-                bool matchDireccion = string.IsNullOrEmpty(SearchDireccion) || c.Direccion.Contains(SearchDireccion, StringComparison.OrdinalIgnoreCase);
+                bool matchId = string.IsNullOrEmpty(filtros.Id) || c.Id.ToString().Contains(filtros.Id);
+                bool matchNombre = string.IsNullOrEmpty(filtros.Nombre) || c.Nombre.Contains(filtros.Nombre, StringComparison.OrdinalIgnoreCase);
+                bool matchRnc = string.IsNullOrEmpty(filtros.Rnc) || (!string.IsNullOrEmpty(c.Rnc) && c.Rnc.Contains(filtros.Rnc, StringComparison.OrdinalIgnoreCase));
+                bool matchCorreo = string.IsNullOrEmpty(filtros.Correo) || (!string.IsNullOrEmpty(c.Correo) && c.Correo.Contains(filtros.Correo, StringComparison.OrdinalIgnoreCase));
+                bool matchTelefono = string.IsNullOrEmpty(filtros.Telefono) || (!string.IsNullOrEmpty(c.Telefono) && c.Telefono.Contains(filtros.Telefono, StringComparison.OrdinalIgnoreCase)) || (!string.IsNullOrEmpty(c.Telefono2) && c.Telefono2.Contains(filtros.Telefono, StringComparison.OrdinalIgnoreCase));
+                bool matchDireccion = string.IsNullOrEmpty(filtros.Direccion) || c.Direccion.Contains(filtros.Direccion, StringComparison.OrdinalIgnoreCase);
                 return matchId && matchNombre && matchRnc && matchCorreo && matchTelefono && matchDireccion;
             });
 

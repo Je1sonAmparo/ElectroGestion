@@ -13,10 +13,12 @@
         <div class="page-title" style="font-family:'Manrope';font-weight:800;font-size:31px;letter-spacing:-.8px;color:#1f2430;line-height:1.15">Solicitudes</div>
         <div style="color:#6B7085;font-size:14.5px;margin-top:5px">Registro de las necesidades de los clientes.</div>
     </div>
-    <button @onclick="NuevaSolicitud" style="padding:10px 16px 10px 18px;background:#1D4ED8;color:#fff;border:0;border-radius:8px;font-weight:700;font-size:14px;cursor:pointer;font-family:'Manrope';white-space:nowrap;display:flex;align-items:center;gap:8px">
-        <span style="font-size:20px;line-height:1;transform:translateY(-1px)">+</span>
-        <span>Nueva solicitud</span>
-    </button>
+    <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;justify-content:flex-end">
+        <button @onclick="NuevaSolicitud" style="padding:10px 16px 10px 18px;background:#1D4ED8;color:#fff;border:0;border-radius:8px;font-weight:700;font-size:14px;cursor:pointer;font-family:'Manrope';white-space:nowrap;display:flex;align-items:center;gap:8px">
+            <span style="font-size:20px;line-height:1;transform:translateY(-1px)">+</span>
+            <span>Nueva solicitud</span>
+        </button>
+    </div>
 </div>
 
 <div style="background:#fff;border:1px solid #E3E5EE;border-radius:12px;overflow:hidden">
@@ -66,14 +68,13 @@
         </div>
     </div>
 
-    <div style="padding:10px 18px;display:flex;justify-content:flex-end;align-items:center;gap:12px"><span style="font-size:13px;color:#6B7085">@Seleccionadas.Count seleccionadas</span><button disabled="@(Seleccionadas.Count == 0)" @onclick="ConfirmarSeleccionadas" style="padding:8px 14px;border:1px solid #F5C2C4;background:#fff;color:#C4141B;border-radius:8px;font-weight:700;cursor:pointer">Eliminar seleccionadas</button></div>
-    <div style="overflow-x:auto">
+<div style="overflow-x:auto">
         <table style="width:100%;border-collapse:collapse;font-size:14px;table-layout:fixed">
             <thead>
                 <tr style="border-bottom:1px solid #EFF0F6;background:#FAFAFC;color:#6B7085;font-family:'Manrope';font-weight:800;font-size:13px;text-transform:uppercase;letter-spacing:0.5px">
                     <th @onclick='() => OrdenarPor("Id")' style="padding:14px 18px;text-align:left;width:12%;cursor:pointer;user-select:none" title="Ordenar por ID">
                         <div style="display:inline-flex;align-items:center;gap:6px">
-                            <input type="checkbox" aria-label="Seleccionar todas las solicitudes visibles que se pueden eliminar" checked="@(ElegiblesVisibles.Count > 0 && ElegiblesVisibles.All(id => Seleccionadas.Contains(id)))" @onchange="e => SeleccionarTodas((bool)(e.Value ?? false))" @onclick:stopPropagation style="margin-right:5px" /><span>ID</span>
+                            <span>ID</span>
                             @if (SortColumn == "Id") { <span style="font-size:11px">@(SortAscending ? "▲" : "▼")</span> }
                         </div>
                     </th>
@@ -117,9 +118,9 @@
                 {
                     @foreach (var s in FilteredSolicitudes)
                     {
-                        <tr style="border-bottom:1px solid #EFF0F6">
+                        <tr style="border-bottom:1px solid #EFF0F6;transition:background 0.15s">
                             <td style="padding:18px;vertical-align:middle">
-                                <input type="checkbox" aria-label="Seleccionar solicitud @s.Id" checked="@Seleccionadas.Contains(s.Id)" disabled="@(!PuedeEliminarSolicitud(s.Id))" @onchange="e => CambiarSeleccion(s.Id, (bool)(e.Value ?? false))" style="margin-right:8px" /><span style="font-family:ui-monospace,'SFMono-Regular',Consolas,monospace;font-size:14px;font-weight:700;letter-spacing:.05em;color:#5B6173">@s.Id.ToString("D4")</span>
+                                <span style="font-family:ui-monospace,'SFMono-Regular',Consolas,monospace;font-size:14px;font-weight:700;letter-spacing:.05em;color:#5B6173">@s.Id.ToString("D4")</span>
                             </td>
                             <td style="padding:18px;vertical-align:middle;font-weight:700;color:#14162B">
                                 @s.Cliente?.Nombre
@@ -137,10 +138,10 @@
                             </td>
                             <td style="padding:18px;text-align:right;vertical-align:middle">
                                 <div style="display:flex;gap:8px;justify-content:flex-end">
-                                    <button @onclick="() => VerDetalle(s.Id)" title="Ver detalle" aria-label="Ver detalle" class="table-action-icon" style="width:30px;height:30px;border:1px solid #D5D8E6;background:#fff;border-radius:7px;cursor:pointer;color:#5F6479;display:flex;align-items:center;justify-content:center;padding:0">
+                                    <button @onclick="() => VerDetalle(s.Id)" @onclick:stopPropagation title="Ver detalle" aria-label="Ver detalle" class="table-action-icon" style="width:30px;height:30px;border:1px solid #D5D8E6;background:#fff;border-radius:7px;cursor:pointer;color:#5F6479;display:flex;align-items:center;justify-content:center;padding:0">
                                         <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2 12s3.5-6 10-6 10 6 10 6-3.5 6-10 6S2 12 2 12Z"/><circle cx="12" cy="12" r="3"/></svg>
                                     </button>
-                                    <button @onclick="() => Editar(s.Id)" title="Editar" aria-label="Editar" class="table-action-icon" style="width:30px;height:30px;border:1px solid #D5D8E6;background:#fff;border-radius:7px;cursor:pointer;color:#5F6479;display:flex;align-items:center;justify-content:center;padding:0">
+                                    <button @onclick="() => Editar(s.Id)" @onclick:stopPropagation title="Editar" aria-label="Editar" class="table-action-icon" style="width:30px;height:30px;border:1px solid #D5D8E6;background:#fff;border-radius:7px;cursor:pointer;color:#5F6479;display:flex;align-items:center;justify-content:center;padding:0">
                                         <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 1 1 3 3L7 19l-4 1 1-4 12.5-12.5Z"/></svg>
                                     </button>
                                 </div>
@@ -207,37 +208,12 @@
     </div>
 }
 
-@if (IsDeleteModalOpen)
-{
-    <div style="position:fixed;inset:0;background:rgba(14,16,40,.5);display:flex;align-items:center;justify-content:center;z-index:9999;padding:20px">
-        <div style="background:#fff;border-radius:16px;width:100%;max-width:400px;padding:32px;box-shadow:0 20px 40px rgba(0,0,0,.2)">
-            <div style="font-family:'Manrope';font-weight:800;font-size:22px;color:#14162B;margin-bottom:10px">Eliminar solicitudes</div>
-            <div style="color:#4A4E63;font-size:14px;margin-bottom:24px">¿Deseas eliminar @(DeleteIds.Count == 1 ? "esta solicitud" : $"estas {DeleteIds.Count} solicitudes")? Confirma para continuar.</div>
-            <div style="display:flex;justify-content:flex-end;gap:12px"><button @onclick="() => IsDeleteModalOpen = false" style="padding:10px 20px;border:1px solid #D5D8E6;background:#fff;border-radius:8px">Cancelar</button><button @onclick="EjecutarEliminar" style="padding:10px 24px;border:0;background:#C0392B;color:#fff;border-radius:8px;font-weight:700">Sí, eliminar</button></div>
-        </div>
-    </div>
-}
-
 @code {
-    private bool IsDeleteModalOpen;
-    private HashSet<int> Seleccionadas = [];
-    private HashSet<int> DeleteIds = [];
-    private bool PuedeEliminarSolicitud(int id) => solicitudes.FirstOrDefault(s => s.Id == id)?.EstadoSolicitud?.Nombre is not ("En proceso" or "En Espera Administración" or "Finalizada");
-    private List<int> ElegiblesVisibles => FilteredSolicitudes.Where(s => PuedeEliminarSolicitud(s.Id)).Select(s => s.Id).ToList();
-    private void CambiarSeleccion(int id, bool marcado) { if (marcado && PuedeEliminarSolicitud(id)) Seleccionadas.Add(id); else Seleccionadas.Remove(id); }
-    private void SeleccionarTodas(bool marcado) { foreach (var id in ElegiblesVisibles) { if (marcado) Seleccionadas.Add(id); else Seleccionadas.Remove(id); } }
-    private void ConfirmarSeleccionadas() { DeleteIds = Seleccionadas.Where(PuedeEliminarSolicitud).ToHashSet(); IsDeleteModalOpen = DeleteIds.Count > 0; }
-    private async Task EjecutarEliminar()
-    {
-        var eliminado = await SolicitudService.EliminarVarios(DeleteIds);
-        IsDeleteModalOpen = false;
-        DeleteIds.Clear();
-        if (!eliminado) { ToastService.ShowWarning("No se pudieron eliminar las solicitudes seleccionadas.", "Atención"); return; }
-        Seleccionadas.Clear();
-        AppState.NotifyStateChanged();
-        await CargarDatos();
-        ToastService.ShowSuccess("Solicitudes eliminadas correctamente.");
-    }
+    [Parameter]
+    public bool AbrirNuevaSolicitud { get; set; }
+
+    private bool SolicitudRapidaAbierta;
+
     private string SearchId { get; set; } = "";
     private string SearchCliente { get; set; } = "";
     private string SearchTipo { get; set; } = "";
@@ -265,6 +241,19 @@
     protected override async Task OnInitializedAsync()
     {
         await CargarDatos();
+    }
+
+    protected override async Task OnParametersSetAsync()
+    {
+        if (!AbrirNuevaSolicitud)
+        {
+            SolicitudRapidaAbierta = false;
+            return;
+        }
+
+        if (SolicitudRapidaAbierta) return;
+        SolicitudRapidaAbierta = true;
+        await NuevaSolicitud();
     }
 
     private void OrdenarPor(string columna)
@@ -329,7 +318,6 @@
             "Estado" => SortAscending ? q.OrderBy(x => x.EstadoSolicitud != null ? x.EstadoSolicitud.Nombre : "") : q.OrderByDescending(x => x.EstadoSolicitud != null ? x.EstadoSolicitud.Nombre : ""),
             _ => SortAscending ? q.OrderBy(x => x.Id) : q.OrderByDescending(x => x.Id)
         }).ToList();
-        Seleccionadas.IntersectWith(FilteredSolicitudes.Select(s => s.Id));
     }
 
     private async Task NuevaSolicitud()

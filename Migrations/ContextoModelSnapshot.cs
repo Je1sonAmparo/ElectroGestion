@@ -74,6 +74,9 @@ namespace ElectroGestion.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(450)");
 
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
+
                     b.Property<string>("Nombre")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
@@ -96,6 +99,7 @@ namespace ElectroGestion.Migrations
                             Cantidad = 500,
                             Categoria = "Materiales",
                             Codigo = "ART-001",
+                            IsDeleted = false,
                             Nombre = "Cable de Cobre",
                             PrecioUnidad = 15m
                         },
@@ -105,6 +109,7 @@ namespace ElectroGestion.Migrations
                             Cantidad = 10,
                             Categoria = "Equipos",
                             Codigo = "ART-002",
+                            IsDeleted = false,
                             Nombre = "Transformador 50kVA",
                             PrecioUnidad = 25000m
                         });
@@ -127,6 +132,9 @@ namespace ElectroGestion.Migrations
                         .IsRequired()
                         .HasMaxLength(250)
                         .HasColumnType("nvarchar(250)");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
 
                     b.Property<string>("Nombre")
                         .IsRequired()
@@ -156,6 +164,7 @@ namespace ElectroGestion.Migrations
                             Id = 1,
                             Correo = "melody@email.com",
                             Direccion = "Calle Duarte #24, Santiago",
+                            IsDeleted = false,
                             Nombre = "Melody Santos",
                             Rnc = "402-1234567-1",
                             Servicios = 8,
@@ -166,6 +175,7 @@ namespace ElectroGestion.Migrations
                             Id = 2,
                             Correo = "info@clopez.com",
                             Direccion = "Av. Estrella Sadhalá #102, Santiago",
+                            IsDeleted = false,
                             Nombre = "Constructora López",
                             Rnc = "101-98765-2",
                             Servicios = 5,
@@ -176,6 +186,7 @@ namespace ElectroGestion.Migrations
                             Id = 3,
                             Correo = "farmacia@elsol.do",
                             Direccion = "Calle 16 #7, La Vega",
+                            IsDeleted = false,
                             Nombre = "Farmacia El Sol",
                             Rnc = "130-33445-3",
                             Servicios = 6,
@@ -186,6 +197,7 @@ namespace ElectroGestion.Migrations
                             Id = 4,
                             Correo = "hernandez@colmado.com",
                             Direccion = "Calle Principal #58, Moca",
+                            IsDeleted = false,
                             Nombre = "Colmado Hernández",
                             Rnc = "402-6677884-1",
                             Servicios = 3,
@@ -196,6 +208,7 @@ namespace ElectroGestion.Migrations
                             Id = 5,
                             Correo = "taller@mecanicord.com",
                             Direccion = "Carretera Luperón km 5, Santiago",
+                            IsDeleted = false,
                             Nombre = "Taller Mecánico RD",
                             Rnc = "130-11223-5",
                             Servicios = 1,
@@ -295,6 +308,11 @@ namespace ElectroGestion.Migrations
                         .HasMaxLength(200)
                         .HasColumnType("nvarchar(200)");
 
+                    b.Property<string>("DocumentoCliente")
+                        .IsRequired()
+                        .HasMaxLength(30)
+                        .HasColumnType("nvarchar(30)");
+
                     b.Property<int>("CotizacionId")
                         .HasColumnType("int");
 
@@ -303,11 +321,28 @@ namespace ElectroGestion.Migrations
                         .HasMaxLength(20)
                         .HasColumnType("nvarchar(20)");
 
+                    b.Property<string>("EstadoOrdenAntesEliminar")
+                        .HasMaxLength(30)
+                        .HasColumnType("nvarchar(30)");
+
+                    b.Property<int?>("EstadoSolicitudIdAntesEliminar")
+                        .HasColumnType("int");
+
                     b.Property<int>("FacturaId")
                         .HasColumnType("int");
 
+                    b.Property<string>("Ncf")
+                        .HasMaxLength(13)
+                        .HasColumnType("nvarchar(13)");
+
                     b.Property<DateTime>("Fecha")
                         .HasColumnType("datetime2");
+
+                    b.Property<DateTime?>("FechaFinSolicitudAntesEliminar")
+                        .HasColumnType("datetime2");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
 
                     b.Property<string>("MetodoPago")
                         .IsRequired()
@@ -317,6 +352,11 @@ namespace ElectroGestion.Migrations
                     b.Property<decimal>("Monto")
                         .HasPrecision(18, 2)
                         .HasColumnType("decimal(18,2)");
+
+                    b.Property<string>("TipoComprobante")
+                        .IsRequired()
+                        .HasMaxLength(30)
+                        .HasColumnType("nvarchar(30)");
 
                     b.Property<int?>("OrdenTrabajoId")
                         .HasColumnType("int");
@@ -357,6 +397,9 @@ namespace ElectroGestion.Migrations
 
                     b.Property<DateTime?>("FechaRespuesta")
                         .HasColumnType("datetime2");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
 
                     b.Property<decimal>("MontoManoObra")
                         .HasPrecision(18, 2)
@@ -663,6 +706,9 @@ namespace ElectroGestion.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
+
                     b.Property<string>("MaterialesJson")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
@@ -712,6 +758,9 @@ namespace ElectroGestion.Migrations
                         .HasMaxLength(30)
                         .HasColumnType("nvarchar(30)");
 
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
+
                     b.Property<string>("Nombre")
                         .IsRequired()
                         .HasMaxLength(150)
@@ -732,6 +781,7 @@ namespace ElectroGestion.Migrations
                             Id = 1,
                             Categoria = "Instalaciones",
                             Estado = "Activo",
+                            IsDeleted = false,
                             Nombre = "Instalación de Paneles Solares",
                             ServicioId = "SV-001"
                         },
@@ -740,6 +790,7 @@ namespace ElectroGestion.Migrations
                             Id = 2,
                             Categoria = "Instalaciones",
                             Estado = "Activo",
+                            IsDeleted = false,
                             Nombre = "Instalación de Sistema UPS",
                             ServicioId = "SV-002"
                         },
@@ -748,6 +799,7 @@ namespace ElectroGestion.Migrations
                             Id = 3,
                             Categoria = "Mantenimiento",
                             Estado = "Activo",
+                            IsDeleted = false,
                             Nombre = "Mantenimiento Eléctrico",
                             ServicioId = "SV-003"
                         },
@@ -756,6 +808,7 @@ namespace ElectroGestion.Migrations
                             Id = 4,
                             Categoria = "Redes y Cableado",
                             Estado = "Activo",
+                            IsDeleted = false,
                             Nombre = "Cableado Estructurado",
                             ServicioId = "SV-004"
                         },
@@ -764,6 +817,7 @@ namespace ElectroGestion.Migrations
                             Id = 5,
                             Categoria = "Instalaciones",
                             Estado = "Activo",
+                            IsDeleted = false,
                             Nombre = "Instalación de Planta Eléctrica",
                             ServicioId = "SV-005"
                         });
@@ -1057,6 +1111,9 @@ namespace ElectroGestion.Migrations
 
                     b.Property<DateTime?>("FechaVenta")
                         .HasColumnType("datetime2");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
 
                     b.Property<string>("Ncf")
                         .HasMaxLength(13)

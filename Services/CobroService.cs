@@ -15,7 +15,9 @@ public class CobroService(IDbContextFactory<Contexto> factory, AppStateService a
             .Include(c => c.Cotizacion).ThenInclude(q => q!.Solicitud).ThenInclude(s => s!.Cliente)
             .Include(c => c.Cotizacion).ThenInclude(q => q!.Solicitud).ThenInclude(s => s!.Servicio)
             .Include(c => c.OrdenTrabajo)
-            .OrderByDescending(c => c.Id).ToListAsync();
+            .OrderBy(c => c.Estado == "Pendiente de cobro" ? 0 : 1)
+            .ThenBy(c => c.Fecha)
+            .ThenBy(c => c.Id).ToListAsync();
     }
 
     public async Task<List<Cotizacion>> ObtenerCotizacionesAprobadasAsync()
@@ -33,9 +35,14 @@ public class CobroService(IDbContextFactory<Contexto> factory, AppStateService a
             .OrderByDescending(q => q.Id).ToListAsync();
     }
 
-    public async Task<bool> CrearAsync(int cotizacionId, decimal abonoInicial, string metodoPago)
+    public async Task<bool> CrearAsync(int cotizacionId, decimal abonoInicial, string metodoPago, string tipoComprobante, string nombreCliente, string documentoCliente)
     {
-        if (!appState.EsGerente || abonoInicial < 0 || (abonoInicial > 0 && string.IsNullOrWhiteSpace(metodoPago))) return false;
+        if (!appState.EsGerente || abonoInicial < 0 || (abonoInicial > 0 && string.IsNullOrWhiteSpace(metodoPago)) ||
+            tipoComprobante is not (Venta.Consumo or Venta.CreditoFiscal)) return false;
+        nombreCliente = nombreCliente.Trim();
+        documentoCliente = System.Text.RegularExpressions.Regex.Replace(documentoCliente.Trim(), @"\D", "");
+        if (tipoComprobante == Venta.CreditoFiscal &&
+            (string.IsNullOrWhiteSpace(nombreCliente) || !System.Text.RegularExpressions.Regex.IsMatch(documentoCliente, @"\A(?:[0-9]{9}|[0-9]{11})\z"))) return false;
         await using var db = await factory.CreateDbContextAsync();
         var cotizacion = await db.Cotizaciones
             .Include(q => q.Solicitud).ThenInclude(s => s!.Cliente)
@@ -49,7 +56,9 @@ public class CobroService(IDbContextFactory<Contexto> factory, AppStateService a
         {
             CotizacionId = cotizacion.Id,
             OrdenTrabajoId = orden?.Id,
-            Cliente = cotizacion.Solicitud.Cliente?.Nombre ?? cotizacion.Cliente,
+            Cliente = string.IsNullOrWhiteSpace(nombreCliente) ? cotizacion.Solicitud.Cliente?.Nombre ?? cotizacion.Cliente : nombreCliente,
+            TipoComprobante = tipoComprobante,
+            DocumentoCliente = documentoCliente,
             FacturaId = 0,
             Fecha = DateTime.Now,
             Monto = cotizacion.MontoTotal,
@@ -66,6 +75,7 @@ public class CobroService(IDbContextFactory<Contexto> factory, AppStateService a
             RegistroEventosSolicitud.Agregar(db, solicitudId, "Abono recibido", $"Se registró un abono de RD$ {abonoInicial:N2}; saldo pendiente RD$ {cotizacion.MontoTotal - abonoInicial:N2}.");
         await db.SaveChangesAsync();
         cobro.FacturaId = 1000 + cobro.Id;
+        cobro.Ncf = $"DEMO-{(tipoComprobante == Venta.CreditoFiscal ? "B01" : "B02")}-{cobro.Id:D4}";
         await db.SaveChangesAsync();
         await CompletarOrdenSiCorrespondeAsync(db, cobro);
         return true;
@@ -187,6 +197,59 @@ public class CobroService(IDbContextFactory<Contexto> factory, AppStateService a
         return true;
     }
 
+    public async Task<int> EliminarVariosAsync(IReadOnlyCollection<int> ids)
+    {
+        if (!appState.EsGerente || ids.Count == 0 || ids.Count != ids.Distinct().Count()) return 0;
+        await using var db = await factory.CreateDbContextAsync();
+        await using var transaccion = await db.Database.BeginTransactionAsync();
+        var cobros = await db.Cobros.Include(c => c.OrdenTrabajo).Where(c => ids.Contains(c.Id)).ToListAsync();
+        var cotizacionIds = cobros.Select(c => c.CotizacionId).Distinct().ToList();
+        var mapaSolicitudes = await db.Cotizaciones.Where(q => cotizacionIds.Contains(q.Id))
+            .Select(q => new { q.Id, q.SolicitudDbId }).ToDictionaryAsync(x => x.Id, x => x.SolicitudDbId);
+        var idsSolicitud = mapaSolicitudes.Values.Where(v => v.HasValue).Select(v => v.GetValueOrDefault()).Distinct().ToList();
+        var solicitudes = await db.Solicitudes.Where(s => idsSolicitud.Contains(s.Id)).ToDictionaryAsync(s => s.Id);
+        var estadoPendiente = await db.EstadosSolicitud.FirstOrDefaultAsync(e => e.Nombre == "Pendiente de cobro");
+
+        var eliminados = 0;
+        foreach (var cobro in cobros)
+        {
+            if (cobro.Estado is not ("Pendiente de cobro" or "Finalizada")) continue;
+
+            var solicitudId = mapaSolicitudes.GetValueOrDefault(cobro.CotizacionId);
+            if (cobro.Estado == "Finalizada" && cobro.OrdenTrabajo is not null)
+            {
+                var solicitud = solicitudId.HasValue ? solicitudes.GetValueOrDefault(solicitudId.GetValueOrDefault()) : null;
+                if (estadoPendiente is not null && solicitud is not null)
+                {
+                    cobro.EstadoOrdenAntesEliminar = cobro.OrdenTrabajo.Estado;
+                    cobro.EstadoSolicitudIdAntesEliminar = solicitud.EstadoSolicitudId;
+                    cobro.FechaFinSolicitudAntesEliminar = solicitud.FechaFin;
+                    cobro.OrdenTrabajo.Estado = "Pendiente de cobro";
+                    solicitud.EstadoSolicitudId = estadoPendiente.Id;
+                    solicitud.FechaFin = null;
+                }
+            }
+            if (solicitudId.HasValue)
+                RegistroEventosSolicitud.Agregar(db, solicitudId.Value, "Cobro eliminado", $"Se eliminó la cuenta de cobro de COT-{cobro.CotizacionId:D5}.");
+            cobro.IsDeleted = true;
+            eliminados++;
+        }
+        await db.SaveChangesAsync();
+        await transaccion.CommitAsync();
+        return eliminados;
+    }
+
+    public async Task<HashSet<int>> ObtenerElegiblesAsync(IEnumerable<int> ids)
+    {
+        var idsCobro = ids.Distinct().ToList();
+        if (!appState.EsGerente || idsCobro.Count == 0) return [];
+        await using var db = await factory.CreateDbContextAsync();
+        var elegibles = await db.Cobros.AsNoTracking()
+            .Where(c => idsCobro.Contains(c.Id) && (c.Estado == "Pendiente de cobro" || c.Estado == "Finalizada"))
+            .Select(c => c.Id).ToListAsync();
+        return elegibles.ToHashSet();
+    }
+
     public async Task<bool> EliminarAsync(int id)
     {
         if (!appState.EsGerente) return false;
@@ -201,6 +264,9 @@ public class CobroService(IDbContextFactory<Contexto> factory, AppStateService a
             var solicitud = solicitudId.HasValue ? await db.Solicitudes.FirstOrDefaultAsync(s => s.Id == solicitudId.Value) : null;
             if (estadoPendiente is not null && solicitud is not null)
             {
+                cobro.EstadoOrdenAntesEliminar = cobro.OrdenTrabajo.Estado;
+                cobro.EstadoSolicitudIdAntesEliminar = solicitud.EstadoSolicitudId;
+                cobro.FechaFinSolicitudAntesEliminar = solicitud.FechaFin;
                 cobro.OrdenTrabajo.Estado = "Pendiente de cobro";
                 solicitud.EstadoSolicitudId = estadoPendiente.Id;
                 solicitud.FechaFin = null;
@@ -208,7 +274,7 @@ public class CobroService(IDbContextFactory<Contexto> factory, AppStateService a
         }
         if (solicitudId.HasValue)
             RegistroEventosSolicitud.Agregar(db, solicitudId.Value, "Cobro eliminado", $"Se eliminó la cuenta de cobro de COT-{cobro.CotizacionId:D5}.");
-        db.Cobros.Remove(cobro);
+        cobro.IsDeleted = true;
         await db.SaveChangesAsync();
         return true;
     }

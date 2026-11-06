@@ -1,9 +1,14 @@
 @page "/historial"
 @inject ElectroGestion.Services.AppStateService AppState
 @inject ElectroGestion.Services.SolicitudService SolicitudService
+@inject ElectroGestion.Services.SolicitudEventoService SolicitudEventoService
 @inject NavigationManager NavManager
 
 <PageTitle>Historial | ElectroGestion</PageTitle>
+<style>
+    .historial-filtros { display:flex; flex-direction:column; gap:16px; padding:18px; border-bottom:1px solid #EFF0F6; }
+    .historial-filtros .resp-search-block { min-width:0; }
+</style>
 
 <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:20px;margin-bottom:24px">
     <div>
@@ -13,7 +18,7 @@
 </div>
 
 <div style="background:#fff;border:1px solid #E3E5EE;border-radius:14px;overflow:hidden">
-    <div style="padding:18px 18px 12px;border-bottom:1px solid #EFF0F6">
+    <div class="historial-filtros">
         <div style="display:flex;align-items:center;gap:20px;white-space:nowrap;overflow-x:auto" class="resp-search-block">
             <div style="display:flex;align-items:center;gap:10px">
                 <span style="font-family:'Manrope';font-weight:800;font-size:15px;color:#14162B">ID:</span>
@@ -31,12 +36,19 @@
                     style="width:150px;padding:9px 12px;border:1px solid #D5D8E6;border-radius:6px;font-size:14px;color:#4A4E63" />
             </div>
             <div style="display:flex;align-items:center;gap:10px">
-                <span style="font-family:'Manrope';font-weight:800;font-size:15px;color:#14162B">Fecha:</span>
-                <select @bind="FiltroFecha" style="width:160px;padding:9px 12px;border:1px solid #D5D8E6;border-radius:6px;font-size:14px;background:#fff;color:#4A4E63">
-                    <option value="Todas las fechas">Todas las fechas</option>
-                    <option value="Últimos 7 días">Últimos 7 días</option>
-                    <option value="Últimos 30 días">Últimos 30 días</option>
-                </select>
+                <span style="font-family:'Manrope';font-weight:800;font-size:15px;color:#14162B">Técnico:</span>
+                <input @bind="SearchTecnico" @bind:event="oninput" placeholder="Técnico asignado"
+                    style="width:170px;padding:9px 12px;border:1px solid #D5D8E6;border-radius:6px;font-size:14px;color:#4A4E63" />
+            </div>
+        </div>
+        <div style="display:flex;align-items:center;gap:20px;flex-wrap:wrap" class="resp-search-block">
+            <div style="display:flex;align-items:center;gap:10px">
+                <span style="font-family:'Manrope';font-weight:800;font-size:15px;color:#14162B">Desde:</span>
+                <input type="date" @bind="SearchDesde" style="width:160px;padding:9px 12px;border:1px solid #D5D8E6;border-radius:6px;font-size:14px;background:#fff;color:#4A4E63" />
+            </div>
+            <div style="display:flex;align-items:center;gap:10px">
+                <span style="font-family:'Manrope';font-weight:800;font-size:15px;color:#14162B">Hasta:</span>
+                <input type="date" @bind="SearchHasta" style="width:160px;padding:9px 12px;border:1px solid #D5D8E6;border-radius:6px;font-size:14px;background:#fff;color:#4A4E63" />
             </div>
             <div style="display:flex;justify-content:flex-end;flex:1;min-width:90px">
                 <button class="primary-btn" @onclick="Filtrar"
@@ -122,16 +134,24 @@
     private string SearchId = "";
     private string SearchCliente = "";
     private string SearchTipo = "";
-    private string FiltroFecha = "Todas las fechas";
+    private string SearchTecnico = "";
+    private DateTime? SearchDesde;
+    private DateTime? SearchHasta;
+    private (string Id, string Cliente, string Tipo, string Tecnico, DateTime? Desde, DateTime? Hasta) FiltrosAplicados = ("", "", "", "", null, null);
     
     private bool IsModalOpen = false;
     private ElectroGestion.Models.Solicitud? SelectedHistorial;
     private List<ElectroGestion.Models.Solicitud> SolicitudesHistoricas = [];
+    private Dictionary<int, DateTime> UltimasActividades = [];
 
     protected override async Task OnInitializedAsync()
     {
-        try { SolicitudesHistoricas = await SolicitudService.GetList(s => s.EstadoSolicitud != null && s.EstadoSolicitud.Nombre == "Finalizada"); }
-        catch { SolicitudesHistoricas = []; }
+        try
+        {
+            SolicitudesHistoricas = await SolicitudService.GetList(s => s.EstadoSolicitud != null && s.EstadoSolicitud.Nombre == "Finalizada");
+            UltimasActividades = await SolicitudEventoService.ObtenerUltimasFechasActividadAsync(SolicitudesHistoricas.Select(s => s.Id));
+        }
+        catch { SolicitudesHistoricas = []; UltimasActividades = []; }
     }
 
     private void AbrirDetalle(ElectroGestion.Models.Solicitud s)
@@ -150,6 +170,7 @@
 
     private void Filtrar()
     {
+        FiltrosAplicados = (SearchId.Trim(), SearchCliente.Trim(), SearchTipo.Trim(), SearchTecnico.Trim(), SearchDesde, SearchHasta);
         StateHasChanged();
     }
 
@@ -157,33 +178,31 @@
     {
         get
         {
+            var filtros = FiltrosAplicados;
             var res = SolicitudesHistoricas.AsEnumerable();
 
-            if (!string.IsNullOrWhiteSpace(SearchId))
+            if (!string.IsNullOrWhiteSpace(filtros.Id))
             {
-                res = res.Where(x => x.Id.ToString().Contains(SearchId));
+                res = res.Where(x => x.Id.ToString().Contains(filtros.Id));
             }
-            if (!string.IsNullOrWhiteSpace(SearchCliente))
+            if (!string.IsNullOrWhiteSpace(filtros.Cliente))
             {
-                res = res.Where(x => x.Cliente != null && x.Cliente.Nombre.Contains(SearchCliente, StringComparison.OrdinalIgnoreCase));
+                res = res.Where(x => x.Cliente != null && x.Cliente.Nombre.Contains(filtros.Cliente, StringComparison.OrdinalIgnoreCase));
             }
-            if (!string.IsNullOrWhiteSpace(SearchTipo))
+            if (!string.IsNullOrWhiteSpace(filtros.Tipo))
             {
-                res = res.Where(x => x.Servicio != null && x.Servicio.Nombre.Contains(SearchTipo, StringComparison.OrdinalIgnoreCase));
+                res = res.Where(x => x.Servicio != null && x.Servicio.Nombre.Contains(filtros.Tipo, StringComparison.OrdinalIgnoreCase));
             }
+            if (!string.IsNullOrWhiteSpace(filtros.Tecnico))
+                res = res.Where(x => (x.TecnicoAsignado ?? "").Contains(filtros.Tecnico, StringComparison.OrdinalIgnoreCase));
+            if (filtros.Desde.HasValue)
+                res = res.Where(x => (x.FechaFin ?? x.FechaSolicitud).Date >= filtros.Desde.Value.Date);
+            if (filtros.Hasta.HasValue)
+                res = res.Where(x => (x.FechaFin ?? x.FechaSolicitud).Date <= filtros.Hasta.Value.Date);
 
-            if (FiltroFecha == "Últimos 7 días")
-            {
-                var lim = DateTime.Today.AddDays(-7);
-                res = res.Where(x => (x.FechaFin ?? x.FechaSolicitud) >= lim);
-            }
-            else if (FiltroFecha == "Últimos 30 días")
-            {
-                var lim = DateTime.Today.AddDays(-30);
-                res = res.Where(x => (x.FechaFin ?? x.FechaSolicitud) >= lim);
-            }
-
-            return res;
+            return res
+                .OrderByDescending(s => UltimasActividades.TryGetValue(s.Id, out var actividad) ? actividad : s.FechaFin ?? s.FechaSolicitud)
+                .ThenByDescending(s => s.Id);
         }
     }
 }

@@ -30,15 +30,19 @@
         <div class="cotizacion-imprimible cotizacion-documento" style="background:#fff;border-radius:14px;width:100%;max-width:820px;padding:32px;max-height:92vh;overflow:auto;box-shadow:0 20px 40px rgba(0,0,0,.2)" @onclick:stopPropagation>
             <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:20px;border-bottom:1px solid #777;padding-bottom:14px">
                 <img src="/images/electrogestion-logo.png" alt="ElectroGestión" style="width:260px;height:auto;object-fit:contain;object-position:left center" />
-                <div style="text-align:right"><div style="font-size:20px;font-weight:700">@(EsFactura ? "Factura" : "Cotización")</div><div style="font-size:14px;margin-top:4px">N.º @(EsFactura ? NumeroFactura.ToString() : $"COT-{cot.Id:D5}")</div><div style="font-size:13px;color:#555">Fecha: @FechaDocumentoEfectiva.ToString("dd/MM/yyyy HH:mm")</div>@if (EsFactura) { <div style="font-size:13px;color:#555">Método de pago: @MetodoPago</div> }</div>
+                <div style="text-align:right"><div style="font-size:20px;font-weight:700">@(EsFactura ? (TipoComprobante == ElectroGestion.Models.Venta.CreditoFiscal ? "Factura de Crédito Fiscal" : "Factura de consumo") : "Cotización")</div><div style="font-size:14px;margin-top:4px">N.º @(EsFactura ? NumeroFactura.ToString() : $"COT-{cot.Id:D5}")</div><div style="font-size:13px;color:#555">Fecha: @FechaDocumentoEfectiva.ToString("dd/MM/yyyy HH:mm")</div>@if (EsFactura) { <div style="font-size:13px;color:#555">NCF: @NcfEfectivo</div><div style="font-size:13px;color:#555">Método de pago: @MetodoPago</div> }</div>
             </div>
             <div class="documento-fila cotizacion-datos" style="display:grid;grid-template-columns:1fr 1fr;gap:18px;margin:22px 0">
                 <section style="padding:4px 0;border-bottom:1px solid #ddd"><div style="font-size:11px;font-weight:700;letter-spacing:.5px;color:#555;margin-bottom:6px">CLIENTE</div>
-                    <div style="font-weight:700;font-size:16px">@(cot.Solicitud?.Cliente?.Nombre ?? cot.Cliente)</div>
-                    @if (!string.IsNullOrWhiteSpace(cot.Solicitud?.Cliente?.Rnc)) { <div>RNC/Cédula: @cot.Solicitud.Cliente.Rnc</div> }
-                    @if (!string.IsNullOrWhiteSpace(cot.Solicitud?.Cliente?.Correo)) { <div>Correo: @cot.Solicitud.Cliente.Correo</div> }
-                    @if (!string.IsNullOrWhiteSpace(cot.Solicitud?.Cliente?.Telefono)) { <div>Teléfono: @cot.Solicitud.Cliente.Telefono</div> }
-                    @if (!string.IsNullOrWhiteSpace(cot.Solicitud?.Cliente?.Direccion)) { <div>Dirección: @cot.Solicitud.Cliente.Direccion</div> }
+                    <div style="font-weight:700;font-size:16px">@(EsFactura ? (TipoComprobante == ElectroGestion.Models.Venta.Consumo ? "Consumidor final" : !string.IsNullOrWhiteSpace(NombreCliente) ? NombreCliente : cot.Solicitud?.Cliente?.Nombre ?? cot.Cliente) : cot.Solicitud?.Cliente?.Nombre ?? cot.Cliente)</div>
+                    @if (EsFactura)
+                    {
+                        @if (TipoComprobante == ElectroGestion.Models.Venta.CreditoFiscal && !string.IsNullOrWhiteSpace(DocumentoCliente)) { <div>RNC/Cédula: @DocumentoCliente</div> }
+                    }
+                    else if (!string.IsNullOrWhiteSpace(cot.Solicitud?.Cliente?.Rnc)) { <div>RNC/Cédula: @cot.Solicitud.Cliente.Rnc</div> }
+                    @if ((!EsFactura || TipoComprobante == ElectroGestion.Models.Venta.CreditoFiscal) && !string.IsNullOrWhiteSpace(cot.Solicitud?.Cliente?.Correo)) { <div>Correo: @cot.Solicitud.Cliente.Correo</div> }
+                    @if ((!EsFactura || TipoComprobante == ElectroGestion.Models.Venta.CreditoFiscal) && !string.IsNullOrWhiteSpace(cot.Solicitud?.Cliente?.Telefono)) { <div>Teléfono: @cot.Solicitud.Cliente.Telefono</div> }
+                    @if ((!EsFactura || TipoComprobante == ElectroGestion.Models.Venta.CreditoFiscal) && !string.IsNullOrWhiteSpace(cot.Solicitud?.Cliente?.Direccion)) { <div>Dirección: @cot.Solicitud.Cliente.Direccion</div> }
                 </section>
                 <section style="padding:4px 0;border-bottom:1px solid #ddd"><div style="font-size:11px;font-weight:700;letter-spacing:.5px;color:#555;margin-bottom:6px">SERVICIO</div>
                     <div><b>Solicitud:</b> @cot.SolicitudId</div><div><b>Servicio:</b> @(cot.Solicitud?.Servicio?.Nombre ?? "—")</div>
@@ -78,7 +82,12 @@
     [Parameter] public bool EsFactura { get; set; }
     [Parameter] public int NumeroFactura { get; set; }
     [Parameter] public string MetodoPago { get; set; } = "";
+    [Parameter] public string TipoComprobante { get; set; } = ElectroGestion.Models.Venta.Consumo;
+    [Parameter] public string? Ncf { get; set; }
+    [Parameter] public string NombreCliente { get; set; } = "";
+    [Parameter] public string DocumentoCliente { get; set; } = "";
     [Parameter] public DateTime? FechaDocumento { get; set; }
     private DateTime FechaDocumentoEfectiva => FechaDocumento ?? Cotizacion?.Fecha ?? DateTime.Now;
+    private string NcfEfectivo => string.IsNullOrWhiteSpace(Ncf) ? $"DEMO-{(TipoComprobante == ElectroGestion.Models.Venta.CreditoFiscal ? "B01" : "B02")}-{Math.Max(1, NumeroFactura - 1000):D4}" : Ncf;
     private async Task Imprimir() => await JS.InvokeVoidAsync("window.print");
 }

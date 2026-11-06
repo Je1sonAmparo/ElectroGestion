@@ -6,6 +6,7 @@ namespace ElectroGestion.Models;
 public class OrdenTrabajo
 {
     public int Id { get; set; }
+    public bool IsDeleted { get; set; }
     public int SolicitudId { get; set; }
     public int CotizacionId { get; set; }
     public Cotizacion? Cotizacion { get; set; }

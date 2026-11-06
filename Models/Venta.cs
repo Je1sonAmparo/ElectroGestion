@@ -11,6 +11,7 @@ public class Venta
     public const string Anulada = "Anulada";
 
     public int Id { get; set; }
+    public bool IsDeleted { get; set; }
     public int ArticuloInventarioId { get; set; }
     public int? ClienteId { get; set; }
     [MaxLength(40)] public string CodigoArticulo { get; set; } = "";

@@ -32,6 +32,7 @@ public class Contexto : DbContext
 
         modelBuilder.Entity<Venta>(entity =>
         {
+            entity.HasQueryFilter(v => !v.IsDeleted);
             entity.Property(v => v.PrecioUnitario).HasPrecision(18, 2);
             entity.Property(v => v.TasaItbis).HasPrecision(5, 2);
             entity.HasIndex(v => v.Ncf).IsUnique();
@@ -44,6 +45,7 @@ public class Contexto : DbContext
 
         modelBuilder.Entity<DetalleVenta>(entity =>
         {
+            entity.HasQueryFilter(d => d.Venta != null && !d.Venta.IsDeleted);
             entity.Property(d => d.PrecioUnitario).HasPrecision(18, 2);
             entity.Ignore(d => d.Subtotal);
             entity.HasOne<ArticuloInventario>().WithMany().HasForeignKey(d => d.ArticuloInventarioId)
@@ -52,6 +54,7 @@ public class Contexto : DbContext
 
         modelBuilder.Entity<ArticuloInventario>(entity =>
         {
+            entity.HasQueryFilter(a => !a.IsDeleted);
             entity.Ignore(a => a.Estado);
             entity.Property(a => a.PrecioUnidad).HasPrecision(18, 2);
             entity.HasIndex(a => a.Codigo).IsUnique();
@@ -62,6 +65,7 @@ public class Contexto : DbContext
 
         modelBuilder.Entity<Cliente>(entity =>
         {
+            entity.HasQueryFilter(c => !c.IsDeleted);
             entity.HasMany(c => c.Telefonos)
                 .WithOne(t => t.Cliente)
                 .HasForeignKey(t => t.ClienteId)
@@ -75,6 +79,7 @@ public class Contexto : DbContext
 
         modelBuilder.Entity<Servicio>(entity =>
         {
+            entity.HasQueryFilter(s => !s.IsDeleted);
             entity.HasMany(s => s.Solicitudes)
                 .WithOne(sol => sol.Servicio)
                 .HasForeignKey(sol => sol.ServicioId)
@@ -107,6 +112,7 @@ public class Contexto : DbContext
 
         modelBuilder.Entity<Cotizacion>(entity =>
         {
+            entity.HasQueryFilter(c => !c.IsDeleted);
             entity.Property(c => c.Cliente).HasMaxLength(200).IsRequired();
             entity.Property(c => c.SolicitudId).HasMaxLength(50).IsRequired();
             entity.Property(c => c.Estado).HasMaxLength(40).IsRequired();
@@ -123,6 +129,7 @@ public class Contexto : DbContext
 
         modelBuilder.Entity<DetalleCotizacion>(entity =>
         {
+            entity.HasQueryFilter(d => d.Cotizacion != null && !d.Cotizacion.IsDeleted);
             entity.Property(d => d.CodigoArticulo).HasMaxLength(40).IsRequired();
             entity.Property(d => d.NombreArticulo).HasMaxLength(200).IsRequired();
             entity.Property(d => d.PrecioUnitario).HasPrecision(18, 2);
@@ -135,6 +142,7 @@ public class Contexto : DbContext
 
         modelBuilder.Entity<OrdenTrabajo>(entity =>
         {
+            entity.HasQueryFilter(o => !o.IsDeleted);
             entity.Property(o => o.Code).HasMaxLength(20).IsRequired();
             entity.Property(o => o.Cliente).HasMaxLength(200).IsRequired();
             entity.Property(o => o.TipoServicio).HasMaxLength(200).IsRequired();
@@ -150,9 +158,11 @@ public class Contexto : DbContext
 
         modelBuilder.Entity<Cobro>(entity =>
         {
+            entity.HasQueryFilter(c => !c.IsDeleted);
             entity.Property(c => c.Cliente).HasMaxLength(200).IsRequired();
             entity.Property(c => c.MetodoPago).HasMaxLength(40).IsRequired();
             entity.Property(c => c.Estado).HasMaxLength(20).IsRequired();
+            entity.Property(c => c.EstadoOrdenAntesEliminar).HasMaxLength(30);
             entity.Property(c => c.Monto).HasPrecision(18, 2);
             entity.HasIndex(c => c.CotizacionId).IsUnique();
             entity.HasIndex(c => c.OrdenTrabajoId);
@@ -162,11 +172,15 @@ public class Contexto : DbContext
 
         modelBuilder.Entity<AbonoCobro>(entity =>
         {
+            entity.HasQueryFilter(a => a.Cobro != null && !a.Cobro.IsDeleted);
             entity.Property(a => a.Monto).HasPrecision(18, 2);
             entity.Property(a => a.MetodoPago).HasMaxLength(40).IsRequired();
             entity.HasIndex(a => new { a.CobroId, a.Fecha });
             entity.HasOne(a => a.Cobro).WithMany(c => c.Abonos).HasForeignKey(a => a.CobroId).OnDelete(DeleteBehavior.Cascade);
         });
+
+        modelBuilder.Entity<ClienteTelefono>()
+            .HasQueryFilter(t => t.Cliente != null && !t.Cliente.IsDeleted);
 
         modelBuilder.Entity<SolicitudEvento>(entity =>
         {

@@ -50,6 +50,7 @@ builder.Services.AddScoped<AutenticacionService>();
 builder.Services.AddScoped<IPasswordHasher<Usuario>, PasswordHasher<Usuario>>();
 builder.Services.AddScoped<ClienteService>();
 builder.Services.AddScoped<ServicioService>();
+builder.Services.AddScoped<RecuperacionService>();
 builder.Services.AddScoped<InventarioService>();
 builder.Services.AddScoped<VentaService>();
 builder.Services.AddScoped<SolicitudService>();
@@ -61,6 +62,7 @@ builder.Services.AddScoped<OrdenTrabajoService>();
 builder.Services.AddScoped<CobroService>();
 builder.Services.AddScoped<InicioDashboardService>();
 builder.Services.AddScoped<ReporteConsumoService>();
+builder.Services.AddScoped<DemoDataSeeder>();
 
 builder.Services.AddBlazorBootstrap();
 
@@ -76,6 +78,15 @@ if (args.Contains("--test-crud"))
     var visService = scope.ServiceProvider.GetRequiredService<VisitaService>();
     var exito = await CrudTester.RunAsync(cliService, srvService, solService, visService);
     Environment.Exit(exito ? 0 : 1);
+    return;
+}
+
+if (args.Contains("--seed-demo-data"))
+{
+    using var scope = app.Services.CreateScope();
+    var seeder = scope.ServiceProvider.GetRequiredService<DemoDataSeeder>();
+    var resultado = await seeder.ReemplazarDatosOperativosAsync();
+    Console.WriteLine($"Carga de demostración terminada: {resultado.Solicitudes} solicitudes, {resultado.Cotizaciones} cotizaciones, {resultado.Ordenes} órdenes, {resultado.Cobros} cobros, {resultado.Ventas} ventas y {resultado.Productos} productos.");
     return;
 }
 

@@ -28,16 +28,17 @@
                     <option value="Semanal">Semanal</option>
                     <option value="Mensual">Mensual</option>
                 </select>
-                <input type="search" value="@SolicitudIdFiltro" @oninput="OnSolicitudIdFiltroChanged"
+                <input type="search" @bind="SolicitudIdBusqueda"
                        aria-label="Filtrar agenda por ID de solicitud" placeholder="ID de solicitud"
                        style="width:145px;padding:9px 12px;border:1px solid #D5D8E6;border-radius:9px;font-size:13.5px" />
-                <select value="@TecnicoFiltroId" @onchange="OnTecnicoFiltroChanged" aria-label="Filtrar agenda por técnico" style="padding:9px 14px;border:1px solid #D5D8E6;border-radius:9px;font-weight:700;font-size:13.5px;background:#fff;color:#14162B;cursor:pointer">
+                <select @bind="TecnicoFiltroBusqueda" aria-label="Filtrar agenda por técnico" style="padding:9px 14px;border:1px solid #D5D8E6;border-radius:9px;font-weight:700;font-size:13.5px;background:#fff;color:#14162B;cursor:pointer">
                     <option value="">Todos los técnicos</option>
                     @foreach (var tecnico in tecnicos)
                     {
                         <option value="@tecnico.Id">@tecnico.Nombre</option>
                     }
                 </select>
+                <button @onclick="AplicarFiltrosAgenda" style="padding:9px 16px;border:0;border-radius:8px;background:#1D4ED8;color:#fff;font-weight:700;cursor:pointer">Buscar</button>
             </div>
             <div style="display:flex;align-items:center;gap:8px;color:#6B7085;font-size:13.5px">
                 <button @onclick="() => CambiarPeriodo(-1)"
@@ -451,6 +452,24 @@
     </div>
 }
 @code {
+    [SupplyParameterFromQuery(Name = "nueva")]
+    public bool AbrirNuevaVisita { get; set; }
+
+    private bool VisitaRapidaAbierta;
+
+    protected override async Task OnParametersSetAsync()
+    {
+        if (!AbrirNuevaVisita)
+        {
+            VisitaRapidaAbierta = false;
+            return;
+        }
+
+        if (VisitaRapidaAbierta) return;
+        VisitaRapidaAbierta = true;
+        await OpenNuevaVisitaModal();
+    }
+
     private string VistaActual = "Hoy";
     private string AgendaRango = "";
     private DateTime FechaCalendario = DateTime.Today;
@@ -465,6 +484,8 @@
     private int? FormTecnicoId;
     private int? TecnicoFiltroId;
     private string SolicitudIdFiltro = "";
+    private int? TecnicoFiltroBusqueda;
+    private string SolicitudIdBusqueda = "";
     private DateTime FormFecha = DateTime.Today;
     private TimeOnly? FormHora;
     private TimeOnly? FormHoraFin;
@@ -616,19 +637,11 @@
         return siguiente;
     }
 
-    private async Task OnTecnicoFiltroChanged(ChangeEventArgs e)
+    private void AplicarFiltrosAgenda()
     {
-        TecnicoFiltroId = int.TryParse(e.Value?.ToString(), out var tecnicoId)
-            ? tecnicoId
-            : null;
-        await UpdateData();
-    }
-
-    private Task OnSolicitudIdFiltroChanged(ChangeEventArgs e)
-    {
-        SolicitudIdFiltro = e.Value?.ToString() ?? "";
+        TecnicoFiltroId = TecnicoFiltroBusqueda;
+        SolicitudIdFiltro = SolicitudIdBusqueda.Trim();
         ConstruirAgenda();
-        return Task.CompletedTask;
     }
 
     private async Task UpdateData()

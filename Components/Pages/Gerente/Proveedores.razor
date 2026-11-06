@@ -9,15 +9,42 @@
         <div class="page-title" style="font-family:'Manrope';font-weight:800;font-size:31px;letter-spacing:-.6px">Proveedores</div>
         <div style="color:#6B7085;font-size:14.5px;margin-top:5px">Gestión de proveedores y suplidores.</div>
     </div>
-    <button class="primary-btn" @onclick="() => AbrirModal()"
-        style="padding:11px 20px;background:#1D4ED8;color:#fff;border:0;border-radius:9px;font-weight:700;font-size:14.5px;cursor:pointer;font-family:'Manrope';display:flex;align-items:center;gap:8px;box-shadow:0 4px 12px rgba(29,78,216,0.25)">
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-            <line x1="12" y1="5" x2="12" y2="19"></line>
-            <line x1="5" y1="12" x2="19" y2="12"></line>
-        </svg>
-        Nuevo Proveedor
-    </button>
+    <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;justify-content:flex-end">
+        <button @onclick="AlternarModoSeleccion" title="Seleccionar varios proveedores para eliminar"
+            style="padding:10px 16px 10px 14px;background:#fff;border:1px solid @(ModoSeleccion ? "#B42318" : "#D5D8E6");color:@(ModoSeleccion ? "#B42318" : "#4A4E63");border-radius:8px;font-weight:700;font-size:14px;cursor:pointer;font-family:'Manrope';white-space:nowrap;display:flex;align-items:center;gap:8px;transition:all .15s">
+            <svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="4"/><path d="m8.5 12.5 2.5 2.5 5-5.5"/></svg>
+            <span>@(ModoSeleccion ? "Salir de selección" : "Seleccionar")</span>
+        </button>
+        <button class="primary-btn" @onclick="() => AbrirModal()"
+            style="padding:11px 20px;background:#1D4ED8;color:#fff;border:0;border-radius:9px;font-weight:700;font-size:14.5px;cursor:pointer;font-family:'Manrope';display:flex;align-items:center;gap:8px;box-shadow:0 4px 12px rgba(29,78,216,0.25)">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                <line x1="12" y1="5" x2="12" y2="19"></line>
+                <line x1="5" y1="12" x2="19" y2="12"></line>
+            </svg>
+            Nuevo Proveedor
+        </button>
+    </div>
 </div>
+
+@if (ModoSeleccion)
+{
+    <div style="padding:10px 18px;display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:12px;background:#EFF6FF;border:1px solid #B6C8F5;border-radius:10px;margin-bottom:18px">
+        <div style="display:flex;align-items:center;gap:9px;font-size:13.5px;color:#1D4ED8;font-weight:700;flex-wrap:wrap">
+            <svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="4"/><path d="m8.5 12.5 2.5 2.5 5-5.5"/></svg>
+            <span>@(Seleccionadas.Count == 1 ? "1 proveedor seleccionado" : $"{Seleccionadas.Count} proveedores seleccionados")</span>
+            <span style="color:#6B7085;font-weight:500">· Haz clic en una fila para marcarla o desmarcarla</span>
+        </div>
+        <div style="display:flex;align-items:center;gap:10px">
+            <button @onclick="AlternarTodas" style="padding:8px 14px;border:1px solid #B6C8F5;background:#fff;color:#1D4ED8;border-radius:8px;font-weight:700;font-size:13px;cursor:pointer;font-family:'Manrope'">
+                @(TodasMarcadas ? "Desmarcar todas" : "Marcar todas")
+            </button>
+            <button disabled="@(Seleccionadas.Count == 0)" @onclick="ConfirmarSeleccionadas" style="padding:8px 16px;border:0;background:@(Seleccionadas.Count == 0 ? "#F1A4A7" : "#C0392B");color:#fff;border-radius:8px;font-weight:700;font-size:13px;cursor:pointer;font-family:'Manrope';display:flex;align-items:center;gap:7px">
+                <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 6h18M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2M10 11v6M14 11v6"/></svg>
+                <span>Eliminar @(Seleccionadas.Count == 1 ? "(1)" : $"({Seleccionadas.Count})")</span>
+            </button>
+        </div>
+    </div>
+}
 
 <div style="background:#fff;border:1px solid #E3E5EE;border-radius:12px;overflow:hidden">
     <div style="display:flex;flex-direction:column;gap:18px;padding:18px 18px 12px;border-bottom:1px solid #EFF0F6">
@@ -42,6 +69,16 @@
                 <input @bind="SearchTelefono" @bind:event="oninput" placeholder="Teléfono"
                     style="width:160px;padding:9px 12px;border:1px solid #D5D8E6;border-radius:6px;font-size:14px;color:#4A4E63" />
             </div>
+            <div style="display:flex;align-items:center;gap:10px">
+                <span style="font-family:'Manrope';font-weight:800;font-size:15px;color:#14162B">Correo:</span>
+                <input @bind="SearchCorreo" @bind:event="oninput" placeholder="Correo electrónico"
+                    style="width:190px;padding:9px 12px;border:1px solid #D5D8E6;border-radius:6px;font-size:14px;color:#4A4E63" />
+            </div>
+            <div style="display:flex;align-items:center;gap:10px">
+                <span style="font-family:'Manrope';font-weight:800;font-size:15px;color:#14162B">Dirección:</span>
+                <input @bind="SearchDireccion" @bind:event="oninput" placeholder="Dirección"
+                    style="width:200px;padding:9px 12px;border:1px solid #D5D8E6;border-radius:6px;font-size:14px;color:#4A4E63" />
+            </div>
             <div style="display:flex;justify-content:flex-end;margin-left:auto">
                 <button class="primary-btn" @onclick="Filtrar"
                     style="padding:9px 16px;background:#1D4ED8;color:#fff;border:0;border-radius:6px;font-weight:700;font-size:14px;cursor:pointer;font-family:'Manrope'">Buscar</button>
@@ -53,7 +90,15 @@
         <table style="width:100%;border-collapse:collapse;font-size:14px">
             <thead style="background:#F8F9FC;border-bottom:1px solid #E3E5EE">
                 <tr>
-                    <th style="padding:14px 18px;text-align:left;color:#4A4E63;font-weight:700">ID</th>
+                    <th style="padding:14px 18px;text-align:left;color:#4A4E63;font-weight:700">
+                        <div style="display:inline-flex;align-items:center;gap:6px">
+                            @if (ModoSeleccion)
+                            {
+                                <input type="checkbox" aria-label="Seleccionar todos los proveedores visibles" checked="@TodasMarcadas" @onchange="e => SeleccionarTodas((bool)(e.Value ?? false))" @onclick:stopPropagation />
+                            }
+                            <span>ID</span>
+                        </div>
+                    </th>
                     <th style="padding:14px 18px;text-align:left;color:#4A4E63;font-weight:700">Nombre</th>
                     <th style="padding:14px 18px;text-align:left;color:#4A4E63;font-weight:700">RNC</th>
                     <th style="padding:14px 18px;text-align:left;color:#4A4E63;font-weight:700">Correo</th>
@@ -72,18 +117,24 @@
                 {
                     @foreach (var prov in FilteredProveedores)
                     {
-                        <tr style="border-bottom:1px solid #EFF0F6;background:#fff">
-                            <td style="padding:14px 18px;color:#14162B;font-weight:600">@prov.Id</td>
+                        <tr @onclick="@(() => FilaClicked(prov.Id))" style="border-bottom:1px solid #EFF0F6;transition:background 0.15s;background:@(ModoSeleccion && Seleccionadas.Contains(prov.Id) ? "#EFF6FF" : "#fff");cursor:@(ModoSeleccion ? "pointer" : "default")">
+                            <td style="padding:14px 18px;color:#14162B;font-weight:600">
+                                @if (ModoSeleccion)
+                                {
+                                    <input type="checkbox" aria-label="Seleccionar proveedor @prov.Id" checked="@Seleccionadas.Contains(prov.Id)" @onchange="e => CambiarSeleccion(prov.Id, (bool)(e.Value ?? false))" @onclick:stopPropagation style="margin-right:8px" />
+                                }
+                                @prov.Id
+                            </td>
                             <td style="padding:14px 18px;color:#4A4E63">@prov.Nombre</td>
                             <td style="padding:14px 18px;color:#4A4E63">@prov.Rnc</td>
                             <td style="padding:14px 18px;color:#4A4E63">@prov.Correo</td>
                             <td style="padding:14px 18px;color:#4A4E63">@prov.Telefono</td>
                             <td style="padding:14px 18px;text-align:center">
                                 <div style="display:flex;gap:8px;justify-content:center">
-                                    <button @onclick="() => VerDetalle(prov.Id)" title="Ver detalle" aria-label="Ver detalle" class="table-action-icon" style="width:30px;height:30px;border:1px solid #D5D8E6;background:#fff;border-radius:7px;cursor:pointer;color:#5F6479;display:flex;align-items:center;justify-content:center;padding:0">
+                                    <button @onclick="() => VerDetalle(prov.Id)" @onclick:stopPropagation title="Ver detalle" aria-label="Ver detalle" class="table-action-icon" style="width:30px;height:30px;border:1px solid #D5D8E6;background:#fff;border-radius:7px;cursor:pointer;color:#5F6479;display:flex;align-items:center;justify-content:center;padding:0">
                                         <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2 12s3.5-6 10-6 10 6 10 6-3.5 6-10 6S2 12 2 12Z"/><circle cx="12" cy="12" r="3"/></svg>
                                     </button>
-                                    <button @onclick="() => AbrirModal(prov.Id)" title="Editar" aria-label="Editar" class="table-action-icon" style="width:30px;height:30px;border:1px solid #D5D8E6;background:#fff;border-radius:7px;cursor:pointer;color:#5F6479;display:flex;align-items:center;justify-content:center;padding:0">
+                                    <button @onclick="() => AbrirModal(prov.Id)" @onclick:stopPropagation title="Editar" aria-label="Editar" class="table-action-icon" style="width:30px;height:30px;border:1px solid #D5D8E6;background:#fff;border-radius:7px;cursor:pointer;color:#5F6479;display:flex;align-items:center;justify-content:center;padding:0">
                                         <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 1 1 3 3L7 19l-4 1 1-4 12.5-12.5Z"/></svg>
                                     </button>
                                 </div>
@@ -165,14 +216,106 @@
     </div>
 }
 
+@if (IsDeleteModalOpen)
+{
+    <div style="position:fixed;inset:0;background:rgba(14,16,40,0.5);display:flex;align-items:center;justify-content:center;z-index:10001;padding:20px">
+        <div style="background:#fff;border-radius:14px;width:100%;max-width:430px;padding:30px;box-shadow:0 20px 40px rgba(0,0,0,0.2);animation:tin 0.2s ease-out">
+            <div style="font-family:'Manrope';font-weight:800;font-size:23px;color:#14162B;margin-bottom:12px">Eliminar @(DeleteIds.Count == 1 ? "proveedor" : "proveedores")</div>
+            <div style="color:#4A4E63;font-size:14.5px;line-height:1.55">¿Está seguro que desea eliminar @(DeleteIds.Count == 1 ? "este proveedor" : $"estos {DeleteIds.Count} proveedores")? Esta acción no se puede deshacer.</div>
+            @if (DeleteIds.Count > 1)
+            {
+                <div style="background:#F9FAFB;border:1px solid #EFF0F6;border-radius:10px;max-height:200px;overflow:auto;margin-top:16px" class="resp-lista-eliminar">
+                    @foreach (var prov in ProvAEliminar)
+                    {
+                        <div style="display:flex;align-items:center;gap:12px;padding:9px 14px;border-bottom:1px solid #EFF0F6">
+                            <span style="font-family:ui-monospace,'SFMono-Regular',Consolas,monospace;font-size:12.5px;font-weight:700;letter-spacing:.05em;color:#C0392B;background:#FDECEC;border-radius:6px;padding:2px 8px;flex-shrink:0">@prov.Id</span>
+                            <div style="min-width:0">
+                                <div style="font-size:13.5px;font-weight:700;color:#14162B;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">@prov.Nombre</div>
+                                <div style="font-size:12px;color:#6B7085;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">@(string.IsNullOrWhiteSpace(prov.Rnc) ? prov.Correo : prov.Rnc)</div>
+                            </div>
+                        </div>
+                    }
+                </div>
+            }
+            <div style="display:flex;justify-content:flex-end;gap:12px;margin-top:28px">
+                <button @onclick="CerrarEliminar" style="padding:11px 24px;border:1px solid #E3E5EE;background:#fff;border-radius:10px;font-weight:600;font-size:15px;cursor:pointer;color:#14162B;font-family:'Manrope'">
+                    Cancelar
+                </button>
+                <button @onclick="EjecutarEliminar" style="padding:11px 26px;border:0;background:#C0392B;color:#fff;border-radius:10px;font-weight:700;font-size:15px;cursor:pointer;font-family:'Manrope'">
+                    Eliminar
+                </button>
+            </div>
+        </div>
+    </div>
+}
+
 @code {
     private string SearchId = "";
     private string SearchNombre = "";
     private string SearchRnc = "";
     private string SearchTelefono = "";
+    private string SearchCorreo = "";
+    private string SearchDireccion = "";
+    private (string Id, string Nombre, string Rnc, string Telefono, string Correo, string Direccion) FiltrosAplicados = ("", "", "", "", "", "");
+
+    // Modo selección + eliminación múltiple (en memoria: AppState.Proveedores)
+    private bool ModoSeleccion;
+    private HashSet<int> Seleccionadas = [];
+    private HashSet<int> DeleteIds = [];
+    private bool IsDeleteModalOpen;
+    private List<int> ElegiblesVisibles => FilteredProveedores.Where(p => PuedeEliminarProveedor(p.Id)).Select(p => p.Id).ToList();
+    private bool TodasMarcadas => ElegiblesVisibles.Count > 0 && ElegiblesVisibles.All(id => Seleccionadas.Contains(id));
+    private List<Proveedor> ProvAEliminar => DeleteIds
+        .Select(id => AppState.Proveedores.FirstOrDefault(p => p.Id == id))
+        .Where(p => p != null)
+        .Cast<Proveedor>()
+        .ToList();
+
+    private bool PuedeEliminarProveedor(int id) => AppState.Proveedores.Any(p => p.Id == id);
+
+    private void AlternarModoSeleccion()
+    {
+        ModoSeleccion = !ModoSeleccion;
+        if (!ModoSeleccion) Seleccionadas.Clear();
+    }
+
+    private void FilaClicked(int id)
+    {
+        if (!ModoSeleccion) return;
+        if (!PuedeEliminarProveedor(id)) return;
+        CambiarSeleccion(id, !Seleccionadas.Contains(id));
+    }
+
+    private void CambiarSeleccion(int id, bool marcado) { if (marcado && PuedeEliminarProveedor(id)) Seleccionadas.Add(id); else Seleccionadas.Remove(id); }
+    private void SeleccionarTodas(bool marcado) { foreach (var id in ElegiblesVisibles) { if (marcado) Seleccionadas.Add(id); else Seleccionadas.Remove(id); } }
+    private void AlternarTodas() => SeleccionarTodas(!TodasMarcadas);
+    private void ConfirmarSeleccionadas() { DeleteIds = Seleccionadas.Where(PuedeEliminarProveedor).ToHashSet(); IsDeleteModalOpen = DeleteIds.Count > 0; }
+
+    private void CerrarEliminar()
+    {
+        IsDeleteModalOpen = false;
+        DeleteIds.Clear();
+    }
+
+    private void EjecutarEliminar()
+    {
+        if (DeleteIds.Count > 0)
+        {
+            var eliminados = DeleteIds.Count;
+            AppState.Proveedores = AppState.Proveedores.Where(p => !DeleteIds.Contains(p.Id)).ToList();
+            AppState.NotifyStateChanged();
+            ToastService.Notify(new ToastMessage(ToastType.Success, eliminados == 1 ? "Proveedor eliminado correctamente." : $"{eliminados} proveedores eliminados correctamente."));
+            Seleccionadas.Clear();
+            ModoSeleccion = false;
+        }
+        IsDeleteModalOpen = false;
+        DeleteIds.Clear();
+    }
 
     private void Filtrar()
     {
+        FiltrosAplicados = (SearchId.Trim(), SearchNombre.Trim(), SearchRnc.Trim(), SearchTelefono.Trim(), SearchCorreo.Trim(), SearchDireccion.Trim());
+        Seleccionadas.IntersectWith(FilteredProveedores.Select(p => p.Id));
         StateHasChanged();
     }
 
@@ -189,11 +332,14 @@
 
     private List<ElectroGestion.Models.Proveedor> FilteredProveedores => AppState.Proveedores
         .Where(p => {
-            bool matchId = string.IsNullOrEmpty(SearchId) || p.Id.ToString().Contains(SearchId);
-            bool matchNombre = string.IsNullOrEmpty(SearchNombre) || p.Nombre.Contains(SearchNombre, StringComparison.OrdinalIgnoreCase);
-            bool matchRnc = string.IsNullOrEmpty(SearchRnc) || p.Rnc.Contains(SearchRnc, StringComparison.OrdinalIgnoreCase);
-            bool matchTel = string.IsNullOrEmpty(SearchTelefono) || p.Telefono.Contains(SearchTelefono, StringComparison.OrdinalIgnoreCase);
-            return matchId && matchNombre && matchRnc && matchTel;
+            var f = FiltrosAplicados;
+            bool matchId = string.IsNullOrEmpty(f.Id) || p.Id.ToString().Contains(f.Id);
+            bool matchNombre = string.IsNullOrEmpty(f.Nombre) || p.Nombre.Contains(f.Nombre, StringComparison.OrdinalIgnoreCase);
+            bool matchRnc = string.IsNullOrEmpty(f.Rnc) || p.Rnc.Contains(f.Rnc, StringComparison.OrdinalIgnoreCase);
+            bool matchTel = string.IsNullOrEmpty(f.Telefono) || p.Telefono.Contains(f.Telefono, StringComparison.OrdinalIgnoreCase);
+            bool matchCorreo = string.IsNullOrEmpty(f.Correo) || p.Correo.Contains(f.Correo, StringComparison.OrdinalIgnoreCase);
+            bool matchDireccion = string.IsNullOrEmpty(f.Direccion) || p.Direccion.Contains(f.Direccion, StringComparison.OrdinalIgnoreCase);
+            return matchId && matchNombre && matchRnc && matchTel && matchCorreo && matchDireccion;
         })
         .OrderByDescending(p => p.Id)
         .ToList();

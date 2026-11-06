@@ -10,7 +10,11 @@ public class OrdenTrabajoService(IDbContextFactory<Contexto> contextFactory, App
     {
         if (!appState.IsAuthenticated) return [];
         await using var db = await contextFactory.CreateDbContextAsync();
-        return await db.OrdenesTrabajo.AsNoTracking().OrderByDescending(o => o.Id).ToListAsync();
+        return await db.OrdenesTrabajo.AsNoTracking()
+            .OrderBy(o => o.Estado == "En proceso" ? 0 : o.Estado == "Pendiente de cobro" ? 1 : o.Estado == "Finalizada" ? 2 : 3)
+            .ThenBy(o => o.FechaCreacion)
+            .ThenBy(o => o.Id)
+            .ToListAsync();
     }
 
     public async Task<List<Cotizacion>> ObtenerCotizacionesDisponiblesAsync()
@@ -79,7 +83,7 @@ public class OrdenTrabajoService(IDbContextFactory<Contexto> contextFactory, App
     {
         if (!appState.EsGerente) return false;
         await using var db = await contextFactory.CreateDbContextAsync();
-        var orden = await db.OrdenesTrabajo.FindAsync(id);
+        var orden = await db.OrdenesTrabajo.FirstOrDefaultAsync(o => o.Id == id);
         if (orden is null || await SolicitudFinalizadaAsync(db, orden.SolicitudId)) return false;
         orden.Trabajos = LimpiarLista(trabajos);
         orden.Herramientas = LimpiarLista(herramientas);
@@ -94,7 +98,7 @@ public class OrdenTrabajoService(IDbContextFactory<Contexto> contextFactory, App
         if (!appState.IsAuthenticated || estado is not ("En proceso" or "Pendiente de cobro" or "Finalizada")) return false;
         if (!appState.EsGerente && estado != "Pendiente de cobro") return false;
         await using var db = await contextFactory.CreateDbContextAsync();
-        var orden = await db.OrdenesTrabajo.FindAsync(id);
+        var orden = await db.OrdenesTrabajo.FirstOrDefaultAsync(o => o.Id == id);
         if (orden is null || orden.Estado == estado) return false;
         if (estado == "En proceso" && await db.Cobros.AnyAsync(c => c.OrdenTrabajoId == id)) return false;
         if (await SolicitudFinalizadaAsync(db, orden.SolicitudId)) return false;
@@ -123,13 +127,73 @@ public class OrdenTrabajoService(IDbContextFactory<Contexto> contextFactory, App
     {
         if (!appState.EsGerente) return false;
         await using var db = await contextFactory.CreateDbContextAsync();
-        var orden = await db.OrdenesTrabajo.FindAsync(id);
+        var orden = await db.OrdenesTrabajo.FirstOrDefaultAsync(o => o.Id == id);
         if (orden is null || await SolicitudFinalizadaAsync(db, orden.SolicitudId) ||
-            await db.Cobros.AnyAsync(c => c.OrdenTrabajoId == id)) return false;
+            await db.Cobros.IgnoreQueryFilters().AnyAsync(c => c.OrdenTrabajoId == id)) return false;
         RegistroEventosSolicitud.Agregar(db, orden.SolicitudId, "Orden de trabajo eliminada", $"Se eliminó {orden.Code}.");
-        db.OrdenesTrabajo.Remove(orden);
+        orden.IsDeleted = true;
         await db.SaveChangesAsync();
         return true;
+    }
+
+    public async Task<HashSet<int>> ObtenerElegiblesAsync(IEnumerable<int> ids)
+    {
+        var elegibles = new HashSet<int>();
+        if (!appState.EsGerente) return elegibles;
+        var idList = ids.Distinct().ToList();
+        if (idList.Count == 0) return elegibles;
+        await using var db = await contextFactory.CreateDbContextAsync();
+        var ordenes = await db.OrdenesTrabajo.AsNoTracking()
+            .Where(o => idList.Contains(o.Id))
+            .Select(o => new
+            {
+                o.Id,
+                Finalizada = db.Solicitudes.Any(s => s.Id == o.SolicitudId &&
+                    s.EstadoSolicitud != null && s.EstadoSolicitud.Nombre == "Finalizada"),
+                ConCobro = db.Cobros.IgnoreQueryFilters().Any(c => c.OrdenTrabajoId == o.Id)
+            })
+            .ToListAsync();
+        foreach (var orden in ordenes)
+            if (!orden.Finalizada && !orden.ConCobro)
+                elegibles.Add(orden.Id);
+        return elegibles;
+    }
+
+    public async Task<int> EliminarVariosAsync(IReadOnlyCollection<int> ids)
+    {
+        var idList = ids.Distinct().ToList();
+        if (!appState.EsGerente || idList.Count == 0) return 0;
+        await using var db = await contextFactory.CreateDbContextAsync();
+        await using var transaccion = await db.Database.BeginTransactionAsync();
+        try
+        {
+            var ordenes = await db.OrdenesTrabajo.Where(o => idList.Contains(o.Id)).ToListAsync();
+            var elegibles = new List<OrdenTrabajo>();
+            foreach (var orden in ordenes)
+            {
+                if (await SolicitudFinalizadaAsync(db, orden.SolicitudId) ||
+                    await db.Cobros.IgnoreQueryFilters().AnyAsync(c => c.OrdenTrabajoId == orden.Id)) continue;
+                elegibles.Add(orden);
+            }
+            if (elegibles.Count == 0)
+            {
+                await transaccion.RollbackAsync();
+                return 0;
+            }
+            foreach (var orden in elegibles)
+            {
+                RegistroEventosSolicitud.Agregar(db, orden.SolicitudId, "Orden de trabajo eliminada", $"Se eliminó {orden.Code}.");
+                orden.IsDeleted = true;
+            }
+            await db.SaveChangesAsync();
+            await transaccion.CommitAsync();
+            return elegibles.Count;
+        }
+        catch
+        {
+            await transaccion.RollbackAsync();
+            return 0;
+        }
     }
 
     public async Task<bool> TieneCobroAsync(int id)
