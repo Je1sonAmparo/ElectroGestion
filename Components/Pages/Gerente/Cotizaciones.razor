@@ -11,6 +11,7 @@
     .cotizacion-filtro { display:flex; align-items:center; gap:9px; min-width:0; }
     .cotizacion-filtro label { font-family:'Manrope'; font-size:14px; font-weight:800; color:#14162B; white-space:nowrap; }
     .cotizacion-filtro input, .cotizacion-filtro select { min-width:0; padding:9px 11px; border:1px solid #D5D8E6; border-radius:7px; background:#fff; color:#4A4E63; }
+    .cotizaciones-acciones { display:grid; grid-template-columns:repeat(2,max-content); align-items:center; justify-content:center; gap:6px; min-width:260px; }
 </style>
 
 <PageTitle>Cotizaciones | ElectroGestion</PageTitle>
@@ -21,12 +22,12 @@
         <div style="color:#6B7085;font-size:14.5px;margin-top:5px">Cotizaciones creadas a partir de levantamientos enviados a administración.</div>
     </div>
     <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;justify-content:flex-end">
-        <button @onclick="AlternarModoSeleccion" title="Seleccionar varias cotizaciones para eliminar"
-            style="padding:10px 16px 10px 14px;background:#fff;border:1px solid @(ModoSeleccion ? "#B42318" : "#D5D8E6");color:@(ModoSeleccion ? "#B42318" : "#4A4E63");border-radius:8px;font-weight:700;font-size:14px;cursor:pointer;font-family:'Manrope';white-space:nowrap;display:flex;align-items:center;gap:8px;transition:all .15s">
+        <button class="page-toolbar-action" @onclick="AlternarModoSeleccion" title="Seleccionar varias cotizaciones para eliminar"
+            style="background:#fff;border:1px solid @(ModoSeleccion ? "#B42318" : "#D5D8E6");color:@(ModoSeleccion ? "#B42318" : "#4A4E63");transition:all .15s">
             <svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="4"/><path d="m8.5 12.5 2.5 2.5 5-5.5"/></svg>
             <span>@(ModoSeleccion ? "Salir de selección" : "Seleccionar")</span>
         </button>
-        <button class="primary-btn" @onclick="AbrirNueva" style="padding:11px 20px;background:#1D4ED8;color:#fff;border:0;border-radius:9px;font-weight:700;font-size:14.5px;cursor:pointer;font-family:'Manrope'">Nueva Cotización</button>
+        <button class="page-toolbar-action page-toolbar-action-primary" @onclick="AbrirNueva">Nueva Cotización</button>
     </div>
 </div>
 
@@ -42,7 +43,7 @@
             <div class="cotizacion-filtro"><label for="filtro-cot-desde">Desde:</label><input id="filtro-cot-desde" type="date" @bind="FiltroDesde" /></div>
             <div class="cotizacion-filtro"><label for="filtro-cot-hasta">Hasta:</label><input id="filtro-cot-hasta" type="date" @bind="FiltroHasta" /></div>
             <div class="cotizacion-filtro"><label for="filtro-cot-estado">Estado:</label><select id="filtro-cot-estado" @bind="EstadoFiltro" style="width:210px"><option value="">Todos</option>@foreach (var estado in ElectroGestion.Services.CotizacionService.Estados) { <option value="@estado">@estado</option> }</select></div>
-            <div style="margin-left:auto"><button @onclick="() => StateHasChanged()" style="padding:9px 20px;border:0;border-radius:7px;background:#1D4ED8;color:#fff;font-weight:700;cursor:pointer">Buscar</button></div>
+            <div style="margin-left:auto"><button @onclick="AplicarFiltros" style="padding:9px 20px;border:0;border-radius:7px;background:#1D4ED8;color:#fff;font-weight:700;cursor:pointer">Buscar</button></div>
         </div>
     </div>
     @if (ModoSeleccion)
@@ -76,7 +77,16 @@
     {
         <div style="overflow-x:auto"><table style="width:100%;border-collapse:collapse;font-size:14px">
             <thead style="background:#F8F9FC"><tr>
-                <th style="padding:14px 18px;text-align:left">ID@if (ModoSeleccion) { <input type="checkbox" aria-label="Seleccionar todas las cotizaciones visibles que se pueden eliminar" checked="@TodasMarcadas" @onchange="e => SeleccionarTodas((bool)(e.Value ?? false))" @onclick:stopPropagation style="margin-left:5px" /> }</th><th style="padding:14px 18px;text-align:left">Solicitud</th><th style="padding:14px 18px;text-align:left">Cliente</th><th style="padding:14px 18px;text-align:left">Servicio</th><th style="padding:14px 18px;text-align:left">Fecha</th><th style="padding:14px 18px;text-align:left">Monto</th><th style="padding:14px 18px;text-align:left">Estado</th><th style="padding:14px 18px;text-align:left">Seguimiento</th><th style="padding:14px 18px;text-align:center">Acciones</th>
+                <th style="padding:14px 18px;text-align:left">
+                    <div style="display:inline-flex;align-items:center;gap:5px">
+                        <span>ID</span>
+                        @if (ModoSeleccion)
+                        {
+                            <input type="checkbox" aria-label="Seleccionar todas las cotizaciones visibles que se pueden eliminar" checked="@TodasMarcadas" @onchange="e => SeleccionarTodas((bool)(e.Value ?? false))" @onclick:stopPropagation />
+                        }
+                    </div>
+                </th>
+                <th style="padding:14px 18px;text-align:left">Solicitud</th><th style="padding:14px 18px;text-align:left">Cliente</th><th style="padding:14px 18px;text-align:left">Servicio</th><th style="padding:14px 18px;text-align:left">Fecha</th><th style="padding:14px 18px;text-align:left">Monto</th><th style="padding:14px 18px;text-align:left">Estado</th><th style="padding:14px 18px;text-align:left">Seguimiento</th><th style="padding:14px 18px;text-align:center">Acciones</th>
             </tr></thead><tbody>
                 @foreach (var cot in CotizacionesFiltradas)
                 {
@@ -85,7 +95,7 @@
                         <td style="padding:14px 18px">@if (ModoSeleccion) { <input type="checkbox" aria-label="Seleccionar cotización @cot.Id" checked="@Seleccionadas.Contains(cot.Id)" disabled="@(!PuedeEliminarCotizacion(cot.Id))" @onchange="e => CambiarSeleccion(cot.Id, (bool)(e.Value ?? false))" @onclick:stopPropagation style="margin-right:8px" /> } <span style="font-family:ui-monospace,'SFMono-Regular',Consolas,monospace;font-weight:700;color:@(ModoSeleccion && Seleccionadas.Contains(cot.Id) ? "#1D4ED8" : "#5B6173")">@cot.Id</span></td><td style="padding:14px 18px">@(cot.SolicitudId)</td><td style="padding:14px 18px">@cot.Cliente</td><td style="padding:14px 18px">@(cot.Solicitud?.Servicio?.Nombre ?? "—")</td><td style="padding:14px 18px">@cot.Fecha.ToString("dd/MM/yyyy")</td><td style="padding:14px 18px;font-weight:700">RD$ @cot.MontoTotal.ToString("N2")</td>
                         <td style="padding:14px 18px;min-width:155px"><span style="display:inline-block;white-space:nowrap;padding:4px 10px;border-radius:20px;font-size:12.5px;font-weight:700;background:@colores.Bg;color:@colores.Fg">@cot.Estado</span></td>
                         <td style="padding:14px 18px;font-size:12px;color:#6B7085">@if (cot.FechaEnvio.HasValue) { <div>Enviada: @cot.FechaEnvio.Value.ToString("dd/MM/yyyy HH:mm")</div> } @if (cot.FechaRespuesta.HasValue) { <div>Respuesta: @cot.FechaRespuesta.Value.ToString("dd/MM/yyyy HH:mm")</div> } @if (!string.IsNullOrWhiteSpace(cot.MotivoRechazo)) { <div title="@cot.MotivoRechazo">Motivo: @cot.MotivoRechazo</div> }</td>
-                        <td style="padding:14px 18px;text-align:center"><div style="display:flex;gap:6px;justify-content:center;flex-wrap:wrap">
+                        <td style="padding:14px 18px;text-align:center"><div class="page-table-actions cotizaciones-acciones">
                             @if (cot.Estado == ElectroGestion.Services.CotizacionService.EnRevision)
                             {
                                 <button @onclick="() => Editar(cot)" @onclick:stopPropagation style="padding:7px 11px;border:1px solid #D5D8E6;background:#fff;border-radius:7px;cursor:pointer">Editar detalle</button>
@@ -175,7 +185,7 @@
     <div style="position:fixed;inset:0;background:rgba(14,16,40,0.5);display:flex;align-items:center;justify-content:center;z-index:10003;padding:20px">
         <div style="background:#fff;border-radius:14px;width:100%;max-width:430px;padding:30px;box-shadow:0 20px 40px rgba(0,0,0,0.2);animation:tin 0.2s ease-out">
             <div style="font-family:'Manrope';font-weight:800;font-size:23px;color:#14162B;margin-bottom:12px">Eliminar @(DeleteIds.Count == 1 ? "cotización" : "cotizaciones")</div>
-            <div style="color:#4A4E63;font-size:14.5px;line-height:1.55">¿Está seguro que desea eliminar @(DeleteIds.Count == 1 ? "esta cotización" : $"estas {DeleteIds.Count} cotizaciones")? Esta acción no se puede deshacer.</div>
+            <div style="color:#4A4E63;font-size:14.5px;line-height:1.55">¿Está seguro que desea eliminar @(DeleteIds.Count == 1 ? "esta cotización" : $"estas {DeleteIds.Count} cotizaciones")? El administrador podrá recuperarlas desde el módulo de Recuperación.</div>
             @if (DeleteIds.Count > 1)
             {
                 <div style="background:#F9FAFB;border:1px solid #EFF0F6;border-radius:10px;max-height:200px;overflow:auto;margin-top:16px" class="resp-lista-eliminar">
@@ -262,6 +272,7 @@
     private DateTime? FiltroDesde;
     private DateTime? FiltroHasta;
     private string EstadoFiltro = "";
+    private (string Id, string Solicitud, string Cliente, string Servicio, DateTime? Desde, DateTime? Hasta, string Estado) FiltrosAplicados = ("", "", "", "", null, null, "");
     private bool ModalAbierto;
     private int? EditandoId;
     private int SolicitudSeleccionada;
@@ -290,13 +301,18 @@
     private HashSet<int> ElegiblesCotizaciones = [];
     private Solicitud? SolicitudActual => LevantamientosPendientes.FirstOrDefault(s => s.Id == SolicitudSeleccionada);
     private IEnumerable<Cotizacion> CotizacionesFiltradas => CotizacionRows.Where(c =>
-        (string.IsNullOrWhiteSpace(FiltroId) || c.Id.ToString().Contains(FiltroId.Trim(), StringComparison.OrdinalIgnoreCase)) &&
-        (string.IsNullOrWhiteSpace(FiltroSolicitud) || c.SolicitudId.Contains(FiltroSolicitud.Trim(), StringComparison.OrdinalIgnoreCase)) &&
-        (string.IsNullOrWhiteSpace(FiltroCliente) || c.Cliente.Contains(FiltroCliente.Trim(), StringComparison.OrdinalIgnoreCase)) &&
-        (string.IsNullOrWhiteSpace(FiltroServicio) || c.Solicitud?.Servicio?.Nombre == FiltroServicio) &&
-        (!FiltroDesde.HasValue || c.Fecha.Date >= FiltroDesde.Value.Date) &&
-        (!FiltroHasta.HasValue || c.Fecha.Date <= FiltroHasta.Value.Date) &&
-        (string.IsNullOrWhiteSpace(EstadoFiltro) || c.Estado == EstadoFiltro));
+        (string.IsNullOrWhiteSpace(FiltrosAplicados.Id) || c.Id.ToString().Contains(FiltrosAplicados.Id, StringComparison.OrdinalIgnoreCase)) &&
+        (string.IsNullOrWhiteSpace(FiltrosAplicados.Solicitud) || c.SolicitudId.Contains(FiltrosAplicados.Solicitud, StringComparison.OrdinalIgnoreCase)) &&
+        (string.IsNullOrWhiteSpace(FiltrosAplicados.Cliente) || c.Cliente.Contains(FiltrosAplicados.Cliente, StringComparison.OrdinalIgnoreCase)) &&
+        (string.IsNullOrWhiteSpace(FiltrosAplicados.Servicio) || c.Solicitud?.Servicio?.Nombre == FiltrosAplicados.Servicio) &&
+        (!FiltrosAplicados.Desde.HasValue || c.Fecha.Date >= FiltrosAplicados.Desde.Value.Date) &&
+        (!FiltrosAplicados.Hasta.HasValue || c.Fecha.Date <= FiltrosAplicados.Hasta.Value.Date) &&
+        (string.IsNullOrWhiteSpace(FiltrosAplicados.Estado) || c.Estado == FiltrosAplicados.Estado));
+    private void AplicarFiltros()
+    {
+        FiltrosAplicados = (FiltroId.Trim(), FiltroSolicitud.Trim(), FiltroCliente.Trim(), FiltroServicio, FiltroDesde, FiltroHasta, EstadoFiltro);
+        Seleccionadas.IntersectWith(CotizacionesFiltradas.Select(c => c.Id));
+    }
     private IEnumerable<int> ElegiblesVisibles => CotizacionesFiltradas.Where(c => PuedeEliminarCotizacion(c.Id)).Select(c => c.Id);
     private bool TodasMarcadas => ElegiblesVisibles.Any() && ElegiblesVisibles.All(Seleccionadas.Contains);
     private List<Cotizacion> CotizacionesAEliminar => DeleteIds

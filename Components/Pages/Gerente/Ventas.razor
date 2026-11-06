@@ -28,9 +28,15 @@ else
 
     <div class="ventas-panel">
         <div class="ventas-filtros">
-            <label>Buscar <input @bind="Busqueda" placeholder="Cliente, producto o NCF" /></label>
+            <label>ID <input @bind="FiltroId" @bind:event="oninput" placeholder="ID de venta" /></label>
+            <label>Cliente <input @bind="Busqueda" @bind:event="oninput" placeholder="Nombre del cliente" /></label>
+            <label>RNC/Cédula <input @bind="FiltroDocumento" @bind:event="oninput" placeholder="Documento" /></label>
+            <label>Producto <input @bind="FiltroProducto" @bind:event="oninput" placeholder="Nombre o código" /></label>
+            <label>NCF <input @bind="FiltroNcf" @bind:event="oninput" placeholder="Número de comprobante" /></label>
             <label>Comprobante <select @bind="Tipo"><option value="">Todos</option><option>@Venta.Consumo</option><option>@Venta.CreditoFiscal</option></select></label>
             <label>Estado <select @bind="Estado"><option value="">Todos</option><option>@Venta.Borrador</option><option>@Venta.Registrada</option><option>@Venta.Anulada</option></select></label>
+            <label>Desde <input type="date" @bind="FechaDesde" /></label>
+            <label>Hasta <input type="date" @bind="FechaHasta" /></label>
             <button class="ventas-primary" @onclick="AplicarFiltros">Buscar</button>
         </div>
         @if (ModoSeleccion)
@@ -191,7 +197,7 @@ else
         <div class="ventas-overlay">
             <section class="ventas-modal" role="dialog" aria-modal="true" aria-labelledby="confirmar-venta">
                 <h2 id="confirmar-venta">@(confirmar.Estado == Venta.Borrador ? "Eliminar borrador" : "Anular venta")</h2>
-                <p>@(confirmar.Estado == Venta.Borrador ? "Se eliminará el borrador seleccionado." : "Confirme que el comprobante ya fue corregido en su sistema de facturación y que las unidades regresaron al inventario.")</p>
+                <p>@(confirmar.Estado == Venta.Borrador ? "El borrador se conservará en Recuperación y el administrador podrá restaurarlo." : "Confirme que el comprobante ya fue corregido en su sistema de facturación y que las unidades regresaron al inventario.")</p>
                 <div class="ventas-pie">
                     <button disabled="@Ocupado" @onclick="() => Confirmacion = null">Cancelar</button>
                     <button class="ventas-danger" disabled="@Ocupado" @onclick="ConfirmarAccion">Confirmar</button>
@@ -205,7 +211,7 @@ else
         <div class="ventas-overlay">
             <section class="ventas-modal" role="dialog" aria-modal="true" aria-labelledby="eliminar-ventas">
                 <div style="font-family:'Manrope';font-weight:800;font-size:23px;color:#14162B;margin-bottom:12px">Eliminar @(DeleteIds.Count == 1 ? "venta" : "ventas")</div>
-                <div style="color:#4A4E63;font-size:14.5px;line-height:1.55">¿Está seguro que desea eliminar @(DeleteIds.Count == 1 ? "esta venta" : $"estas {DeleteIds.Count} ventas")? Esta acción no se puede deshacer.</div>
+                <div style="color:#4A4E63;font-size:14.5px;line-height:1.55">¿Está seguro que desea eliminar @(DeleteIds.Count == 1 ? "esta venta" : $"estas {DeleteIds.Count} ventas")? Los borradores se conservarán en Recuperación y el administrador podrá restaurarlos.</div>
                 @if (DeleteIds.Count > 1)
                 {
                     <div style="background:#F9FAFB;border:1px solid #EFF0F6;border-radius:10px;max-height:200px;overflow:auto;margin-top:16px" class="resp-lista-eliminar">
@@ -246,8 +252,9 @@ else
     private List<Cliente> Clientes = [];
     private Venta? Formulario, Detalle, Confirmacion;
     private bool Ocupado;
-    private string Busqueda = "", Tipo = "", Estado = "";
-    private (string Texto, string Tipo, string Estado) Filtros = ("", "", "");
+    private string Busqueda = "", FiltroId = "", FiltroDocumento = "", FiltroProducto = "", FiltroNcf = "", Tipo = "", Estado = "";
+    private DateTime? FechaDesde, FechaHasta;
+    private (string Id, string Cliente, string Documento, string Producto, string Ncf, string Tipo, string Estado, DateTime? Desde, DateTime? Hasta) Filtros = ("", "", "", "", "", "", "", null, null);
 
     // Modo selección + eliminación múltiple
     private bool ModoSeleccion;
@@ -328,18 +335,24 @@ else
     }
 
     private IEnumerable<Venta> Filtradas => Lista.Where(v =>
+        (Filtros.Id.Length == 0 || v.Id.ToString().Contains(Filtros.Id)) &&
+        (Filtros.Cliente.Length == 0 || Comprador(v).Contains(Filtros.Cliente, StringComparison.OrdinalIgnoreCase)) &&
+        (Filtros.Documento.Length == 0 || v.DocumentoCliente.Contains(Filtros.Documento, StringComparison.OrdinalIgnoreCase)) &&
+        (Filtros.Producto.Length == 0 ||
+            v.Detalles.Any(d => d.NombreArticulo.Contains(Filtros.Producto, StringComparison.OrdinalIgnoreCase) || d.CodigoArticulo.Contains(Filtros.Producto, StringComparison.OrdinalIgnoreCase)) ||
+            (v.Detalles.Count == 0 && (v.NombreArticulo.Contains(Filtros.Producto, StringComparison.OrdinalIgnoreCase) || v.CodigoArticulo.Contains(Filtros.Producto, StringComparison.OrdinalIgnoreCase)))) &&
+        (Filtros.Ncf.Length == 0 || (v.Ncf ?? "").Contains(Filtros.Ncf, StringComparison.OrdinalIgnoreCase)) &&
         (Filtros.Tipo.Length == 0 || v.TipoComprobante == Filtros.Tipo) &&
         (Filtros.Estado.Length == 0 || v.Estado == Filtros.Estado) &&
-        (Comprador(v).Contains(Filtros.Texto, StringComparison.OrdinalIgnoreCase) ||
-            v.Detalles.Any(d => d.NombreArticulo.Contains(Filtros.Texto, StringComparison.OrdinalIgnoreCase)) ||
-            (v.Ncf ?? "").Contains(Filtros.Texto, StringComparison.OrdinalIgnoreCase)));
+        (!Filtros.Desde.HasValue || (v.FechaVenta ?? v.FechaCreacion).Date >= Filtros.Desde.Value.Date) &&
+        (!Filtros.Hasta.HasValue || (v.FechaVenta ?? v.FechaCreacion).Date <= Filtros.Hasta.Value.Date));
 
     private int ArticuloSeleccionadoId;
     private int CantidadNueva = 1;
     private ArticuloInventario? ArticuloSeleccionado => Articulos.FirstOrDefault(a => a.Id == ArticuloSeleccionadoId);
     private static string Comprador(Venta v) => string.IsNullOrWhiteSpace(v.NombreCliente) ? "Consumidor final" : v.NombreCliente;
     private static string Moneda(decimal importe) => $"RD$ {importe:N2}";
-    private void AplicarFiltros() => Filtros = (Busqueda.Trim(), Tipo, Estado);
+    private void AplicarFiltros() => Filtros = (FiltroId.Trim(), Busqueda.Trim(), FiltroDocumento.Trim(), FiltroProducto.Trim(), FiltroNcf.Trim(), Tipo, Estado, FechaDesde, FechaHasta);
     private void CerrarFormulario() { if (!Ocupado) Formulario = null; }
     private async Task Imprimir() => await JS.InvokeVoidAsync("window.print");
 

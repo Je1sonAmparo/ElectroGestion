@@ -69,6 +69,16 @@
                 <input @bind="SearchTelefono" @bind:event="oninput" placeholder="Teléfono"
                     style="width:160px;padding:9px 12px;border:1px solid #D5D8E6;border-radius:6px;font-size:14px;color:#4A4E63" />
             </div>
+            <div style="display:flex;align-items:center;gap:10px">
+                <span style="font-family:'Manrope';font-weight:800;font-size:15px;color:#14162B">Correo:</span>
+                <input @bind="SearchCorreo" @bind:event="oninput" placeholder="Correo electrónico"
+                    style="width:190px;padding:9px 12px;border:1px solid #D5D8E6;border-radius:6px;font-size:14px;color:#4A4E63" />
+            </div>
+            <div style="display:flex;align-items:center;gap:10px">
+                <span style="font-family:'Manrope';font-weight:800;font-size:15px;color:#14162B">Dirección:</span>
+                <input @bind="SearchDireccion" @bind:event="oninput" placeholder="Dirección"
+                    style="width:200px;padding:9px 12px;border:1px solid #D5D8E6;border-radius:6px;font-size:14px;color:#4A4E63" />
+            </div>
             <div style="display:flex;justify-content:flex-end;margin-left:auto">
                 <button class="primary-btn" @onclick="Filtrar"
                     style="padding:9px 16px;background:#1D4ED8;color:#fff;border:0;border-radius:6px;font-weight:700;font-size:14px;cursor:pointer;font-family:'Manrope'">Buscar</button>
@@ -244,6 +254,9 @@
     private string SearchNombre = "";
     private string SearchRnc = "";
     private string SearchTelefono = "";
+    private string SearchCorreo = "";
+    private string SearchDireccion = "";
+    private (string Id, string Nombre, string Rnc, string Telefono, string Correo, string Direccion) FiltrosAplicados = ("", "", "", "", "", "");
 
     // Modo selección + eliminación múltiple (en memoria: AppState.Proveedores)
     private bool ModoSeleccion;
@@ -301,6 +314,8 @@
 
     private void Filtrar()
     {
+        FiltrosAplicados = (SearchId.Trim(), SearchNombre.Trim(), SearchRnc.Trim(), SearchTelefono.Trim(), SearchCorreo.Trim(), SearchDireccion.Trim());
+        Seleccionadas.IntersectWith(FilteredProveedores.Select(p => p.Id));
         StateHasChanged();
     }
 
@@ -317,11 +332,14 @@
 
     private List<ElectroGestion.Models.Proveedor> FilteredProveedores => AppState.Proveedores
         .Where(p => {
-            bool matchId = string.IsNullOrEmpty(SearchId) || p.Id.ToString().Contains(SearchId);
-            bool matchNombre = string.IsNullOrEmpty(SearchNombre) || p.Nombre.Contains(SearchNombre, StringComparison.OrdinalIgnoreCase);
-            bool matchRnc = string.IsNullOrEmpty(SearchRnc) || p.Rnc.Contains(SearchRnc, StringComparison.OrdinalIgnoreCase);
-            bool matchTel = string.IsNullOrEmpty(SearchTelefono) || p.Telefono.Contains(SearchTelefono, StringComparison.OrdinalIgnoreCase);
-            return matchId && matchNombre && matchRnc && matchTel;
+            var f = FiltrosAplicados;
+            bool matchId = string.IsNullOrEmpty(f.Id) || p.Id.ToString().Contains(f.Id);
+            bool matchNombre = string.IsNullOrEmpty(f.Nombre) || p.Nombre.Contains(f.Nombre, StringComparison.OrdinalIgnoreCase);
+            bool matchRnc = string.IsNullOrEmpty(f.Rnc) || p.Rnc.Contains(f.Rnc, StringComparison.OrdinalIgnoreCase);
+            bool matchTel = string.IsNullOrEmpty(f.Telefono) || p.Telefono.Contains(f.Telefono, StringComparison.OrdinalIgnoreCase);
+            bool matchCorreo = string.IsNullOrEmpty(f.Correo) || p.Correo.Contains(f.Correo, StringComparison.OrdinalIgnoreCase);
+            bool matchDireccion = string.IsNullOrEmpty(f.Direccion) || p.Direccion.Contains(f.Direccion, StringComparison.OrdinalIgnoreCase);
+            return matchId && matchNombre && matchRnc && matchTel && matchCorreo && matchDireccion;
         })
         .OrderByDescending(p => p.Id)
         .ToList();

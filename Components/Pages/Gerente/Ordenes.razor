@@ -35,7 +35,7 @@
             <div class="orden-filtro"><label for="orden-desde">Desde:</label><input id="orden-desde" type="date" @bind="FiltroDesde" /></div>
             <div class="orden-filtro"><label for="orden-hasta">Hasta:</label><input id="orden-hasta" type="date" @bind="FiltroHasta" /></div>
             <div class="orden-filtro"><label for="orden-estado">Estado:</label><select id="orden-estado" @bind="FiltroEstado" style="width:210px"><option value="">Todos</option><option>En proceso</option><option>Pendiente de cobro</option><option>Finalizada</option></select></div>
-            <div style="margin-left:auto"><button @onclick="() => StateHasChanged()" style="padding:9px 20px;border:0;border-radius:7px;background:#1D4ED8;color:#fff;font-weight:700;cursor:pointer">Buscar</button></div>
+            <div style="margin-left:auto"><button @onclick="AplicarFiltros" style="padding:9px 20px;border:0;border-radius:7px;background:#1D4ED8;color:#fff;font-weight:700;cursor:pointer">Buscar</button></div>
         </div>
     </div>
 </div>
@@ -136,7 +136,7 @@ else
     <div style="position:fixed;inset:0;background:rgba(14,16,40,0.5);display:flex;align-items:center;justify-content:center;z-index:9999;padding:20px">
         <div style="background:#fff;border-radius:14px;width:100%;max-width:430px;padding:30px;box-shadow:0 20px 40px rgba(0,0,0,0.2);animation:tin 0.2s ease-out">
             <div style="font-family:'Manrope';font-weight:800;font-size:23px;color:#14162B;margin-bottom:12px">Eliminar @(DeleteIds.Count == 1 ? "orden de trabajo" : "ordenes de trabajo")</div>
-            <div style="color:#4A4E63;font-size:14.5px;line-height:1.55">¿Está seguro que desea eliminar @(DeleteIds.Count == 1 ? "esta orden de trabajo" : $"estas {DeleteIds.Count} ordenes de trabajo")? Esta acción no se puede deshacer.</div>
+            <div style="color:#4A4E63;font-size:14.5px;line-height:1.55">¿Está seguro que desea eliminar @(DeleteIds.Count == 1 ? "esta orden de trabajo" : $"estas {DeleteIds.Count} ordenes de trabajo")? El administrador podrá recuperarla desde el módulo de Recuperación.</div>
             @if (DeleteIds.Count > 1)
             {
                 <div style="background:#F9FAFB;border:1px solid #EFF0F6;border-radius:10px;max-height:200px;overflow:auto;margin-top:16px" class="resp-lista-eliminar">
@@ -190,6 +190,7 @@ else
     private bool Cargando;
     private string FiltroId = "", FiltroCliente = "", FiltroServicio = "", FiltroEstado = "";
     private DateTime? FiltroDesde, FiltroHasta;
+    private (string Id, string Cliente, string Servicio, string Estado, DateTime? Desde, DateTime? Hasta) FiltrosAplicados = ("", "", "", "", null, null);
     private ElectroGestion.Models.Cotizacion? CotizacionDetalle;
     private bool ModalAbierto;
     private int? EditandoId;
@@ -272,12 +273,17 @@ else
     }
     private ElectroGestion.Models.Cotizacion? CotizacionSeleccionada => CotizacionesDisponibles.FirstOrDefault(c => c.Id == FormCotizacionId);
     private IEnumerable<ElectroGestion.Models.OrdenTrabajo> OrdenesFiltradas => OrdenesRows.Where(o =>
-        (string.IsNullOrWhiteSpace(FiltroId) || o.Id.ToString().Contains(FiltroId) || o.Code.Contains(FiltroId, StringComparison.OrdinalIgnoreCase)) &&
-        (string.IsNullOrWhiteSpace(FiltroCliente) || o.Cliente.Contains(FiltroCliente, StringComparison.OrdinalIgnoreCase)) &&
-        (string.IsNullOrWhiteSpace(FiltroServicio) || o.TipoServicio == FiltroServicio) &&
-        (!FiltroDesde.HasValue || o.FechaCreacion.Date >= FiltroDesde.Value.Date) &&
-        (!FiltroHasta.HasValue || o.FechaCreacion.Date <= FiltroHasta.Value.Date) &&
-        (string.IsNullOrWhiteSpace(FiltroEstado) || o.Estado == FiltroEstado));
+        (string.IsNullOrWhiteSpace(FiltrosAplicados.Id) || o.Id.ToString().Contains(FiltrosAplicados.Id) || o.Code.Contains(FiltrosAplicados.Id, StringComparison.OrdinalIgnoreCase)) &&
+        (string.IsNullOrWhiteSpace(FiltrosAplicados.Cliente) || o.Cliente.Contains(FiltrosAplicados.Cliente, StringComparison.OrdinalIgnoreCase)) &&
+        (string.IsNullOrWhiteSpace(FiltrosAplicados.Servicio) || o.TipoServicio == FiltrosAplicados.Servicio) &&
+        (!FiltrosAplicados.Desde.HasValue || o.FechaCreacion.Date >= FiltrosAplicados.Desde.Value.Date) &&
+        (!FiltrosAplicados.Hasta.HasValue || o.FechaCreacion.Date <= FiltrosAplicados.Hasta.Value.Date) &&
+        (string.IsNullOrWhiteSpace(FiltrosAplicados.Estado) || o.Estado == FiltrosAplicados.Estado));
+    private void AplicarFiltros()
+    {
+        FiltrosAplicados = (FiltroId.Trim(), FiltroCliente.Trim(), FiltroServicio, FiltroEstado, FiltroDesde, FiltroHasta);
+        Seleccionadas.IntersectWith(OrdenesFiltradas.Select(o => o.Id));
+    }
 
     protected override async Task OnInitializedAsync() => await Recargar();
 

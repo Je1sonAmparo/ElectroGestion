@@ -30,6 +30,11 @@
     <div style="display:flex;flex-direction:column;gap:18px;padding:18px 18px 12px;border-bottom:1px solid #EFF0F6">
         <div style="display:flex;align-items:center;gap:20px;flex-wrap:wrap" class="resp-search-block">
             <div style="display:flex;align-items:center;gap:10px">
+                <span style="font-family:'Manrope';font-weight:800;font-size:15px;color:#14162B">ID:</span>
+                <input @bind="SearchId" @bind:event="oninput" placeholder="ID"
+                    style="width:100px;padding:9px 12px;border:1px solid #D5D8E6;border-radius:6px;font-size:14px;color:#4A4E63" />
+            </div>
+            <div style="display:flex;align-items:center;gap:10px">
                 <span style="font-family:'Manrope';font-weight:800;font-size:15px;color:#14162B">Código:</span>
                 <input @bind="SearchCodigo" @bind:event="oninput" placeholder="Ej: SV-001"
                     style="width:140px;padding:9px 12px;border:1px solid #D5D8E6;border-radius:6px;font-size:14px;color:#4A4E63" />
@@ -253,7 +258,7 @@
     <div style="position:fixed;inset:0;background:rgba(14,16,40,0.5);display:flex;align-items:center;justify-content:center;z-index:9999;padding:20px">
         <div style="background:#fff;border-radius:14px;width:100%;max-width:430px;padding:30px;box-shadow:0 20px 40px rgba(0,0,0,0.2);animation:tin 0.2s ease-out">
             <div style="font-family:'Manrope';font-weight:800;font-size:23px;color:#14162B;margin-bottom:12px">Eliminar @(DeleteIds.Count == 1 ? "servicio" : "servicios")</div>
-            <div style="color:#4A4E63;font-size:14.5px;line-height:1.55">¿Está seguro que desea eliminar @(DeleteIds.Count == 1 ? "este servicio" : $"estos {DeleteIds.Count} servicios")? Esta acción no se puede deshacer.</div>
+            <div style="color:#4A4E63;font-size:14.5px;line-height:1.55">¿Está seguro que desea eliminar @(DeleteIds.Count == 1 ? "este servicio" : $"estos {DeleteIds.Count} servicios")? El administrador podrá recuperarlos desde el módulo de Recuperación.</div>
             @if (DeleteIds.Count > 1)
             {
                 <div style="background:#F9FAFB;border:1px solid #EFF0F6;border-radius:10px;max-height:200px;overflow:auto;margin-top:16px" class="resp-lista-eliminar">
@@ -289,10 +294,11 @@
 
 @code {
     private string SearchCodigo = "";
+    private string SearchId = "";
     private string SearchNombre = "";
     private string SearchCategoria = "";
     private string SearchEstado = "";
-    private (string Codigo, string Nombre, string Categoria, string Estado) FiltrosAplicados = ("", "", "", "");
+    private (string Id, string Codigo, string Nombre, string Categoria, string Estado) FiltrosAplicados = ("", "", "", "", "");
 
     private string SortColumn = "Id";
     private bool SortAscending = true;
@@ -312,7 +318,7 @@
 
     private void Filtrar()
     {
-        FiltrosAplicados = (SearchCodigo.Trim(), SearchNombre.Trim(), SearchCategoria.Trim(), SearchEstado);
+        FiltrosAplicados = (SearchId.Trim(), SearchCodigo.Trim(), SearchNombre.Trim(), SearchCategoria.Trim(), SearchEstado);
         Seleccionadas.IntersectWith(FilteredServicios.Select(s => s.Id));
     }
 
@@ -347,6 +353,7 @@
         {
             var filtros = FiltrosAplicados;
             var q = servicios.Where(s =>
+                (filtros.Id.Length == 0 || s.Id.ToString().Contains(filtros.Id)) &&
                 s.ServicioId.Contains(filtros.Codigo, StringComparison.OrdinalIgnoreCase) &&
                 s.Nombre.Contains(filtros.Nombre, StringComparison.OrdinalIgnoreCase) &&
                 s.Categoria.Contains(filtros.Categoria, StringComparison.OrdinalIgnoreCase) &&

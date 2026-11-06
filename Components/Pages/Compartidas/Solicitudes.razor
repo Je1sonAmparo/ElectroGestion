@@ -3,9 +3,14 @@
 
 @if (AppState.EsGerente)
 {
-    <ElectroGestion.Components.Pages.Gerente.Solicitudes />
+    <ElectroGestion.Components.Pages.Gerente.Solicitudes AbrirNuevaSolicitud="@Nueva" />
 }
 else
 {
-    <ElectroGestion.Components.Pages.Tecnico.Solicitudes />
+    <ElectroGestion.Components.Pages.Tecnico.Solicitudes AbrirNuevaSolicitud="@Nueva" />
+}
+
+@code {
+    [SupplyParameterFromQuery(Name = "nueva")]
+    public bool Nueva { get; set; }
 }

@@ -328,6 +328,11 @@
 }
 
 @code {
+    [Parameter]
+    public bool AbrirNuevaSolicitud { get; set; }
+
+    private bool SolicitudRapidaAbierta;
+
     private string SearchId { get; set; } = "";
     private string SearchCliente { get; set; } = "";
     private string SearchTipo { get; set; } = "";
@@ -396,6 +401,19 @@
     protected override async Task OnInitializedAsync()
     {
         await CargarDatos();
+    }
+
+    protected override async Task OnParametersSetAsync()
+    {
+        if (!AbrirNuevaSolicitud)
+        {
+            SolicitudRapidaAbierta = false;
+            return;
+        }
+
+        if (SolicitudRapidaAbierta) return;
+        SolicitudRapidaAbierta = true;
+        await NuevaSolicitud();
     }
 
     private void OrdenarPor(string columna)

@@ -258,7 +258,7 @@
     <div style="position:fixed;inset:0;background:rgba(14,16,40,0.5);display:flex;align-items:center;justify-content:center;z-index:9999;padding:20px">
         <div style="background:#fff;border-radius:14px;width:100%;max-width:430px;padding:30px;box-shadow:0 20px 40px rgba(0,0,0,0.2);animation:tin 0.2s ease-out">
             <div style="font-family:'Manrope';font-weight:800;font-size:23px;color:#14162B;margin-bottom:12px">Eliminar @(DeleteIds.Count == 1 ? "cliente" : "clientes")</div>
-            <div style="color:#4A4E63;font-size:14.5px;line-height:1.55">¿Está seguro que desea eliminar @(DeleteIds.Count == 1 ? "este cliente" : $"estos {DeleteIds.Count} clientes")? Esta acción no se puede deshacer.</div>
+            <div style="color:#4A4E63;font-size:14.5px;line-height:1.55">¿Está seguro que desea eliminar @(DeleteIds.Count == 1 ? "este cliente" : $"estos {DeleteIds.Count} clientes")? El administrador podrá recuperarlos desde el módulo de Recuperación.</div>
             @if (DeleteIds.Count > 1)
             {
                 <div style="background:#F9FAFB;border:1px solid #EFF0F6;border-radius:10px;max-height:200px;overflow:auto;margin-top:16px" class="resp-lista-eliminar">
@@ -299,6 +299,7 @@
     private string SearchCorreo = "";
     private string SearchTelefono = "";
     private string SearchDireccion = "";
+    private (string Id, string Nombre, string Rnc, string Correo, string Telefono, string Direccion) FiltrosAplicados = ("", "", "", "", "", "");
 
     private string SortColumn = "Nombre";
     private bool SortAscending = true;
@@ -318,6 +319,7 @@
 
     private void Filtrar()
     {
+        FiltrosAplicados = (SearchId.Trim(), SearchNombre.Trim(), SearchRnc.Trim(), SearchCorreo.Trim(), SearchTelefono.Trim(), SearchDireccion.Trim());
         Seleccionadas.IntersectWith(FilteredClientes.Select(c => c.Id));
         StateHasChanged();
     }
@@ -444,13 +446,14 @@
     {
         get
         {
+            var filtros = FiltrosAplicados;
             var q = clientes.Where(c => {
-                bool matchId = string.IsNullOrEmpty(SearchId) || c.Id.ToString().Contains(SearchId);
-                bool matchNombre = string.IsNullOrEmpty(SearchNombre) || c.Nombre.Contains(SearchNombre, StringComparison.OrdinalIgnoreCase);
-                bool matchRnc = string.IsNullOrEmpty(SearchRnc) || (!string.IsNullOrEmpty(c.Rnc) && c.Rnc.Contains(SearchRnc, StringComparison.OrdinalIgnoreCase));
-                bool matchCorreo = string.IsNullOrEmpty(SearchCorreo) || (!string.IsNullOrEmpty(c.Correo) && c.Correo.Contains(SearchCorreo, StringComparison.OrdinalIgnoreCase));
-                bool matchTelefono = string.IsNullOrEmpty(SearchTelefono) || (!string.IsNullOrEmpty(c.Telefono) && c.Telefono.Contains(SearchTelefono, StringComparison.OrdinalIgnoreCase)) || (!string.IsNullOrEmpty(c.Telefono2) && c.Telefono2.Contains(SearchTelefono, StringComparison.OrdinalIgnoreCase));
-                bool matchDireccion = string.IsNullOrEmpty(SearchDireccion) || c.Direccion.Contains(SearchDireccion, StringComparison.OrdinalIgnoreCase);
+                bool matchId = string.IsNullOrEmpty(filtros.Id) || c.Id.ToString().Contains(filtros.Id);
+                bool matchNombre = string.IsNullOrEmpty(filtros.Nombre) || c.Nombre.Contains(filtros.Nombre, StringComparison.OrdinalIgnoreCase);
+                bool matchRnc = string.IsNullOrEmpty(filtros.Rnc) || (!string.IsNullOrEmpty(c.Rnc) && c.Rnc.Contains(filtros.Rnc, StringComparison.OrdinalIgnoreCase));
+                bool matchCorreo = string.IsNullOrEmpty(filtros.Correo) || (!string.IsNullOrEmpty(c.Correo) && c.Correo.Contains(filtros.Correo, StringComparison.OrdinalIgnoreCase));
+                bool matchTelefono = string.IsNullOrEmpty(filtros.Telefono) || (!string.IsNullOrEmpty(c.Telefono) && c.Telefono.Contains(filtros.Telefono, StringComparison.OrdinalIgnoreCase)) || (!string.IsNullOrEmpty(c.Telefono2) && c.Telefono2.Contains(filtros.Telefono, StringComparison.OrdinalIgnoreCase));
+                bool matchDireccion = string.IsNullOrEmpty(filtros.Direccion) || c.Direccion.Contains(filtros.Direccion, StringComparison.OrdinalIgnoreCase);
                 return matchId && matchNombre && matchRnc && matchCorreo && matchTelefono && matchDireccion;
             });
 
