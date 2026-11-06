@@ -23,7 +23,7 @@ El sistema se encuentra desplegado y plenamente operativo en la nube a través d
 
 El acceso usa una cookie de sesión firmada por el servidor. Al refrescar se recupera el usuario; al cerrar sesión se elimina la cookie. La sesión vence tras 30 minutos sin actividad. En localhost funciona por HTTP y en producción debe servirse por HTTPS.
 
-Las claves de protección se guardan por defecto en el directorio de datos locales del usuario que ejecuta la aplicación (`ElectroGestion/keys`). En el hosting configure `DataProtection__KeysPath` con una carpeta persistente y escribible; si hay varias instancias, todas deben compartir esa carpeta. Configure también `ConnectionStrings__SqlConStr` para la base de datos del hosting y los encabezados de proxy de HTTPS si el servidor web termina TLS antes de ASP.NET Core.
+ASP.NET Core administra por defecto el almacenamiento de las claves de protección según el entorno de hospedaje. Si se configura `DataProtection__KeysPath`, la aplicación usará esa carpeta (una ruta relativa se resuelve desde el directorio del sitio); en el hosting debe ser persistente y tener permisos de escritura. Si hay varias instancias, todas deben compartirla. Configure también `ConnectionStrings__SqlConStr` para la base de datos del hosting y los encabezados de proxy de HTTPS si el servidor web termina TLS antes de ASP.NET Core.
 
 ### Credenciales de demostración
 

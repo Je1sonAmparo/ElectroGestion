@@ -34,10 +34,16 @@ builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationSc
 });
 builder.Services.AddAuthorization();
 builder.Services.Configure<ForwardedHeadersOptions>(options => options.ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto);
-var keysPath = builder.Configuration["DataProtection:KeysPath"]
-    ?? Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "ElectroGestion", "keys");
-Directory.CreateDirectory(keysPath);
-builder.Services.AddDataProtection().PersistKeysToFileSystem(new DirectoryInfo(keysPath));
+var dataProtection = builder.Services.AddDataProtection();
+var configuredKeysPath = builder.Configuration["DataProtection:KeysPath"];
+if (!string.IsNullOrWhiteSpace(configuredKeysPath))
+{
+    var keysPath = Path.IsPathRooted(configuredKeysPath)
+        ? configuredKeysPath
+        : Path.Combine(builder.Environment.ContentRootPath, configuredKeysPath);
+    Directory.CreateDirectory(keysPath);
+    dataProtection.PersistKeysToFileSystem(new DirectoryInfo(keysPath));
+}
 
 var ConStr = builder.Configuration.GetConnectionString("SqlConStr");
 
