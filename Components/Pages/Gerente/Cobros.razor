@@ -2,6 +2,7 @@
 @inject ElectroGestion.Services.CobroService CobroService
 @inject ElectroGestion.Services.ServicioService ServicioService
 @inject BlazorBootstrap.ToastService ToastService
+@inject ILogger<Cobros> Logger
 
 <PageTitle>Cobros | ElectroGestion</PageTitle>
 <style>
@@ -72,10 +73,11 @@ else { @foreach (var cobro in Filtrados) { var (bg, fg) = ElectroGestion.Service
         <label style="font-weight:700">Nombre o razón social</label><input maxlength="200" @bind="NombreClienteComprobante" style="display:block;width:100%;padding:10px;margin:6px 0 12px;border:1px solid #D5D8E6;border-radius:8px" />
         <label style="font-weight:700">RNC o cédula</label><input maxlength="30" @bind="DocumentoClienteComprobante" style="display:block;width:100%;padding:10px;margin:6px 0 15px;border:1px solid #D5D8E6;border-radius:8px" />
     }
-    <label style="font-weight:700">Monto recibido ahora (abono inicial)</label><input type="number" min="0" max="@(CotizacionSeleccionada?.MontoTotal ?? 0)" step="0.01" @bind="AbonoInicial" style="display:block;width:100%;padding:10px;margin:6px 0 15px;border:1px solid #D5D8E6;border-radius:8px" />
+    <label style="font-weight:700">Monto recibido ahora (anticipo del 50 %)</label><input type="number" min="0" max="@(CotizacionSeleccionada?.MontoTotal ?? 0)" step="0.01" @bind="AbonoInicial" style="display:block;width:100%;padding:10px;margin:6px 0 5px;border:1px solid #D5D8E6;border-radius:8px" />
+    @if (CotizacionSeleccionada is not null) { <div style="color:#6B7085;font-size:13px;margin-bottom:15px">Se propone el 50 % del total: RD$ @(Math.Min(Math.Round(CotizacionSeleccionada.MontoTotal * .5m, 2), CotizacionSeleccionada.MontoTotal).ToString("N2")). Ajuste el monto si recibió otra cantidad.</div> }
     <label style="font-weight:700">Método de pago del abono</label><select @bind="MetodoPago" style="display:block;width:100%;padding:10px;margin:6px 0 20px;border:1px solid #D5D8E6;border-radius:8px"><option>Efectivo</option><option>Transferencia</option><option>Cheque</option><option>Tarjeta de Crédito</option></select>
     @if(CotizacionSeleccionada is not null && AbonoInicial > 0){<div style="margin:-8px 0 18px;color:#4A4E63">Saldo inicial: <b>RD$ @Math.Max(0, CotizacionSeleccionada.MontoTotal - AbonoInicial).ToString("N2")</b></div>}
-    <div style="display:flex;justify-content:flex-end;gap:10px"><button @onclick="CerrarModal" style="padding:10px 16px;border:1px solid #D5D8E6;background:white;border-radius:8px">Cancelar</button><button @onclick="GuardarCobro" disabled="@(CotizacionSeleccionadaId <= 0 || AbonoInicial < 0 || (CotizacionSeleccionada is not null && AbonoInicial > CotizacionSeleccionada.MontoTotal))" style="padding:10px 18px;border:0;background:#1D4ED8;color:white;border-radius:8px">Crear cobro</button></div>
+    <div style="display:flex;justify-content:flex-end;gap:10px"><button @onclick="CerrarModal" disabled="@GuardandoCobro" style="padding:10px 16px;border:1px solid #D5D8E6;background:white;border-radius:8px">Cancelar</button><button @onclick="GuardarCobro" disabled="@(GuardandoCobro || CotizacionSeleccionadaId <= 0 || AbonoInicial < 0 || (CotizacionSeleccionada is not null && AbonoInicial > CotizacionSeleccionada.MontoTotal))" style="padding:10px 18px;border:0;background:#1D4ED8;color:white;border-radius:8px">@(GuardandoCobro ? "Guardando..." : "Crear cobro")</button></div>
 </div></div> }
 
 @if (CobroDetalle is not null)
@@ -158,7 +160,7 @@ else { @foreach (var cobro in Filtrados) { var (bg, fg) = ElectroGestion.Service
     private List<ElectroGestion.Models.Cotizacion> CotizacionesAprobadas = [];
     private List<ElectroGestion.Models.Servicio> ServiciosActivos = [];
     private static readonly string[] MetodosPagoDisponibles = ["Efectivo", "Transferencia", "Cheque", "Tarjeta de Crédito"];
-    private bool Cargando, ModalAbierto, ModalAbonoAbierto, ModalEditarAbonoAbierto;
+    private bool Cargando, GuardandoCobro, ModalAbierto, ModalAbonoAbierto, ModalEditarAbonoAbierto;
     private string FiltroId = "", FiltroSolicitud = "", FiltroCliente = "", FiltroFactura = "", FiltroServicio = "", FiltroMetodo = "", FiltroEstado = "", MetodoPago = "Transferencia", MetodoAbono = "Transferencia", MetodoAbonoEditar = "Transferencia";
     private string TipoComprobanteNuevo = ElectroGestion.Models.Venta.Consumo, NombreClienteComprobante = "", DocumentoClienteComprobante = "";
     private DateTime? FiltroDesde, FiltroHasta;
@@ -235,9 +237,25 @@ else { @foreach (var cobro in Filtrados) { var (bg, fg) = ElectroGestion.Service
     private void CerrarModal() => ModalAbierto = false;
     private async Task GuardarCobro()
     {
+        if (GuardandoCobro) return;
         if (CotizacionSeleccionadaId <= 0) { ToastService.Notify(new ToastMessage(ToastType.Warning, "Seleccione una cotización aprobada.")); return; }
-        if (await CobroService.CrearAsync(CotizacionSeleccionadaId, AbonoInicial, MetodoPago, TipoComprobanteNuevo, NombreClienteComprobante, DocumentoClienteComprobante)) { CerrarModal(); ToastService.Notify(new ToastMessage(ToastType.Success, "Cobro creado y abono inicial registrado.")); await Recargar(); }
-        else ToastService.Notify(new ToastMessage(ToastType.Warning, TipoComprobanteNuevo == ElectroGestion.Models.Venta.CreditoFiscal ? "Para crédito fiscal indique la razón social y un RNC de 9 dígitos o una cédula de 11 dígitos." : "No se pudo crear el cobro. Verifique el estado y el monto del abono."));
+        GuardandoCobro = true;
+        try
+        {
+            if (await CobroService.CrearAsync(CotizacionSeleccionadaId, AbonoInicial, MetodoPago, TipoComprobanteNuevo, NombreClienteComprobante, DocumentoClienteComprobante))
+            {
+                CerrarModal();
+                ToastService.Notify(new ToastMessage(ToastType.Success, "Cobro creado y abono inicial registrado."));
+                await Recargar();
+            }
+            else ToastService.Notify(new ToastMessage(ToastType.Warning, TipoComprobanteNuevo == ElectroGestion.Models.Venta.CreditoFiscal ? "Verifique la cotización, la razón social y el RNC o cédula del comprador." : "No se pudo crear el cobro. Verifique el estado y el monto del abono."));
+        }
+        catch (Exception ex)
+        {
+            Logger.LogError(ex, "No se pudo crear el cobro de la cotización {CotizacionId}", CotizacionSeleccionadaId);
+            ToastService.Notify(new ToastMessage(ToastType.Danger, "Ocurrió un error al guardar el cobro. Inténtelo de nuevo."));
+        }
+        finally { GuardandoCobro = false; }
     }
     private async Task RegistrarAbono()
     {

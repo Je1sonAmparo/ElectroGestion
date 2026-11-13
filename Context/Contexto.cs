@@ -166,7 +166,7 @@ public class Contexto : DbContext
             entity.Property(c => c.Estado).HasMaxLength(20).IsRequired();
             entity.Property(c => c.EstadoOrdenAntesEliminar).HasMaxLength(30);
             entity.Property(c => c.Monto).HasPrecision(18, 2);
-            entity.HasIndex(c => c.CotizacionId).IsUnique();
+            entity.HasIndex(c => c.CotizacionId).IsUnique().HasFilter("[IsDeleted] = 0");
             entity.HasIndex(c => c.OrdenTrabajoId);
             entity.HasOne(c => c.Cotizacion).WithMany().HasForeignKey(c => c.CotizacionId).OnDelete(DeleteBehavior.Restrict);
             entity.HasOne(c => c.OrdenTrabajo).WithMany().HasForeignKey(c => c.OrdenTrabajoId).OnDelete(DeleteBehavior.Restrict);

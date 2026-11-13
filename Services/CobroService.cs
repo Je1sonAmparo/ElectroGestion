@@ -10,6 +10,7 @@ public class CobroService(IDbContextFactory<Contexto> factory, AppStateService a
     {
         await using var db = await factory.CreateDbContextAsync();
         return await db.Cobros.AsNoTracking()
+            .AsSplitQuery()
             .Include(c => c.Abonos)
             .Include(c => c.Cotizacion).ThenInclude(q => q!.Detalles)
             .Include(c => c.Cotizacion).ThenInclude(q => q!.Solicitud).ThenInclude(s => s!.Cliente)
@@ -25,6 +26,7 @@ public class CobroService(IDbContextFactory<Contexto> factory, AppStateService a
         if (!appState.EsGerente) return [];
         await using var db = await factory.CreateDbContextAsync();
         return await db.Cotizaciones.AsNoTracking()
+            .AsSplitQuery()
             .Where(q => q.Estado == "Aprobada" && q.SolicitudDbId.HasValue &&
                 q.Solicitud != null && q.Solicitud.EstadoSolicitud != null &&
                 q.Solicitud.EstadoSolicitud.Nombre != "Finalizada" &&
@@ -68,6 +70,7 @@ public class CobroService(IDbContextFactory<Contexto> factory, AppStateService a
         if (abonoInicial > 0)
             cobro.Abonos.Add(new AbonoCobro { Fecha = DateTime.Now, Monto = abonoInicial, MetodoPago = metodoPago.Trim() });
 
+        await using var transaction = await db.Database.BeginTransactionAsync();
         db.Cobros.Add(cobro);
         var solicitudId = cotizacion.SolicitudDbId.GetValueOrDefault();
         RegistroEventosSolicitud.Agregar(db, solicitudId, "Cuenta por cobrar creada", $"Se abrió el cobro de la cotización COT-{cotizacion.Id:D5} por RD$ {cotizacion.MontoTotal:N2}.");
@@ -78,6 +81,7 @@ public class CobroService(IDbContextFactory<Contexto> factory, AppStateService a
         cobro.Ncf = $"DEMO-{(tipoComprobante == Venta.CreditoFiscal ? "B01" : "B02")}-{cobro.Id:D4}";
         await db.SaveChangesAsync();
         await CompletarOrdenSiCorrespondeAsync(db, cobro);
+        await transaction.CommitAsync();
         return true;
     }
 

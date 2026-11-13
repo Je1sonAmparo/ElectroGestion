@@ -316,13 +316,13 @@ namespace ElectroGestion.Migrations
                         .HasMaxLength(200)
                         .HasColumnType("nvarchar(200)");
 
+                    b.Property<int>("CotizacionId")
+                        .HasColumnType("int");
+
                     b.Property<string>("DocumentoCliente")
                         .IsRequired()
                         .HasMaxLength(30)
                         .HasColumnType("nvarchar(30)");
-
-                    b.Property<int>("CotizacionId")
-                        .HasColumnType("int");
 
                     b.Property<string>("Estado")
                         .IsRequired()
@@ -338,10 +338,6 @@ namespace ElectroGestion.Migrations
 
                     b.Property<int>("FacturaId")
                         .HasColumnType("int");
-
-                    b.Property<string>("Ncf")
-                        .HasMaxLength(13)
-                        .HasColumnType("nvarchar(13)");
 
                     b.Property<DateTime>("Fecha")
                         .HasColumnType("datetime2");
@@ -361,18 +357,23 @@ namespace ElectroGestion.Migrations
                         .HasPrecision(18, 2)
                         .HasColumnType("decimal(18,2)");
 
+                    b.Property<string>("Ncf")
+                        .HasMaxLength(13)
+                        .HasColumnType("nvarchar(13)");
+
+                    b.Property<int?>("OrdenTrabajoId")
+                        .HasColumnType("int");
+
                     b.Property<string>("TipoComprobante")
                         .IsRequired()
                         .HasMaxLength(30)
                         .HasColumnType("nvarchar(30)");
 
-                    b.Property<int?>("OrdenTrabajoId")
-                        .HasColumnType("int");
-
                     b.HasKey("Id");
 
                     b.HasIndex("CotizacionId")
-                        .IsUnique();
+                        .IsUnique()
+                        .HasFilter("[IsDeleted] = 0");
 
                     b.HasIndex("OrdenTrabajoId");
 
