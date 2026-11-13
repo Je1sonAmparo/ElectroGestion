@@ -1,0 +1,39 @@
+@inject IJSRuntime JS
+
+<style>
+    .paginacion-registros{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:14px 18px;color:#6B7085;font-size:13px;border-top:1px solid #EFF0F6;background:#fff}
+    .paginacion-registros div{display:flex;align-items:center;gap:12px}
+    .paginacion-registros button{width:34px;height:34px;border:1px solid #D5D8E6;border-radius:8px;background:white;font-size:22px;line-height:1;color:#1D4ED8}
+    .paginacion-registros button:disabled{color:#A0A4B5;cursor:not-allowed}
+    @@media(max-width:480px){.paginacion-registros{align-items:flex-start;flex-direction:column}}
+</style>
+
+@if (TotalRegistros > TamanoPagina)
+{
+    <nav class="paginacion-registros" aria-label="Paginación de registros">
+        <span>Mostrando @Inicio–@Fin de @TotalRegistros</span>
+        <div>
+            <button type="button" aria-label="Página anterior" disabled="@(Pagina <= 1)" @onclick="() => CambiarPagina(Pagina - 1)">‹</button>
+            <span>Página @Pagina de @TotalPaginas</span>
+            <button type="button" aria-label="Página siguiente" disabled="@(Pagina >= TotalPaginas)" @onclick="() => CambiarPagina(Pagina + 1)">›</button>
+        </div>
+    </nav>
+}
+
+@code {
+    [Parameter] public int TotalRegistros { get; set; }
+    [Parameter] public int Pagina { get; set; } = 1;
+    [Parameter] public int TamanoPagina { get; set; } = 20;
+    [Parameter] public EventCallback<int> PaginaChanged { get; set; }
+    private int TotalPaginas => Math.Max(1, (int)Math.Ceiling(TotalRegistros / (double)TamanoPagina));
+    private int Inicio => TotalRegistros == 0 ? 0 : (Pagina - 1) * TamanoPagina + 1;
+    private int Fin => Math.Min(Pagina * TamanoPagina, TotalRegistros);
+
+    private async Task CambiarPagina(int pagina)
+    {
+        if (pagina < 1 || pagina > TotalPaginas || pagina == Pagina) return;
+        Pagina = pagina;
+        await PaginaChanged.InvokeAsync(pagina);
+        await JS.InvokeVoidAsync("window.scrollTo", new { top = 0, behavior = "smooth" });
+    }
+}

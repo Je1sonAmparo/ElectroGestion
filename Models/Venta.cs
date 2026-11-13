@@ -21,6 +21,8 @@ public class Venta
     [MaxLength(30)] public string TipoComprobante { get; set; } = Consumo;
     [MaxLength(13)] public string? Ncf { get; set; }
     [MaxLength(20)] public string Estado { get; set; } = Borrador;
+    [MaxLength(30)] public string MetodoPago { get; set; } = "";
+    public decimal? MontoRecibido { get; set; }
     public DateTime FechaCreacion { get; set; }
     public DateTime? FechaVenta { get; set; }
     public int Cantidad { get; set; } = 1;
@@ -30,6 +32,7 @@ public class Venta
     public decimal Subtotal => Detalles.Count > 0 ? Detalles.Sum(d => d.Subtotal) : Cantidad * PrecioUnitario;
     public decimal Itbis => Math.Round(Subtotal * TasaItbis / 100m, 2, MidpointRounding.AwayFromZero);
     public decimal Total => Subtotal + Itbis;
+    public decimal Cambio => MontoRecibido.HasValue ? Math.Max(0, MontoRecibido.Value - Total) : 0;
 }
 
 public class DetalleVenta

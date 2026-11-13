@@ -182,6 +182,10 @@
                     <input @bind="FormCodigo" style="width:100%;padding:10px 14px;border:1px solid #D5D8E6;border-radius:8px;font-size:14px;color:#14162B" placeholder="Ej: ART-001" />
                 </div>
                 <div>
+                    <label style="display:block;font-family:'Manrope';font-weight:700;font-size:14px;color:#4A4E63;margin-bottom:6px">Código de barras (opcional)</label>
+                    <input @bind="FormCodigoBarra" maxlength="80" style="width:100%;padding:10px 14px;border:1px solid #D5D8E6;border-radius:8px;font-size:14px;color:#14162B" placeholder="Escanee o escriba el código" />
+                </div>
+                <div>
                     <label style="display:block;font-family:'Manrope';font-weight:700;font-size:14px;color:#4A4E63;margin-bottom:6px">Nombre</label>
                     <input @bind="FormNombre" style="width:100%;padding:10px 14px;border:1px solid #D5D8E6;border-radius:8px;font-size:14px;color:#14162B" placeholder="Nombre del artículo" />
                 </div>
@@ -229,6 +233,10 @@
             </div>
             <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px" class="resp-grid-2">
                 <div style="background:#F7F8FC;border:1px solid #EFF0F6;border-radius:10px;padding:12px 14px"><div style="font-size:11.5px;color:#8B90A3;font-weight:800;text-transform:uppercase">Código</div><div style="font-size:14px;margin-top:4px;font-weight:700;color:#14162B">@SelectedArticulo.Codigo</div></div>
+                @if (!string.IsNullOrWhiteSpace(SelectedArticulo.CodigoBarra))
+                {
+                    <div style="background:#F7F8FC;border:1px solid #EFF0F6;border-radius:10px;padding:12px 14px"><div style="font-size:11.5px;color:#8B90A3;font-weight:800;text-transform:uppercase">Código de barras</div><div style="font-size:14px;margin-top:4px;font-weight:700;color:#14162B">@SelectedArticulo.CodigoBarra</div></div>
+                }
                 <div style="background:#F7F8FC;border:1px solid #EFF0F6;border-radius:10px;padding:12px 14px"><div style="font-size:11.5px;color:#8B90A3;font-weight:800;text-transform:uppercase">Nombre</div><div style="font-size:14px;margin-top:4px;font-weight:700;color:#14162B">@SelectedArticulo.Nombre</div></div>
                 <div style="background:#F7F8FC;border:1px solid #EFF0F6;border-radius:10px;padding:12px 14px"><div style="font-size:11.5px;color:#8B90A3;font-weight:800;text-transform:uppercase">Categoría</div><div style="font-size:14px;margin-top:4px;font-weight:700;color:#14162B">@SelectedArticulo.Categoria</div></div>
                 <div style="background:#F7F8FC;border:1px solid #EFF0F6;border-radius:10px;padding:12px 14px"><div style="font-size:11.5px;color:#8B90A3;font-weight:800;text-transform:uppercase">Stock Actual</div><div style="font-size:14px;margin-top:4px;font-weight:700;color:#14162B">@SelectedArticulo.Cantidad unid.</div></div>
@@ -403,6 +411,7 @@
     private ElectroGestion.Models.ArticuloInventario? StockArticulo => AppState.Inventario.FirstOrDefault(a => a.Id == StockArticuloId);
 
     private string FormCodigo = "";
+    private string FormCodigoBarra = "";
     private string FormNombre = "";
     private string FormCategoria = "";
     private int FormCantidad = 0;
@@ -428,6 +437,7 @@
             ModalTitle = "Editar Artículo";
             var item = AppState.Inventario.First(x => x.Id == id.Value);
             FormCodigo = item.Codigo;
+            FormCodigoBarra = item.CodigoBarra ?? "";
             FormNombre = item.Nombre;
             FormCategoria = item.Categoria;
             FormCantidad = item.Cantidad;
@@ -438,6 +448,7 @@
         {
             ModalTitle = "Nuevo Artículo";
             FormCodigo = "";
+            FormCodigoBarra = "";
             FormNombre = "";
             FormCategoria = "";
             FormCantidad = 0;
@@ -464,6 +475,7 @@
         {
             Id = EditId ?? 0,
             Codigo = FormCodigo,
+            CodigoBarra = FormCodigoBarra,
             Nombre = FormNombre,
             Categoria = FormCategoria,
             Cantidad = FormCantidad,

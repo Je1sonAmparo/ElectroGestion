@@ -35,6 +35,7 @@ public class Contexto : DbContext
             entity.HasQueryFilter(v => !v.IsDeleted);
             entity.Property(v => v.PrecioUnitario).HasPrecision(18, 2);
             entity.Property(v => v.TasaItbis).HasPrecision(5, 2);
+            entity.Property(v => v.MontoRecibido).HasPrecision(18, 2);
             entity.HasIndex(v => v.Ncf).IsUnique();
             entity.HasIndex(v => new { v.Estado, v.FechaVenta });
             entity.HasOne<ArticuloInventario>().WithMany().HasForeignKey(v => v.ArticuloInventarioId)
@@ -58,6 +59,7 @@ public class Contexto : DbContext
             entity.Ignore(a => a.Estado);
             entity.Property(a => a.PrecioUnidad).HasPrecision(18, 2);
             entity.HasIndex(a => a.Codigo).IsUnique();
+            entity.HasIndex(a => a.CodigoBarra).IsUnique().HasFilter("[CodigoBarra] IS NOT NULL");
             entity.HasData(
                 new ArticuloInventario { Id = 1, Codigo = "ART-001", Nombre = "Cable de Cobre", Categoria = "Materiales", Cantidad = 500, PrecioUnidad = 15m },
                 new ArticuloInventario { Id = 2, Codigo = "ART-002", Nombre = "Transformador 50kVA", Categoria = "Equipos", Cantidad = 10, PrecioUnidad = 25000m });
@@ -164,7 +166,7 @@ public class Contexto : DbContext
             entity.Property(c => c.Estado).HasMaxLength(20).IsRequired();
             entity.Property(c => c.EstadoOrdenAntesEliminar).HasMaxLength(30);
             entity.Property(c => c.Monto).HasPrecision(18, 2);
-            entity.HasIndex(c => c.CotizacionId).IsUnique();
+            entity.HasIndex(c => c.CotizacionId).IsUnique().HasFilter("[IsDeleted] = 0");
             entity.HasIndex(c => c.OrdenTrabajoId);
             entity.HasOne(c => c.Cotizacion).WithMany().HasForeignKey(c => c.CotizacionId).OnDelete(DeleteBehavior.Restrict);
             entity.HasOne(c => c.OrdenTrabajo).WithMany().HasForeignKey(c => c.OrdenTrabajoId).OnDelete(DeleteBehavior.Restrict);

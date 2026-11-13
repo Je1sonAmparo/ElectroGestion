@@ -15,14 +15,19 @@ public class InventarioService(IDbContextFactory<Contexto> factory)
     public async Task<bool> GuardarAsync(ArticuloInventario articulo, int? cantidadOriginal = null)
     {
         articulo.Codigo = articulo.Codigo.Trim();
+        articulo.CodigoBarra = string.IsNullOrWhiteSpace(articulo.CodigoBarra) ? null : articulo.CodigoBarra.Trim();
         articulo.Nombre = articulo.Nombre.Trim();
         articulo.Categoria = articulo.Categoria.Trim();
         if (articulo.Codigo.Length is 0 or > 40 || articulo.Nombre.Length is 0 or > 200 ||
-            articulo.Categoria.Length > 80 || articulo.Cantidad < 0 || articulo.PrecioUnidad < 0)
+            articulo.Categoria.Length > 80 || articulo.CodigoBarra?.Length > 80 ||
+            articulo.Cantidad < 0 || articulo.PrecioUnidad < 0)
             return false;
 
         await using var db = await factory.CreateDbContextAsync();
         if (await db.ArticulosInventario.AnyAsync(a => a.Codigo == articulo.Codigo && a.Id != articulo.Id))
+            return false;
+        if (articulo.CodigoBarra is not null &&
+            await db.ArticulosInventario.AnyAsync(a => a.CodigoBarra == articulo.CodigoBarra && a.Id != articulo.Id))
             return false;
 
         if (articulo.Id == 0)
@@ -36,6 +41,7 @@ public class InventarioService(IDbContextFactory<Contexto> factory)
                     return await db.ArticulosInventario
                         .Where(a => a.Id == articulo.Id && a.Cantidad == cantidadOriginal.Value)
                         .ExecuteUpdateAsync(set => set.SetProperty(a => a.Codigo, articulo.Codigo)
+                            .SetProperty(a => a.CodigoBarra, articulo.CodigoBarra)
                             .SetProperty(a => a.Nombre, articulo.Nombre)
                             .SetProperty(a => a.Categoria, articulo.Categoria)
                             .SetProperty(a => a.PrecioUnidad, articulo.PrecioUnidad)
@@ -46,6 +52,7 @@ public class InventarioService(IDbContextFactory<Contexto> factory)
             var existente = await db.ArticulosInventario.FirstOrDefaultAsync(a => a.Id == articulo.Id);
             if (existente is null) return false;
             existente.Codigo = articulo.Codigo;
+            existente.CodigoBarra = articulo.CodigoBarra;
             existente.Nombre = articulo.Nombre;
             existente.Categoria = articulo.Categoria;
             if (!cantidadOriginal.HasValue) existente.Cantidad = articulo.Cantidad;

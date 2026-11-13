@@ -74,6 +74,10 @@ namespace ElectroGestion.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(450)");
 
+                    b.Property<string>("CodigoBarra")
+                        .HasMaxLength(80)
+                        .HasColumnType("nvarchar(80)");
+
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("bit");
 
@@ -89,6 +93,10 @@ namespace ElectroGestion.Migrations
 
                     b.HasIndex("Codigo")
                         .IsUnique();
+
+                    b.HasIndex("CodigoBarra")
+                        .IsUnique()
+                        .HasFilter("[CodigoBarra] IS NOT NULL");
 
                     b.ToTable("ArticulosInventario");
 
@@ -308,13 +316,13 @@ namespace ElectroGestion.Migrations
                         .HasMaxLength(200)
                         .HasColumnType("nvarchar(200)");
 
+                    b.Property<int>("CotizacionId")
+                        .HasColumnType("int");
+
                     b.Property<string>("DocumentoCliente")
                         .IsRequired()
                         .HasMaxLength(30)
                         .HasColumnType("nvarchar(30)");
-
-                    b.Property<int>("CotizacionId")
-                        .HasColumnType("int");
 
                     b.Property<string>("Estado")
                         .IsRequired()
@@ -330,10 +338,6 @@ namespace ElectroGestion.Migrations
 
                     b.Property<int>("FacturaId")
                         .HasColumnType("int");
-
-                    b.Property<string>("Ncf")
-                        .HasMaxLength(13)
-                        .HasColumnType("nvarchar(13)");
 
                     b.Property<DateTime>("Fecha")
                         .HasColumnType("datetime2");
@@ -353,18 +357,23 @@ namespace ElectroGestion.Migrations
                         .HasPrecision(18, 2)
                         .HasColumnType("decimal(18,2)");
 
+                    b.Property<string>("Ncf")
+                        .HasMaxLength(13)
+                        .HasColumnType("nvarchar(13)");
+
+                    b.Property<int?>("OrdenTrabajoId")
+                        .HasColumnType("int");
+
                     b.Property<string>("TipoComprobante")
                         .IsRequired()
                         .HasMaxLength(30)
                         .HasColumnType("nvarchar(30)");
 
-                    b.Property<int?>("OrdenTrabajoId")
-                        .HasColumnType("int");
-
                     b.HasKey("Id");
 
                     b.HasIndex("CotizacionId")
-                        .IsUnique();
+                        .IsUnique()
+                        .HasFilter("[IsDeleted] = 0");
 
                     b.HasIndex("OrdenTrabajoId");
 
@@ -1114,6 +1123,15 @@ namespace ElectroGestion.Migrations
 
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("bit");
+
+                    b.Property<string>("MetodoPago")
+                        .IsRequired()
+                        .HasMaxLength(30)
+                        .HasColumnType("nvarchar(30)");
+
+                    b.Property<decimal?>("MontoRecibido")
+                        .HasPrecision(18, 2)
+                        .HasColumnType("decimal(18,2)");
 
                     b.Property<string>("Ncf")
                         .HasMaxLength(13)

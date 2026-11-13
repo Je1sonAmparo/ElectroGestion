@@ -5,6 +5,8 @@ public class ArticuloInventario
     public int Id { get; set; }
     public bool IsDeleted { get; set; }
     public string Codigo { get; set; } = "";
+    [System.ComponentModel.DataAnnotations.MaxLength(80)]
+    public string? CodigoBarra { get; set; }
     public string Nombre { get; set; } = "";
     public string Categoria { get; set; } = "";
     public int Cantidad { get; set; }

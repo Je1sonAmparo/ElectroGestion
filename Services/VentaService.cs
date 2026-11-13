@@ -14,6 +14,63 @@ public class VentaService(IDbContextFactory<Contexto> factory, AppStateService a
 {
     private static DateTime AhoraDominicana => DateTimeOffset.UtcNow.ToOffset(TimeSpan.FromHours(-4)).DateTime;
 
+    public async Task<List<ArticuloInventario>> BuscarArticulosAsync(string termino, CancellationToken cancellationToken = default)
+    {
+        if (!appState.EsGerente || string.IsNullOrWhiteSpace(termino)) return [];
+        termino = termino.Trim();
+        await using var db = await factory.CreateDbContextAsync(cancellationToken);
+        return await db.ArticulosInventario.AsNoTracking()
+            .Where(a => a.Cantidad > 0 && (a.Codigo == termino || a.CodigoBarra == termino ||
+                EF.Functions.Like(a.Codigo, termino + "%") || EF.Functions.Like(a.Nombre, "%" + termino + "%")))
+            .OrderBy(a => a.Codigo == termino || a.CodigoBarra == termino ? 0 : 1)
+            .ThenBy(a => a.Nombre).Take(15).ToListAsync(cancellationToken);
+    }
+
+    public async Task<List<string>> ObtenerCategoriasProductosAsync()
+    {
+        if (!appState.EsGerente) return [];
+        await using var db = await factory.CreateDbContextAsync();
+        return await db.ArticulosInventario.AsNoTracking()
+            .Where(a => a.Cantidad > 0 && a.Categoria != "")
+            .Select(a => a.Categoria).Distinct().OrderBy(c => c).ToListAsync();
+    }
+
+    public async Task<List<ArticuloInventario>> FiltrarProductosAsync(
+        string termino, string categoria, decimal? precioMinimo, decimal? precioMaximo, int? stockMinimo)
+    {
+        if (!appState.EsGerente) return [];
+        termino = termino.Trim();
+        categoria = categoria.Trim();
+        await using var db = await factory.CreateDbContextAsync();
+        var productos = db.ArticulosInventario.AsNoTracking().Where(a => a.Cantidad > 0);
+        if (termino.Length > 0)
+            productos = productos.Where(a => a.Codigo.Contains(termino) || a.Nombre.Contains(termino) ||
+                (a.CodigoBarra != null && a.CodigoBarra.Contains(termino)));
+        if (categoria.Length > 0) productos = productos.Where(a => a.Categoria == categoria);
+        if (precioMinimo.HasValue) productos = productos.Where(a => a.PrecioUnidad >= precioMinimo.Value);
+        if (precioMaximo.HasValue) productos = productos.Where(a => a.PrecioUnidad <= precioMaximo.Value);
+        if (stockMinimo.HasValue) productos = productos.Where(a => a.Cantidad >= stockMinimo.Value);
+        return await productos.OrderBy(a => a.Nombre).ThenBy(a => a.Codigo).Take(50).ToListAsync();
+    }
+
+    public async Task<ArticuloInventario?> BuscarPorCodigoAsync(string codigo)
+    {
+        if (!appState.EsGerente || string.IsNullOrWhiteSpace(codigo)) return null;
+        codigo = codigo.Trim();
+        await using var db = await factory.CreateDbContextAsync();
+        return await db.ArticulosInventario.AsNoTracking()
+            .FirstOrDefaultAsync(a => a.Cantidad > 0 && (a.Codigo == codigo || a.CodigoBarra == codigo));
+    }
+
+    public async Task<List<ArticuloInventario>> ObtenerArticulosAsync(IEnumerable<int> ids)
+    {
+        if (!appState.EsGerente) return [];
+        var lista = ids.Distinct().ToArray();
+        if (lista.Length == 0) return [];
+        await using var db = await factory.CreateDbContextAsync();
+        return await db.ArticulosInventario.AsNoTracking().Where(a => lista.Contains(a.Id)).ToListAsync();
+    }
+
     public async Task<List<Venta>> ListarAsync()
     {
         if (!appState.EsGerente) return [];
@@ -35,6 +92,7 @@ public class VentaService(IDbContextFactory<Contexto> factory, AppStateService a
 
         var nombre = datos.NombreCliente.Trim();
         var documento = datos.DocumentoCliente.Trim().Replace("-", "");
+        var metodoPago = datos.MetodoPago.Trim();
         if (nombre.Length > 200 || documento.Length > 30)
             return "Revise la longitud de los datos del comprador y del comprobante.";
 
@@ -70,6 +128,8 @@ public class VentaService(IDbContextFactory<Contexto> factory, AppStateService a
             venta.PrecioUnitario = primero.PrecioUnitario;
             venta.TasaItbis = 18m;
             venta.TipoComprobante = datos.TipoComprobante;
+            venta.MetodoPago = metodoPago;
+            venta.MontoRecibido = datos.MontoRecibido;
             var prefijo = venta.TipoComprobante == Venta.CreditoFiscal ? "DEMO-B01-" : "DEMO-B02-";
             if (venta.Ncf is null || !venta.Ncf.StartsWith(prefijo, StringComparison.Ordinal))
             {
@@ -81,6 +141,11 @@ public class VentaService(IDbContextFactory<Contexto> factory, AppStateService a
 
             if (registrar)
             {
+                if (metodoPago is not ("Efectivo" or "Tarjeta" or "Transferencia"))
+                    return "Seleccione el método de pago.";
+                if (metodoPago == "Efectivo" && (!datos.MontoRecibido.HasValue || datos.MontoRecibido.Value < venta.Total))
+                    return "El efectivo recibido debe cubrir el total de la venta.";
+                if (metodoPago != "Efectivo") venta.MontoRecibido = venta.Total;
                 if (venta.TipoComprobante == Venta.CreditoFiscal && nombre.Length == 0)
                     return "Indique el nombre o razón social del comprador.";
                 if (venta.TipoComprobante == Venta.CreditoFiscal && !Regex.IsMatch(documento, @"\A(?:[0-9]{9}|[0-9]{11})\z"))
@@ -102,6 +167,7 @@ public class VentaService(IDbContextFactory<Contexto> factory, AppStateService a
             if (venta.Id == 0) db.Ventas.Add(venta);
             await db.SaveChangesAsync();
             await transaccion.CommitAsync();
+            datos.Id = venta.Id;
             return null;
         }
         catch (Exception ex) when (ex is DbException or DbUpdateException)
