@@ -51,12 +51,12 @@ Esta versión agrupa la ampliación del flujo operativo y comercial, los reporte
 - **Levantamientos:** captura de información técnica, observaciones y fotografías por solicitud.
 - **Cotizaciones:** creación desde levantamientos enviados a Administración; productos del inventario y cantidades, mano de obra, subtotal, ITBIS del 18 %, total y condiciones de pago. Incluye estados **En revisión**, **Enviada al cliente**, **Aprobada** y **Rechazada**, seguimiento, detalle e impresión o guardado PDF con logo y firmas.
 - **Órdenes de trabajo:** checklist, materiales vinculados a la cotización, herramientas asignadas e instrucciones de campo. Gerencia administra las órdenes; el Técnico consulta sus órdenes y puede marcarlas listas para cobro. La cotización vinculada solo está disponible para Gerencia.
-- **Cobros:** creación desde una cotización aprobada, comprobante de consumidor final o crédito fiscal, abonos parciales con método de pago, edición/eliminación de abonos, saldo, finalización, reversión, eliminación e impresión de factura. El NCF `DEMO` se genera para demostración y no es una secuencia fiscal autorizada.
+- **Cobros y facturación de servicios:** creación desde una cotización aprobada, comprobante de consumidor final o crédito fiscal y cuenta por cobrar separada de las ventas de mostrador. Los abonos se registran con método de pago y reducen el saldo; se pueden editar o revertir según el estado. Incluye finalización, reversión e impresión de factura. Crear la cuenta no registra dinero si el abono inicial es cero. El NCF `DEMO` se genera para demostración y no es una secuencia fiscal autorizada.
 - **Clientes:** consulta y administración de datos del cliente y su actividad. Gerencia puede crear, editar y eliminar; el Técnico cuenta con consulta.
 - **Historial:** solicitudes finalizadas ordenadas por actividad reciente y línea de tiempo resumida con los eventos de solicitud, visita, levantamiento, cotización, orden y cobro.
-- **Ventas directas:** ventas de uno o varios productos con stock, borradores, comprobante de consumidor final o crédito fiscal, cálculo automático de ITBIS del 18 %, NCF de demostración e impresión de factura. Los NCF de prueba no son secuencias fiscales autorizadas.
+- **Ventas directas:** ventas de mostrador de uno o varios productos con stock, borradores, comprobante de consumidor final o crédito fiscal, cálculo automático de ITBIS del 18 %, pago inmediato en efectivo, tarjeta o transferencia, monto recibido y cambio calculado. La búsqueda de artículos trae hasta 15 resultados por consulta y acepta código de barras o código interno; al escanear y pulsar Enter agrega una unidad. Al registrar la venta se descuenta el inventario y se puede imprimir la factura. Los NCF de prueba no son secuencias fiscales autorizadas.
 - **Servicios:** catálogo con categoría y estado activo/inactivo. Los servicios inactivos no están disponibles para nuevas solicitudes. El precio se define en los productos de inventario y en la mano de obra de la cotización, no en el catálogo de servicios.
-- **Inventario:** catálogo de artículos, filtros por ID, código, nombre, categoría, disponibilidad y rango de precio; detalle y acción para agregar stock.
+- **Inventario:** catálogo de artículos con código de barras opcional, filtros por ID, código, nombre, categoría, disponibilidad y rango de precio; detalle y acción para agregar stock.
 - **Proveedores:** consulta, alta, edición, filtros y eliminación individual o múltiple con confirmación.
 - **Reportes:** consumo de materiales en servicios durante el último año y ventas directas durante los últimos tres meses, con filtros, indicadores, tablas y gráficos.
 - **Filtros y protección de datos:** la mayoría de los listados requiere pulsar **Buscar** para aplicar criterios. Las bajas lógicas conservan los registros eliminados y el Administrador puede recuperarlos.
@@ -293,6 +293,7 @@ erDiagram
         int Id PK
         boolean IsDeleted
         string Codigo UK
+        string CodigoBarra UK "nullable"
         string Nombre
         string Categoria
         int Cantidad
@@ -310,6 +311,8 @@ erDiagram
         string TipoComprobante
         string Ncf UK
         string Estado
+        string MetodoPago
+        decimal MontoRecibido "nullable"
         datetime FechaCreacion
         datetime FechaVenta
         int Cantidad
