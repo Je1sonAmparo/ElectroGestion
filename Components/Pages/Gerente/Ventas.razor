@@ -62,7 +62,7 @@ else
             <table>
                 <thead><tr><th><div style="display:inline-flex;align-items:center;gap:6px">@if (ModoSeleccion) { <input type="checkbox" aria-label="Seleccionar todas las ventas visibles que se pueden eliminar" checked="@TodasMarcadas" @onchange="e => SeleccionarTodas((bool)(e.Value ?? false))" @onclick:stopPropagation /> }<span>ID</span></div></th><th>Fecha</th><th>Cliente</th><th>Producto</th><th>Comprobante</th><th>Total</th><th>Estado</th><th>Acciones</th></tr></thead>
                 <tbody>
-                    @foreach (var venta in Filtradas)
+                    @foreach (var venta in Filtradas.Skip((PaginaActual - 1) * 20).Take(20))
                     {
                         <tr @key="venta.Id" @onclick="@(() => FilaClicked(venta.Id))" style="transition:background 0.15s;background:@(ModoSeleccion && Seleccionadas.Contains(venta.Id) ? "#EFF6FF" : "transparent");cursor:@(ModoSeleccion ? "pointer" : "default")">
                             <td>
@@ -96,6 +96,7 @@ else
                 </tbody>
             </table>
         </div>
+        <Paginacion TotalRegistros="Filtradas.Count()" @bind-Pagina="PaginaActual" />
     </div>
 
     @if (Formulario is { } form)
@@ -104,15 +105,25 @@ else
             <section class="ventas-modal" role="dialog" aria-modal="true" aria-labelledby="titulo-venta" @onclick:stopPropagation>
                 <h2 id="titulo-venta">@(form.Id == 0 ? "Nueva venta" : "Editar borrador")</h2>
                 <div class="ventas-formulario">
-                    <label class="ventas-producto">Producto
-                        <select @bind="ArticuloSeleccionadoId">
-                            <option value="0">Seleccione un producto</option>
-                            @foreach (var articulo in Articulos)
-                            {
-                                <option value="@articulo.Id">@articulo.Codigo · @articulo.Nombre</option>
-                            }
-                        </select>
-                    </label>
+                    <div class="ventas-producto ventas-buscador">
+                        <div class="ventas-buscador-cabecera"><label for="buscar-producto">Buscar producto por nombre, código o código de barras</label><button type="button" @onclick="AbrirFiltrosProductos">Filtros de productos</button></div>
+                        <input id="buscar-producto" value="@BusquedaProducto" @oninput="BuscarProductos" @onkeydown="ProcesarCodigo" autocomplete="off" placeholder="Escriba o escanee un producto" />
+                        @if (ResultadosBusqueda.Count > 0)
+                        {
+                            <div class="ventas-resultados">
+                                @foreach (var articulo in ResultadosBusqueda)
+                                {
+                                    <button type="button" @key="articulo.Id" @onclick="() => SeleccionarProducto(articulo)">
+                                        <span>@articulo.Codigo · @articulo.Nombre</span><small>@articulo.Cantidad disponibles · @Moneda(articulo.PrecioUnidad)</small>
+                                    </button>
+                                }
+                            </div>
+                        }
+                        @if (ArticuloSeleccionado is { } elegido)
+                        {
+                            <small class="ventas-disponibilidad">Seleccionado: @elegido.Codigo · @elegido.Nombre</small>
+                        }
+                    </div>
                     <label>Cantidad <input type="number" min="1" step="1" @bind="CantidadNueva" />
                         @if (ArticuloSeleccionado is { } productoDisponible)
                         {
@@ -146,10 +157,65 @@ else
                     </tbody></table></div>
                     <div class="ventas-resumen"><div class="ventas-resumen-filas"><span>Subtotal</span><strong>@Moneda(subtotal)</strong><span>ITBIS (18%)</span><strong>@Moneda(impuesto)</strong><span class="ventas-total-label">Total</span><strong class="ventas-total">@Moneda(subtotal + impuesto)</strong></div></div>
                 }
+                <div class="ventas-pago">
+                    <h3>Pago de mostrador</h3>
+                    <div class="ventas-formulario">
+                        <label>Método de pago
+                            <select @bind="form.MetodoPago" @bind:after="CambiarMetodoPago">
+                                <option value="Efectivo">Efectivo</option><option value="Tarjeta">Tarjeta</option><option value="Transferencia">Transferencia</option>
+                            </select>
+                        </label>
+                        @if (form.MetodoPago == "Efectivo")
+                        {
+                            <label>Efectivo recibido <input type="number" min="0" step="0.01" @bind="form.MontoRecibido" @bind:event="oninput" /></label>
+                        }
+                    </div>
+                    @if (form.MetodoPago == "Efectivo")
+                    {
+                        <div class="ventas-cambio"><span>Cambio a devolver</span><strong>@Moneda(form.Cambio)</strong></div>
+                    }
+                    else
+                    {
+                        <div class="ventas-cambio"><span>Importe a cobrar</span><strong>@Moneda(form.Total)</strong></div>
+                    }
+                </div>
                 <div class="ventas-pie">
                     <button disabled="@Ocupado" @onclick="CerrarFormulario">Cancelar</button>
                     <button disabled="@Ocupado" @onclick="() => Guardar(false)">Guardar borrador</button>
                     <button class="ventas-primary" disabled="@Ocupado" @onclick="() => Guardar(true)">Registrar venta</button>
+                </div>
+            </section>
+        </div>
+    }
+
+    @if (VentanaFiltrosProductosAbierta)
+    {
+        <div class="ventas-overlay ventas-overlay-filtros" @onclick="CerrarFiltrosProductos">
+            <section class="ventas-modal ventas-filtro-panel" role="dialog" aria-modal="true" aria-labelledby="titulo-filtros-productos" @onclick:stopPropagation>
+                <h2 id="titulo-filtros-productos">Buscar productos</h2>
+                <div class="ventas-filtro-productos-campos">
+                    <label>Nombre, código o código de barras <input @bind="FiltroProductoTexto" placeholder="Escriba una característica" /></label>
+                    <label>Categoría <select @bind="FiltroProductoCategoria"><option value="">Todas</option>@foreach (var categoria in CategoriasProductos) { <option value="@categoria">@categoria</option> }</select></label>
+                    <label>Precio mínimo (RD$) <input type="number" min="0" step="0.01" @bind="FiltroProductoPrecioMinimo" /></label>
+                    <label>Precio máximo (RD$) <input type="number" min="0" step="0.01" @bind="FiltroProductoPrecioMaximo" /></label>
+                    <label>Stock mínimo (unidades) <input type="number" min="1" step="1" @bind="FiltroProductoStockMinimo" /></label>
+                </div>
+                <div class="ventas-filtro-productos-acciones"><button type="button" @onclick="CerrarFiltrosProductos">Cerrar</button><button type="button" class="ventas-primary" disabled="@FiltrandoProductos" @onclick="BuscarProductosFiltrados">@(FiltrandoProductos ? "Buscando..." : "Buscar")</button></div>
+                <div class="ventas-filtro-productos-resultados">
+                    <p>Productos con stock disponible · hasta 50 resultados</p>
+                    @if (ProductosFiltrados.Count == 0 && !FiltrandoProductos)
+                    {
+                        <div class="ventas-sin-productos">No se encontraron productos con esos criterios.</div>
+                    }
+                    else
+                    {
+                        <div class="ventas-tabla"><table><thead><tr><th>Código</th><th>Producto</th><th>Categoría</th><th>Precio</th><th>Stock</th><th></th></tr></thead><tbody>
+                            @foreach (var articulo in ProductosFiltrados)
+                            {
+                                <tr @key="articulo.Id"><td>@articulo.Codigo</td><td>@articulo.Nombre</td><td>@articulo.Categoria</td><td>@Moneda(articulo.PrecioUnidad)</td><td>@articulo.Cantidad</td><td><button type="button" @onclick="() => SeleccionarProductoFiltrado(articulo)">Seleccionar</button></td></tr>
+                            }
+                        </tbody></table></div>
+                    }
                 </div>
             </section>
         </div>
@@ -184,6 +250,10 @@ else
                     </table>
                 </div>
                 <div class="factura-totales"><div><span>Subtotal</span><strong>@Moneda(detalle.Subtotal)</strong><span>ITBIS (@detalle.TasaItbis.ToString("0.##") %)</span><strong>@Moneda(detalle.Itbis)</strong><span class="factura-total-label">Total</span><strong class="factura-total">@Moneda(detalle.Total)</strong></div></div>
+                @if (detalle.Estado == Venta.Registrada)
+                {
+                    <div class="factura-pago"><span>Método de pago</span><strong>@(string.IsNullOrWhiteSpace(detalle.MetodoPago) ? "No registrado" : detalle.MetodoPago)</strong>@if (detalle.MontoRecibido.HasValue) { <span>Monto recibido</span><strong>@Moneda(detalle.MontoRecibido.Value)</strong> }@if (detalle.MetodoPago == "Efectivo") { <span>Cambio entregado</span><strong>@Moneda(detalle.Cambio)</strong> }</div>
+                }
                 <div class="ventas-pie">
                     <button @onclick="() => Detalle = null">Cerrar</button>
                     <button class="ventas-primary" @onclick="Imprimir">Imprimir / Guardar como PDF</button>
@@ -249,9 +319,19 @@ else
 @code {
     private List<Venta> Lista = [];
     private List<ArticuloInventario> Articulos = [];
+    private List<ArticuloInventario> ResultadosBusqueda = [];
+    private List<ArticuloInventario> ProductosFiltrados = [];
+    private List<string> CategoriasProductos = [];
+    private string BusquedaProducto = "";
+    private string FiltroProductoTexto = "", FiltroProductoCategoria = "";
+    private decimal? FiltroProductoPrecioMinimo, FiltroProductoPrecioMaximo;
+    private int? FiltroProductoStockMinimo;
+    private bool VentanaFiltrosProductosAbierta, FiltrandoProductos;
+    private CancellationTokenSource? BusquedaPendiente;
     private List<Cliente> Clientes = [];
     private Venta? Formulario, Detalle, Confirmacion;
     private bool Ocupado;
+    private int PaginaActual = 1;
     private string Busqueda = "", FiltroId = "", FiltroDocumento = "", FiltroProducto = "", FiltroNcf = "", Tipo = "", Estado = "";
     private DateTime? FechaDesde, FechaHasta;
     private (string Id, string Cliente, string Documento, string Producto, string Ncf, string Tipo, string Estado, DateTime? Desde, DateTime? Hasta) Filtros = ("", "", "", "", "", "", "", null, null);
@@ -352,8 +432,8 @@ else
     private ArticuloInventario? ArticuloSeleccionado => Articulos.FirstOrDefault(a => a.Id == ArticuloSeleccionadoId);
     private static string Comprador(Venta v) => string.IsNullOrWhiteSpace(v.NombreCliente) ? "Consumidor final" : v.NombreCliente;
     private static string Moneda(decimal importe) => $"RD$ {importe:N2}";
-    private void AplicarFiltros() => Filtros = (FiltroId.Trim(), Busqueda.Trim(), FiltroDocumento.Trim(), FiltroProducto.Trim(), FiltroNcf.Trim(), Tipo, Estado, FechaDesde, FechaHasta);
-    private void CerrarFormulario() { if (!Ocupado) Formulario = null; }
+    private void AplicarFiltros() { PaginaActual = 1; Filtros = (FiltroId.Trim(), Busqueda.Trim(), FiltroDocumento.Trim(), FiltroProducto.Trim(), FiltroNcf.Trim(), Tipo, Estado, FechaDesde, FechaHasta); }
+    private void CerrarFormulario() { if (!Ocupado) { BusquedaPendiente?.Cancel(); VentanaFiltrosProductosAbierta = false; Formulario = null; } }
     private async Task Imprimir() => await JS.InvokeVoidAsync("window.print");
 
     protected override async Task OnInitializedAsync()
@@ -371,19 +451,124 @@ else
     {
         try
         {
-            Articulos = await InventarioService.ObtenerTodosAsync();
+            BusquedaPendiente?.Cancel();
+            ResultadosBusqueda = [];
+            BusquedaProducto = "";
+            VentanaFiltrosProductosAbierta = false;
+            FiltroProductoTexto = FiltroProductoCategoria = "";
+            FiltroProductoPrecioMinimo = FiltroProductoPrecioMaximo = null;
+            FiltroProductoStockMinimo = null;
+            ProductosFiltrados = [];
+            Articulos = await VentaService.ObtenerArticulosAsync(venta?.Detalles.Select(d => d.ArticuloInventarioId) ?? []);
             Clientes = (await ClienteService.GetList(c => true)).OrderBy(c => c.Nombre).ToList();
-            Formulario = venta is null ? new Venta() : new Venta
+            Formulario = venta is null ? new Venta { MetodoPago = "Efectivo" } : new Venta
             {
                 Id = venta.Id, ClienteId = venta.ClienteId,
                 NombreCliente = venta.NombreCliente, DocumentoCliente = venta.DocumentoCliente,
                 TipoComprobante = venta.TipoComprobante, TasaItbis = venta.TasaItbis,
+                MetodoPago = string.IsNullOrWhiteSpace(venta.MetodoPago) ? "Efectivo" : venta.MetodoPago,
+                MontoRecibido = venta.MontoRecibido,
                 Detalles = venta.Detalles.Select(d => new DetalleVenta { ArticuloInventarioId = d.ArticuloInventarioId, CodigoArticulo = d.CodigoArticulo, NombreArticulo = d.NombreArticulo, Cantidad = d.Cantidad, PrecioUnitario = d.PrecioUnitario }).ToList()
             };
             ArticuloSeleccionadoId = 0;
             CantidadNueva = 1;
         }
         catch { ToastService.Notify(new ToastMessage(ToastType.Danger, "No se pudieron cargar los productos o clientes.")); }
+    }
+
+    private async Task BuscarProductos(ChangeEventArgs e)
+    {
+        BusquedaProducto = e.Value?.ToString() ?? "";
+        BusquedaPendiente?.Cancel();
+        ResultadosBusqueda = [];
+        if (string.IsNullOrWhiteSpace(BusquedaProducto)) return;
+        var pendiente = new CancellationTokenSource();
+        BusquedaPendiente = pendiente;
+        try
+        {
+            await Task.Delay(250, pendiente.Token);
+            var encontrados = await VentaService.BuscarArticulosAsync(BusquedaProducto, pendiente.Token);
+            if (!pendiente.IsCancellationRequested) ResultadosBusqueda = encontrados;
+        }
+        catch (OperationCanceledException) { }
+        finally
+        {
+            if (ReferenceEquals(BusquedaPendiente, pendiente)) BusquedaPendiente = null;
+            pendiente.Dispose();
+        }
+    }
+
+    private void SeleccionarProducto(ArticuloInventario articulo)
+    {
+        BusquedaPendiente?.Cancel();
+        if (Articulos.All(a => a.Id != articulo.Id)) Articulos.Add(articulo);
+        ArticuloSeleccionadoId = articulo.Id;
+        BusquedaProducto = $"{articulo.Codigo} · {articulo.Nombre}";
+        ResultadosBusqueda = [];
+    }
+
+    private async Task AbrirFiltrosProductos()
+    {
+        if (Formulario is null) return;
+        VentanaFiltrosProductosAbierta = true;
+        FiltrandoProductos = true;
+        try
+        {
+            CategoriasProductos = await VentaService.ObtenerCategoriasProductosAsync();
+            ProductosFiltrados = await VentaService.FiltrarProductosAsync("", "", null, null, null);
+        }
+        catch { ToastService.Notify(new ToastMessage(ToastType.Danger, "No se pudieron cargar los productos del inventario.")); }
+        finally { FiltrandoProductos = false; }
+    }
+
+    private void CerrarFiltrosProductos() => VentanaFiltrosProductosAbierta = false;
+
+    private async Task BuscarProductosFiltrados()
+    {
+        if (FiltrandoProductos) return;
+        if ((FiltroProductoPrecioMinimo is < 0) || (FiltroProductoPrecioMaximo is < 0) ||
+            (FiltroProductoStockMinimo is < 1) ||
+            (FiltroProductoPrecioMinimo.HasValue && FiltroProductoPrecioMaximo.HasValue && FiltroProductoPrecioMinimo > FiltroProductoPrecioMaximo))
+        {
+            ToastService.Notify(new ToastMessage(ToastType.Warning, "Revise los rangos de precio y el stock mínimo."));
+            return;
+        }
+        FiltrandoProductos = true;
+        try
+        {
+            ProductosFiltrados = await VentaService.FiltrarProductosAsync(FiltroProductoTexto, FiltroProductoCategoria,
+                FiltroProductoPrecioMinimo, FiltroProductoPrecioMaximo, FiltroProductoStockMinimo);
+        }
+        catch { ToastService.Notify(new ToastMessage(ToastType.Danger, "No se pudo filtrar el inventario.")); }
+        finally { FiltrandoProductos = false; }
+    }
+
+    private void SeleccionarProductoFiltrado(ArticuloInventario articulo)
+    {
+        SeleccionarProducto(articulo);
+        CantidadNueva = 1;
+        CerrarFiltrosProductos();
+    }
+
+    private async Task ProcesarCodigo(KeyboardEventArgs e)
+    {
+        if (e.Key != "Enter" || string.IsNullOrWhiteSpace(BusquedaProducto)) return;
+        BusquedaPendiente?.Cancel();
+        var articulo = await VentaService.BuscarPorCodigoAsync(BusquedaProducto);
+        if (articulo is null)
+        {
+            ToastService.Notify(new ToastMessage(ToastType.Warning, "No se encontró un producto con ese código."));
+            return;
+        }
+        SeleccionarProducto(articulo);
+        CantidadNueva = 1;
+        AgregarProducto();
+    }
+
+    private void CambiarMetodoPago()
+    {
+        if (Formulario is not { } form) return;
+        form.MontoRecibido = form.MetodoPago == "Efectivo" ? null : form.Total;
     }
 
     private void AgregarProducto()
@@ -396,6 +581,8 @@ else
         else actual.Cantidad = total;
         ArticuloSeleccionadoId = 0;
         CantidadNueva = 1;
+        BusquedaProducto = "";
+        ResultadosBusqueda = [];
     }
 
     private void QuitarProducto(int articuloId) => Formulario?.Detalles.RemoveAll(d => d.ArticuloInventarioId == articuloId);
@@ -433,6 +620,15 @@ else
             }
             Formulario = null;
             await Recargar();
+            if (registrar)
+            {
+                Detalle = Lista.FirstOrDefault(v => v.Id == form.Id);
+                if (Detalle is null)
+                {
+                    ToastService.Notify(new ToastMessage(ToastType.Warning, "Venta registrada. Abra su detalle en la lista para imprimir la factura."));
+                    return;
+                }
+            }
             ToastService.Notify(new ToastMessage(ToastType.Success, registrar ? "Venta registrada." : "Borrador guardado."));
         }
         catch { ToastService.Notify(new ToastMessage(ToastType.Danger, "No se pudo guardar la venta.")); }

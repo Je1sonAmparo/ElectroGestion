@@ -74,6 +74,10 @@ namespace ElectroGestion.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(450)");
 
+                    b.Property<string>("CodigoBarra")
+                        .HasMaxLength(80)
+                        .HasColumnType("nvarchar(80)");
+
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("bit");
 
@@ -89,6 +93,10 @@ namespace ElectroGestion.Migrations
 
                     b.HasIndex("Codigo")
                         .IsUnique();
+
+                    b.HasIndex("CodigoBarra")
+                        .IsUnique()
+                        .HasFilter("[CodigoBarra] IS NOT NULL");
 
                     b.ToTable("ArticulosInventario");
 
@@ -1114,6 +1122,15 @@ namespace ElectroGestion.Migrations
 
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("bit");
+
+                    b.Property<string>("MetodoPago")
+                        .IsRequired()
+                        .HasMaxLength(30)
+                        .HasColumnType("nvarchar(30)");
+
+                    b.Property<decimal?>("MontoRecibido")
+                        .HasPrecision(18, 2)
+                        .HasColumnType("decimal(18,2)");
 
                     b.Property<string>("Ncf")
                         .HasMaxLength(13)
